@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { CheckCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -33,6 +32,7 @@ export default function PrePaymentInfoPage() {
       if (!url) {
         throw new Error('No URL returned from checkout session creation')
       }
+
       router.push(url)
     } catch (error) {
       console.error('Payment error:', error)
@@ -59,7 +59,6 @@ export default function PrePaymentInfoPage() {
         <p className="text-xl text-gray-600 mb-12 text-center">
           Get started with your first AI-powered life insurance policy analysis
         </p>
-
         <Card className="bg-white p-8 shadow-lg rounded-xl mb-12">
           <h2 className="text-2xl font-semibold text-[#4B6FEE] mb-6">What You&apos;ll Get:</h2>
           <p>You&apos;ll receive:</p>
@@ -72,7 +71,6 @@ export default function PrePaymentInfoPage() {
             ))}
           </ul>
         </Card>
-
         <Card className="bg-white p-8 shadow-lg rounded-xl mb-12">
           <h2 className="text-2xl font-semibold text-[#4B6FEE] mb-6">Pricing:</h2>
           <p className="text-3xl font-bold text-gray-800 mb-4">$20 per Policy Review</p>
@@ -86,7 +84,6 @@ export default function PrePaymentInfoPage() {
             </p>
           </div>
         </Card>
-
         <div className="text-center">
           <h2 className="text-2xl font-semibold text-[#4B6FEE] mb-6">Ready to Start?</h2>
           <Button
@@ -101,4 +98,3 @@ export default function PrePaymentInfoPage() {
     </main>
   )
 }
-
