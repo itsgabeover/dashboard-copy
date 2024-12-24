@@ -4,10 +4,7 @@ import { useState } from 'react'
 import { 
   BookOpen, 
   FileText, 
-  Download, 
-  ChevronDown, 
-  ChevronUp, 
-  X 
+  Download 
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { 
@@ -48,20 +45,6 @@ type FAQCategory = {
 
 export default function ResourcesPage() {
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
-
-  const toggleSection = (section: string) => {
-    if (expandedSection === section) {
-      setExpandedSection(null)
-    } else {
-      setExpandedSection(section)
-      setTimeout(() => {
-        const element = document.getElementById(section)
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      }, 100)
-    }
-  }
 
   const resources: Resource[] = [
     {
