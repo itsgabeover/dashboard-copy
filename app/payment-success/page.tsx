@@ -2,7 +2,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-// Create a separate component for the payment processing logic
+// Payment processor component
 function PaymentProcessor() {
   const [isRedirecting, setIsRedirecting] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -99,7 +99,7 @@ function LoadingFallback() {
 // Main page component with Suspense boundary
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={<LoadingFallback>}>
+    <Suspense fallback={<LoadingFallback />}>
       <PaymentProcessor />
     </Suspense>
   )
