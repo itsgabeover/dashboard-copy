@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createClient } from 'redis';
 
+// Define a type guard for Error objects
+function isError(error: unknown): error is Error {
+  return error instanceof Error;
+}
+
 export async function GET() {
   try {
     // Create Redis client
@@ -29,12 +34,15 @@ export async function GET() {
       testValue: value
     });
   } catch (error: unknown) {
+    // Log the full error for debugging
     console.error('Redis test error:', error);
     
-    // Handle the error with proper type checking
-    const errorMessage = error instanceof Error 
+    // Get error message based on error type
+    const errorMessage = isError(error) 
       ? error.message 
-      : 'Unknown error occurred';
+      : typeof error === 'string'
+        ? error
+        : 'An unknown error occurred';
 
     return NextResponse.json(
       { 
