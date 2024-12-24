@@ -15,26 +15,24 @@ interface PaymentData {
 export async function POST(req: Request): Promise<Response> {
   try {
     const data: PaymentData = await req.json()
-
     if (!data.session_id) {
       return NextResponse.json({ success: false, message: 'Missing session_id' }, { status: 400 })
     }
 
-    const session = await stripe.checkout.sessions.retrieve(data.session_id)
-
+    const session = await stripe.checkout.sessions.retrieve(data.session_id) as Stripe.Checkout.Session
+    
     if (session.payment_status === 'paid') {
       // Generate a token for the upload page
-      const token = generateToken() // You need to implement this function
-
+      const token = generateToken()
       // Here you would typically store the token and associate it with the payment
       // For now, we'll just return it
       return NextResponse.json({ success: true, token })
     } else {
       return NextResponse.json({ success: false, message: 'Payment not completed' }, { status: 400 })
     }
-  } catch (err: unknown) {
-    console.error('Stripe error:', err)
-    const message = err instanceof Error ? err.message : 'An error occurred while verifying the payment'
+  } catch (error: unknown) {
+    console.error('Stripe error:', error)
+    const message = error instanceof Error ? error.message : 'An error occurred while verifying the payment'
     return NextResponse.json({ success: false, message }, { status: 500 })
   }
 }
@@ -44,4 +42,3 @@ function generateToken(): string {
   // This is a simple implementation. In a real-world scenario, you'd want to use a more secure method.
   return Math.random().toString(36).substr(2, 9)
 }
-
