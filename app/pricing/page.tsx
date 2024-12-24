@@ -6,6 +6,24 @@ import { useRouter } from 'next/navigation'
 
 export default function PricingPage() {
   const router = useRouter()
+  
+  // Extract list items to constants to improve maintainability
+  const featuresList = [
+    "Premium adequacy analysis",
+    "Performance metrics",
+    "Risk assessment",
+    "Action items",
+    "Client-ready explanations",
+    "Professional formatting"
+  ]
+
+  const benefitsList = [
+    "No subscription required",
+    "No minimum commitment",
+    "Pay only when you need it",
+    "Instant report delivery",
+    "100% satisfaction guarantee"
+  ]
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0]">
@@ -52,15 +70,8 @@ export default function PricingPage() {
             <div className="bg-white rounded-xl shadow-md p-8">
               <h3 className="text-2xl font-semibold mb-6 text-[#4B6FEE]">Includes:</h3>
               <ul className="text-left text-gray-700 space-y-3">
-                {[
-                  "Premium adequacy analysis",
-                  "Performance metrics",
-                  "Risk assessment",
-                  "Action items",
-                  "Client-ready explanations",
-                  "Professional formatting"
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center">
+                {featuresList.map((item, index) => (
+                  <li key={`feature-${index}`} className="flex items-center">
                     <CheckCircle className="text-green-500 mr-3 h-5 w-5" />
                     {item}
                   </li>
@@ -71,14 +82,8 @@ export default function PricingPage() {
             <div className="bg-white rounded-xl shadow-md p-8">
               <h3 className="text-2xl font-semibold mb-6 text-[#4B6FEE]">No surprises:</h3>
               <ul className="text-left text-gray-700 space-y-3">
-                {[
-                  "No subscription required",
-                  "No minimum commitment",
-                  "Pay only when you need it",
-                  "Instant report delivery",
-                  "100% satisfaction guarantee"
-                ].map((item, index) => (
-                  <li key={index} className="flex items-center">
+                {benefitsList.map((item, index) => (
+                  <li key={`benefit-${index}`} className="flex items-center">
                     <Zap className="text-[#4B6FEE] mr-3 h-5 w-5" />
                     {item}
                   </li>
@@ -87,11 +92,17 @@ export default function PricingPage() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mt-8">
-            To request a refund, email <a href="mailto:support@financialplanner-ai.com" className="text-[#4B6FEE] hover:underline">support@financialplanner-ai.com</a>. Full terms and conditions in our Terms of Service.
+            To request a refund, email{' '}
+            <a 
+              href="mailto:support@financialplanner-ai.com" 
+              className="text-[#4B6FEE] hover:underline"
+            >
+              support@financialplanner-ai.com
+            </a>
+            . Full terms and conditions in our Terms of Service.
           </p>
         </div>
       </section>
     </main>
   )
 }
-
