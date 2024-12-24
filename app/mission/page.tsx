@@ -299,7 +299,7 @@ export default function MissionPage() {
               </div>
             </div>
 
-            <div className="max-w-4xl mx-auto mt-16 flex justify-center space-x-6">
+           <div className="max-w-4xl mx-auto mt-16 flex justify-center space-x-6">
               <Button 
                 asChild 
                 className="bg-[#22C55E] hover:bg-[#16A34A] text-white text-xl px-12 py-6 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-2 mx-auto"
@@ -316,4 +316,3 @@ export default function MissionPage() {
     </main>
   )
 }
-
