@@ -1,11 +1,8 @@
 import { NextResponse } from 'next/server'
 
-export async function POST(_req: Request) {
+export async function POST() {
   try {
-    // Generate a unique token for the upload session
     const token = `${Date.now()}_${Math.random().toString(36).substring(7)}`
-    
-    // Construct the upload URL with the token
     const upload_url = `/upload?token=${token}`
 
     return NextResponse.json({

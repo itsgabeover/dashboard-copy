@@ -270,7 +270,7 @@ export default function MissionPage() {
             </div>
 
             <p className="text-gray-600 mt-12 text-xl font-normal max-w-3xl mx-auto">
-              That's it. No questionnaires, no extra steps. Just upload and get your analysis in 5 minutes.
+              That&apos;s it. No questionnaires, no extra steps. Just upload and get your analysis in 5 minutes.
             </p>
 
             <div className="max-w-4xl mx-auto mt-16">

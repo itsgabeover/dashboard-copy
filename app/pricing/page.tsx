@@ -1,23 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import { CheckCircle, Zap } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
 
-interface PricingData {
-    id: string;
-    name: string;
-    price: number;
-    features: string[];
-}
-
 export default function PricingPage() {
   const router = useRouter()
-
-  const pricing: PricingData[] = [
-    // pricing data...
-  ];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0]">

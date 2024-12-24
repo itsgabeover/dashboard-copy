@@ -3,7 +3,6 @@
 import { Upload, Clock, FileText, CheckCircle, Zap, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import Image from 'next/image'
 
 export function Hero() {
   return (

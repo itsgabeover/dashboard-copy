@@ -99,7 +99,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       let data: UploadResponse;
       try {
         data = JSON.parse(responseText);
-      } catch (_e) {
+      } catch {
         console.log('Response is not JSON:', responseText);
         data = { success: response.ok, message: responseText };
       }

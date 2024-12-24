@@ -12,10 +12,6 @@ interface PaymentData {
     session_id: string;
 }
 
-interface ErrorResponse {
-    message: string;
-}
-
 export async function POST(req: Request): Promise<Response> {
   try {
     const data: PaymentData = await req.json()
