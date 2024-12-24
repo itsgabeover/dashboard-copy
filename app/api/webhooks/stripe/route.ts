@@ -6,7 +6,8 @@ import { stripe } from '@/lib/stripe'
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
-  const signature = headers().get('stripe-signature')
+  const headersList = await headers()
+  const signature = headersList.get('stripe-signature')
 
   if (!signature || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
@@ -28,13 +29,11 @@ export async function POST(req: NextRequest) {
         // Handle successful payment
         console.log('Payment successful:', session)
         break
-
       case 'payment_intent.succeeded':
         const paymentIntent = event.data.object as Stripe.PaymentIntent
         // Handle successful payment intent
         console.log('Payment intent succeeded:', paymentIntent)
         break
-
       default:
         console.log(`Unhandled event type: ${event.type}`)
     }
@@ -54,4 +53,4 @@ export const config = {
   api: {
     bodyParser: false,
   },
-} 
+}
