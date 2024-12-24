@@ -28,10 +28,19 @@ export async function GET() {
       message: 'Redis connection working',
       testValue: value
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Redis test error:', error);
+    
+    // Handle the error with proper type checking
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Unknown error occurred';
+
     return NextResponse.json(
-      { error: 'Redis connection failed', details: error.message },
+      { 
+        error: 'Redis connection failed', 
+        details: errorMessage 
+      },
       { status: 500 }
     );
   }
