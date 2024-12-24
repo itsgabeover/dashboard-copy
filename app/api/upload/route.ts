@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     let metadata
     try {
       metadata = JSON.parse(metadataStr)
-    } catch (e) {
+    } catch (_e) {
       return NextResponse.json(
         { success: false, error: 'Invalid metadata format' },
         { status: 400 }

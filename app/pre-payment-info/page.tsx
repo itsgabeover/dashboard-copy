@@ -62,6 +62,7 @@ export default function PrePaymentInfoPage() {
 
         <Card className="bg-white p-8 shadow-lg rounded-xl mb-12">
           <h2 className="text-2xl font-semibold text-[#4B6FEE] mb-6">What You'll Get:</h2>
+          <p>You&apos;ll receive:</p>
           <ul className="space-y-4">
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-start">

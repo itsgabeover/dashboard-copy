@@ -1,6 +1,5 @@
 import { Zap, Shield, TrendingUp, Users, Clock, Brain, Upload, FileText, ArrowRight, AlertTriangle, CheckCircle, BarChart, Target, RefreshCw, XCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
-import Image from 'next/image'
 import { SampleAnalysisReport } from '@/components/SampleAnalysisReport'
 
 export default function MissionPage() {

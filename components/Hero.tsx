@@ -83,7 +83,7 @@ export function Hero() {
           </div>
           
           <p className="text-gray-700 mt-8 text-base font-medium">
-            That's it. No questionnaires, no extra steps. Just upload and get your analysis in 5 minutes.
+            That&apos;s it. No questionnaires. Just upload and get your analysis in 5 minutes.
           </p>
         </div>
 

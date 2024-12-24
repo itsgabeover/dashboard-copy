@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 
-export async function GET(req: NextRequest) {
+export async function POST(_req: Request) {
   try {
     // Generate a unique token for the upload session
     const token = `${Date.now()}_${Math.random().toString(36).substring(7)}`

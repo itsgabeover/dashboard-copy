@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Upload, CheckCircle, AlertTriangle } from 'lucide-react'
+import { Upload, CheckCircle } from 'lucide-react'
 
 interface UploadInterfaceProps {
   token: string
@@ -93,7 +93,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       let data;
       try {
         data = JSON.parse(responseText);
-      } catch (e) {
+      } catch (_e) {
         console.log('Response is not JSON:', responseText);
         data = { success: response.ok, message: responseText };
       }

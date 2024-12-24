@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server'
 
-export async function POST(req: Request) {
-  try {
-    const { token } = await req.json()
+interface PaymentData {
+    payment_id: string;
+    status: string;
+    amount: number;
+    token: string;
+}
 
-    if (!token) {
+export async function POST(req: Request): Promise<Response> {
+  try {
+    const data: PaymentData = await req.json()
+
+    if (!data.token) {
       return NextResponse.json({ success: false, message: 'Missing token' }, { status: 400 })
     }
 

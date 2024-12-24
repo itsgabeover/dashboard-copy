@@ -5,15 +5,22 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
 })
 
-export async function POST(req: Request) {
-  try {
-    const { session_id } = await req.json()
+interface PaymentData {
+    payment_id: string;
+    status: string;
+    amount: number;
+    session_id: string;
+}
 
-    if (!session_id) {
+export async function POST(req: Request): Promise<Response> {
+  try {
+    const data: PaymentData = await req.json()
+
+    if (!data.session_id) {
       return NextResponse.json({ success: false, message: 'Missing session_id' }, { status: 400 })
     }
 
-    const session = await stripe.checkout.sessions.retrieve(session_id)
+    const session = await stripe.checkout.sessions.retrieve(data.session_id)
 
     if (session.payment_status === 'paid') {
       // Generate a token for the upload page

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { CheckCircle, Zap } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
@@ -11,14 +11,19 @@ declare global {
   }
 }
 
+interface PricingData {
+    id: string;
+    name: string;
+    price: number;
+    features: string[];
+}
+
 export default function PricingPage() {
-  const [origin, setOrigin] = useState('')
   const router = useRouter()
 
-  useEffect(() => {
-    setOrigin(window.location.origin)
-  }, [])
-
+  const pricing: PricingData[] = [
+    // pricing data...
+  ];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0]">
