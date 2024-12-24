@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { 
   BookOpen, 
   FileText, 
@@ -44,8 +43,6 @@ type FAQCategory = {
 }
 
 export default function ResourcesPage() {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null)
-
   const resources: Resource[] = [
     {
       title: 'Practice Planning',
