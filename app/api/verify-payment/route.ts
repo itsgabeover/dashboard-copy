@@ -12,6 +12,10 @@ interface PaymentData {
     session_id: string;
 }
 
+interface ErrorResponse {
+    message: string;
+}
+
 export async function POST(req: Request): Promise<Response> {
   try {
     const data: PaymentData = await req.json()
@@ -32,9 +36,10 @@ export async function POST(req: Request): Promise<Response> {
     } else {
       return NextResponse.json({ success: false, message: 'Payment not completed' }, { status: 400 })
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Stripe error:', err)
-    return NextResponse.json({ success: false, message: err.message || 'An error occurred while verifying the payment' }, { status: 500 })
+    const message = err instanceof Error ? err.message : 'An error occurred while verifying the payment'
+    return NextResponse.json({ success: false, message }, { status: 500 })
   }
 }
 

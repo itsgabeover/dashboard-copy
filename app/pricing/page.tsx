@@ -5,12 +5,6 @@ import { CheckCircle, Zap } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
 
-declare global {
-  interface Window {
-    Stripe?: any;
-  }
-}
-
 interface PricingData {
     id: string;
     name: string;

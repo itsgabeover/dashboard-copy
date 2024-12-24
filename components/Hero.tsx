@@ -88,7 +88,7 @@ export function Hero() {
         </div>
 
         <div className="max-w-4xl mx-auto mb-16">
-          <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You'll Receive</h3>
+          <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You&apos;ll Receive</h3>
           <div className="grid md:grid-cols-2 gap-6">
             {/* Report cards... */}
           </div>

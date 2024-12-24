@@ -9,6 +9,12 @@ interface UploadInterfaceProps {
   token: string
 }
 
+interface UploadResponse {
+    success: boolean;
+    message?: string;
+    error?: string;
+}
+
 export function UploadInterface({ token }: UploadInterfaceProps) {
   const [email, setEmail] = useState('')
   const [file, setFile] = useState<File | null>(null)
@@ -90,7 +96,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       console.log('n8n response:', responseText);
 
       // Try to parse as JSON if possible
-      let data;
+      let data: UploadResponse;
       try {
         data = JSON.parse(responseText);
       } catch (_e) {
