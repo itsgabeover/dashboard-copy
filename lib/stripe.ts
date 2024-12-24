@@ -8,7 +8,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 console.log('Stripe key loaded:', process.env.STRIPE_SECRET_KEY.slice(0, 7) + '...')
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2024-12-18.acacia',  // Updated to latest stable version
   typescript: true,
   appInfo: {
     name: 'Insurance Planner AI',
@@ -18,4 +18,4 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 
 export const PRICE_AMOUNT = 2000 // $20.00 in cents
 export const CURRENCY = 'usd'
-export const PRODUCT_NAME = 'Policy Review' 
+export const PRODUCT_NAME = 'Policy Review'
