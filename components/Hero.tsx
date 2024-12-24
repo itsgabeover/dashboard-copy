@@ -1,0 +1,122 @@
+'use client'
+
+import { Upload, Clock, FileText, CheckCircle, Zap, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from "@/components/ui/button"
+import Image from 'next/image'
+
+export function Hero() {
+  return (
+    <section className="bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16">
+      <div className="container mx-auto px-4 text-center">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
+          Life Insurance Policy Reviews<br />
+          <span className="text-4xl md:text-5xl lg:text-6xl">in 5 Minutes</span>
+        </h1>
+        <h2 className="text-2xl md:text-3xl mb-12 text-gray-600 font-light">
+          AI-Powered Analysis for Financial Advisors
+        </h2>
+        
+        <div className="max-w-4xl mx-auto mb-16 bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
+          <div className="p-8">
+            <h3 className="text-3xl font-bold mb-6 text-[#4B6FEE] flex items-center justify-center">
+              <Zap className="w-8 h-8 mr-2" />
+              Transform Your Policy Review Process
+            </h3>
+            <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+              Make life insurance policy reviews a seamless part of your practice. Just like investment portfolio reviews, regular life insurance policy analysis helps you deliver ongoing value to clients while identifying optimization opportunities.
+            </p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
+              <div className="flex items-center">
+                <CheckCircle className="w-6 h-6 text-green-500 mr-2" />
+                <span>No complex software to learn</span>
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-6 h-6 text-green-500 mr-2" />
+                <span>No lengthy analysis to perform</span>
+              </div>
+            </div>
+            <p className="mt-6 text-xl font-semibold text-[#4B6FEE] flex items-center justify-center">
+              <Upload className="w-6 h-6 mr-2" />
+              Simply upload any in-force illustration and let our AI handle the rest
+            </p>
+          </div>
+        </div>
+        
+        <div className="max-w-4xl mx-auto mb-16">
+          <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">How It Works</h3>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="flex flex-col items-center">
+              <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
+                <Upload className="w-6 h-6 text-[#4B6FEE]" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Upload Illustration</h4>
+              <ul className="text-gray-600 text-sm space-y-1">
+                <li>Drop your in-force illustration</li>
+                <li>Add your email</li>
+              </ul>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
+                <Clock className="w-6 h-6 text-[#4B6FEE]" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">AI Analysis (5 Minutes)</h4>
+              <ul className="text-gray-600 text-sm space-y-1">
+                <li>Advanced policy review</li>
+                <li>Comprehensive metrics analysis</li>
+                <li>Risk assessment</li>
+              </ul>
+            </div>
+            
+            <div className="flex flex-col items-center">
+              <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
+                <FileText className="w-6 h-6 text-[#4B6FEE]" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Receive Reports</h4>
+              <ul className="text-gray-600 text-sm space-y-1">
+                <li>Technical summary for you</li>
+                <li>Professional client letter</li>
+                <li>Both delivered to your inbox</li>
+              </ul>
+            </div>
+          </div>
+          
+          <p className="text-gray-700 mt-8 text-base font-medium">
+            That's it. No questionnaires, no extra steps. Just upload and get your analysis in 5 minutes.
+          </p>
+        </div>
+
+        <div className="max-w-4xl mx-auto mb-16">
+          <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You'll Receive</h3>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Report cards... */}
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
+            <div className="bg-[#4B6FEE] text-white p-6">
+              <h3 className="text-3xl font-bold mb-2 flex items-center justify-center">
+                <Zap className="w-8 h-8 mr-2" />
+                Ready to Transform Your Policy Reviews?
+              </h3>
+              <p className="text-xl">Upload an in-force illustration and receive both reports within 5 minutes</p>
+            </div>
+            <div className="p-8">
+              <div className="flex justify-center mt-8">
+                <Button asChild className="bg-[#22C55E] text-white hover:bg-[#16A34A] text-lg px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center">
+                  <Link href="/pre-payment-info">
+                    Start Your Analysis
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
