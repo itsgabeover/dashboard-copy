@@ -10,9 +10,9 @@ interface UploadInterfaceProps {
 }
 
 interface UploadResponse {
-    success: boolean;
-    message?: string;
-    error?: string;
+  success: boolean
+  message?: string
+  error?: string
 }
 
 export function UploadInterface({ token }: UploadInterfaceProps) {
@@ -59,29 +59,29 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
   }
 
   const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   const handleUpload = async () => {
-    if (!file || !email) return;
+    if (!file || !email) return
     
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address.');
-      return;
+      setError('Please enter a valid email address.')
+      return
     }
 
-    setIsUploading(true);
-    setError(null);
-    setUploadSuccess(false);
+    setIsUploading(true)
+    setError(null)
+    setUploadSuccess(false)
 
     try {
-      const formData = new FormData();
-      formData.append('data0', file);
+      const formData = new FormData()
+      formData.append('data0', file)
       formData.append('metadata', JSON.stringify({
         email: email.trim(),
         token: token
-      }));
+      }))
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -89,43 +89,41 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
           'Authorization': `Bearer ${token}`
         },
         body: formData
-      });
+      })
 
-      // Get response text first for debugging
-      const responseText = await response.text();
-      console.log('n8n response:', responseText);
+      const responseText = await response.text()
+      console.log('n8n response:', responseText)
 
-      // Try to parse as JSON if possible
-      let data: UploadResponse;
+      let data: UploadResponse
       try {
-        data = JSON.parse(responseText);
+        data = JSON.parse(responseText)
       } catch {
-        console.log('Response is not JSON:', responseText);
-        data = { success: response.ok, message: responseText };
+        console.log('Response is not JSON:', responseText)
+        data = { success: response.ok, message: responseText }
       }
 
       if (!response.ok) {
-        throw new Error(data.error || data.message || 'Upload failed');
+        throw new Error(data.error || data.message || 'Upload failed')
       }
 
-      setUploadSuccess(true);
-      setFile(null);
-      setEmail('');
+      setUploadSuccess(true)
+      setFile(null)
+      setEmail('')
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = ''
       }
 
-    } catch (err) {
-      console.error('Upload failed:', err);
+    } catch (error) {
+      console.error('Upload failed:', error)
       setError(
-        err instanceof Error 
-          ? err.message 
+        error instanceof Error 
+          ? error.message 
           : 'An error occurred during upload. Please try again.'
-      );
+      )
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   return (
     <section className="bg-white py-16">
