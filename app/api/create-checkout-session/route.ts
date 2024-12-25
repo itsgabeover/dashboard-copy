@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
               name: 'Policy Review',
               description: 'AI-powered insurance policy review'
             },
-            unit_amount: 2000, // $20.00
+            unit_amount: 75, // $.75
           },
           quantity: 1,
         },
