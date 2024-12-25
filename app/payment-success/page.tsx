@@ -10,39 +10,53 @@ function PaymentProcessor() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const processPayment = async () => {
+    let timeoutId: NodeJS.Timeout
+    let intervalId: NodeJS.Timeout
+
+    const verifyPayment = async () => {
       try {
         const sessionId = searchParams.get('session_id')
         if (!sessionId) {
           throw new Error('No session ID provided')
         }
-        // Wait a moment for webhook processing
-        await new Promise(resolve => setTimeout(resolve, 2000))
-        // Get upload URL
-        const response = await fetch('/api/get-upload-url', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-        if (!response.ok) {
-          const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to get upload URL')
-        }
+
+        const response = await fetch(`/api/verify-payment?session_id=${sessionId}`)
         const data = await response.json()
-        
-        if (!data.upload_url) {
-          throw new Error('No upload URL received')
+
+        if (!data.success) {
+          // If still pending, continue polling
+          if (data.status === 'pending') {
+            return
+          }
+          throw new Error(data.message || 'Failed to verify payment')
         }
-        // Redirect to upload page
-        router.push(data.upload_url)
+
+        if (data.token) {
+          // Redirect to upload page with token
+          router.push(`/upload/${data.token}`)
+        } else {
+          throw new Error('No valid token received')
+        }
       } catch (error) {
         console.error('Error processing payment:', error)
         setIsRedirecting(false)
         setError(error instanceof Error ? error.message : 'Unknown error')
       }
     }
-    processPayment()
+
+    // Start polling
+    intervalId = setInterval(verifyPayment, 2000)
+    
+    // Stop polling after 30 seconds
+    timeoutId = setTimeout(() => {
+      clearInterval(intervalId)
+      setError('Payment verification timed out')
+    }, 30000)
+
+    return () => {
+      clearInterval(intervalId)
+      clearTimeout(timeoutId)
+    }
   }, [router, searchParams])
 
   if (error) {
