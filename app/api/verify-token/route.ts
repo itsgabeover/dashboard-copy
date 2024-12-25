@@ -2,14 +2,22 @@
 import { NextResponse } from 'next/server'
 import { createClient } from 'redis'
 
+interface TokenData {
+  token: string
+  customerEmail: string
+  expires: string
+  created: string
+  used: boolean
+}
+
 export async function POST(request: Request) {
   const client = createClient({
-    url: process.env.REDIS_URL
+    url: process.env.REDIS_URL as string
   })
 
   try {
-    const { token } = await request.json()
-
+    const { token } = (await request.json()) as { token?: string }
+    
     if (!token) {
       return NextResponse.json(
         { error: 'Token is required' },
@@ -18,45 +26,30 @@ export async function POST(request: Request) {
     }
 
     await client.connect()
-
-    // First, check if token exists and is valid
+    
+    // Check if token exists and is valid
     const existingToken = await client.get(`upload_token:${token}`)
     
-    if (existingToken) {
-      // Token exists in Redis - check if used
-      const tokenData = JSON.parse(existingToken)
-      if (tokenData.used) {
-        return NextResponse.json(
-          { error: 'Token has already been used' },
-          { status: 400 }
-        )
-      }
-      return NextResponse.json({
-        valid: true,
-        customerEmail: tokenData.customerEmail
-      })
+    if (!existingToken) {
+      return NextResponse.json(
+        { error: 'Invalid or expired token' },
+        { status: 401 }
+      )
     }
 
-    // Token doesn't exist in Redis - store it from n8n data
-    // This simulates the data we would have gotten from n8n
-    const newTokenData = {
-      token,
-      created: new Date().toISOString(),
-      expires: new Date(Date.now() + 30 * 60000).toISOString(), // 30 min
-      customerEmail: 'test@example.com', // This would come from Stripe
-      used: false
+    // Token exists - check if used
+    const tokenData = JSON.parse(existingToken) as TokenData
+    
+    if (tokenData.used) {
+      return NextResponse.json(
+        { error: 'Token has already been used' },
+        { status: 400 }
+      )
     }
-
-    // Store in Redis
-    await client.set(
-      `upload_token:${token}`, 
-      JSON.stringify(newTokenData),
-      { EX: 1800 } // 30 minutes expiration
-    )
 
     return NextResponse.json({
       valid: true,
-      customerEmail: newTokenData.customerEmail
+      customerEmail: tokenData.customerEmail
     })
 
   } catch (error) {
