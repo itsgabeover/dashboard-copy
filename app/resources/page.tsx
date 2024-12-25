@@ -62,13 +62,13 @@ export default function ResourcesPage() {
           name: 'Advisor Analysis', 
           type: 'PDF', 
           action: 'Download',
-          link: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IP%20AI%20ANALYSIS%20Sample-70EjJp7rBVSnRVSXDpgynLK20VtqF0.html'
+          link: 'https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20ANALYSIS-KcNItO6ThA29F15Sa0kuWc4uySibb9.pdf'
         },
         { 
           name: 'Client Summary', 
           type: 'PDF', 
           action: 'Download',
-          link: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IP%20AI%20SUMMARY%20Sample-y2eG2cyjpvjXlp5MsXhv9J7RWA11Ld.html'
+          link: 'https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20SUMMARY-gN6m36r8cHAwdzi68E4adsDuqypPMT.pdf'
         }
       ]
     }
