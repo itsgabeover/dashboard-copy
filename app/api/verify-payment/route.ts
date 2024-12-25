@@ -1,44 +1,90 @@
+// /insurance-planner/app/api/verify-payment/route.ts
+
 import { NextResponse } from 'next/server'
-import Stripe from 'stripe'
+import { createClient } from 'redis'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-})
-
-interface PaymentData {
-    payment_id: string;
-    status: string;
-    amount: number;
-    session_id: string;
+// TypeScript interface for type safety
+interface TokenData {
+  token: string
+  customerEmail: string
+  expires: string
+  created: string
+  used: boolean
+  sessionId: string
 }
 
-export async function POST(req: Request): Promise<Response> {
+export async function GET(request: Request) {
+  // Create Redis client outside of try block
+  const client = createClient({
+    url: process.env.REDIS_URL || '' // Fallback for type safety
+  })
+
   try {
-    const data: PaymentData = await req.json()
-    if (!data.session_id) {
-      return NextResponse.json({ success: false, message: 'Missing session_id' }, { status: 400 })
-    }
-
-    const session = await stripe.checkout.sessions.retrieve(data.session_id) as Stripe.Checkout.Session
+    // Parse URL params safely
+    const { searchParams } = new URL(request.url)
+    const sessionId = searchParams.get('session_id')
     
-    if (session.payment_status === 'paid') {
-      // Generate a token for the upload page
-      const token = generateToken()
-      // Here you would typically store the token and associate it with the payment
-      // For now, we'll just return it
-      return NextResponse.json({ success: true, token })
-    } else {
-      return NextResponse.json({ success: false, message: 'Payment not completed' }, { status: 400 })
+    if (!sessionId) {
+      return NextResponse.json(
+        { success: false, message: 'Missing session_id' }, 
+        { status: 400 }
+      )
     }
-  } catch (error: unknown) {
-    console.error('Stripe error:', error)
-    const message = error instanceof Error ? error.message : 'An error occurred while verifying the payment'
-    return NextResponse.json({ success: false, message }, { status: 500 })
-  }
-}
 
-// Implement a function to generate a unique token
-function generateToken(): string {
-  // This is a simple implementation. In a real-world scenario, you'd want to use a more secure method.
-  return Math.random().toString(36).substr(2, 9)
+    // Connect to Redis
+    await client.connect()
+    
+    // Get token data
+    const data = await client.get(`payment:${sessionId}`)
+    
+    if (!data) {
+      return NextResponse.json({ 
+        success: false, 
+        status: 'pending',
+        message: 'Token not found' 
+      })
+    }
+
+    // Parse with type safety
+    const tokenData = JSON.parse(data) as TokenData
+    
+    // Validate expiration
+    if (new Date(tokenData.expires) < new Date()) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Token expired' 
+      }, { status: 400 })
+    }
+
+    // Check usage
+    if (tokenData.used) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Token already used' 
+      }, { status: 400 })
+    }
+
+    // Return success with token
+    return NextResponse.json({ 
+      success: true,
+      token: tokenData.token,
+      status: 'success'
+    })
+
+  } catch (error) {
+    // Proper error logging for Vercel
+    console.error('[Verify Payment Error]:', error)
+    
+    return NextResponse.json({ 
+      success: false, 
+      message: 'Server error' 
+    }, { status: 500 })
+  } finally {
+    // Always disconnect from Redis
+    try {
+      await client.disconnect()
+    } catch (error) {
+      console.error('[Redis Disconnect Error]:', error)
+    }
+  }
 }
