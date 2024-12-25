@@ -16,6 +16,6 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   }
 })
 
-export const PRICE_AMOUNT = 2000 // $20.00 in cents
+export const PRICE_AMOUNT = 50 // $.50 in cents
 export const CURRENCY = 'usd'
 export const PRODUCT_NAME = 'Policy Review'
