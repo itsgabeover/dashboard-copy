@@ -10,9 +10,6 @@ function PaymentProcessor() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null
-    let timeoutId: NodeJS.Timeout | null = null
-
     const verifyPayment = async () => {
       try {
         const sessionId = searchParams.get('session_id')
@@ -30,8 +27,6 @@ function PaymentProcessor() {
         const data = await response.json()
         
         if (data.success && data.token) {
-          if (intervalId) clearInterval(intervalId)
-          if (timeoutId) clearTimeout(timeoutId)
           router.push(`/upload/${data.token}`)
         }
       } catch (error) {
@@ -41,16 +36,18 @@ function PaymentProcessor() {
       }
     }
 
-    intervalId = setInterval(verifyPayment, 2000)
+    // Set up polling with cleanup
+    const intervalId = setInterval(verifyPayment, 2000)
     
-    timeoutId = setTimeout(() => {
-      if (intervalId) clearInterval(intervalId)
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId)
       setError('Payment verification timed out')
     }, 30000)
 
+    // Cleanup function
     return () => {
-      if (intervalId) clearInterval(intervalId)
-      if (timeoutId) clearTimeout(timeoutId)
+      clearInterval(intervalId)
+      clearTimeout(timeoutId)
     }
   }, [router, searchParams])
 
