@@ -1,17 +1,22 @@
 // app/upload/[token]/page.tsx
+import { TokenHandler } from './TokenHandler'
+
+export default function Page({ 
+  params 
+}: { 
+  params: { token: string } 
+}) {
+  return <TokenHandler token={params.token} />
+}
+
+// app/upload/[token]/TokenHandler.tsx
 'use client'
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-type PageProps = {
-  params: { token: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
-const Page = (props: PageProps) => {
+export function TokenHandler({ token }: { token: string }) {
   const router = useRouter()
-  const { token } = props.params
 
   useEffect(() => {
     if (token) {
@@ -28,5 +33,3 @@ const Page = (props: PageProps) => {
     </div>
   )
 }
-
-export default Page
