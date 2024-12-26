@@ -2,6 +2,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import type { ReactElement } from 'react'
 
 type VerifyResponse = {
   success: boolean
@@ -10,7 +11,7 @@ type VerifyResponse = {
   token?: string
 }
 
-export default function PaymentSuccessPage(): JSX.Element {
+export default function PaymentSuccessPage(): ReactElement {
   const [error, setError] = useState<string>()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -44,14 +45,12 @@ export default function PaymentSuccessPage(): JSX.Element {
       }
     }
 
-    // Set up polling with const declarations
     const intervalId = setInterval(verifyPayment, 2000)
     const timeoutId = setTimeout(() => {
       clearInterval(intervalId)
       setError('Payment verification timed out')
     }, 30000)
 
-    // Cleanup function
     return () => {
       clearInterval(intervalId)
       clearTimeout(timeoutId)
