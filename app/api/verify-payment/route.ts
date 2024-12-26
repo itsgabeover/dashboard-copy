@@ -7,7 +7,7 @@ type TokenData = {
   customerEmail?: string
   expires: string
   created: string
-  used: string // Changed to string to match n8n output
+  used: string  // Changed to string type
   sessionId: string
 }
 
@@ -42,12 +42,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
 
     const tokenData = JSON.parse(data) as TokenData
-    console.log('Token status:', tokenData.used)
+    console.log('Token data:', tokenData)
 
+    // Compare as string explicitly
     if (tokenData.used !== "false") {
       return NextResponse.json({ 
         success: false, 
-        status: 'error',
         message: 'Token already used' 
       }, { status: 400 })
     }
@@ -62,7 +62,6 @@ export async function GET(request: Request): Promise<NextResponse> {
     console.error('Verify payment error:', error)
     return NextResponse.json({ 
       success: false,
-      status: 'error',
       message: error instanceof Error ? error.message : 'Server error'
     }, { status: 500 })
   } finally {
