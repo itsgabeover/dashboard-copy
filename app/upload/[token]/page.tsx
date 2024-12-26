@@ -15,12 +15,11 @@ interface UploadResponse {
   message?: string
 }
 
-type PageProps = {
-  params: { token: string }
-  searchParams: Record<string, string | string[] | undefined>
+interface Params {
+  token: string
 }
 
-export default function Page({ params }: PageProps) {
+export default function Page({ params }: { params: Params }) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
