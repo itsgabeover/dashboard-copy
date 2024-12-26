@@ -4,25 +4,7 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-type Props = {
-  params: {
-    token: string
-  }
-}
-
-interface UploadMetadata {
-  token: string
-  filename: string
-  timestamp: string
-  email: string
-}
-
-interface UploadResponse {
-  success: boolean
-  message?: string
-}
-
-export default function UploadPage({ params }: Props) {
+export default function Page({ params }: { params: { token: string } }) {
   const { token } = params
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
@@ -41,7 +23,7 @@ export default function UploadPage({ params }: Props) {
           body: JSON.stringify({ token })
         })
 
-        const data = await response.json() as UploadResponse
+        const data = await response.json()
         
         if (!data.success) {
           setStatus('error')
@@ -88,7 +70,7 @@ export default function UploadPage({ params }: Props) {
     setErrorMessage('')
 
     try {
-      const metadata: UploadMetadata = {
+      const metadata = {
         token,
         filename: file.name,
         timestamp: new Date().toISOString(),
@@ -107,7 +89,7 @@ export default function UploadPage({ params }: Props) {
         body: formData
       })
 
-      const data = await response.json() as UploadResponse
+      const data = await response.json()
 
       if (!data.success) {
         throw new Error(data.message || 'Upload failed')
