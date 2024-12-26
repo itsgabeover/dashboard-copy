@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-// Removed unused TokenData interface
-
 interface UploadMetadata {
   token: string
   filename: string
@@ -16,13 +14,12 @@ interface UploadResponse {
   message?: string
 }
 
-interface PageProps {
-  params: {
-    token: string
-  }
+type Props = {
+  params: { token: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default function UploadPage({ params }: PageProps) {
+export default function UploadPage({ params }: Props) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -49,7 +46,6 @@ export default function UploadPage({ params }: PageProps) {
 
         setStatus('valid')
       } catch {
-        // Removed unused error parameter
         setStatus('error')
         setErrorMessage('Failed to validate token')
       }
