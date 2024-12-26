@@ -7,6 +7,7 @@ interface UploadMetadata {
   token: string
   filename: string
   timestamp: string
+  email: string
 }
 
 interface UploadResponse {
@@ -14,7 +15,6 @@ interface UploadResponse {
   message?: string
 }
 
-// Update the params interface to match Next.js 15 expectations
 interface PageProps {
   params: {
     token: string
@@ -24,12 +24,13 @@ interface PageProps {
 
 export default function UploadPage({
   params,
-  searchParams
+  _searchParams
 }: PageProps) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [email, setEmail] = useState('')
 
   useEffect(() => {
     const validateToken = async () => {
@@ -64,8 +65,24 @@ export default function UploadPage({
     const file = event.target.files?.[0]
     if (!file) return
 
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address')
+      return
+    }
+
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      setErrorMessage('Please enter a valid email address')
+      return
+    }
+
     if (file.type !== 'application/pdf') {
       setErrorMessage('Please select a PDF file')
+      return
+    }
+
+    const TWO_MB = 2 * 1024 * 1024 // 2MB in bytes
+    if (file.size > TWO_MB) {
+      setErrorMessage('File size exceeds 2MB limit')
       return
     }
 
@@ -76,7 +93,8 @@ export default function UploadPage({
       const metadata: UploadMetadata = {
         token: params.token,
         filename: file.name,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        email: email.trim()
       }
 
       const formData = new FormData()
@@ -149,10 +167,22 @@ export default function UploadPage({
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Upload Your Insurance Document</h1>
+        <h1 className="text-2xl font-bold mb-4">Upload Your Policy Illustration</h1>
         
         <div className="bg-white shadow rounded-lg p-6">
           <div className="space-y-4">
+            <label className="block">
+              <span className="text-gray-700">Email Address</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email address"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                required
+              />
+            </label>
+
             <label className="block">
               <span className="text-gray-700">PDF Document</span>
               <input
@@ -181,7 +211,7 @@ export default function UploadPage({
               <p>Please note:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Only PDF files are accepted</li>
-                <li>Maximum file size: 10MB</li>
+                <li>Maximum file size: 2MB</li>
                 <li>Upload link is valid for one use only</li>
               </ul>
             </div>
