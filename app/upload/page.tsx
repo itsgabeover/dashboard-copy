@@ -1,10 +1,11 @@
+// app/upload/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
 interface UploadMetadata {
-  token: string
+  token?: string  // Made optional since this is regular upload
   filename: string
   timestamp: string
   email: string
@@ -15,47 +16,11 @@ interface UploadResponse {
   message?: string
 }
 
-type Props = {
-  params: {
-    token: string
-  }
-}
-
-export default function UploadPage({ params }: Props) {
-  const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
+export default function UploadPage() {  // Removed Props parameter
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const [email, setEmail] = useState('')
-
-  useEffect(() => {
-    const validateToken = async () => {
-      try {
-        const response = await fetch('/api/validate-token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token: params.token })
-        })
-
-        const data = await response.json() as UploadResponse
-        
-        if (!data.success) {
-          setStatus('error')
-          setErrorMessage(data.message || 'Invalid token')
-          return
-        }
-
-        setStatus('valid')
-      } catch {
-        setStatus('error')
-        setErrorMessage('Failed to validate token')
-      }
-    }
-
-    validateToken()
-  }, [params.token])
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -87,7 +52,6 @@ export default function UploadPage({ params }: Props) {
 
     try {
       const metadata: UploadMetadata = {
-        token: params.token,
         filename: file.name,
         timestamp: new Date().toISOString(),
         email: email.trim()
@@ -99,9 +63,6 @@ export default function UploadPage({ params }: Props) {
 
       const response = await fetch('/api/upload', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${params.token}`
-        },
         body: formData
       })
 
@@ -117,32 +78,6 @@ export default function UploadPage({ params }: Props) {
     } finally {
       setIsUploading(false)
     }
-  }
-
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
-          <p className="text-gray-600">Validating your upload session...</p>
-        </div>
-      </div>
-    )
-  }
-
-  if (status === 'error') {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-red-600 mb-4">
-            Upload Error
-          </h1>
-          <p className="text-gray-600 mb-4">
-            {errorMessage}
-          </p>
-        </div>
-      </div>
-    )
   }
 
   if (uploadSuccess) {
