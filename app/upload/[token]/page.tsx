@@ -3,15 +3,7 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-// Moved types to separate interfaces for better organization
-interface TokenData {
-  token: string
-  customerEmail?: string
-  expires: string
-  created: string
-  used: string
-  sessionId: string
-}
+// Removed unused TokenData interface
 
 interface UploadMetadata {
   token: string
@@ -31,7 +23,6 @@ interface PageProps {
 }
 
 export default function UploadPage({ params }: PageProps) {
-  // Explicitly type the status state
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -57,7 +48,8 @@ export default function UploadPage({ params }: PageProps) {
         }
 
         setStatus('valid')
-      } catch (error) {
+      } catch {
+        // Removed unused error parameter
         setStatus('error')
         setErrorMessage('Failed to validate token')
       }
