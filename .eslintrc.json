@@ -16,6 +16,9 @@
         "char": "'",
         "alternatives": ["&apos;"]
       }]
-    }]
+    }],
+    "@next/next/no-async-client-component": "warn",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
