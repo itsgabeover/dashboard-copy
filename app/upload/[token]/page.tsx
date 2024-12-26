@@ -3,25 +3,24 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-interface PageProps {
+type Props = {
   params: {
     token: string
   }
 }
 
-export default function Page({ 
-  params,
-}: PageProps) {
+export default function Page(props: Props) {
   const router = useRouter()
+  const token = props.params.token
   
   useEffect(() => {
-    if (params.token) {
-      sessionStorage.setItem('upload_token', params.token)
+    if (token) {
+      sessionStorage.setItem('upload_token', token)
       router.push('/upload')
     } else {
       router.push('/')
     }
-  }, [params.token, router])
+  }, [token, router])
 
   return (
     <div className="min-h-screen flex items-center justify-center">
