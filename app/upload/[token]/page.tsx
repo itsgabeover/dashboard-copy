@@ -15,7 +15,6 @@ interface UploadResponse {
   message?: string
 }
 
-// Updated to match Next.js 15 type expectations
 type Props = {
   params: {
     token: string
@@ -23,7 +22,7 @@ type Props = {
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default async function UploadPage({ params }: Props) {
+export default function UploadPage({ params }: Props) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
