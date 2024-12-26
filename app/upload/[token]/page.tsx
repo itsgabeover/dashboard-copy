@@ -3,11 +3,17 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
+interface PageProps {
+  params: {
+    token: string
+  }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
 export default function Page({ 
-  params 
-}: { 
-  params: { token: string } 
-}) {
+  params,
+  searchParams,
+}: PageProps) {
   const router = useRouter()
   
   useEffect(() => {
