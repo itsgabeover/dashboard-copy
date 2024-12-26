@@ -1,23 +1,26 @@
+// app/upload/[token]/page.tsx
 'use client'
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-export default function Page({ 
-  params 
-}: { 
-  params: { token: string } 
-}) {
+type PageProps = {
+  params: { token: string }
+  searchParams: { [key: string]: string | string[] | undefined }
+}
+
+const Page = (props: PageProps) => {
   const router = useRouter()
+  const { token } = props.params
 
   useEffect(() => {
-    if (params.token) {
-      sessionStorage.setItem('upload_token', params.token)
+    if (token) {
+      sessionStorage.setItem('upload_token', token)
       router.push('/upload')
     } else {
       router.push('/')
     }
-  }, [params.token, router])
+  }, [token, router])
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -25,3 +28,5 @@ export default function Page({
     </div>
   )
 }
+
+export default Page
