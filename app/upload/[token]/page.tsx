@@ -1,9 +1,10 @@
 'use client'
+
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 interface PageProps {
-  params: Promise<{ token: string }> | { token: string }
+  params: { token: string }  // Removed Promise type
 }
 
 export default function TokenHandlerPage({ params }: PageProps) {
@@ -13,17 +14,15 @@ export default function TokenHandlerPage({ params }: PageProps) {
   useEffect(() => {
     async function handleToken() {
       try {
-        // Handle if params is a Promise
-        const resolvedParams = await Promise.resolve(params)
-        if (resolvedParams.token) {
-          sessionStorage.setItem('upload_token', resolvedParams.token)
+        if (params.token) {
+          sessionStorage.setItem('upload_token', params.token)
           router.push('/upload')
         }
       } catch {
         router.push('/')
       }
     }
-
+    
     setMounted(true)
     handleToken()
   }, [params, router])
