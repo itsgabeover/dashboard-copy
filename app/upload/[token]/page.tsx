@@ -18,7 +18,7 @@ interface PageParams {
   token: string
 }
 
-export default async function UploadPage({
+export default function UploadPage({
   params,
 }: {
   params: PageParams
