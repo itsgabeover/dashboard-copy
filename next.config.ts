@@ -1,11 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typescript: {
-    ignoreBuildErrors: false,
-  },
-  experimental: {
-    serverActions: true,
-  },
+    ignoreBuildErrors: false
+  }
 }
 
 module.exports = nextConfig
