@@ -15,11 +15,7 @@ interface UploadResponse {
   message?: string
 }
 
-interface Params {
-  token: string
-}
-
-export default function Page({ params }: { params: Params }) {
+export default function UploadForm({ token }: { token: string }) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -34,7 +30,7 @@ export default function Page({ params }: { params: Params }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ token: params.token })
+          body: JSON.stringify({ token })
         })
 
         const data = await response.json() as UploadResponse
@@ -53,7 +49,7 @@ export default function Page({ params }: { params: Params }) {
     }
 
     validateToken()
-  }, [params.token])
+  }, [token])
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -85,7 +81,7 @@ export default function Page({ params }: { params: Params }) {
 
     try {
       const metadata: UploadMetadata = {
-        token: params.token,
+        token,
         filename: file.name,
         timestamp: new Date().toISOString(),
         email: email.trim()
@@ -98,7 +94,7 @@ export default function Page({ params }: { params: Params }) {
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${params.token}`
+          'Authorization': `Bearer ${token}`
         },
         body: formData
       })
@@ -215,3 +211,4 @@ export default function Page({ params }: { params: Params }) {
     </div>
   )
 }
+
