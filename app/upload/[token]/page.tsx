@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
+interface UploadFormProps {
+  token: string
+}
+
 interface UploadMetadata {
   token: string
   filename: string
@@ -15,7 +19,7 @@ interface UploadResponse {
   message?: string
 }
 
-export default function UploadForm({ token }: { token: string }) {
+export default function UploadForm({ token }: UploadFormProps) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
