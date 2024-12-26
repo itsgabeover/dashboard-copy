@@ -3,15 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
-type Props = {
-  params: {
-    token: string
-  }
-}
-
-export default function Page(props: Props) {
+export default function Page({ params }: { params: { token: string } }) {
   const router = useRouter()
-  const token = props.params.token
+  const token = params.token
   
   useEffect(() => {
     if (token) {
@@ -31,3 +25,4 @@ export default function Page(props: Props) {
     </div>
   )
 }
+
