@@ -19,14 +19,9 @@ type Props = {
   params: {
     token: string
   }
-  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default function UploadPage({ 
-  params,
-  // Using underscore prefix for unused parameter as per ESLint config
-  _searchParams 
-}: Props) {
+export default function UploadPage({ params }: Props) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
