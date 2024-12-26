@@ -1,10 +1,13 @@
+// app/upload/[token]/page.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-interface UploadFormProps {
-  token: string
+interface PageProps {
+  params: {
+    token: string
+  }
 }
 
 interface UploadMetadata {
@@ -19,7 +22,8 @@ interface UploadResponse {
   message?: string
 }
 
-export default function UploadForm({ token }: UploadFormProps) {
+export default function UploadPage({ params }: PageProps) {
+  const { token } = params
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
@@ -215,4 +219,3 @@ export default function UploadForm({ token }: UploadFormProps) {
     </div>
   )
 }
-
