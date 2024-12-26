@@ -2,61 +2,47 @@
 import { NextResponse } from 'next/server'
 import { createClient } from 'redis'
 
-interface TokenData {
+type TokenData = {
   token: string
   customerEmail: string
   expires: string
   created: string
   used: boolean
-  sessionId: string  // Added for Stripe session tracking
+  sessionId: string
 }
 
 export async function POST(request: Request) {
   const client = createClient({
-    url: process.env.REDIS_URL
+    url: process.env.REDIS_URL || '' // Added fallback for type safety
   })
   
   try {
-    const { 
-      token, 
-      customerEmail, 
-      expires, 
-      created, 
-      used,
-      sessionId  // Added to receive from n8n
-    } = await request.json()
-    
+    const body = await request.json() as TokenData
+    console.log('Received data to store:', body)
+
     await client.connect()
+    console.log('Redis connected')
     
-    // Store token data with two keys for bi-directional lookup
+    const tokenData = {
+      ...body,
+      used: false
+    }
+
     await Promise.all([
-      // Store by token for upload validation
       client.set(
-        `upload_token:${token}`, 
-        JSON.stringify({
-          token,
-          customerEmail,
-          expires,
-          created,
-          used,
-          sessionId
-        } as TokenData),
-        { EX: 1800 }  // 30 minutes
+        `upload_token:${body.token}`, 
+        JSON.stringify(tokenData),
+        { EX: 1800 }
       ),
-      // Store by sessionId for payment success page
       client.set(
-        `payment:${sessionId}`,
-        JSON.stringify({
-          token,
-          customerEmail,
-          expires,
-          created,
-          used,
-          sessionId
-        } as TokenData),
-        { EX: 1800 }  // 30 minutes
+        `payment:${body.sessionId}`,
+        JSON.stringify(tokenData),
+        { EX: 1800 }
       )
     ])
+
+    const storedData = await client.get(`payment:${body.sessionId}`)
+    console.log('Stored data:', storedData)
 
     return NextResponse.json({
       success: true,
@@ -64,7 +50,10 @@ export async function POST(request: Request) {
     })
   } catch (error) {
     console.error('Store token error:', error)
-    return NextResponse.json({ error: 'Failed to store token' }, { status: 500 })
+    return NextResponse.json({ 
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to store token' 
+    }, { status: 500 })
   } finally {
     await client.disconnect()
   }
