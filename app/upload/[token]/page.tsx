@@ -4,10 +4,11 @@
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
 
-interface PageProps {
+type Props = {
   params: {
     token: string
   }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 interface UploadMetadata {
@@ -22,7 +23,7 @@ interface UploadResponse {
   message?: string
 }
 
-export default function UploadPage({ params }: PageProps) {
+export default function UploadPage({ params, searchParams }: Props) {
   const { token } = params
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
