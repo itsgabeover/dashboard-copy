@@ -7,12 +7,10 @@ interface PageProps {
   params: {
     token: string
   }
-  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 export default function Page({ 
   params,
-  searchParams,
 }: PageProps) {
   const router = useRouter()
   
