@@ -1,6 +1,6 @@
 // app/payment-success/page.tsx
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { ReactElement } from 'react'
 
@@ -11,7 +11,7 @@ type VerifyResponse = {
   token?: string
 }
 
-export default function PaymentSuccessPage(): ReactElement {
+function PaymentProcessor(): ReactElement {
   const [error, setError] = useState<string>()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -87,5 +87,26 @@ export default function PaymentSuccessPage(): ReactElement {
         <p className="text-gray-600">Processing your payment...</p>
       </div>
     </div>
+  )
+}
+
+// Loading component
+function LoadingPage(): ReactElement {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4B6FEE] mx-auto mb-4" />
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    </div>
+  )
+}
+
+// Main page component with Suspense boundary
+export default function PaymentSuccessPage(): ReactElement {
+  return (
+    <Suspense fallback={<LoadingPage />}>
+      <PaymentProcessor />
+    </Suspense>
   )
 }
