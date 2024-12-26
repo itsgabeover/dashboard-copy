@@ -3,9 +3,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 interface PageProps {
-  params: {
-    token: string;
-  } & Record<string, string | string[]>;
+  params: Promise<{ token: string }> | { token: string }
 }
 
 export default function TokenHandlerPage({ params }: PageProps) {
@@ -13,12 +11,22 @@ export default function TokenHandlerPage({ params }: PageProps) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setMounted(true)
-    if (params?.token) {
-      sessionStorage.setItem('upload_token', params.token)
-      router.push('/upload')
+    async function handleToken() {
+      try {
+        // Handle if params is a Promise
+        const resolvedParams = await Promise.resolve(params)
+        if (resolvedParams.token) {
+          sessionStorage.setItem('upload_token', resolvedParams.token)
+          router.push('/upload')
+        }
+      } catch {
+        router.push('/')
+      }
     }
-  }, [params?.token, router])
+
+    setMounted(true)
+    handleToken()
+  }, [params, router])
 
   if (!mounted) return null
 
