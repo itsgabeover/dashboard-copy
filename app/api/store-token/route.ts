@@ -4,7 +4,7 @@ import { createClient } from 'redis'
 
 type TokenData = {
   token: string
-  customerEmail?: string // Optional since some events might not have email
+  customerEmail?: string
   expires: string
   created: string
   used: boolean
@@ -16,19 +16,18 @@ type RequestBody = {
   customerEmail?: string
   expires: string
   created: string
-  used: string // Coming as string from n8n
+  used: string
   sessionId: string
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
-  const client = createClient({
-    url: process.env.REDIS_URL || ''
-  })
+  let client;
   
   try {
     const body = await request.json() as RequestBody
     console.log('Received data to store:', body)
 
+    // Early return before Redis connection if not checkout session
     if (!body.sessionId?.startsWith('cs_live_')) {
       return NextResponse.json({
         success: false,
@@ -42,6 +41,11 @@ export async function POST(request: Request): Promise<NextResponse> {
         message: 'Missing required fields'
       }, { status: 400 })
     }
+
+    // Only create Redis client if we need it
+    client = createClient({
+      url: process.env.REDIS_URL || ''
+    })
 
     await client.connect()
     console.log('Redis connected')
@@ -77,6 +81,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       success: true,
       message: 'Token stored successfully'
     })
+
   } catch (error) {
     console.error('Store token error:', error)
     return NextResponse.json({ 
@@ -84,10 +89,12 @@ export async function POST(request: Request): Promise<NextResponse> {
       message: error instanceof Error ? error.message : 'Failed to store token' 
     }, { status: 500 })
   } finally {
-    try {
-      await client.disconnect()
-    } catch (error) {
-      console.error('Redis disconnect error:', error)
+    if (client) {
+      try {
+        await client.disconnect()
+      } catch (error) {
+        console.error('Redis disconnect error:', error)
+      }
     }
   }
 }
