@@ -2,32 +2,29 @@
 import { NextResponse } from 'next/server'
 import { createClient } from 'redis'
 
+// Types at the top
 type TokenData = {
-  token: string
-  customerEmail?: string
-  expires: string
-  created: string
-  used: boolean
-  sessionId: string
+  readonly token: string
+  readonly customerEmail?: string
+  readonly expires: string
+  readonly created: string
+  readonly used: string
+  readonly sessionId: string
 }
 
-type RequestBody = {
-  token: string
-  customerEmail?: string
-  expires: string
-  created: string
+type RequestBody = Omit<TokenData, 'used'> & {
   used: string
-  sessionId: string
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
   let client;
   
   try {
-    const body = await request.json() as RequestBody
+    // Parse and validate request body
+    const body: RequestBody = await request.json()
     console.log('Received data to store:', body)
 
-    // Early return before Redis connection if not checkout session
+    // Early validations before Redis connection
     if (!body.sessionId?.startsWith('cs_live_')) {
       return NextResponse.json({
         success: false,
@@ -42,23 +39,24 @@ export async function POST(request: Request): Promise<NextResponse> {
       }, { status: 400 })
     }
 
-    // Only create Redis client if we need it
+    // Initialize Redis client
     client = createClient({
       url: process.env.REDIS_URL || ''
     })
 
     await client.connect()
-    console.log('Redis connected')
     
+    // Prepare token data with explicit type
     const tokenData: TokenData = {
       token: body.token,
       customerEmail: body.customerEmail,
       expires: body.expires,
       created: body.created,
-      used: body.used === "false" ? false : true,
+      used: "false",
       sessionId: body.sessionId
     }
 
+    // Redis operations with explicit typing
     const redisPromises = [
       client.set(
         `upload_token:${body.token}`, 
@@ -73,9 +71,6 @@ export async function POST(request: Request): Promise<NextResponse> {
     ] as const
 
     await Promise.all(redisPromises)
-
-    const storedData = await client.get(`payment:${body.sessionId}`)
-    console.log('Stored data:', storedData)
 
     return NextResponse.json({
       success: true,
@@ -92,8 +87,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (client) {
       try {
         await client.disconnect()
-      } catch (error) {
-        console.error('Redis disconnect error:', error)
+      } catch (disconnectError) {
+        console.error('Redis disconnect error:', disconnectError)
       }
     }
   }
