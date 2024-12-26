@@ -16,9 +16,6 @@ export default function PaymentSuccessPage(): JSX.Element {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    let intervalId: NodeJS.Timer
-    let timeoutId: NodeJS.Timer
-
     const verifyPayment = async (): Promise<void> => {
       try {
         const sessionId = searchParams.get('session_id')
@@ -32,8 +29,6 @@ export default function PaymentSuccessPage(): JSX.Element {
         console.log('Verify response:', data)
 
         if (data.success && data.token) {
-          clearInterval(intervalId)
-          clearTimeout(timeoutId)
           router.push(`/upload/${data.token}`)
           return
         }
@@ -49,12 +44,14 @@ export default function PaymentSuccessPage(): JSX.Element {
       }
     }
 
-    intervalId = setInterval(verifyPayment, 2000)
-    timeoutId = setTimeout(() => {
+    // Set up polling with const declarations
+    const intervalId = setInterval(verifyPayment, 2000)
+    const timeoutId = setTimeout(() => {
       clearInterval(intervalId)
       setError('Payment verification timed out')
     }, 30000)
 
+    // Cleanup function
     return () => {
       clearInterval(intervalId)
       clearTimeout(timeoutId)
