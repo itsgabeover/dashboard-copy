@@ -4,31 +4,58 @@ import { createClient } from 'redis'
 
 type TokenData = {
   token: string
-  customerEmail: string
+  customerEmail?: string // Optional since some events might not have email
   expires: string
   created: string
   used: boolean
   sessionId: string
 }
 
-export async function POST(request: Request) {
+type RequestBody = {
+  token: string
+  customerEmail?: string
+  expires: string
+  created: string
+  used: string // Coming as string from n8n
+  sessionId: string
+}
+
+export async function POST(request: Request): Promise<NextResponse> {
   const client = createClient({
-    url: process.env.REDIS_URL || '' // Added fallback for type safety
+    url: process.env.REDIS_URL || ''
   })
   
   try {
-    const body = await request.json() as TokenData
+    const body = await request.json() as RequestBody
     console.log('Received data to store:', body)
+
+    if (!body.sessionId?.startsWith('cs_live_')) {
+      return NextResponse.json({
+        success: false,
+        message: 'Not a checkout session'
+      }, { status: 400 })
+    }
+
+    if (!body.token || !body.expires || !body.created) {
+      return NextResponse.json({
+        success: false,
+        message: 'Missing required fields'
+      }, { status: 400 })
+    }
 
     await client.connect()
     console.log('Redis connected')
     
-    const tokenData = {
-      ...body,
-      used: false
+    const tokenData: TokenData = {
+      token: body.token,
+      customerEmail: body.customerEmail,
+      expires: body.expires,
+      created: body.created,
+      used: body.used === "false" ? false : true,
+      sessionId: body.sessionId
     }
 
-    await Promise.all([
+    const redisPromises = [
       client.set(
         `upload_token:${body.token}`, 
         JSON.stringify(tokenData),
@@ -39,7 +66,9 @@ export async function POST(request: Request) {
         JSON.stringify(tokenData),
         { EX: 1800 }
       )
-    ])
+    ] as const
+
+    await Promise.all(redisPromises)
 
     const storedData = await client.get(`payment:${body.sessionId}`)
     console.log('Stored data:', storedData)
@@ -52,9 +81,13 @@ export async function POST(request: Request) {
     console.error('Store token error:', error)
     return NextResponse.json({ 
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to store token' 
+      message: error instanceof Error ? error.message : 'Failed to store token' 
     }, { status: 500 })
   } finally {
-    await client.disconnect()
+    try {
+      await client.disconnect()
+    } catch (error) {
+      console.error('Redis disconnect error:', error)
+    }
   }
 }
