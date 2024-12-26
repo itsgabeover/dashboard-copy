@@ -15,14 +15,15 @@ interface UploadResponse {
   message?: string
 }
 
-interface PageProps {
+// Updated to match Next.js 15 type expectations
+type Props = {
   params: {
     token: string
   }
-  searchParams: Record<string, never>
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default function UploadPage({ params }: PageProps) {
+export default async function UploadPage({ params }: Props) {
   const [status, setStatus] = useState<'loading' | 'valid' | 'error'>('loading')
   const [errorMessage, setErrorMessage] = useState('')
   const [isUploading, setIsUploading] = useState(false)
