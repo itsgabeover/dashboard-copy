@@ -2,10 +2,15 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { use } from 'react'
 
-export default function Page({ params }: { params: { token: string } }) {
+export default function Page({ 
+  params 
+}: { 
+  params: Promise<{ token: string }> 
+}) {
   const router = useRouter()
-  const token = params.token
+  const { token } = use(params)
   
   useEffect(() => {
     if (token) {
@@ -25,4 +30,3 @@ export default function Page({ params }: { params: { token: string } }) {
     </div>
   )
 }
-
