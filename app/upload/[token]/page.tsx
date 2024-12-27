@@ -48,8 +48,8 @@ export default function UploadPage({
        setErrorMessage('Please select a PDF file.')
        return
      }
-     if (selectedFile.size > 10 * 1024 * 1024) {
-       setErrorMessage('File size exceeds 10MB.')
+     if (selectedFile.size > 2 * 1024 * 1024) {
+       setErrorMessage('File size exceeds 2MB.')
        return
      }
      setFile(selectedFile)
@@ -134,7 +134,7 @@ export default function UploadPage({
                    </label>
                    <p className="pl-1">or drag and drop</p>
                  </div>
-                 <p className="text-xs text-gray-500">PDF up to 10MB</p>
+                 <p className="text-xs text-gray-500">PDF up to 2MB</p>
                </div>
              </div>
              {file && (
