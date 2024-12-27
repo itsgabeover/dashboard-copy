@@ -284,7 +284,7 @@ export default function MissionPage() {
                     "Action Items",
                     "Performance Metrics"
                   ]}
-                  reportUrl="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IP%20AI%20ANALYSIS%20Sample%20Report-5eeVcADyOuu3fkxTHDc3XgWLaqfCeS.html"
+                  reportUrl="https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20ANALYSIS-KcNItO6ThA29F15Sa0kuWc4uySibb9.pdf"
                 />
                 <SampleAnalysisReport 
                   title="Policy Review Client Summary"
@@ -294,7 +294,7 @@ export default function MissionPage() {
                     "Key Findings",
                     "Next Steps"
                   ]}
-                  reportUrl="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/IP%20AI%20SUMMARY%20Sample%20Report-5WXqkcNSdZXm7vmKIgDxhjXLpEZrws.html"
+                  reportUrl="https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20SUMMARY-gN6m36r8cHAwdzi68E4adsDuqypPMT.pdf"
                 />
               </div>
             </div>
