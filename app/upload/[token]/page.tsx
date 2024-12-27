@@ -1,7 +1,7 @@
 'use client'
-
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { use } from 'react'
 import { Upload, CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,25 +10,28 @@ import { Document, Page, pdfjs } from 'react-pdf'
 // Set up the worker for react-pdf
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
 
-export default function UploadPage() {
+export default function Page({ 
+  params 
+}: { 
+  params: Promise<{ token: string }> 
+}) {
+  const router = useRouter()
+  const { token } = use(params)
+  const [isLoading, setIsLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState('')
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
+  
   useEffect(() => {
-    const token = searchParams.get('token')
     if (token) {
       sessionStorage.setItem('upload_token', token)
       setIsLoading(false)
     } else {
       router.push('/')
     }
-  }, [searchParams, router])
+  }, [token, router])
 
   useEffect(() => {
     return () => {
@@ -66,9 +69,9 @@ export default function UploadPage() {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('email', email)
-    const token = sessionStorage.getItem('upload_token')
-    if (token) {
-      formData.append('token', token)
+    const storedToken = sessionStorage.getItem('upload_token')
+    if (storedToken) {
+      formData.append('token', storedToken)
     }
 
     try {
@@ -199,4 +202,3 @@ export default function UploadPage() {
     </div>
   )
 }
-
