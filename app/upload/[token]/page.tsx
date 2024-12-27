@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Document, Page as PDFPage, pdfjs } from 'react-pdf'
 
 // Set up the worker for react-pdf
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
+pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js'
 
 export default function UploadPage({ 
  params 
