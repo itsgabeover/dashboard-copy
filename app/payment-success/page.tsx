@@ -1,4 +1,3 @@
-// app/payment-success/page.tsx
 'use client'
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -12,14 +11,19 @@ type VerifyResponse = {
 }
 
 function PaymentProcessor(): ReactElement {
+  console.log('PaymentProcessor mounted') // Component mount log
   const [error, setError] = useState<string>()
   const router = useRouter()
   const searchParams = useSearchParams()
 
   useEffect(() => {
+    console.log('PaymentProcessor useEffect started') // Effect start log
+    
     const verifyPayment = async (): Promise<void> => {
       try {
         const sessionId = searchParams.get('session_id')
+        console.log('Attempting verification with session ID:', sessionId) // Session ID log
+        
         if (!sessionId) {
           throw new Error('No session ID provided')
         }
@@ -28,14 +32,18 @@ function PaymentProcessor(): ReactElement {
         const data = await response.json() as VerifyResponse
         
         console.log('Verify response:', data)
-
+        console.log('Current URL:', window.location.href) // Current URL log
+        
         if (data.success && data.token) {
+          console.log('Success condition met, redirecting to:', `/upload/${data.token}`) // Pre-redirect log
           router.push(`/upload/${data.token}`)
+          console.log('Redirect initiated') // Post-redirect log
           return
         }
 
         if (data.status === 'pending') {
-          return // Keep polling
+          console.log('Payment still pending') // Pending state log
+          return
         }
 
         setError(data.message || 'Verification failed')
@@ -45,18 +53,26 @@ function PaymentProcessor(): ReactElement {
       }
     }
 
+    console.log('Setting up interval for payment verification') // Interval setup log
     const intervalId = setInterval(verifyPayment, 2000)
+    
+    // Run initial verification
+    verifyPayment()
+
     const timeoutId = setTimeout(() => {
+      console.log('Verification timed out') // Timeout log
       clearInterval(intervalId)
       setError('Payment verification timed out')
     }, 30000)
 
     return () => {
+      console.log('PaymentProcessor cleanup running') // Cleanup log
       clearInterval(intervalId)
       clearTimeout(timeoutId)
     }
   }, [router, searchParams])
 
+  // Rest of the component remains unchanged...
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -90,7 +106,7 @@ function PaymentProcessor(): ReactElement {
   )
 }
 
-// Loading component
+// Loading component remains unchanged
 function LoadingPage(): ReactElement {
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -102,7 +118,7 @@ function LoadingPage(): ReactElement {
   )
 }
 
-// Main page component with Suspense boundary
+// Main page component remains unchanged
 export default function PaymentSuccessPage(): ReactElement {
   return (
     <Suspense fallback={<LoadingPage />}>
