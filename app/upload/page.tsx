@@ -1,24 +1,23 @@
-// app/upload/[token]/page.tsx
 'use client'
 
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { use } from 'react'
 
 type PageProps = {
-  params: {
-    token: string
-  }
+  params: Promise<{ token: string }>
 }
 
 export default function Page({ params }: PageProps) {
   const router = useRouter()
+  const { token } = use(params)
 
   useEffect(() => {
-    if (params.token) {
-      sessionStorage.setItem('upload_token', params.token)
+    if (token) {
+      sessionStorage.setItem('upload_token', token)
       router.push('/upload')
     }
-  }, [router, params.token])
+  }, [router, token])
 
   return null
 }
