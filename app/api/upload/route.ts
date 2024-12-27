@@ -1,12 +1,11 @@
-// app/api/upload/route.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function POST(req: NextRequest) {
   try {
+    // Validate authorization token
     const authHeader = req.headers.get('authorization')
     const token = authHeader?.replace('Bearer ', '')
-
     if (!token) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -14,36 +13,30 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Get form data
     const formData = await req.formData()
-    const file = formData.get('data0') as File | null
-    const metadataStr = formData.get('metadata') as string | null
+    const file = formData.get('file') as File | null
+    const email = formData.get('email') as string | null
 
-    if (!file || !metadataStr) {
+    // Validate required fields
+    if (!file || !email) {
       return NextResponse.json(
         { 
           success: false, 
-          error: !file ? 'No file provided' : 'No metadata provided' 
+          error: !file ? 'No file provided' : 'No email provided' 
         },
         { status: 400 }
       )
     }
 
-    let metadata
-    try {
-      metadata = JSON.parse(metadataStr)
-    } catch {
-      return NextResponse.json(
-        { success: false, error: 'Invalid metadata format' },
-        { status: 400 }
-      )
-    }
-
+    // Prepare data for n8n
     const n8nFormData = new FormData()
     n8nFormData.append('data0', file, file.name)
-    n8nFormData.append('email', metadata.email)
+    n8nFormData.append('email', email)
     n8nFormData.append('filename', file.name)
     n8nFormData.append('timestamp', new Date().toISOString())
 
+    // Send to n8n webhook
     const response = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT!, {
       method: 'POST',
       body: n8nFormData
