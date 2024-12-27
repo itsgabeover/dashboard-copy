@@ -4,7 +4,7 @@ import { Upload, Clock, FileText, CheckCircle, Zap, ArrowRight } from 'lucide-re
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 
-interface HeroProps {}
+export function Hero() {
 
 export function Hero({}: HeroProps) {
   return (
