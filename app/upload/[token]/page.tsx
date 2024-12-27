@@ -5,10 +5,6 @@ import { use } from 'react'
 import { Upload, CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Document, Page as PDFPage, pdfjs } from 'react-pdf'
-
-// Set worker using CDN
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function UploadPage({ 
   params 
@@ -22,7 +18,6 @@ export default function UploadPage({
   const [email, setEmail] = useState('')
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   
   useEffect(() => {
     if (token) {
@@ -32,14 +27,6 @@ export default function UploadPage({
       router.push('/')
     }
   }, [token, router])
-
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-    }
-  }, [previewUrl])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
@@ -54,14 +41,6 @@ export default function UploadPage({
       }
       setFile(selectedFile)
       setErrorMessage('')
-
-      try {
-        const fileUrl = URL.createObjectURL(selectedFile)
-        setPreviewUrl(fileUrl)
-      } catch (error) {
-        setErrorMessage('Error creating preview')
-        console.error('Preview error:', error)
-      }
     }
   }
 
@@ -117,10 +96,6 @@ export default function UploadPage({
 
   const clearFileSelection = () => {
     setFile(null)
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl)
-      setPreviewUrl(null)
-    }
   }
 
   if (isLoading) {
@@ -182,22 +157,6 @@ export default function UploadPage({
                 </div>
               )}
             </div>
-            {previewUrl && (
-              <div className="mt-4 border rounded-md overflow-hidden">
-                <Document
-                  file={previewUrl}
-                  className="w-full"
-                  loading={<div className="p-4">Loading PDF...</div>}
-                  error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you&apos;ve selected a valid PDF file.</div>}
-                  onLoadError={(error) => {
-                    console.error('PDF load error:', error)
-                    setErrorMessage('Error loading PDF preview')
-                  }}
-                >
-                  <PDFPage pageNumber={1} width={300} />
-                </Document>
-              </div>
-            )}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
