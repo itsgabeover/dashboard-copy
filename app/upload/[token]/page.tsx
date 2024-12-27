@@ -55,9 +55,6 @@ export default function UploadPage({
     formData.append('file', file)
     formData.append('email', email)
     const storedToken = sessionStorage.getItem('upload_token')
-    if (storedToken) {
-      formData.append('token', storedToken)
-    }
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
@@ -67,6 +64,7 @@ export default function UploadPage({
         method: 'POST',
         headers: {
           'Accept': 'application/json',
+          'Authorization': `Bearer ${storedToken}`
         },
         body: formData,
         signal: controller.signal
