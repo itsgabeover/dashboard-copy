@@ -7,13 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Document, Page as PDFPage, pdfjs } from 'react-pdf'
 
-// Set worker
-if (typeof window !== 'undefined') {
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.js',
-    import.meta.url,
-  ).toString();
-}
+// Set worker using CDN
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 export default function UploadPage({ 
  params 
@@ -60,8 +55,13 @@ export default function UploadPage({
      setFile(selectedFile)
      setErrorMessage('')
 
-     const fileUrl = URL.createObjectURL(selectedFile)
-     setPreviewUrl(fileUrl)
+     try {
+       const fileUrl = URL.createObjectURL(selectedFile)
+       setPreviewUrl(fileUrl)
+     } catch (error) {
+       setErrorMessage('Error creating preview')
+       console.error('Preview error:', error)
+     }
    }
  }
 
@@ -70,6 +70,7 @@ export default function UploadPage({
    if (!file || !email) return
 
    setUploadStatus('uploading')
+   setErrorMessage('')
 
    const formData = new FormData()
    formData.append('file', file)
@@ -79,21 +80,34 @@ export default function UploadPage({
      formData.append('token', storedToken)
    }
 
+   const controller = new AbortController()
+   const timeoutId = setTimeout(() => controller.abort(), 30000)
+
    try {
      const response = await fetch('/api/upload', {
        method: 'POST',
+       headers: {
+         'Accept': 'application/json',
+       },
        body: formData,
+       signal: controller.signal
      })
 
+     clearTimeout(timeoutId)
+
      if (!response.ok) {
-       throw new Error('Upload failed')
+       throw new Error(`Upload failed: ${response.statusText}`)
      }
 
      setUploadStatus('success')
    } catch (error) {
      console.error('Upload error:', error)
+     if (error.name === 'AbortError') {
+       setErrorMessage('Upload timed out. Please try again.')
+     } else {
+       setErrorMessage('Upload failed. Please try again or contact support.')
+     }
      setUploadStatus('error')
-     setErrorMessage('Upload failed. Please try again or contact support.')
    }
  }
 
@@ -135,7 +149,14 @@ export default function UploadPage({
                      className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]"
                    >
                      <span>Upload a file</span>
-                     <Input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf" />
+                     <Input 
+                       id="file-upload" 
+                       name="file-upload" 
+                       type="file" 
+                       className="sr-only" 
+                       onChange={handleFileChange} 
+                       accept=".pdf"
+                     />
                    </label>
                    <p className="pl-1">or drag and drop</p>
                  </div>
@@ -162,7 +183,12 @@ export default function UploadPage({
                <Document
                  file={previewUrl}
                  className="w-full"
-                 error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you&apos;ve selected a valid PDF file.</div>}
+                 loading={<div className="p-4">Loading PDF...</div>}
+                 error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you've selected a valid PDF file.</div>}
+                 onLoadError={(error) => {
+                   console.error('PDF load error:', error)
+                   setErrorMessage('Error loading PDF preview')
+                 }}
                >
                  <PDFPage pageNumber={1} width={300} />
                </Document>
@@ -190,16 +216,16 @@ export default function UploadPage({
              {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Policy'}
            </Button>
          </form>
-         {uploadStatus === 'success' && (
-           <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
-             <CheckCircle className="mr-2" />
-             <span>Upload successful! We&apos;ll email your analysis shortly.</span>
-           </div>
-         )}
-         {uploadStatus === 'error' && (
+         {errorMessage && (
            <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
              <AlertTriangle className="mr-2" />
              <span>{errorMessage}</span>
+           </div>
+         )}
+         {uploadStatus === 'success' && (
+           <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
+             <CheckCircle className="mr-2" />
+             <span>Upload successful! We'll email your analysis shortly.</span>
            </div>
          )}
        </div>
