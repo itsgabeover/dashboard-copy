@@ -184,7 +184,7 @@ export default function UploadPage({
                  file={previewUrl}
                  className="w-full"
                  loading={<div className="p-4">Loading PDF...</div>}
-                 error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you've selected a valid PDF file.</div>}
+                 error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you&apos;ve selected a valid PDF file.</div>}
                  onLoadError={(error) => {
                    console.error('PDF load error:', error)
                    setErrorMessage('Error loading PDF preview')
@@ -225,7 +225,7 @@ export default function UploadPage({
          {uploadStatus === 'success' && (
            <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
              <CheckCircle className="mr-2" />
-             <span>Upload successful! We'll email your analysis shortly.</span>
+             <span>Upload successful! We&apos;ll email your analysis shortly.</span>
            </div>
          )}
        </div>
