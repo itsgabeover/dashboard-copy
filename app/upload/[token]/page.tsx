@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Upload, CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -19,7 +19,6 @@ export default function UploadPage() {
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const token = searchParams.get('token')
@@ -40,9 +39,18 @@ export default function UploadPage() {
   }, [previewUrl])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const selectedFile = event.target.files[0]
+    const selectedFile = event.target.files?.[0]
+    if (selectedFile) {
+      if (selectedFile.type !== 'application/pdf') {
+        setErrorMessage('Please select a PDF file.')
+        return
+      }
+      if (selectedFile.size > 10 * 1024 * 1024) {
+        setErrorMessage('File size exceeds 10MB.')
+        return
+      }
       setFile(selectedFile)
+      setErrorMessage('')
 
       const fileUrl = URL.createObjectURL(selectedFile)
       setPreviewUrl(fileUrl)
@@ -100,27 +108,11 @@ export default function UploadPage() {
     )
   }
 
-  if (errorMessage) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] flex items-center justify-center">
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
-          <div className="text-center text-red-600 mb-4">
-            <AlertTriangle className="mx-auto h-12 w-12 mb-4" />
-            <p>{errorMessage}</p>
-          </div>
-          <Button className="w-full" onClick={() => window.location.href = '/'}>
-            Return to Home
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16 px-4">
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-8">
-          <h1 className="text-2xl font-bold text-[#4B6FEE] mb-6">Upload Your Policy Illustration</h1>
+          <h1 className="text-2xl font-bold text-[#4B6FEE] mb-6">Upload Your Policy</h1>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
@@ -162,7 +154,7 @@ export default function UploadPage() {
                 <Document
                   file={previewUrl}
                   className="w-full"
-                  error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you've selected a valid PDF file.</div>}
+                  error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you&apos;ve selected a valid PDF file.</div>}
                 >
                   <Page pageNumber={1} width={300} />
                 </Document>
@@ -193,7 +185,7 @@ export default function UploadPage() {
           {uploadStatus === 'success' && (
             <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
               <CheckCircle className="mr-2" />
-              <span>Upload successful! We'll email your analysis shortly.</span>
+              <span>Upload successful! We&apos;ll email your analysis shortly.</span>
             </div>
           )}
           {uploadStatus === 'error' && (
