@@ -1,25 +1,93 @@
 'use client'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { use } from 'react'
 
-export default function Page({ 
-  params 
-}: { 
-  params: Promise<{ token: string }> 
-}) {
-  const router = useRouter()
-  const { token } = use(params)
+import { useState, useEffect, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Upload, CheckCircle, AlertTriangle, X } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Document, Page, pdfjs } from 'react-pdf'
+
+// Set up the worker for react-pdf
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`
+
+export default function UploadPage() {
+  const [file, setFile] = useState<File | null>(null)
+  const [email, setEmail] = useState('')
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
+    const token = searchParams.get('token')
     if (token) {
       sessionStorage.setItem('upload_token', token)
       setIsLoading(false)
     } else {
       router.push('/')
     }
-  }, [token, router])
+  }, [searchParams, router])
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const selectedFile = event.target.files[0]
+      setFile(selectedFile)
+
+      const fileUrl = URL.createObjectURL(selectedFile)
+      setPreviewUrl(fileUrl)
+    }
+  }
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!file || !email) return
+
+    setUploadStatus('uploading')
+
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('email', email)
+    const token = sessionStorage.getItem('upload_token')
+    if (token) {
+      formData.append('token', token)
+    }
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Upload failed')
+      }
+
+      setUploadStatus('success')
+    } catch (error) {
+      console.error('Upload error:', error)
+      setUploadStatus('error')
+      setErrorMessage('Upload failed. Please try again or contact support.')
+    }
+  }
+
+  const clearFileSelection = () => {
+    setFile(null)
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+      setPreviewUrl(null)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -32,13 +100,111 @@ export default function Page({
     )
   }
 
-  // Return upload interface when not loading
+  if (errorMessage) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
+          <div className="text-center text-red-600 mb-4">
+            <AlertTriangle className="mx-auto h-12 w-12 mb-4" />
+            <p>{errorMessage}</p>
+          </div>
+          <Button className="w-full" onClick={() => window.location.href = '/'}>
+            Return to Home
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div>
-        <h1>Upload Your Documents</h1>
-        {/* Add your upload interface here */}
+    <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16 px-4">
+      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="p-8">
+          <h1 className="text-2xl font-bold text-[#4B6FEE] mb-6">Upload Your Policy Illustration</h1>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
+                Policy File (PDF)
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600">
+                    <label
+                      htmlFor="file-upload"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]"
+                    >
+                      <span>Upload a file</span>
+                      <Input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf" />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">PDF up to 10MB</p>
+                </div>
+              </div>
+              {file && (
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-sm text-gray-600">Selected file: {file.name}</p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFileSelection}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+            {previewUrl && (
+              <div className="mt-4 border rounded-md overflow-hidden">
+                <Document
+                  file={previewUrl}
+                  className="w-full"
+                  error={<div className="text-red-500 p-4">Failed to load PDF. Please ensure you've selected a valid PDF file.</div>}
+                >
+                  <Page pageNumber={1} width={300} />
+                </Document>
+              </div>
+            )}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <Input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                className="w-full"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE]"
+              disabled={uploadStatus === 'uploading' || !file || !email}
+            >
+              {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Policy'}
+            </Button>
+          </form>
+          {uploadStatus === 'success' && (
+            <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
+              <CheckCircle className="mr-2" />
+              <span>Upload successful! We'll email your analysis shortly.</span>
+            </div>
+          )}
+          {uploadStatus === 'error' && (
+            <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
+              <AlertTriangle className="mr-2" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
 }
+
