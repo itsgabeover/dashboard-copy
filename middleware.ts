@@ -4,25 +4,17 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   
+  // Only handle /upload paths
   if (pathname === '/upload') {
-    // Base /upload path - check for token in query
-    const token = request.nextUrl.searchParams.get('token')
-    
-    if (!token) {
-      return NextResponse.redirect(new URL('/pre-payment-info', request.url))
-    }
-    if (!token.match(/^[A-Za-z0-9-_]+$/)) {
-      return NextResponse.redirect(new URL('/pre-payment-info', request.url))
-    }
-    
-    // If valid token in query, redirect to token path
-    return NextResponse.redirect(new URL(`/upload/${token}`, request.url))
+    // Redirect base upload path to pre-payment
+    return NextResponse.redirect(new URL('/pre-payment-info', request.url))
   }
   
-  // For /upload/[token] paths, just validate the token
+  // For /upload/[token] paths, validate the token
   if (pathname.startsWith('/upload/')) {
     const token = pathname.split('/').pop()
-    if (!token || !token.match(/^[A-Za-z0-9-_]+$/)) {
+    // Validate token format
+    if (!token || !token.match(/^m[0-9a-z]+_[a-f0-9]+$/)) {
       return NextResponse.redirect(new URL('/pre-payment-info', request.url))
     }
   }
