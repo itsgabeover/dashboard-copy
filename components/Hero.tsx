@@ -5,8 +5,6 @@ import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 
 export function Hero() {
-
-export function Hero({}: HeroProps) {
   return (
     <section className="bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16">
       <div className="container mx-auto px-4 text-center">
@@ -45,7 +43,6 @@ export function Hero({}: HeroProps) {
           </div>
         </div>
 
-        {/* How It Works Section */}
         <div className="max-w-4xl mx-auto mb-16">
           <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">How It Works</h3>
           <div className="grid md:grid-cols-3 gap-8">
@@ -87,7 +84,6 @@ export function Hero({}: HeroProps) {
           </p>
         </div>
 
-        {/* What You&apos;ll Receive Section */}
         <div className="max-w-4xl mx-auto mb-16">
           <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You&apos;ll Receive</h3>
           <div className="grid md:grid-cols-2 gap-6">
@@ -146,7 +142,6 @@ export function Hero({}: HeroProps) {
           </div>
         </div>
 
-        {/* CTA Section */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
             <div className="bg-[#4B6FEE] text-white p-6">
@@ -172,5 +167,3 @@ export function Hero({}: HeroProps) {
     </section>
   )
 }
-
-export default Hero
