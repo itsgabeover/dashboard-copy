@@ -6,8 +6,10 @@ import { Upload, CheckCircle, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-interface PageProps {
-  params: { token: string }
+type PageProps = {
+  params: {
+    token: string
+  }
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -21,7 +23,7 @@ const isValidEmail = (email: string): boolean => {
          validTLDs.some(tld => email.toLowerCase().endsWith(tld))
 }
 
-export default function UploadPage({ params }: PageProps) {
+export default async function UploadPage({ params }: PageProps) {
   const router = useRouter()
   const { token } = params
   const [isLoading, setIsLoading] = useState(true)
