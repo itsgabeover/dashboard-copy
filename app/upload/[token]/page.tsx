@@ -6,6 +6,16 @@ import { Upload, CheckCircle, AlertTriangle, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
+// Email validation helper
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email) &&
+    !email.endsWith('.con') && 
+    !email.endsWith('.cim') &&
+    !email.includes('..') &&
+    email.length <= 254
+}
+
 export default function UploadPage({ 
   params 
 }: { 
@@ -47,6 +57,11 @@ export default function UploadPage({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     if (!file || !email) return
+
+    if (!isValidEmail(email)) {
+      setErrorMessage('Please enter a valid email address.')
+      return
+    }
 
     setUploadStatus('uploading')
     setErrorMessage('')
@@ -163,16 +178,28 @@ export default function UploadPage({
                 type="email"
                 id="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  if (e.target.value && !isValidEmail(e.target.value)) {
+                    setErrorMessage('Please enter a valid email address')
+                  } else {
+                    setErrorMessage('')
+                  }
+                }}
                 placeholder="your@email.com"
                 required
-                className="w-full"
+                className={`w-full ${email && !isValidEmail(email) ? 'border-red-500' : ''}`}
               />
+              {email && !isValidEmail(email) && (
+                <p className="mt-1 text-sm text-red-500">
+                  Please enter a valid email address
+                </p>
+              )}
             </div>
             <Button 
               type="submit" 
               className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE]"
-              disabled={uploadStatus === 'uploading' || !file || !email}
+              disabled={uploadStatus === 'uploading' || !file || !email || (email && !isValidEmail(email))}
             >
               {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Policy'}
             </Button>
