@@ -122,6 +122,11 @@ export default function UploadPage({
     )
   }
 
+  const isSubmitDisabled = uploadStatus === 'uploading' || 
+    !file || 
+    !email || 
+    (email.length > 0 && !isValidEmail(email))
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16 px-4">
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
@@ -199,7 +204,7 @@ export default function UploadPage({
             <Button 
               type="submit" 
               className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE]"
-              disabled={uploadStatus === 'uploading' || !file || !email || (email && !isValidEmail(email))}
+              disabled={isSubmitDisabled}
             >
               {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Policy'}
             </Button>
