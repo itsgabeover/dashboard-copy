@@ -6,9 +6,8 @@ import { Upload, CheckCircle, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-// Remove client-side types and use server component props
 type PageProps = {
-  params: Promise<{ token: string }>
+  params: { token: string }
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -22,9 +21,9 @@ const isValidEmail = (email: string): boolean => {
          validTLDs.some(tld => email.toLowerCase().endsWith(tld))
 }
 
-export default async function UploadPage({ params }: PageProps) {
+export default function UploadPage({ params }: PageProps) {
   const router = useRouter()
-  const { token } = await params
+  const { token } = params
   const [isLoading, setIsLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState('')
@@ -32,15 +31,12 @@ export default async function UploadPage({ params }: PageProps) {
   const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
-    const initializeToken = async () => {
-      if (token) {
-        sessionStorage.setItem('upload_token', token)
-        setIsLoading(false)
-      } else {
-        router.push('/')
-      }
+    if (token) {
+      sessionStorage.setItem('upload_token', token)
+      setIsLoading(false)
+    } else {
+      router.push('/')
     }
-    initializeToken()
   }, [token, router])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
