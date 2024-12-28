@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 type PageProps = {
-  params: { token: string }
+  params: { token: string } & { [Symbol.toStringTag]: string }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -32,8 +33,13 @@ export default function UploadPage({ params }: PageProps) {
 
   useEffect(() => {
     if (token) {
-      sessionStorage.setItem('upload_token', token)
-      setIsLoading(false)
+      try {
+        sessionStorage.setItem('upload_token', token)
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Session storage error:', error)
+        router.push('/')
+      }
     } else {
       router.push('/')
     }
