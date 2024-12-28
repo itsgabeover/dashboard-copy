@@ -23,7 +23,7 @@ const isValidEmail = (email: string): boolean => {
          validTLDs.some(tld => email.toLowerCase().endsWith(tld))
 }
 
-export default async function UploadPage({ params }: PageProps) {
+export default function UploadPage({ params }: PageProps) {
   const router = useRouter()
   const { token } = params
   const [isLoading, setIsLoading] = useState(true)
@@ -126,6 +126,7 @@ export default async function UploadPage({ params }: PageProps) {
         <div className="p-8">
           <h1 className="text-2xl font-bold text-[#4B6FEE] mb-6">Upload Your Policy</h1>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Rest of the JSX remains the same */}
             <div>
               <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
                 Policy File (PDF)
