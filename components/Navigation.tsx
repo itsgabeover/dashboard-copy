@@ -31,7 +31,8 @@ export default function Navigation() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500"
+              className="md:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              aria-label="Toggle menu"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -83,24 +84,20 @@ export default function Navigation() {
                 Chat with Sage
               </button>
             </div>
+          </div>
 
-            {/* Mobile Navigation */}
-            <div
-              className={`
-                absolute top-16 left-0 right-0 bg-white border-b border-border md:hidden
-                transition-transform duration-200 ease-in-out
-                ${isOpen ? 'transform translate-y-0' : 'transform -translate-y-full'}
-              `}
-            >
-              <div className="px-4 py-2 space-y-1">
+          {/* Mobile Navigation - Modified for better visibility */}
+          {isOpen && (
+            <div className="md:hidden border-t border-border">
+              <div className="px-4 py-2 space-y-1 bg-white shadow-lg">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`block py-3 text-base transition-colors duration-200
+                    className={`block px-4 py-3 text-base transition-colors duration-200 rounded-md
                       ${isActivePath(link.href)
-                        ? 'text-[#4B6FEE] font-semibold'
-                        : 'text-gray-600 hover:text-[#4B6FEE]'
+                        ? 'text-[#4B6FEE] font-semibold bg-blue-50'
+                        : 'text-gray-600 hover:text-[#4B6FEE] hover:bg-gray-50'
                       }
                     `}
                     onClick={() => setIsOpen(false)}
@@ -115,7 +112,7 @@ export default function Navigation() {
                     setShowChat(true);
                     setIsOpen(false);
                   }}
-                  className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white rounded-full px-6 py-2 flex items-center justify-center gap-2 mt-2"
+                  className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white rounded-full px-6 py-2 flex items-center justify-center gap-2 my-2"
                 >
                   <svg 
                     width="20" 
@@ -137,7 +134,7 @@ export default function Navigation() {
                 </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </nav>
 
