@@ -67,6 +67,31 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const email = formData.get('email') as string | null
+
+    // Prepare data for n8n
+    const n8nFormData = new FormData()
+    n8nFormData.append('data0', file, file.name)
+    if (email) {
+      n8nFormData.append('email', email)
+    }
+    n8nFormData.append('filename', file.name)
+    n8nFormData.append('timestamp', new Date().toISOString())
+    n8nFormData.append('token', token)
+    n8nFormData.append('sessionId', tokenData.sessionId)
+
+    // Send to n8n webhook
+    const response = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT!, {
+      method: 'POST',
+      body: n8nFormData
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('n8n error response:', errorText)
+      throw new Error('Failed to process file with n8n')
+    }
+
     // Mark token as used in both Redis keys
     tokenData.used = "true"
     const redisPromises = [
