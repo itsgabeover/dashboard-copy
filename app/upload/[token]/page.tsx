@@ -6,10 +6,11 @@ import { Upload, CheckCircle, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-type PageProps = {
+interface PageProps {
   params: {
-    token: string
-  }
+    token: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 const isValidEmail = (email: string): boolean => {
