@@ -6,11 +6,8 @@ import { Upload, CheckCircle, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-interface PageProps {
-  params: {
-    token: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
+type PageProps = {
+  params: { token: string }
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -72,6 +69,7 @@ export default function UploadPage({ params }: PageProps) {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('email', email)
+    
     const storedToken = sessionStorage.getItem('upload_token')
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
@@ -127,7 +125,6 @@ export default function UploadPage({ params }: PageProps) {
         <div className="p-8">
           <h1 className="text-2xl font-bold text-[#4B6FEE] mb-6">Upload Your Policy</h1>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Rest of the JSX remains the same */}
             <div>
               <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
                 Policy File (PDF)
@@ -138,7 +135,14 @@ export default function UploadPage({ params }: PageProps) {
                   <div className="flex text-sm text-gray-600">
                     <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]">
                       <span>Upload a file</span>
-                      <Input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf" />
+                      <Input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        onChange={handleFileChange}
+                        accept=".pdf"
+                      />
                     </label>
                     <p className="pl-1">or drag and drop</p>
                   </div>
@@ -148,7 +152,13 @@ export default function UploadPage({ params }: PageProps) {
               {file && (
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-sm text-gray-600">Selected file: {file.name}</p>
-                  <Button type="button" variant="ghost" size="sm" onClick={clearFileSelection} className="text-red-500 hover:text-red-700">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFileSelection}
+                    className="text-red-500 hover:text-red-700"
+                  >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
