@@ -1,15 +1,10 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, use } from 'react'
 import { Upload, CheckCircle, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
-type PageProps = {
-  params: { token: string } & { [Symbol.toStringTag]: string }
-  searchParams?: { [key: string]: string | string[] | undefined }
-}
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -22,9 +17,13 @@ const isValidEmail = (email: string): boolean => {
          validTLDs.some(tld => email.toLowerCase().endsWith(tld))
 }
 
-export default function UploadPage({ params }: PageProps) {
+export default function UploadPage({ 
+  params 
+}: { 
+  params: Promise<{ token: string }> 
+}) {
   const router = useRouter()
-  const { token } = params
+  const { token } = use(params)
   const [isLoading, setIsLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState('')
