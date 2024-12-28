@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 
 interface PageProps {
   params: { token: string }
-  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 const isValidEmail = (email: string): boolean => {
@@ -22,7 +21,7 @@ const isValidEmail = (email: string): boolean => {
          validTLDs.some(tld => email.toLowerCase().endsWith(tld))
 }
 
-export default function UploadPage({ params, _searchParams }: PageProps) {
+export default function UploadPage({ params }: PageProps) {
   const router = useRouter()
   const { token } = params
   const [isLoading, setIsLoading] = useState(true)
