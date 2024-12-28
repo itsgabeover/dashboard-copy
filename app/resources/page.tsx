@@ -2,14 +2,11 @@
 
 import { useState } from 'react'
 import { 
-  ArrowRight, 
   BookOpen, 
   FileText, 
-  HelpCircle, 
   Download, 
   ChevronDown, 
   ChevronUp, 
-  Lightbulb, 
   X 
 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
