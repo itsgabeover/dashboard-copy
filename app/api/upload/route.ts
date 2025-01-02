@@ -13,6 +13,7 @@ type TokenData = {
 
 export async function POST(req: NextRequest) {
   let client;
+
   try {
     // Validate authorization token
     const authHeader = req.headers.get('authorization')
@@ -53,34 +54,13 @@ export async function POST(req: NextRequest) {
 
     // Get form data
     const formData = await req.formData()
-    const file = formData.get('data0') as File | null
-    const metadataJson = formData.get('metadata') as string | null
+    const file = formData.get('file') as File | null
+    const email = formData.get('email') as string | null
 
-    // Validate file and metadata
-    if (!file || !metadataJson) {
+    // Validate file
+    if (!file) {
       return NextResponse.json(
-        { success: false, error: 'Missing file or metadata' },
-        { status: 400 }
-      )
-    }
-
-    // Parse metadata
-    let metadata;
-    try {
-      metadata = JSON.parse(metadataJson)
-    } catch {
-      return NextResponse.json(
-        { success: false, error: 'Invalid metadata format' },
-        { status: 400 }
-      )
-    }
-
-    const { email, formAnswers } = metadata
-
-    // Validate email and formAnswers
-    if (!email || !formAnswers || !Array.isArray(formAnswers) || formAnswers.length !== 6) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid email or form answers' },
+        { success: false, error: 'No file provided' },
         { status: 400 }
       )
     }
@@ -88,26 +68,22 @@ export async function POST(req: NextRequest) {
     // Prepare data for n8n
     const n8nFormData = new FormData()
     n8nFormData.append('data0', file, file.name)
-    n8nFormData.append('email', email)
+    if (email) {
+      n8nFormData.append('email', email)
+    }
     n8nFormData.append('filename', file.name)
     n8nFormData.append('timestamp', new Date().toISOString())
     n8nFormData.append('token', token)
     n8nFormData.append('sessionId', tokenData.sessionId)
 
-    // Append form answers
-    formAnswers.forEach((answer: string, index: number) => {
-      n8nFormData.append(`formAnswer${index + 1}`, answer)
-    })
-
     // Send to n8n webhook
-    const n8nResponse = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT!, {
+    const response = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT!, {
       method: 'POST',
       body: n8nFormData
     })
 
-    if (!n8nResponse.ok) {
-      const errorText = await n8nResponse.text()
-      throw new Error(`Failed to process file with n8n: ${errorText}`)
+    if (!response.ok) {
+      throw new Error('Failed to process file with n8n')
     }
 
     // Mark token as used in both Redis keys
@@ -124,14 +100,12 @@ export async function POST(req: NextRequest) {
         { EX: 1800 }
       )
     ] as const
-
     await Promise.all(redisPromises)
 
     return NextResponse.json({
       success: true,
       message: 'File uploaded successfully'
     })
-
   } catch (error) {
     console.error('Upload processing error:', error)
     return NextResponse.json(
@@ -143,7 +117,11 @@ export async function POST(req: NextRequest) {
     )
   } finally {
     if (client) {
-      await client.disconnect().catch(console.error)
+      try {
+        await client.disconnect()
+      } catch (disconnectError) {
+        console.error('Redis disconnect error:', disconnectError)
+      }
     }
   }
 }
