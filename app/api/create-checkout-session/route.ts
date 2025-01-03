@@ -55,7 +55,9 @@ export async function POST(req: NextRequest) {
       success_url: `${body.success_url}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: body.cancel_url,
       metadata: {
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        service_type: 'gba',
+        created_at: new Date().toISOString()
       }
     })
 
