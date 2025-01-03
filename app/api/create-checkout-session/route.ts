@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       cancel_url: body.cancel_url,
       metadata: {
         timestamp: new Date().toISOString(),
-        service_type: 'gba',
+        service_type: 'policy review',
         created_at: new Date().toISOString()
       }
     })
