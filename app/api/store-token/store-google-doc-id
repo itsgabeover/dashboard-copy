@@ -1,0 +1,117 @@
+// app/api/store-doc/route.ts
+import { NextResponse } from 'next/server'
+import { createClient } from 'redis'
+
+// Types
+type DocData = {
+  readonly docId: string
+  readonly customerEmail: string
+  readonly sessionId: string
+  readonly created: string
+}
+
+type RequestBody = Omit<DocData, 'created'> & {
+  docId: string
+}
+
+// POST handler for storing document ID
+export async function POST(request: Request): Promise<NextResponse> {
+  let client;
+  
+  try {
+    // Parse and validate request body
+    const body: RequestBody = await request.json()
+    console.log('Received doc data to store:', body)
+
+    // Validation
+    if (!body.docId || !body.sessionId || !body.customerEmail) {
+      return NextResponse.json({
+        success: false,
+        message: 'Missing required fields: docId, sessionId, and customerEmail are required'
+      }, { status: 400 })
+    }
+
+    // Connect to Redis
+    client = createClient({
+      url: process.env.REDIS_URL
+    })
+    await client.connect()
+
+    // Create composite key
+    const key = `doc:${body.customerEmail}:${body.sessionId}`
+    
+    // Store data with timestamp
+    await client.set(key, JSON.stringify({
+      docId: body.docId,
+      customerEmail: body.customerEmail,
+      sessionId: body.sessionId,
+      created: new Date().toISOString()
+    }))
+
+    return NextResponse.json({
+      success: true,
+      message: 'Document ID stored successfully'
+    })
+
+  } catch (error) {
+    console.error('Error storing document ID:', error)
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to store document ID'
+    }, { status: 500 })
+  } finally {
+    if (client) await client.quit()
+  }
+}
+
+// GET handler for retrieving document ID
+export async function GET(request: Request): Promise<NextResponse> {
+  let client;
+  
+  try {
+    const { searchParams } = new URL(request.url)
+    const email = searchParams.get('email')
+    const sessionId = searchParams.get('sessionId')
+
+    if (!email || !sessionId) {
+      return NextResponse.json({
+        success: false,
+        message: 'Missing required parameters: email and sessionId'
+      }, { status: 400 })
+    }
+
+    // Connect to Redis
+    client = createClient({
+      url: process.env.REDIS_URL
+    })
+    await client.connect()
+
+    // Generate the same composite key format
+    const key = `doc:${email}:${sessionId}`
+    const data = await client.get(key)
+
+    if (!data) {
+      return NextResponse.json({
+        success: false,
+        message: 'Document not found'
+      }, { status: 404 })
+    }
+
+    // Parse and return the stored data
+    const docData = JSON.parse(data)
+    
+    return NextResponse.json({
+      success: true,
+      data: docData
+    })
+
+  } catch (error) {
+    console.error('Error retrieving document:', error)
+    return NextResponse.json({
+      success: false,
+      message: 'Failed to retrieve document'
+    }, { status: 500 })
+  } finally {
+    if (client) await client.quit()
+  }
+}
