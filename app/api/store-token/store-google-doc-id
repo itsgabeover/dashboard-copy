@@ -1,4 +1,4 @@
-// app/api/store-doc/route.ts
+// app/api/store-token/store-google-doc-id/route.ts
 import { NextResponse } from 'next/server'
 import { createClient } from 'redis'
 
@@ -19,11 +19,9 @@ export async function POST(request: Request): Promise<NextResponse> {
   let client;
   
   try {
-    // Parse and validate request body
     const body: RequestBody = await request.json()
     console.log('Received doc data to store:', body)
 
-    // Validation
     if (!body.docId || !body.sessionId || !body.customerEmail) {
       return NextResponse.json({
         success: false,
@@ -31,16 +29,12 @@ export async function POST(request: Request): Promise<NextResponse> {
       }, { status: 400 })
     }
 
-    // Connect to Redis
     client = createClient({
       url: process.env.REDIS_URL
     })
     await client.connect()
 
-    // Create composite key
     const key = `doc:${body.customerEmail}:${body.sessionId}`
-    
-    // Store data with timestamp
     await client.set(key, JSON.stringify({
       docId: body.docId,
       customerEmail: body.customerEmail,
@@ -80,13 +74,11 @@ export async function GET(request: Request): Promise<NextResponse> {
       }, { status: 400 })
     }
 
-    // Connect to Redis
     client = createClient({
       url: process.env.REDIS_URL
     })
     await client.connect()
 
-    // Generate the same composite key format
     const key = `doc:${email}:${sessionId}`
     const data = await client.get(key)
 
@@ -97,12 +89,9 @@ export async function GET(request: Request): Promise<NextResponse> {
       }, { status: 404 })
     }
 
-    // Parse and return the stored data
-    const docData = JSON.parse(data)
-    
     return NextResponse.json({
       success: true,
-      data: docData
+      data: JSON.parse(data)
     })
 
   } catch (error) {
