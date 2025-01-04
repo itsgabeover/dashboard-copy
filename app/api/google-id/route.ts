@@ -84,3 +84,53 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
   }
 }
+// Add this GET handler to your existing app/api/google-id/route.ts file
+export async function GET(request: Request): Promise<NextResponse> {
+  let client;
+  
+  try {
+    const { searchParams } = new URL(request.url)
+    const sessionId = searchParams.get('sessionId')
+
+    if (!sessionId?.startsWith('cs_live_')) {
+      return NextResponse.json({
+        success: false,
+        message: 'Not a checkout session'
+      }, { status: 400 })
+    }
+
+    client = createClient({
+      url: process.env.REDIS_URL || ''
+    })
+    await client.connect()
+
+    const data = await client.get(`doc:${sessionId}`)
+
+    if (!data) {
+      return NextResponse.json({
+        success: false,
+        message: 'Document not found'
+      }, { status: 404 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: JSON.parse(data)
+    })
+
+  } catch (error) {
+    console.error('Get doc ID error:', error)
+    return NextResponse.json({ 
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to retrieve doc ID' 
+    }, { status: 500 })
+  } finally {
+    if (client) {
+      try {
+        await client.disconnect()
+      } catch (disconnectError) {
+        console.error('Redis disconnect error:', disconnectError)
+      }
+    }
+  }
+}
