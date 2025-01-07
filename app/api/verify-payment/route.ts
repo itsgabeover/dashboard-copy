@@ -31,6 +31,11 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     await client.connect()
     const data = await client.get(`payment:${sessionId}`)
+    console.log('Raw Redis data:', data)
+    const tokenData = JSON.parse(data) as TokenData
+    console.log('Parsed token data:', tokenData)
+    console.log('Token being returned:', tokenData.token)
+           
     console.log('Found data for session:', sessionId, data)
 
     if (!data) {
