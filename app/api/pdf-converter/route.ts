@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     try {
         let html: string;
         const contentType = request.headers.get('content-type');
-
+        //bob was here
         // Handle different content types
         if (contentType?.includes('application/json')) {
             const body = await request.json();
