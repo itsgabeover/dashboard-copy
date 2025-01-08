@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         }
 
         const browser = await puppeteer.launch({
-            headless: 'true',
+            headless: true,
             executablePath: '/usr/bin/chromium-browser',
             args: ['--no-sandbox']
         });
