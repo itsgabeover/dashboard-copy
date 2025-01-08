@@ -1,20 +1,13 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: false
-  },
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
   experimental: {
     serverActions: true
   },
-  webpack: (
-    config: any,
-    { isServer }: { isServer: boolean }
-  ) => {
-    if (isServer) {
-      config.externals = [...config.externals, 'puppeteer'];
-    }
+  webpack: (config: any) => {
+    config.externals = [...config.externals, 'chrome-aws-lambda'];
     return config;
   }
-}
+};
 
-module.exports = nextConfig
+export default nextConfig;
