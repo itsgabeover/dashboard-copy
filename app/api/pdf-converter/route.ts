@@ -3,7 +3,21 @@ import puppeteer from 'puppeteer';
 
 export async function POST(request: Request) {
     try {
-        const { html, filename = 'document.pdf' } = await request.json();
+        let html: string;
+        const contentType = request.headers.get('content-type');
+
+        // Handle different content types
+        if (contentType?.includes('application/json')) {
+            const body = await request.json();
+            html = body.html;
+        } else if (contentType?.includes('text/html')) {
+            html = await request.text();
+        } else {
+            return NextResponse.json(
+                { error: 'Content-Type must be application/json or text/html' },
+                { status: 400 }
+            );
+        }
 
         if (!html) {
             return NextResponse.json(
@@ -13,37 +27,25 @@ export async function POST(request: Request) {
         }
 
         const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            headless: 'new',
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox']
         });
 
         const page = await browser.newPage();
-
-        // Add support for both direct HTML and URL
-        if (html.startsWith('http')) {
-            await page.goto(html, { waitUntil: 'networkidle0' });
-        } else {
-            await page.setContent(html, { waitUntil: 'networkidle0' });
-        }
+        await page.setContent(html, { waitUntil: 'networkidle0' });
 
         const pdfBuffer = await page.pdf({
             format: 'A4',
-            margin: {
-                top: '20px',
-                right: '20px',
-                bottom: '20px',
-                left: '20px'
-            },
             printBackground: true
         });
 
         await browser.close();
 
-        // Return the PDF as a response
         return new NextResponse(pdfBuffer, {
             headers: {
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': `attachment; filename=${filename}`
+                'Content-Disposition': 'attachment; filename=document.pdf'
             }
         });
 
