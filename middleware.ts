@@ -15,8 +15,8 @@ export function middleware(request: NextRequest) {
     const token = pathname.split('/').pop()
     console.log('Token path accessed:', token)
     
-    // Validate token exists and has basic format
-    if (!token || !token.startsWith('m')) {
+    // Validate token exists and has new format (PI + timestamp)
+    if (!token || !token.startsWith('pi_') || !token.includes('_')) {
       console.log('Invalid token:', token)
       return NextResponse.redirect(new URL('/pre-payment-info', request.url))
     }
