@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
+import { PDFOptions } from 'puppeteer-core';
 
 // Define PDF settings optimized for policy reports
-const PDF_OPTIONS = {
-    format: 'Letter',  // Changed from A4 to US Letter
+const PDF_OPTIONS: PDFOptions = {
+    format: 'letter',  // lowercase 'letter' is the correct type
     printBackground: true,
     margin: {
         top: '0.75in',
