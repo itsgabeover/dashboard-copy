@@ -16,37 +16,26 @@ const PDF_OPTIONS: PDFOptions = {
     displayHeaderFooter: true,
     headerTemplate: '<div></div>',
     footerTemplate: `
-        <div style="
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            font-size: 9pt;
-            padding: 0 0.5in;
-            width: 100%;
-            border-top: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-        ">
+        <div style="font-size: 8pt; padding: 0 0.75in; width: 100%; border-top: 1pt solid #e2e8f0;">
             <span style="color: #2d3748;">Confidential</span>
-            <span>Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>
+            <span style="float: right;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>
         </div>
     `,
-    timeout: 30000 // Add timeout
+    timeout: 30000
 };
 
 export async function POST(request: Request) {
     let browser;
     try {
-        // Validate request
         if (!request) {
             throw new Error('No request received');
         }
 
-        // Get HTML content with validation
         const html = await getHtmlFromRequest(request);
         if (!html) {
             throw new Error('No HTML content received');
         }
 
-        // Launch browser with error handling
         browser = await puppeteer.launch({
             args: [
                 ...chromium.args, 
@@ -61,55 +50,36 @@ export async function POST(request: Request) {
             },
             executablePath: await chromium.executablePath(),
             headless: chromium.headless,
-        }).catch(error => {
-            console.error('Browser launch failed:', error);
-            throw error;
         });
 
         const page = await browser.newPage();
-
-        // Add request timeout
         await page.setDefaultNavigationTimeout(30000);
         await page.setDefaultTimeout(30000);
 
-        // Set content with error handling
         await page.setContent(html, { 
             waitUntil: ['load', 'networkidle0', 'domcontentloaded'],
             timeout: 30000
-        }).catch(error => {
-            console.error('Content loading failed:', error);
-            throw error;
         });
 
-        // Wait for content with timeout
-        try {
-            await Promise.race([
-                Promise.all([
-                    page.evaluateHandle('document.fonts.ready'),
-                    page.evaluate(() => {
-                        return new Promise((resolve) => {
-                            if (document.readyState === 'complete') {
-                                resolve(true);
-                            } else {
-                                window.addEventListener('load', resolve);
-                            }
-                        });
-                    })
-                ]),
-                new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Content loading timeout')), 30000)
-                )
-            ]);
-        } catch (error) {
-            console.error('Content preparation failed:', error);
-            throw error;
-        }
+        await Promise.race([
+            Promise.all([
+                page.evaluateHandle('document.fonts.ready'),
+                page.evaluate(() => {
+                    return new Promise((resolve) => {
+                        if (document.readyState === 'complete') {
+                            resolve(true);
+                        } else {
+                            window.addEventListener('load', resolve);
+                        }
+                    });
+                })
+            ]),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Content loading timeout')), 30000)
+            )
+        ]);
 
-        // Generate PDF with error handling
-        const pdfBuffer = await page.pdf(PDF_OPTIONS).catch(error => {
-            console.error('PDF generation failed:', error);
-            throw error;
-        });
+        const pdfBuffer = await page.pdf(PDF_OPTIONS);
 
         if (!pdfBuffer || pdfBuffer.length === 0) {
             throw new Error('Generated PDF is empty');
@@ -125,21 +95,23 @@ export async function POST(request: Request) {
             }
         });
 
-    } catch (error) {
+    } catch (error: any) { // Type annotation added here
         console.error('PDF conversion error:', {
-            error: error.message,
-            stack: error.stack,
+            error: error?.message || 'Unknown error',
+            stack: error?.stack || 'No stack trace',
             timestamp: new Date().toISOString()
         });
         return NextResponse.json(
-            { error: 'Failed to convert HTML to PDF', details: error.message },
+            { error: 'Failed to convert HTML to PDF', details: error?.message || 'Unknown error' },
             { status: 500 }
         );
     } finally {
         if (browser) {
-            await browser.close().catch(error => 
-                console.error('Browser cleanup failed:', error)
-            );
+            try {
+                await browser.close();
+            } catch (closeError) {
+                console.error('Browser cleanup failed:', closeError);
+            }
         }
     }
 }
@@ -169,7 +141,7 @@ async function getHtmlFromRequest(request: Request): Promise<string> {
         }
         
         throw new Error('Unsupported Content-Type: ' + contentType);
-    } catch (error) {
+    } catch (error: any) { // Type annotation added here
         console.error('HTML extraction failed:', error);
         throw error;
     }
