@@ -3,6 +3,11 @@ import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 import { PDFOptions } from 'puppeteer-core';
 
+// Custom error types
+interface ConversionError extends Error {
+    stack?: string;
+}
+
 const PDF_OPTIONS: PDFOptions = {
     format: 'letter',
     printBackground: true,
@@ -95,14 +100,15 @@ export async function POST(request: Request) {
             }
         });
 
-    } catch (error: any) { // Type annotation added here
+    } catch (error) {
+        const conversionError = error as ConversionError;
         console.error('PDF conversion error:', {
-            error: error?.message || 'Unknown error',
-            stack: error?.stack || 'No stack trace',
+            error: conversionError.message || 'Unknown error',
+            stack: conversionError.stack || 'No stack trace',
             timestamp: new Date().toISOString()
         });
         return NextResponse.json(
-            { error: 'Failed to convert HTML to PDF', details: error?.message || 'Unknown error' },
+            { error: 'Failed to convert HTML to PDF', details: conversionError.message || 'Unknown error' },
             { status: 500 }
         );
     } finally {
@@ -141,8 +147,9 @@ async function getHtmlFromRequest(request: Request): Promise<string> {
         }
         
         throw new Error('Unsupported Content-Type: ' + contentType);
-    } catch (error: any) { // Type annotation added here
-        console.error('HTML extraction failed:', error);
-        throw error;
+    } catch (error) {
+        const requestError = error as ConversionError;
+        console.error('HTML extraction failed:', requestError);
+        throw requestError;
     }
 }
