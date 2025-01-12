@@ -12,16 +12,16 @@ const PDF_OPTIONS: PDFOptions = {
     format: 'letter',
     printBackground: true,
     margin: {
-        top: '0.5in',
+        top: '0.75in',        // Updated for consistency
         right: '0.5in',
-        bottom: '0.5in',
+        bottom: '0.75in',     // Updated to accommodate footer
         left: '0.5in'
     },
     preferCSSPageSize: true,
     displayHeaderFooter: true,
     headerTemplate: '<div></div>',
     footerTemplate: `
-        <div style="font-size: 8pt; padding: 0 0.75in; width: 100%; border-top: 1pt solid #e2e8f0;">
+        <div style="font-size: 8pt; width: 100%; padding: 0 0.5in; margin-top: 20px">
             <span style="color: #2d3748;">Confidential</span>
             <span style="float: right;">Page <span class="pageNumber"></span> of <span class="totalPages"></span></span>
         </div>
@@ -60,6 +60,28 @@ export async function POST(request: Request) {
         const page = await browser.newPage();
         await page.setDefaultNavigationTimeout(30000);
         await page.setDefaultTimeout(30000);
+
+        // Add CSS for page margin control before setting content
+        await page.evaluate(() => {
+            const style = document.createElement('style');
+            style.textContent = `
+                @page {
+                    margin: 0.75in 0.5in;
+                    size: letter;
+                }
+                
+                body {
+                    margin: 0;
+                    padding-top: 0.75in;
+                    padding-bottom: 0.75in;
+                }
+                
+                .cover {
+                    margin-top: -0.75in;
+                }
+            `;
+            document.head.appendChild(style);
+        });
 
         await page.setContent(html, { 
             waitUntil: ['load', 'networkidle0', 'domcontentloaded'],
