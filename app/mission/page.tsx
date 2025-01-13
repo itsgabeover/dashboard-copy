@@ -1,6 +1,7 @@
 import { Zap, Shield, TrendingUp, Users, Clock, Brain, Upload, FileText, ArrowRight, AlertTriangle, CheckCircle, BarChart, Target, RefreshCw, XCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { SampleAnalysisReport } from '@/components/SampleAnalysisReport'
+import Link from 'next/link'
 
 export default function MissionPage() {
   return (
@@ -307,7 +308,7 @@ export default function MissionPage() {
                 <a href="/upload">
                   Start Your Analysis
                   <ArrowRight className="w-6 h-6" />
-                </a>
+                 </Link>
               </Button>
             </div>
           </div>
