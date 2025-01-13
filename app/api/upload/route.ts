@@ -13,7 +13,6 @@ type TokenData = {
 
 export async function POST(req: NextRequest) {
   let client;
-
   try {
     // Validate authorization token
     const authHeader = req.headers.get('authorization')
@@ -26,30 +25,35 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Initialize Redis client
-    client = createClient({
-      url: process.env.REDIS_URL || ''
-    })
-    await client.connect()
-
-    // Check if token exists and is valid
-    const existingToken = await client.get(`upload_token:${token}`)
-    if (!existingToken) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid or expired token' },
-        { status: 401 }
-      )
-    }
-
-    // Parse and validate token data
-    const tokenData = JSON.parse(existingToken) as TokenData
+    // Check if it's a mock token (pi_*_mock)
+    const isMockToken = token.includes('_mock');
     
-    // Check if token is already used
-    if (tokenData.used === "true") {
-      return NextResponse.json(
-        { success: false, error: 'Token has already been used' },
-        { status: 400 }
-      )
+    if (!isMockToken) {
+      // Initialize Redis client for real tokens
+      client = createClient({
+        url: process.env.REDIS_URL || ''
+      })
+      await client.connect()
+      
+      // Check if token exists and is valid
+      const existingToken = await client.get(`upload_token:${token}`)
+      if (!existingToken) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid or expired token' },
+          { status: 401 }
+        )
+      }
+      
+      // Parse and validate token data
+      const tokenData = JSON.parse(existingToken) as TokenData
+      
+      // Check if token is already used
+      if (tokenData.used === "true") {
+        return NextResponse.json(
+          { success: false, error: 'Token has already been used' },
+          { status: 400 }
+        )
+      }
     }
 
     // Get form data
@@ -74,7 +78,7 @@ export async function POST(req: NextRequest) {
     n8nFormData.append('filename', file.name)
     n8nFormData.append('timestamp', new Date().toISOString())
     n8nFormData.append('token', token)
-    n8nFormData.append('sessionId', tokenData.sessionId)
+    n8nFormData.append('sessionId', isMockToken ? 'mock_session' : token)
 
     // Send to n8n webhook
     const response = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT!, {
@@ -86,21 +90,30 @@ export async function POST(req: NextRequest) {
       throw new Error('Failed to process file with n8n')
     }
 
-    // Mark token as used in both Redis keys
-    tokenData.used = "true"
-    const redisPromises = [
-      client.set(
-        `upload_token:${token}`, 
-        JSON.stringify(tokenData),
-        { EX: 1800 }
-      ),
-      client.set(
-        `payment:${tokenData.sessionId}`,
-        JSON.stringify(tokenData),
-        { EX: 1800 }
-      )
-    ] as const
-    await Promise.all(redisPromises)
+    // Only update Redis if it's not a mock token
+    if (!isMockToken && client) {
+      const tokenData = {
+        token,
+        used: "true",
+        created: new Date().toISOString(),
+        expires: new Date(Date.now() + 1800000).toISOString(),
+        sessionId: token
+      }
+      
+      const redisPromises = [
+        client.set(
+          `upload_token:${token}`, 
+          JSON.stringify(tokenData),
+          { EX: 1800 }
+        ),
+        client.set(
+          `payment:${token}`,
+          JSON.stringify(tokenData),
+          { EX: 1800 }
+        )
+      ] as const
+      await Promise.all(redisPromises)
+    }
 
     return NextResponse.json({
       success: true,
