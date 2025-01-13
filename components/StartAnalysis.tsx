@@ -8,7 +8,7 @@ export function StartAnalysis() {
 
   const handleStart = () => {
     setIsLoading(true)
-    router.push('/pre-payment-info')
+    router.push('/upload')
   }
 
   return (
