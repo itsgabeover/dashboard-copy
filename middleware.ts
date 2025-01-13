@@ -4,10 +4,11 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   
-  // Only handle /upload paths
+  // For base /upload path, generate a mock token and redirect
   if (pathname === '/upload') {
     console.log('Base /upload path accessed')
-    return NextResponse.redirect(new URL('/pre-payment-info', request.url))
+    const mockToken = `pi_${Date.now()}_mock`
+    return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url))
   }
   
   // For /upload/[token] paths
@@ -15,10 +16,11 @@ export function middleware(request: NextRequest) {
     const token = pathname.split('/').pop()
     console.log('Token path accessed:', token)
     
-    // Validate token exists and has new format (PI + timestamp)
-    if (!token || !token.startsWith('pi_') || !token.includes('_')) {
-      console.log('Invalid token:', token)
-      return NextResponse.redirect(new URL('/pre-payment-info', request.url))
+    // Allow any token format since we're bypassing payment
+    if (!token) {
+      console.log('No token provided')
+      const mockToken = `pi_${Date.now()}_mock`
+      return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url))
     }
     
     // Valid token, proceed
