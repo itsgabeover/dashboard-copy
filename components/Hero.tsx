@@ -17,7 +17,6 @@ export const Hero: FC = () => {
           AI-Powered Analysis to Protect Your Family&apos;s Future
         </h2>
         
-        {/* Value Proposition Box */}
         <div className="max-w-4xl mx-auto mb-16 bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
           <div className="p-8">
             <h3 className="text-3xl font-bold mb-6 text-[#4B6FEE] flex items-center justify-center">
@@ -45,7 +44,6 @@ export const Hero: FC = () => {
           </div>
         </div>
 
-        {/* How It Works */}
         <div className="max-w-4xl mx-auto mb-16">
           <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">How It Works</h3>
           <div className="grid md:grid-cols-3 gap-8">
@@ -53,33 +51,33 @@ export const Hero: FC = () => {
               <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
                 <Upload className="w-6 h-6 text-[#4B6FEE]" aria-hidden="true" />
               </div>
-              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Get Ready</h4>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Step 1: Get Ready</h4>
               <ul className="text-gray-600 text-sm space-y-1">
                 <li>Contact carrier for illustration</li>
-                <li>Takes about a week</li>
-                <li>We'll show you how</li>
+                <li>Takes about 2 weeks</li>
+                <li>We&apos;ll guide you how</li>
               </ul>
             </div>
             <div className="flex flex-col items-center">
               <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
                 <Clock className="w-6 h-6 text-[#4B6FEE]" aria-hidden="true" />
               </div>
-              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Upload & Analyze</h4>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Step 2: Upload & Analyze</h4>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>Share your in-force illustration</li>
-                <li>AI analyzes hundreds of data points</li>
-                <li>Takes just 5 minutes</li>
+                <li>Share your illustration</li>
+                <li>AI reviews everything</li>
+                <li>Just 5 minutes total</li>
               </ul>
             </div>
             <div className="flex flex-col items-center">
               <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
                 <FileText className="w-6 h-6 text-[#4B6FEE]" aria-hidden="true" />
               </div>
-              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Get Two Reports</h4>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Step 3: Get Two Reports</h4>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>Expert analysis for your advisor</li>
-                <li>Easy summary for you</li>
-                <li>Both emailed instantly</li>
+                <li>Advisor technical report</li>
+                <li>Your simple summary</li>
+                <li>Instant delivery</li>
               </ul>
             </div>
           </div>
@@ -88,7 +86,6 @@ export const Hero: FC = () => {
           </p>
         </div>
 
-        {/* What You'll Learn */}
         <div className="max-w-4xl mx-auto mb-16">
           <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You&apos;ll Receive</h3>
           <div className="grid md:grid-cols-2 gap-6">
@@ -127,11 +124,11 @@ export const Hero: FC = () => {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">How You're Protected Today</span>
+                  <span className="text-lg">How You&apos;re Protected Today</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">What's Working Well</span>
+                  <span className="text-lg">What&apos;s Working Well</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
@@ -147,7 +144,6 @@ export const Hero: FC = () => {
           </div>
         </div>
 
-        {/* CTA Section */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
             <div className="bg-[#4B6FEE] text-white p-6">
@@ -155,7 +151,7 @@ export const Hero: FC = () => {
                 <Zap className="w-8 h-8 mr-2" aria-hidden="true" />
                 Get Peace of Mind Today
               </h3>
-              <p className="text-xl">See how your life insurance is really performing in just minutes</p>
+              <p className="text-xl">See how your life insurance is really performing in just 5 minutes</p>
             </div>
             <div className="p-8">
               <div className="flex justify-center mt-8">
