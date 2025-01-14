@@ -1,55 +1,48 @@
-'use client'
-
 import { Zap, Shield, TrendingUp, Users, Clock, Brain, Upload, FileText, ArrowRight, AlertTriangle, CheckCircle, BarChart, Target, RefreshCw, XCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { SampleAnalysisReport } from '@/components/SampleAnalysisReport'
-import Link from 'next/link'
 
-const MissionPage = () => {
+export default function MissionPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0]">
       <section className="py-16">
         <div className="container mx-auto px-4 text-center">
-          {/* Hero Section */}
           <div className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-medium text-[#4B6FEE] mb-2">Why Check Your Policy?</h2>
+            <h2 className="text-2xl md:text-3xl font-medium text-[#4B6FEE] mb-2">Our Mission</h2>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-800 leading-tight">
-              Your Life Insurance Needs<br />Regular Check-Ups Too
+              Addressing the Hidden Crisis<br />in Life Insurance
             </h1>
           </div>
-          <h2 className="text-xl md:text-2xl mb-12 text-gray-600 font-normal">
-            Like any financial plan, your life insurance needs care to stay healthy and protect your family
-          </h2>
+          <h2 className="text-xl md:text-2xl mb-12 text-gray-600 font-normal">Permanent life insurance policies often face critical issues without regular review</h2>
 
-          {/* Feature Cards */}
           <div className="max-w-5xl mx-auto mb-16">
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 { 
                   icon: AlertTriangle, 
-                  title: "Warning Signs", 
+                  title: "Policy Risks", 
                   items: [
-                    "Premium costs rising unexpectedly",
-                    "Coverage that might end too soon",
-                    "Policy expenses eating into value"
+                    "Insufficient premium funding",
+                    "Expiration of no-lapse guarantees",
+                    "Rising cost of insurance charges"
                   ]
                 },
                 { 
                   icon: TrendingUp, 
-                  title: "Performance Checks", 
+                  title: "Performance Impacts", 
                   items: [
-                    "Returns lower than promised",
-                    "Cash value growing too slowly",
-                    "Policy not meeting expectations"
+                    "Lower-than-expected crediting rates",
+                    "Cash value volatility",
+                    "Gaps between actual and illustrated performance"
                   ]
                 },
                 { 
                   icon: Shield, 
-                  title: "Protection Updates", 
+                  title: "Purpose & Design", 
                   items: [
-                    "Family needs have changed",
-                    "Coverage may need adjusting",
-                    "Better options now available"
+                    "Policy may not match current needs",
+                    "Coverage may be insufficient",
+                    "Features may no longer align"
                   ]
                 },
               ].map((section, index) => (
@@ -73,62 +66,61 @@ const MissionPage = () => {
             </div>
           </div>
 
-          {/* Main Features Section */}
           <div className="max-w-5xl mx-auto mb-16 bg-white rounded-lg shadow-md overflow-hidden">
             <div className="bg-[#4B6FEE] text-white p-6">
               <h3 className="text-2xl font-medium mb-2 flex items-center justify-center">
                 <Brain className="w-8 h-8 mr-3" />
-                Taking Care of Your Family&apos;s Protection
+                Strategic Life Insurance Policy Management
               </h3>
             </div>
             <div className="p-8">
               <div className="text-gray-700 mb-8 space-y-4">
                 <p className="text-lg leading-relaxed">
-                  Just like checking your retirement accounts, reviewing your life insurance helps ensure your family&apos;s protection stays strong. Regular check-ups catch problems early, before they put your coverage at risk.
+                  Just as investment planning involves regular portfolio rebalancing and performance monitoring, life insurance planning benefits from consistent review to ensure policies perform as expected and align with current needs. Regular policy assessment allows for timely adjustments, similar to how investment portfolios are optimized through strategic reallocation.
                 </p>
-                <p className="font-medium text-[#4B6FEE] text-xl">What we check in every review:</p>
+                <p className="font-medium text-[#4B6FEE] text-xl">Key considerations include:</p>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {[
                   { 
                     icon: RefreshCw, 
-                    title: "Life Changes",
-                    text: "Update protection as your family grows"
+                    title: "Life Event Updates",
+                    text: "Adapt coverage for changing circumstances"
                   },
                   { 
                     icon: Target, 
-                    title: "Coverage Check",
-                    text: "Make sure protection matches needs"
+                    title: "Design Alignment",
+                    text: "Ensure policy matches current objectives"
                   },
                   { 
                     icon: BarChart, 
-                    title: "Cost Review",
-                    text: "Keep premiums affordable long-term"
+                    title: "Premium Adequacy",
+                    text: "Verify premium funding meets policy requirements"
                   },
                   { 
                     icon: TrendingUp, 
-                    title: "Growth Check",
-                    text: "See if your policy is growing right"
+                    title: "Performance Analysis",
+                    text: "Compare actual results to illustrated projections"
                   },
                   { 
                     icon: Users, 
-                    title: "Value Review",
-                    text: "Make sure you&apos;re not overpaying"
+                    title: "Cost Efficiency",
+                    text: "Assess policy expenses and effectiveness"
                   },
                   { 
                     icon: AlertTriangle, 
-                    title: "Loan Impact",
-                    text: "Understand how loans affect coverage"
+                    title: "Loan Management",
+                    text: "Monitor impact on values and benefits"
                   },
                   { 
                     icon: CheckCircle, 
-                    title: "Tax Review",
-                    text: "Keep your benefits tax-efficient"
+                    title: "Tax Compliance",
+                    text: "Review MEC status and tax implications"
                   },
                   { 
                     icon: FileText, 
-                    title: "Health Report",
-                    text: "Get a clear picture of policy status"
+                    title: "Policy Documentation",
+                    text: "Track policy status and review findings"
                   }
                 ].map((item, index) => (
                   <div 
@@ -146,38 +138,36 @@ const MissionPage = () => {
             </div>
           </div>
 
-          {/* Comparison Section */}
           <div className="max-w-5xl mx-auto mb-16">
             <div className="grid md:grid-cols-2 gap-8">
-              {/* Challenge Card */}
               <div className="bg-white rounded-xl p-8 text-left border-2 border-red-100 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="bg-red-50 p-3 rounded-full">
                     <XCircle className="w-8 h-8 text-red-500" />
                   </div>
-                  <h4 className="text-2xl font-semibold text-gray-900">Why It&apos;s Hard to Do Alone</h4>
+                  <h4 className="text-2xl font-semibold text-gray-900">The Challenge</h4>
                 </div>
                 <div className="space-y-6">
                   <p className="text-lg text-gray-700 border-l-4 border-red-200 pl-4">
-                    Most people don&apos;t know what to check:
+                    Traditional policy reviews demand significant time and expertise:
                   </p>
                   <ul className="space-y-4">
                     {[
                       {
-                        title: "Complex Documents",
-                        description: "Insurance policies are hard to understand"
+                        title: "Time-Consuming Analysis",
+                        description: "Hours analyzing illustrations and data"
                       },
                       {
-                        title: "Hidden Problems",
-                        description: "Issues aren&apos;t obvious until it&apos;s too late"
+                        title: "Technical Complexity",
+                        description: "Complex technical interpretation required"
                       },
                       {
-                        title: "Time-Consuming",
-                        description: "Traditional reviews take weeks to complete"
+                        title: "Reporting Burden",
+                        description: "Time-intensive client reporting process"
                       },
                       {
-                        title: "Confusing Results",
-                        description: "Hard to know what needs attention"
+                        title: "Inconsistent Standards",
+                        description: "Lack of standardized review methodology"
                       }
                     ].map((item, i) => (
                       <li key={i} className="flex items-start bg-red-50/50 rounded-lg p-3 hover:bg-red-50 transition-all duration-300">
@@ -192,35 +182,34 @@ const MissionPage = () => {
                 </div>
               </div>
 
-              {/* Solution Card */}
               <div className="bg-white rounded-xl p-8 text-left border-2 border-green-100 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="bg-green-50 p-3 rounded-full">
                     <Zap className="w-8 h-8 text-green-500" />
                   </div>
-                  <h4 className="text-2xl font-semibold text-gray-900">How We Make It Easy</h4>
+                  <h4 className="text-2xl font-semibold text-gray-900">The IP-AI Solution</h4>
                 </div>
                 <div className="space-y-6">
                   <p className="text-lg text-gray-700 border-l-4 border-green-200 pl-4">
-                    Get clear answers in minutes:
+                    Transform policy reviews into a 5-minute process that delivers:
                   </p>
                   <ul className="space-y-4">
                     {[
                       {
-                        title: "Quick Check-Up",
-                        description: "Just upload your policy statement"
+                        title: "Instant Analysis",
+                        description: "Rapid, consistent analysis in minutes"
                       },
                       {
-                        title: "Simple Answers",
-                        description: "Learn exactly what&apos;s working and what isn&apos;t"
+                        title: "Clear Insights",
+                        description: "Actionable recommendations and key findings"
                       },
                       {
-                        title: "Clear Reports",
-                        description: "One simple summary, one for your advisor"
+                        title: "Professional Reports",
+                        description: "Polished client-ready documentation"
                       },
                       {
-                        title: "Fast Results",
-                        description: "Complete review in just 5 minutes"
+                        title: "Practice Enhancement",
+                        description: "Streamlined workflow and improved efficiency"
                       }
                     ].map((item, i) => (
                       <li key={i} className="flex items-start bg-green-50/50 rounded-lg p-3 hover:bg-green-50 transition-all duration-300">
@@ -237,11 +226,10 @@ const MissionPage = () => {
             </div>
           </div>
 
-          {/* Process Steps */}
           <div className="max-w-5xl mx-auto mb-24 pt-8">
-            <h3 className="text-4xl md:text-5xl font-medium mb-4 text-[#4B6FEE]">How It Works</h3>
+            <h3 className="text-4xl md:text-5xl font-medium mb-4 text-[#4B6FEE]">The IP-AI Solution</h3>
             <p className="text-xl text-gray-600 mb-16">
-              Three simple steps to check your policy:
+              Transform in-force policy reviews into a streamlined process:
             </p>
 
             <div className="grid md:grid-cols-3 gap-12">
@@ -249,10 +237,10 @@ const MissionPage = () => {
                 <div className="bg-[#4B6FEE]/10 p-6 rounded-full mb-6 transform transition-all hover:scale-110 duration-300">
                   <Upload className="w-12 h-12 text-[#4B6FEE]" />
                 </div>
-                <h5 className="text-2xl font-medium mb-4 text-[#4B6FEE]">1. Share Your Policy</h5>
+                <h5 className="text-2xl font-medium mb-4 text-[#4B6FEE]">Upload Illustration</h5>
                 <ul className="text-gray-600 text-lg space-y-2">
-                  <li>Upload your latest statement</li>
-                  <li>Quick and secure</li>
+                  <li>Drop your in-force illustration</li>
+                  <li>Add your email</li>
                 </ul>
               </div>
 
@@ -260,11 +248,11 @@ const MissionPage = () => {
                 <div className="bg-[#4B6FEE]/10 p-6 rounded-full mb-6 transform transition-all hover:scale-110 duration-300">
                   <Clock className="w-12 h-12 text-[#4B6FEE]" />
                 </div>
-                <h5 className="text-2xl font-medium mb-4 text-[#4B6FEE]">2. Quick Review</h5>
+                <h5 className="text-2xl font-medium mb-4 text-[#4B6FEE]">AI Analysis (5 Minutes)</h5>
                 <ul className="text-gray-600 text-lg space-y-2">
-                  <li>Thorough analysis</li>
-                  <li>Check all key areas</li>
-                  <li>Find any issues</li>
+                  <li>Advanced policy review</li>
+                  <li>Comprehensive metrics analysis</li>
+                  <li>Risk assessment</li>
                 </ul>
               </div>
 
@@ -272,56 +260,54 @@ const MissionPage = () => {
                 <div className="bg-[#4B6FEE]/10 p-6 rounded-full mb-6 transform transition-all hover:scale-110 duration-300">
                   <FileText className="w-12 h-12 text-[#4B6FEE]" />
                 </div>
-                <h5 className="text-2xl font-medium mb-4 text-[#4B6FEE]">3. Get Answers</h5>
+                <h5 className="text-2xl font-medium mb-4 text-[#4B6FEE]">Receive Reports</h5>
                 <ul className="text-gray-600 text-lg space-y-2">
-                  <li>Clear explanation</li>
-                  <li>Simple next steps</li>
-                  <li>Expert guidance</li>
+                  <li>Technical summary for you</li>
+                  <li>Professional client letter</li>
+                  <li>Both delivered to your inbox</li>
                 </ul>
               </div>
             </div>
 
             <p className="text-gray-600 mt-12 text-xl font-normal max-w-3xl mx-auto">
-              Start your policy check-up now - it only takes 5 minutes to get answers.
+              That&apos;s it. No questionnaires, no extra steps. Just upload and get your analysis in 5 minutes.
             </p>
 
-            {/* Sample Reports */}
             <div className="max-w-4xl mx-auto mt-16">
               <h4 className="text-2xl font-medium mb-8 text-[#4B6FEE]">Sample Reports</h4>
               <div className="grid md:grid-cols-2 gap-8">
                 <SampleAnalysisReport 
-                  title="Your Policy Check-Up"
+                  title="Policy Review Advisor Analysis"
                   items={[
-                    "Easy to understand",
-                    "Clear findings",
-                    "Simple next steps",
-                    "Key numbers explained"
+                    "Advisor Report",
+                    "Comprehensive Policy Review",
+                    "Action Items",
+                    "Performance Metrics"
                   ]}
                   reportUrl="https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20ANALYSIS-KcNItO6ThA29F15Sa0kuWc4uySibb9.pdf"
                 />
                 <SampleAnalysisReport 
-                  title="Advisor Details"
+                  title="Policy Review Client Summary"
                   items={[
-                    "Technical analysis",
-                    "Detailed metrics",
-                    "Specific recommendations",
-                    "Professional summary"
+                    "Client Report",
+                    "Clear Explanations",
+                    "Key Findings",
+                    "Next Steps"
                   ]}
                   reportUrl="https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20SUMMARY-gN6m36r8cHAwdzi68E4adsDuqypPMT.pdf"
                 />
               </div>
             </div>
 
-            {/* Call to Action */}
-            <div className="max-w-4xl mx-auto mt-16 flex justify-center space-x-6">
+           <div className="max-w-4xl mx-auto mt-16 flex justify-center space-x-6">
               <Button 
                 asChild 
                 className="bg-[#22C55E] hover:bg-[#16A34A] text-white text-xl px-12 py-6 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-2 mx-auto"
               >
-                <Link href="/upload">
-                  Check Your Policy Now
+                <a href="/pre-payment-info">
+                  Start Your Analysis
                   <ArrowRight className="w-6 h-6" />
-                </Link>
+                </a>
               </Button>
             </div>
           </div>
@@ -330,5 +316,3 @@ const MissionPage = () => {
     </main>
   )
 }
-
-export default MissionPage
