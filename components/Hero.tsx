@@ -53,32 +53,33 @@ export const Hero: FC = () => {
               <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
                 <Upload className="w-6 h-6 text-[#4B6FEE]" aria-hidden="true" />
               </div>
-              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Upload Illustration</h4>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Get Ready</h4>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>Share your in-force illustration</li>
-                <li>Receive dual-report analysis</li>
+                <li>Contact carrier for illustration</li>
+                <li>Takes about a week</li>
+                <li>We'll show you how</li>
               </ul>
             </div>
             <div className="flex flex-col items-center">
               <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
                 <Clock className="w-6 h-6 text-[#4B6FEE]" aria-hidden="true" />
               </div>
-              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Quick Analysis</h4>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Upload & Analyze</h4>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>Policy health check</li>
-                <li>Performance review</li>
-                <li>Cost comparison</li>
+                <li>Share your in-force illustration</li>
+                <li>AI analyzes hundreds of data points</li>
+                <li>Takes just 5 minutes</li>
               </ul>
             </div>
             <div className="flex flex-col items-center">
               <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
                 <FileText className="w-6 h-6 text-[#4B6FEE]" aria-hidden="true" />
               </div>
-              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Get Clear Answers</h4>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Get Two Reports</h4>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>Easy-to-understand report</li>
-                <li>Personalized insights</li>
-                <li>Action steps if needed</li>
+                <li>Expert analysis for your advisor</li>
+                <li>Easy summary for you</li>
+                <li>Both emailed instantly</li>
               </ul>
             </div>
           </div>
@@ -89,26 +90,26 @@ export const Hero: FC = () => {
 
         {/* What You'll Learn */}
         <div className="max-w-4xl mx-auto mb-16">
-          <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You&apos;ll Learn</h3>
+          <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You&apos;ll Receive</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-lg shadow-md p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <h4 className="text-2xl font-semibold mb-6 text-center">Advisor Technical Analysis</h4>
+              <h4 className="text-2xl font-semibold mb-6 text-center">Expert Policy Analysis</h4>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Comprehensive Policy Review</span>
+                  <span className="text-lg">Deep-Dive Coverage Review</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Performance Metrics</span>
+                  <span className="text-lg">How Your Policy is Working</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Risk Assessment</span>
+                  <span className="text-lg">Protection Check-Up</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Strategic Recommendations</span>
+                  <span className="text-lg">Expert Recommendations</span>
                 </li>
               </ul>
               <Button asChild className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2">
@@ -118,23 +119,23 @@ export const Hero: FC = () => {
               </Button>
             </div>
             <div className="bg-white rounded-lg shadow-md p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <h4 className="text-2xl font-semibold mb-6 text-center">Client-Friendly Summary</h4>
+              <h4 className="text-2xl font-semibold mb-6 text-center">Easy-to-Read Summary</h4>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Clear Policy Overview</span>
+                  <span className="text-lg">Your Coverage Made Clear</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Performance Summary</span>
+                  <span className="text-lg">How You're Protected Today</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Key Findings Explained</span>
+                  <span className="text-lg">What's Working Well</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Next Steps Guide</span>
+                  <span className="text-lg">What to Do Next</span>
                 </li>
               </ul>
               <Button asChild className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2">
@@ -154,7 +155,7 @@ export const Hero: FC = () => {
                 <Zap className="w-8 h-8 mr-2" aria-hidden="true" />
                 Get Peace of Mind Today
               </h3>
-              <p className="text-xl">See how your life insurance is really performing in just 5 minutes</p>
+              <p className="text-xl">See how your life insurance is really performing in just minutes</p>
             </div>
             <div className="p-8">
               <div className="flex justify-center mt-8">
