@@ -1,13 +1,16 @@
+'use client'
+
 import { Zap, Shield, TrendingUp, Users, Clock, Brain, Upload, FileText, ArrowRight, AlertTriangle, CheckCircle, BarChart, Target, RefreshCw, XCircle } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { SampleAnalysisReport } from '@/components/SampleAnalysisReport'
 import Link from 'next/link'
 
-export default function MissionPage() {
+const MissionPage = () => {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0]">
       <section className="py-16">
         <div className="container mx-auto px-4 text-center">
+          {/* Hero Section */}
           <div className="mb-8">
             <h2 className="text-2xl md:text-3xl font-medium text-[#4B6FEE] mb-2">Why Check Your Policy?</h2>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-800 leading-tight">
@@ -18,6 +21,7 @@ export default function MissionPage() {
             Like any financial plan, your life insurance needs care to stay healthy and protect your family
           </h2>
 
+          {/* Feature Cards */}
           <div className="max-w-5xl mx-auto mb-16">
             <div className="grid md:grid-cols-3 gap-8">
               {[
@@ -68,6 +72,8 @@ export default function MissionPage() {
               ))}
             </div>
           </div>
+
+          {/* Main Features Section */}
           <div className="max-w-5xl mx-auto mb-16 bg-white rounded-lg shadow-md overflow-hidden">
             <div className="bg-[#4B6FEE] text-white p-6">
               <h3 className="text-2xl font-medium mb-2 flex items-center justify-center">
@@ -140,8 +146,10 @@ export default function MissionPage() {
             </div>
           </div>
 
+          {/* Comparison Section */}
           <div className="max-w-5xl mx-auto mb-16">
             <div className="grid md:grid-cols-2 gap-8">
+              {/* Challenge Card */}
               <div className="bg-white rounded-xl p-8 text-left border-2 border-red-100 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="bg-red-50 p-3 rounded-full">
@@ -184,6 +192,7 @@ export default function MissionPage() {
                 </div>
               </div>
 
+              {/* Solution Card */}
               <div className="bg-white rounded-xl p-8 text-left border-2 border-green-100 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="flex items-center gap-4 mb-6">
                   <div className="bg-green-50 p-3 rounded-full">
@@ -227,6 +236,8 @@ export default function MissionPage() {
               </div>
             </div>
           </div>
+
+          {/* Process Steps */}
           <div className="max-w-5xl mx-auto mb-24 pt-8">
             <h3 className="text-4xl md:text-5xl font-medium mb-4 text-[#4B6FEE]">How It Works</h3>
             <p className="text-xl text-gray-600 mb-16">
@@ -274,6 +285,7 @@ export default function MissionPage() {
               Start your policy check-up now - it only takes 5 minutes to get answers.
             </p>
 
+            {/* Sample Reports */}
             <div className="max-w-4xl mx-auto mt-16">
               <h4 className="text-2xl font-medium mb-8 text-[#4B6FEE]">Sample Reports</h4>
               <div className="grid md:grid-cols-2 gap-8">
@@ -300,6 +312,7 @@ export default function MissionPage() {
               </div>
             </div>
 
+            {/* Call to Action */}
             <div className="max-w-4xl mx-auto mt-16 flex justify-center space-x-6">
               <Button 
                 asChild 
@@ -316,3 +329,6 @@ export default function MissionPage() {
       </section>
     </main>
   )
+}
+
+export default MissionPage
