@@ -134,8 +134,8 @@ export function Hero() {
                 </li>
               </ul>
               <Button asChild className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2">
-                <Link href="/sample-client-report">
-                  <a href="SAMPLE CLIENT SUMMARY 01 14.DOCX"download="SAMPLE CLIENT SUMMARY 01 14.DOCX"/>
+                <Link href="/SAMPLE CLIENT SUMMARY 01 14.docx" passHref>
+                  <a href="/SAMPLE CLIENT SUMMARY 01 14.docx"download="/SAMPLE CLIENT SUMMARY 01 14.docx"/>
                   <FileText className="w-5 h-5" aria-hidden="true" /> Download Sample Report
                 </Link>
               </Button>
