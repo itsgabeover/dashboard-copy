@@ -11,7 +11,7 @@ export const Hero: FC = () => {
       <div className="container mx-auto px-4 text-center">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
           Understand Your Life Insurance<br />
-          <span className="text-4xl md:text-5xl lg:text-6xl">in Minutes</span>
+          <span className="text-4xl md:text-5xl lg:text-6xl">in 5 Minutes</span>
         </h1>
         <h2 className="text-2xl md:text-3xl mb-12 text-gray-600 font-light">
           AI-Powered Analysis to Protect Your Family&apos;s Future
@@ -31,16 +31,16 @@ export const Hero: FC = () => {
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
               <div className="flex items-center">
                 <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
-                <span>No complicated forms to fill out</span>
+                <span>Detailed analysis for your advisor</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
-                <span>No confusing insurance jargon</span>
+                <span>Clear summary you can understand</span>
               </div>
             </div>
             <p className="mt-6 text-xl font-semibold text-[#4B6FEE] flex items-center justify-center">
               <Upload className="w-6 h-6 mr-2" aria-hidden="true" />
-              Just share your policy statement and get clear answers in minutes
+              Just upload your in-force illustration to get started* (*Need an in-force illustration? Learn how to get one)
             </p>
           </div>
         </div>
@@ -53,10 +53,10 @@ export const Hero: FC = () => {
               <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
                 <Upload className="w-6 h-6 text-[#4B6FEE]" aria-hidden="true" />
               </div>
-              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Share Your Policy</h4>
+              <h4 className="text-lg font-semibold mb-2 text-[#4B6FEE]">Upload Illustration</h4>
               <ul className="text-gray-600 text-sm space-y-1">
-                <li>Upload your latest statement</li>
-                <li>Add your email</li>
+                <li>Share your in-force illustration</li>
+                <li>Receive dual-report analysis</li>
               </ul>
             </div>
             <div className="flex flex-col items-center">
@@ -83,7 +83,7 @@ export const Hero: FC = () => {
             </div>
           </div>
           <p className="text-gray-700 mt-8 text-base font-medium">
-            That&apos;s it. No complicated process, no insurance agent required. Just answers you can trust in minutes.
+            That&apos;s it. No complicated process, no insurance agent required. Just answers you can trust in 5 minutes.
           </p>
         </div>
 
@@ -92,23 +92,23 @@ export const Hero: FC = () => {
           <h3 className="text-2xl font-semibold mb-8 text-[#4B6FEE]">What You&apos;ll Learn</h3>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-lg shadow-md p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <h4 className="text-2xl font-semibold mb-6 text-center">Policy Health Check</h4>
+              <h4 className="text-2xl font-semibold mb-6 text-center">Advisor Technical Analysis</h4>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Coverage Assessment</span>
+                  <span className="text-lg">Comprehensive Policy Review</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Cost Analysis</span>
+                  <span className="text-lg">Performance Metrics</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Policy Strengths</span>
+                  <span className="text-lg">Risk Assessment</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Improvement Options</span>
+                  <span className="text-lg">Strategic Recommendations</span>
                 </li>
               </ul>
               <Button asChild className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2">
@@ -118,23 +118,23 @@ export const Hero: FC = () => {
               </Button>
             </div>
             <div className="bg-white rounded-lg shadow-md p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <h4 className="text-2xl font-semibold mb-6 text-center">Personal Action Plan</h4>
+              <h4 className="text-2xl font-semibold mb-6 text-center">Client-Friendly Summary</h4>
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Simple Explanations</span>
+                  <span className="text-lg">Clear Policy Overview</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Key Findings</span>
+                  <span className="text-lg">Performance Summary</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Recommended Steps</span>
+                  <span className="text-lg">Key Findings Explained</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="text-green-500 mr-3 h-5 w-5" aria-hidden="true" />
-                  <span className="text-lg">Future Planning</span>
+                  <span className="text-lg">Next Steps Guide</span>
                 </li>
               </ul>
               <Button asChild className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2">
