@@ -8,7 +8,7 @@ export default function MissionPage() {
       <section className="py-16">
         <div className="container mx-auto px-4 text-center">
           <div className="mb-8">
-            <h2 className="text-2xl md:text-3xl font-medium text-[#4B6FEE] mb-2">Our Mission</h2>
+            <h2 className="text-2xl md:text-3xl font-medium text-[#4B6FEE] mb-2"></h2>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-gray-800 leading-tight">
               Why Your Life Insurance<br />Needs Regular Check-ups
             </h1>
@@ -78,7 +78,7 @@ export default function MissionPage() {
             <div className="p-8">
               <div className="text-gray-700 mb-8">
                 <p className="text-lg leading-relaxed">
-                  Just as you review your 401(k) or investment accounts regularly, your life insurance needs periodic check-ups to ensure it's performing as expected and meeting your family's needs. Regular reviews help catch issues early, just like monitoring your investment portfolio.
+                  Just as you review your 401(k) or investment accounts regularly, your life insurance needs periodic check-ups to ensure it&apos;s performing as expected and meeting your family&apos;s needs. Regular reviews help catch issues early, just like monitoring your investment portfolio.
                 </p>
               </div>
               <div className="grid md:grid-cols-2 gap-6">
@@ -160,7 +160,7 @@ export default function MissionPage() {
                       },
                       {
                         title: "Confusing Terms",
-                        description: "Technical language you shouldn't need to understand"
+                        description: "Technical language you shouldn&apos;t need to understand"
                       },
                       {
                         title: "Complex Process",
@@ -271,7 +271,7 @@ export default function MissionPage() {
             </div>
 
             <p className="text-gray-600 mt-12 text-xl font-normal max-w-3xl mx-auto">
-              That's it. No questionnaires, no meetings. Just answers in 5 minutes.
+              That&apos;s it. No questionnaires, no meetings. Just answers in 5 minutes.
             </p>
 
             <div className="max-w-4xl mx-auto mt-16">
@@ -291,7 +291,7 @@ export default function MissionPage() {
                   title="Email Summary"
                   items={[
                     "Simple Explanations",
-                    "Important Highlights", 
+                    "Important Highlights",
                     "Next Steps",
                     "Clear Actions"
                   ]}
@@ -306,7 +306,7 @@ export default function MissionPage() {
                 className="bg-[#22C55E] hover:bg-[#16A34A] text-white text-xl px-12 py-6 rounded-full transition-all duration-300 transform hover:scale-105 flex items-center gap-2 mx-auto"
               >
                 <a href="/pre-payment-info">
-                  Start My Analysis
+                  Analyze My Policy
                   <ArrowRight className="w-6 h-6" />
                 </a>
               </Button>
