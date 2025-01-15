@@ -60,27 +60,27 @@ export default function ResourcesPage() {
 
   const resources: Resource[] = [
     {
-      title: 'Practice Planning',
+      title: 'Getting Started',
       icon: BookOpen,
-      description: 'Must have Advisor Resources',
+      description: 'Essential Resources for Understanding Your Policy',
       content: [
-        { name: 'Client Engagement Email', type: 'PDF', action: 'Download' },
-        { name: 'IFL Request Form', type: 'PDF', action: 'Download' }
+        { name: 'Illustration Request Template', type: 'PDF', action: 'Download' },
+        { name: 'Common Insurance Terms', type: 'PDF', action: 'Download' }
       ]
     },
     {
       title: 'Sample Reports',
       icon: FileText,
-      description: 'Advisor Analysis and Client Summary',
+      description: 'See How We Analyze Your Policy',
       content: [
         { 
-          name: 'Advisor Analysis', 
+          name: 'Sample Professional Analysis PDF', 
           type: 'PDF', 
           action: 'Download',
           link: 'https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20ANALYSIS-KcNItO6ThA29F15Sa0kuWc4uySibb9.pdf'
         },
         { 
-          name: 'Client Summary', 
+          name: 'Sample Email Summary', 
           type: 'PDF', 
           action: 'Download',
           link: 'https://phw1ruho25yy63z9.public.blob.vercel-storage.com/SAMPLE%20SUMMARY-gN6m36r8cHAwdzi68E4adsDuqypPMT.pdf'
@@ -91,19 +91,19 @@ export default function ResourcesPage() {
 
   const faqs: FAQCategory[] = [
     {
-      category: "About IP-AI",
+      category: "What We Do",
       questions: [
         {
-          question: "What is IP-AI?",
-          answer: "IP-AI is an AI-powered platform that helps financial advisors conduct life insurance policy reviews in minutes. We analyze in-force illustrations and deliver both technical advisor reports and client-ready summaries, enabling advisors to provide thorough policy reviews efficiently."
+          question: "What is Insurance Planner AI?",
+          answer: "We provide objective AI-powered analysis of life insurance policy illustrations. We're not an insurance company, agent, or advisor - we don't sell, solicit, recommend, or endorse any insurance products or companies. Our role is simply to help you understand your existing policy better."
         },
         {
-          question: "Why use IP-AI?",
-          answer: "Advisors use IP-AI to transform time-consuming policy reviews into a streamlined process. Just like investment portfolio reviews, regular policy monitoring helps ensure coverage stays aligned with client goals. Our technology makes this practical by reducing analysis time from hours to minutes."
+          question: "What exactly do you analyze?",
+          answer: "Our AI analyzes only the information contained in your in-force illustration. We deliver two outputs: a clear email summary and a detailed PDF report. Remember that our analysis is based solely on your illustration - actual policy performance may vary based on market conditions and insurance company performance."
         },
         {
-          question: "How does it work?",
-          answer: "Simply upload an in-force illustration and receive two professional reports: A technical analysis for advisors and a client-ready summary for presentations."
+          question: "Are you providing financial advice?",
+          answer: "No. We provide policy analysis, not advice. We don't offer tax, legal, insurance, or financial advice. Think of us as a translation tool - we help you understand your policy details so you can have more informed discussions with your professional advisors."
         }
       ]
     },
@@ -112,11 +112,11 @@ export default function ResourcesPage() {
       questions: [
         {
           question: "What do I need to begin?",
-          answer: "Just two things: A current in-force illustration (PDF) and your email address for report delivery."
+          answer: "Just two things: a current in-force illustration (we'll show you how to get one) and an email address. Our analysis is based solely on the illustration provided."
         },
         {
-          question: "Is there software to install?",
-          answer: "No. IP-AI is web-based - there's nothing to install or maintain. Just upload your illustration and receive your analysis."
+          question: "How do I get my in-force illustration?",
+          answer: "Request it from your insurance carrier - we provide a template letter and contact information. Typically takes 2-3 weeks. Remember, you'll want a current illustration as policy values and projections can change over time."
         },
         {
           question: "What types of policies can be analyzed?",
@@ -125,83 +125,41 @@ export default function ResourcesPage() {
       ]
     },
     {
-      category: "Technical Details",
+      category: "Working with Advisors",
       questions: [
         {
-          question: "What format do you accept?",
-          answer: "PDF format only and 2MB maximum file size.  The file should be a current in-force illustration from the carrier."
+          question: "Can I share the analysis with my advisor?",
+          answer: "Yes! We provide both a consumer-friendly summary and a detailed professional analysis specifically designed for advisor review."
+        },
+        {
+          question: "Do I need an advisor to use this service?",
+          answer: "No - our service is designed for both direct consumer use and professional advisor collaboration."
+        }
+      ]
+    },
+    {
+      category: "Understanding Results",
+      questions: [
+        {
+          question: "What will I receive?",
+          answer: "You'll receive two items: 1) A clear email summary in plain English, and 2) A detailed Professional Analysis PDF suitable for your advisor. Both are based on your illustration and should be used as discussion tools with your advisors, not as the sole basis for decisions."
         },
         {
           question: "How quickly do I receive results?",
-          answer: "Analysis and reports are delivered to your email typically within minutes of upload."
+          answer: "Once you upload your illustration, the analysis takes about 5 minutes. While our AI technology is efficient, it can occasionally misinterpret information, which is why we encourage reviewing results with your professional advisors."
         }
       ]
     },
     {
-      category: "Practice Implementation",
-      questions: [
-        {
-          question: "How do I integrate this service into my practice?",
-          answer: "Most advisors start by: Running a few policy reviews to experience the process, creating a systematic review schedule, using our templates to communicate with clients, and making policy reviews part of their client relationship strategy."
-        },
-        {
-          question: "What do I receive with each analysis?",
-          answer: "Two professional reports: 1) Technical Analysis (for advisors): Comprehensive policy review, risk assessment, action items, performance metrics. 2) Client Summary: Clear explanations, key findings, next steps, professional formatting."
-        },
-        {
-          question: "How do I explain policy reviews to clients?",
-          answer: "Position policy reviews like investment portfolio reviews - a natural part of your comprehensive wealth management approach. Our client-ready reports help facilitate these discussions professionally."
-        }
-      ]
-    },
-    {
-      category: "Compliance & Best Practices",
-      questions: [
-        {
-          question: "What compliance considerations should I keep in mind?",
-          answer: "We recommend consulting with your firm's compliance team before sharing IP-AI reports with clients. Consider reviewing analysis against the actual in-force illustration and following your firm's protocols for client communications."
-        },
-        {
-          question: "How should I verify the analysis?",
-          answer: "While our AI technology is efficient, cross-checking analysis with the actual in-force illustration helps ensure accuracy. Consider verifying key metrics and findings as part of your review process."
-        },
-        {
-          question: "What are IP-AI's limitations?",
-          answer: "Like all AI technology, IP-AI is evolving and serves as a tool to enhance professional service. Our analysis is designed to support, not replace, advisor expertise and professional judgment."
-        },
-        {
-          question: "How should I handle IP-AI reports?",
-          answer: "Check with your compliance team about using AI-generated analysis in client communications."
-        }
-      ]
-    },
-    {
-      category: "Support",
+      category: "Support & Policies",
       questions: [
         {
           question: "What if I need help?",
-          answer: <>Support is available at <a href="mailto:support@financialplanner-ai.com" className="text-[#4B6FEE] hover:underline">support@financialplanner-ai.com</a>. We typically respond within one business day.</>
+          answer: <>Support is available at <a href="mailto:support@financialplanner-ai.com" className="text-[#4B6FEE] hover:underline">support@financialplanner-ai.com</a>. We typically respond within one business day. We can help with technical issues but cannot provide insurance, financial, legal, or tax advice.</>
         },
         {
-          question: "Do you provide training?",
-          answer: "The platform is designed to be intuitive with no training needed. However, we provide guides and templates to help you implement policy reviews in your practice."
-        },
-        {
-          question: "Can IP-AI replace my expertise?",
-          answer: "No - IP-AI enhances your expertise by handling time-consuming analysis, allowing you to focus on what matters most: guiding your clients with professional insights and recommendations."
-        }
-      ]
-    },
-    {
-      category: "Refund Policy",
-      questions: [
-        {
-          question: "What is your refund policy?",
-          answer: "We offer a No-Risk First Purchase Guarantee. If you are a first-time user and are not satisfied, you will receive a full refund within 14 days - no questions asked."
-        },
-        {
-          question: "How do I request a refund?",
-          answer: <>To request a refund, email <a href="mailto:support@fpai.com" className="text-[#4B6FEE] hover:underline">support@financialplanner-ai.com</a> and request a refund. You will receive a full refund within 14 days.</>
+          question: "What's your refund policy?",
+          answer: "We offer a 14-day money-back guarantee for first-time users if you're not satisfied with your analysis. Simply email support with your request."
         }
       ]
     }
@@ -213,10 +171,10 @@ export default function ResourcesPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-bold text-[#4B6FEE] mb-6 tracking-tight">
-              Resources for Advisors
+              Policy Analysis Resources
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to implement policy reviews in your practice
+              Everything you need to understand and review your life insurance policy
             </p>
           </div>
 
