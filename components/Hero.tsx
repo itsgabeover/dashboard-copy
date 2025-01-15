@@ -38,8 +38,7 @@ export const Hero: FC = () => {
             </div>
             <p className="mt-6 text-xl font-semibold text-[#4B6FEE] flex items-center justify-center">
               <Upload className="w-6 h-6 mr-2" aria-hidden="true" />
-              Just upload your in-force illustration to get started* (*Need an in-force illustration? Learn how to get one)
-            </p>
+              Simply upload any in-force illustration and let our AI handle the rest
           </div>
         </div>
 
