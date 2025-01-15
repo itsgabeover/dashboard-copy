@@ -35,7 +35,7 @@ export function Footer() {
                   href="/mission" 
                   className="text-text-light hover:text-text block py-2 md:py-0"
                 >
-                  Our Mission
+                  About
                 </Link>
               </li>
               <li>
