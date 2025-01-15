@@ -24,7 +24,6 @@ export const Hero: FC = () => {
             </h3>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
               Get straight answers about your policy in minutes, not hours. Finally know exactly how your coverage works for you.
-
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
               <div className="flex items-center">
@@ -39,6 +38,7 @@ export const Hero: FC = () => {
             <p className="mt-6 text-xl font-semibold text-[#4B6FEE] flex items-center justify-center">
               <Upload className="w-6 h-6 mr-2" aria-hidden="true" />
               Simply upload any in-force illustration and let our AI handle the rest
+            </p>
           </div>
         </div>
 
