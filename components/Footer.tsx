@@ -32,7 +32,7 @@ export function Footer() {
               </li>
               <li>
                 <Link 
-                  href="/mission" 
+                  href="/about" 
                   className="text-text-light hover:text-text block py-2 md:py-0"
                 >
                   About
