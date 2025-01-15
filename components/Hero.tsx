@@ -20,11 +20,11 @@ export const Hero: FC = () => {
           <div className="p-8">
             <h3 className="text-3xl font-bold mb-6 text-[#4B6FEE] flex items-center justify-center">
               <Zap className="w-8 h-8 mr-2" aria-hidden="true" /> 
-              Clear Insights in 5 Minutes
+              Understand Your Coverage Like Never Before
             </h3>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              Get a clear email summary plus detailed professional analysis - all in 5 minutes. 
-              Stop wondering if your life insurance is working for you.
+              Get straight answers about your policy in minutes, not hours. Finally know exactly how your coverage works for you.
+
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
               <div className="flex items-center">
