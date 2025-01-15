@@ -13,8 +13,8 @@ export default function PrivacyPage() {
               >
                   
                   <a
-                    href="/disclosures/privacytxt"
-                    download="/disclosures/privacytxt"
+                    href="/disclosures/privacy.txt"
+                    download="/disclosures/privacy.txt"
                   ><FileText className="w-5 h-5" aria-hidden="true" />Download</a>
               </Button>
       </div>
