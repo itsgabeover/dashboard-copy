@@ -10,7 +10,7 @@ import { UploadSuccess } from '@/components/upload-success'
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
 
-// Simplified props type that matches Next.js requirements
+// Updated PageProps type to match Next.js requirements
 type PageProps = {
   params: { token: string }
 }
@@ -30,7 +30,6 @@ export default function UploadPage({ params }: PageProps) {
   const router = useRouter()
   const { token } = params
 
-  // Rest of your code stays exactly the same...
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState<string>('')
@@ -260,3 +259,4 @@ export default function UploadPage({ params }: PageProps) {
     </section>
   )
 }
+
