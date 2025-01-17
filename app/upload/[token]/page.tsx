@@ -1,55 +1,56 @@
-'use client'
-
+import { Suspense } from 'react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Upload, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { UploadSuccess } from '@/components/upload-success'
 
-type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
-
-// Updated PageProps type to match Next.js requirements
 type PageProps = {
   params: { token: string }
 }
 
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  const validTLDs = ['.com', '.net', '.org', '.edu', '.gov', '.mil', '.info', '.io', '.co.uk', '.ca']
-  return emailRegex.test(email) && 
-         !email.endsWith('.con') && 
-         !email.endsWith('.cim') && 
-         !email.includes('..') && 
-         email.length <= 254 && 
-         validTLDs.some(tld => email.toLowerCase().endsWith(tld))
+async function validateToken(token: string): Promise<boolean> {
+  // Implement your token validation logic here
+  // This is a placeholder implementation
+  await new Promise(resolve => setTimeout(resolve, 100)) // Simulating an async operation
+  return token.length > 0 // Simple check, replace with actual validation
 }
 
-export default function UploadPage({ params }: PageProps) {
-  const router = useRouter()
-  const { token } = params
+export default async function UploadPage({ params }: PageProps) {
+  const isValidToken = await validateToken(params.token)
 
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  if (!isValidToken) {
+    return <div>Invalid or expired token. Please request a new upload link.</div>
+  }
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UploadForm token={params.token} />
+    </Suspense>
+  )
+}
+
+type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
+
+function UploadForm({ token }: { token: string }) {
+  const router = useRouter()
+
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState<string>('')
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string>('')
 
-  useEffect(() => {
-    if (!token) {
-      router.push('/')
-      return
-    }
-
-    try {
-      sessionStorage.setItem('upload_token', token)
-      setIsLoading(false)
-    } catch (error) {
-      console.error('Session storage error:', error)
-      router.push('/')
-    }
-  }, [token, router])
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const validTLDs = ['.com', '.net', '.org', '.edu', '.gov', '.mil', '.info', '.io', '.co.uk', '.ca']
+    return emailRegex.test(email) && 
+           !email.endsWith('.con') && 
+           !email.endsWith('.cim') && 
+           !email.includes('..') && 
+           email.length <= 254 && 
+           validTLDs.some(tld => email.toLowerCase().endsWith(tld))
+  }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
@@ -111,7 +112,6 @@ export default function UploadPage({ params }: PageProps) {
     formData.append('file', file)
     formData.append('email', email)
     
-    const storedToken = sessionStorage.getItem('upload_token')
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
@@ -120,7 +120,7 @@ export default function UploadPage({ params }: PageProps) {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
-          'Authorization': `Bearer ${storedToken}`
+          'Authorization': `Bearer ${token}`
         },
         body: formData,
         signal: controller.signal
@@ -142,14 +142,6 @@ export default function UploadPage({ params }: PageProps) {
       )
       setUploadStatus('error')
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4B6FEE]" aria-label="Loading" />
-      </div>
-    )
   }
 
   if (uploadStatus === 'success') {
@@ -257,6 +249,19 @@ export default function UploadPage({ params }: PageProps) {
         </Card>
       </div>
     </section>
+  )
+}
+
+function UploadSuccess() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md text-center">
+        <h2 className="text-2xl font-bold text-green-600 mb-4">Upload Successful!</h2>
+        <p className="text-gray-600">
+          Your file has been successfully uploaded. We&apos;ll analyze it and send the results to your email shortly.
+        </p>
+      </div>
+    </div>
   )
 }
 
