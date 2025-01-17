@@ -5,6 +5,8 @@ import { useEffect, useState, use } from 'react'
 import { Upload, CheckCircle, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { UploadSuccess } from '@/components/upload-success'
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -20,10 +22,10 @@ const isValidEmail = (email: string): boolean => {
 export default function UploadPage({ 
   params 
 }: { 
-  params: Promise<{ token: string }> 
+  params: { token: string } // Changed from Promise
 }) {
   const router = useRouter()
-  const { token } = use(params)
+  const token = params.token // Changed from use(params)
   const [isLoading, setIsLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState('')
@@ -49,13 +51,36 @@ export default function UploadPage({
     if (selectedFile) {
       if (selectedFile.type !== 'application/pdf') {
         setErrorMessage("Please select a PDF file.")
+        setFile(null)
         return
       }
       if (selectedFile.size > 2 * 1024 * 1024) {
         setErrorMessage("File size exceeds 2MB.")
+        setFile(null)
         return
       }
       setFile(selectedFile)
+      setErrorMessage('')
+    }
+  }
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+  }
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    const droppedFile = event.dataTransfer.files[0]
+    if (droppedFile) {
+      if (droppedFile.type !== 'application/pdf') {
+        setErrorMessage("Please select a PDF file.")
+        return
+      }
+      if (droppedFile.size > 2 * 1024 * 1024) {
+        setErrorMessage("File size exceeds 2MB.")
+        return
+      }
+      setFile(droppedFile)
       setErrorMessage('')
     }
   }
@@ -101,17 +126,13 @@ export default function UploadPage({
         if (error.name === 'AbortError') {
           setErrorMessage('Upload timed out. Please try again.')
         } else {
-          setErrorMessage('Upload failed. Please try again or contact support.')
+          setErrorMessage('Upload failed. Please try again or contact support at support@financialplanner-ai.com.')
         }
       } else {
-        setErrorMessage('Upload failed. Please try again or contact support.')
+        setErrorMessage('Upload failed. Please try again or contact support at support@financialplanner-ai.com.')
       }
       setUploadStatus('error')
     }
-  }
-
-  const clearFileSelection = () => {
-    setFile(null)
   }
 
   if (isLoading) {
@@ -122,73 +143,78 @@ export default function UploadPage({
     )
   }
 
-  const isSubmitDisabled = uploadStatus === 'uploading' || !file || !email || (email.length > 0 && !isValidEmail(email))
+  if (uploadStatus === 'success') {
+    return <UploadSuccess />
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16 px-4">
-      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="p-8">
-          <h1 className="text-2xl font-bold text-[#4B6FEE] mb-6">Upload Your Policy</h1>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
-                Policy File (PDF)
-              </label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                <div className="space-y-1 text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="flex text-sm text-gray-600">
-                    <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]">
-                      <span>Upload a file</span>
-                      <Input
-                        id="file-upload"
-                        name="file-upload"
-                        type="file"
-                        className="sr-only"
-                        onChange={handleFileChange}
-                        accept=".pdf"
-                      />
-                    </label>
-                    <p className="pl-1">or drag and drop</p>
-                  </div>
-                  <p className="text-xs text-gray-500">PDF up to 2MB</p>
-                </div>
-              </div>
-              {file && (
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-sm text-gray-600">Selected file: {file.name}</p>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={clearFileSelection}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+    <section className="bg-white py-16">
+      <div className="container mx-auto px-4 max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold text-[#4361EE]">
+              Upload In-Force Illustration
+            </CardTitle>
+            <CardDescription className="text-gray-600 space-y-2">
+              <p>
+                Please upload your life insurance policy&apos;s in-force illustration for analysis. 
+                Our AI will review your policy and provide detailed insights within minutes.
+              </p>
+              <p>
+                You&apos;ll receive:
+              </p>
+              <ul className="list-disc list-inside">
+                <li>A clear email summary of your coverage</li>
+                <li>Professional PDF analysis with detailed metrics</li>
+              </ul>
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            <div 
+              className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer hover:border-[#4361EE] transition-colors"
+              onClick={() => document.getElementById('file-upload')?.click()}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <Upload className="mx-auto mb-3 text-[#4361EE]" size={32} />
+              <p className="mb-1 text-gray-600">Drag and drop your file here or click to browse</p>
+              <p className="text-sm text-gray-500">Supported format: PDF (Max 2 MB)</p>
+              <Input
+                id="file-upload"
+                type="file"
+                onChange={handleFileChange}
+                accept=".pdf"
+                className="hidden"
+              />
             </div>
+            
+            {file && (
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-sm text-green-600">Selected file: {file.name}</p>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFile(null)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+              <label htmlFor="email" className="block mb-2 font-medium text-[#4361EE]">
+                Email for Report Delivery
               </label>
               <Input
                 type="email"
                 id="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                  if (e.target.value && !isValidEmail(e.target.value)) {
-                    setErrorMessage("Please enter a valid email address")
-                  } else {
-                    setErrorMessage('')
-                  }
-                }}
                 placeholder="your@email.com"
-                required
-                className={`w-full ${email && !isValidEmail(email) ? 'border-red-500' : ''}`}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border-gray-300 focus:border-[#4361EE] focus:ring-[#4361EE]"
               />
               <div className="mt-2 flex items-start space-x-2 text-sm text-gray-600">
                 <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -196,42 +222,31 @@ export default function UploadPage({
                   Please double-check your email address carefully. Your analysis will be sent to this email.
                   If you don&apos;t receive it within 30 minutes, please check your spam/junk folders.
                   Still can&apos;t find it? Contact us at{' '}
-                  <a href="mailto:support@fpai.com" className="text-[#4B6FEE] hover:text-[#3B4FDE]">
+                  <a href="mailto:support@fpai.com" className="text-[#4361EE] hover:text-[#3B4FDE]">
                     support@fpai.com
                   </a>
                 </p>
               </div>
-              {email && !isValidEmail(email) && (
-                <p className="mt-1 text-sm text-red-500">
-                  Please enter a valid email address
-                </p>
-              )}
             </div>
 
             <Button
-              type="submit"
-              className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE]"
-              disabled={isSubmitDisabled}
+              onClick={handleSubmit}
+              className="w-full bg-[#4361EE] text-white hover:bg-[#3651DE]"
+              size="lg"
+              disabled={!file || !email || uploadStatus === 'uploading'}
             >
-              {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Policy'}
+              {uploadStatus === 'uploading' ? 'Uploading...' : 'Submit for Analysis'}
             </Button>
-          </form>
 
-          {errorMessage && (
-            <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
-              <AlertTriangle className="mr-2" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {uploadStatus === 'success' && (
-            <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
-              <CheckCircle className="mr-2" />
-              <span>Upload successful! Your analysis will be emailed to you shortly. Please check your spam/junk folders if you don&apos;t see it within 30 minutes.</span>
-            </div>
-          )}
-        </div>
+            {errorMessage && (
+              <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
+                <AlertTriangle className="mr-2" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </section>
   )
 }
