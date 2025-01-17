@@ -8,18 +8,15 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { UploadSuccess } from '@/components/upload-success'
 
-// Define types to ensure type safety
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
 
-// Updated page props interface to match Next.js requirements
-interface PageProps {
+type PageProps = {
   params: {
     token: string;
   };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
-// Email validation function
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   const validTLDs = ['.com', '.net', '.org', '.edu', '.gov', '.mil', '.info', '.io', '.co.uk', '.ca']
@@ -31,19 +28,17 @@ const isValidEmail = (email: string): boolean => {
          validTLDs.some(tld => email.toLowerCase().endsWith(tld))
 }
 
-// Main component
-export default function UploadPage({ params, searchParams }: PageProps) {
+export default function UploadPage({ params }: PageProps) {
   const router = useRouter()
   const { token } = params
-
-  // State management
+  
+  // Rest of your component code stays exactly the same
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState<string>('')
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle')
   const [errorMessage, setErrorMessage] = useState<string>('')
 
-  // Handle token storage
   useEffect(() => {
     if (!token) {
       router.push('/')
@@ -59,7 +54,6 @@ export default function UploadPage({ params, searchParams }: PageProps) {
     }
   }, [token, router])
 
-  // File handling functions
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
     if (!selectedFile) return
@@ -103,7 +97,6 @@ export default function UploadPage({ params, searchParams }: PageProps) {
     setErrorMessage('')
   }
 
-  // Form submission
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
     
@@ -154,7 +147,6 @@ export default function UploadPage({ params, searchParams }: PageProps) {
     }
   }
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -163,12 +155,10 @@ export default function UploadPage({ params, searchParams }: PageProps) {
     )
   }
 
-  // Success state
   if (uploadStatus === 'success') {
     return <UploadSuccess />
   }
 
-  // Main render
   return (
     <section className="bg-white py-16">
       <div className="container mx-auto px-4 max-w-2xl">
