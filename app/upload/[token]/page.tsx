@@ -11,10 +11,12 @@ import { UploadSuccess } from '@/components/upload-success'
 // Define types to ensure type safety
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
 
-interface UploadPageProps {
+// Updated page props interface to match Next.js requirements
+interface PageProps {
   params: {
-    token: string
-  }
+    token: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 // Email validation function
@@ -30,7 +32,7 @@ const isValidEmail = (email: string): boolean => {
 }
 
 // Main component
-export default function UploadPage({ params }: UploadPageProps) {
+export default function UploadPage({ params, searchParams }: PageProps) {
   const router = useRouter()
   const { token } = params
 
@@ -270,4 +272,3 @@ export default function UploadPage({ params }: UploadPageProps) {
     </section>
   )
 }
-
