@@ -1,105 +1,69 @@
-import { Suspense } from 'react'
+'use client'
+
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { Upload, AlertTriangle, X, Info } from 'lucide-react'
+import { useEffect, useState, use } from 'react'
+import { Upload, CheckCircle, AlertTriangle, X, Info } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
-type PageProps = {
-  params: { token: string }
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const validTLDs = ['.com', '.net', '.org', '.edu', '.gov', '.mil', '.info', '.io', '.co.uk', '.ca']
+  return emailRegex.test(email) && 
+         !email.endsWith('.con') && 
+         !email.endsWith('.cim') && 
+         !email.includes('..') && 
+         email.length <= 254 && 
+         validTLDs.some(tld => email.toLowerCase().endsWith(tld))
 }
 
-async function validateToken(token: string): Promise<boolean> {
-  // Implement your token validation logic here
-  // This is a placeholder implementation
-  await new Promise(resolve => setTimeout(resolve, 100)) // Simulating an async operation
-  return token.length > 0 // Simple check, replace with actual validation
-}
-
-export default async function UploadPage({ params }: PageProps) {
-  const isValidToken = await validateToken(params.token)
-
-  if (!isValidToken) {
-    return <div>Invalid or expired token. Please request a new upload link.</div>
-  }
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <UploadForm token={params.token} />
-    </Suspense>
-  )
-}
-
-type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
-
-function UploadForm({ token }: { token: string }) {
+export default function UploadPage({ 
+  params 
+}: { 
+  params: Promise<{ token: string }> 
+}) {
   const router = useRouter()
-
+  const { token } = use(params)
+  const [isLoading, setIsLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
-  const [email, setEmail] = useState<string>('')
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>('idle')
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [email, setEmail] = useState('')
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    const validTLDs = ['.com', '.net', '.org', '.edu', '.gov', '.mil', '.info', '.io', '.co.uk', '.ca']
-    return emailRegex.test(email) && 
-           !email.endsWith('.con') && 
-           !email.endsWith('.cim') && 
-           !email.includes('..') && 
-           email.length <= 254 && 
-           validTLDs.some(tld => email.toLowerCase().endsWith(tld))
-  }
+  useEffect(() => {
+    if (token) {
+      try {
+        sessionStorage.setItem('upload_token', token)
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Session storage error:', error)
+        router.push('/')
+      }
+    } else {
+      router.push('/')
+    }
+  }, [token, router])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
-    if (!selectedFile) return
-
-    if (selectedFile.type !== 'application/pdf') {
-      setErrorMessage("Please select a PDF file.")
-      setFile(null)
-      return
+    if (selectedFile) {
+      if (selectedFile.type !== 'application/pdf') {
+        setErrorMessage("Please select a PDF file.")
+        return
+      }
+      if (selectedFile.size > 2 * 1024 * 1024) {
+        setErrorMessage("File size exceeds 2MB.")
+        return
+      }
+      setFile(selectedFile)
+      setErrorMessage('')
     }
-    
-    if (selectedFile.size > 2 * 1024 * 1024) {
-      setErrorMessage("File size exceeds 2MB.")
-      setFile(null)
-      return
-    }
-    
-    setFile(selectedFile)
-    setErrorMessage('')
-  }
-
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-  }
-
-  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    const droppedFile = event.dataTransfer.files[0]
-    if (!droppedFile) return
-
-    if (droppedFile.type !== 'application/pdf') {
-      setErrorMessage("Please select a PDF file.")
-      return
-    }
-    
-    if (droppedFile.size > 2 * 1024 * 1024) {
-      setErrorMessage("File size exceeds 2MB.")
-      return
-    }
-    
-    setFile(droppedFile)
-    setErrorMessage('')
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    
     if (!file || !email) return
-    
     if (!isValidEmail(email)) {
       setErrorMessage("Please enter a valid email address.")
       return
@@ -112,6 +76,7 @@ function UploadForm({ token }: { token: string }) {
     formData.append('file', file)
     formData.append('email', email)
     
+    const storedToken = sessionStorage.getItem('upload_token')
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
@@ -120,102 +85,118 @@ function UploadForm({ token }: { token: string }) {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${storedToken}`
         },
         body: formData,
         signal: controller.signal
       })
-      
       clearTimeout(timeoutId)
 
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.statusText}`)
       }
-      
       setUploadStatus('success')
+      router.push('/upload/success') // Redirect to success page
     } catch (error: unknown) {
       console.error('Upload error:', error)
-      setErrorMessage(
-        error instanceof Error && error.name === 'AbortError'
-          ? 'Upload timed out. Please try again.'
-          : 'Upload failed. Please try again or contact support at support@financialplanner-ai.com.'
-      )
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          setErrorMessage('Upload timed out. Please try again.')
+        } else {
+          setErrorMessage('Upload failed. Please try again or contact support.')
+        }
+      } else {
+        setErrorMessage('Upload failed. Please try again or contact support.')
+      }
       setUploadStatus('error')
     }
   }
 
-  if (uploadStatus === 'success') {
-    return <UploadSuccess />
+  const clearFileSelection = () => {
+    setFile(null)
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4B6FEE]" aria-label="Loading" />
+      </div>
+    )
+  }
+
+  const isSubmitDisabled = uploadStatus === 'uploading' || !file || !email || (email.length > 0 && !isValidEmail(email))
+
   return (
-    <section className="bg-white py-16">
-      <div className="container mx-auto px-4 max-w-2xl">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-[#4361EE]">
-              Upload In-Force Illustration
-            </CardTitle>
-            <CardDescription className="text-gray-600 space-y-2">
-              <p>
-                Please upload your life insurance policy&apos;s in-force illustration for analysis. 
-                Our AI will review your policy and provide detailed insights within minutes.
-              </p>
-              <p>
-                You&apos;ll receive:
-              </p>
-              <ul className="list-disc list-inside">
-                <li>A clear email summary of your coverage</li>
-                <li>Professional PDF analysis with detailed metrics</li>
-              </ul>
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            <div 
-              className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer hover:border-[#4361EE] transition-colors"
-              onClick={() => document.getElementById('file-upload')?.click()}
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
-              <Upload className="mx-auto mb-3 text-[#4361EE]" size={32} />
-              <p className="mb-1 text-gray-600">Drag and drop your file here or click to browse</p>
-              <p className="text-sm text-gray-500">Supported format: PDF (Max 2 MB)</p>
-              <Input
-                id="file-upload"
-                type="file"
-                onChange={handleFileChange}
-                accept=".pdf"
-                className="hidden"
-              />
-            </div>
-            
-            {file && (
-              <div className="mt-2 flex items-center justify-between">
-                <p className="text-sm text-green-600">Selected file: {file.name}</p>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setFile(null)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+    <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16 px-4">
+      <Card className="max-w-3xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-[#4B6FEE]">Upload Your Policy</CardTitle>
+          <CardDescription>
+            Please upload your life insurance policy&apos;s in-force illustration for analysis. 
+            Our AI will review your policy and provide detailed insights within minutes.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
+                Policy File (PDF)
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600">
+                    <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]">
+                      <span>Upload a file</span>
+                      <Input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        onChange={handleFileChange}
+                        accept=".pdf"
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">PDF up to 2MB</p>
+                </div>
               </div>
-            )}
+              {file && (
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-sm text-gray-600">Selected file: {file.name}</p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearFileSelection}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
 
             <div>
-              <label htmlFor="email" className="block mb-2 font-medium text-[#4361EE]">
-                Email for Report Delivery
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
               </label>
               <Input
                 type="email"
                 id="email"
-                placeholder="your@email.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border-gray-300 focus:border-[#4361EE] focus:ring-[#4361EE]"
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  if (e.target.value && !isValidEmail(e.target.value)) {
+                    setErrorMessage("Please enter a valid email address")
+                  } else {
+                    setErrorMessage('')
+                  }
+                }}
+                placeholder="your@email.com"
+                required
+                className={`w-full ${email && !isValidEmail(email) ? 'border-red-500' : ''}`}
               />
               <div className="mt-2 flex items-start space-x-2 text-sm text-gray-600">
                 <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
@@ -223,44 +204,35 @@ function UploadForm({ token }: { token: string }) {
                   Please double-check your email address carefully. Your analysis will be sent to this email.
                   If you don&apos;t receive it within 30 minutes, please check your spam/junk folders.
                   Still can&apos;t find it? Contact us at{' '}
-                  <a href="mailto:support@fpai.com" className="text-[#4361EE] hover:text-[#3B4FDE]">
+                  <a href="mailto:support@fpai.com" className="text-[#4B6FEE] hover:text-[#3B4FDE]">
                     support@fpai.com
                   </a>
                 </p>
               </div>
+              {email && !isValidEmail(email) && (
+                <p className="mt-1 text-sm text-red-500">
+                  Please enter a valid email address
+                </p>
+              )}
             </div>
 
             <Button
-              onClick={handleSubmit}
-              className="w-full bg-[#4361EE] text-white hover:bg-[#3651DE]"
-              size="lg"
-              disabled={!file || !email || uploadStatus === 'uploading'}
+              type="submit"
+              className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE]"
+              disabled={isSubmitDisabled}
             >
-              {uploadStatus === 'uploading' ? 'Uploading...' : 'Submit for Analysis'}
+              {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Policy'}
             </Button>
+          </form>
 
-            {errorMessage && (
-              <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
-                <AlertTriangle className="mr-2" />
-                <span>{errorMessage}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </section>
-  )
-}
-
-function UploadSuccess() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md text-center">
-        <h2 className="text-2xl font-bold text-green-600 mb-4">Upload Successful!</h2>
-        <p className="text-gray-600">
-          Your file has been successfully uploaded. We&apos;ll analyze it and send the results to your email shortly.
-        </p>
-      </div>
+          {errorMessage && (
+            <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
+              <AlertTriangle className="mr-2" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
