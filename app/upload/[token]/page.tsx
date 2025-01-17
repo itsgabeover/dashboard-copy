@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { UploadSuccess } from '@/components/upload-success'
-import type { Metadata } from 'next'
 
 // Define types to ensure type safety
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'error'
@@ -271,3 +270,4 @@ export default function UploadPage({ params }: UploadPageProps) {
     </section>
   )
 }
+
