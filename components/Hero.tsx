@@ -30,10 +30,9 @@ export const Hero: FC = () => {
               AI-Powered Analysis That Gives You Answers
             </h3>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              Upload your policy's in-force illustration and get clear insights in minutes. 
-              Our AI helps you understand your coverage's true value and make confident decisions about your future.
-              What You'll Receive:
-              
+              Upload your policy&apos;s in-force illustration and get clear insights in minutes. 
+              Our AI helps you understand your coverage&apos;s true value and make confident decisions about your future.
+              What You&apos;ll Receive:
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
               <div className="flex items-center">
@@ -156,11 +155,13 @@ export const Hero: FC = () => {
                 asChild
                 className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2"
               >
-                  
-                  <a
-                    href="/sample_reports/SAMPLE_CLIENT_SUMMARY.docx"
-                    download="SAMPLE_CLIENT_SUMMARY.docx"
-                  ><FileText className="w-5 h-5" aria-hidden="true" />View Sample Summary</a>
+                <a
+                  href="/sample_reports/SAMPLE_CLIENT_SUMMARY.docx"
+                  download="SAMPLE_CLIENT_SUMMARY.docx"
+                >
+                  <FileText className="w-5 h-5" aria-hidden="true" />
+                  View Sample Summary
+                </a>
               </Button>
             </div>
             <div className="bg-white rounded-lg shadow-md p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
@@ -201,14 +202,13 @@ export const Hero: FC = () => {
                 asChild
                 className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2"
               >
-                  
-                  <a
-                    href="/sample_reports/SAMPLE_POLICY_REVIEW.docx"
-                    download="SAMPLE_POLICY_REVIEW.docx"
-                  >
-                    <FileText className="w-5 h-5" aria-hidden="true" />
-                    View Sample Analysis
-                  </a>
+                <a
+                  href="/sample_reports/SAMPLE_POLICY_REVIEW.docx"
+                  download="SAMPLE_POLICY_REVIEW.docx"
+                >
+                  <FileText className="w-5 h-5" aria-hidden="true" />
+                  View Sample Analysis
+                </a>
               </Button>
             </div>
           </div>
