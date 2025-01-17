@@ -3,7 +3,9 @@
 import { useState, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Upload, CheckCircle } from 'lucide-react'
+import { Upload } from 'lucide-react'
+import { UploadSuccess } from './upload-success'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
 interface UploadInterfaceProps {
   token: string
@@ -125,67 +127,87 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     }
   }
 
+  if (uploadSuccess) {
+    return <UploadSuccess />
+  }
+
   return (
     <section className="bg-white py-16">
       <div className="container mx-auto px-4 max-w-2xl">
-        <h3 className="text-2xl font-semibold mb-6 text-[#4361EE]">Upload In-Force Illustration</h3>
-        
-        <div className="space-y-6">
-          <div 
-            className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer hover:border-[#4361EE] transition-colors"
-            onClick={() => fileInputRef.current?.click()}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-          >
-            <Upload className="mx-auto mb-3 text-[#4361EE]" size={32} />
-            <p className="mb-1 text-gray-600">Drag and drop your file here or click to browse</p>
-            <p className="text-sm text-gray-500">Supported format: PDF (Max 2 MB)</p>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept=".pdf"
-              className="hidden"
-            />
-          </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold text-[#4361EE]">
+              Upload In-Force Illustration
+            </CardTitle>
+            <CardDescription className="text-gray-600 space-y-2">
+              <p>
+                Please upload your life insurance policy&apos;s in-force illustration for analysis. 
+                Our AI will review your policy and provide detailed insights within minutes.
+              </p>
+              <p>
+                You&apos;ll receive:
+              </p>
+              <ul className="list-disc list-inside">
+                <li>A clear email summary of your coverage</li>
+                <li>Professional PDF analysis with detailed metrics</li>
+                <li>Optimization recommendations</li>
+              </ul>
+            </CardDescription>
+          </CardHeader>
           
-          {file && (
-            <p className="text-sm text-green-600">Selected file: {file.name}</p>
-          )}
-
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
-          
-          <div>
-            <label htmlFor="email" className="block mb-2 font-medium text-[#4361EE]">Email for Report Delivery</label>
-            <Input
-              type="email"
-              id="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border-gray-300 focus:border-[#4361EE] focus:ring-[#4361EE]"
-            />
-          </div>
-          
-          <Button 
-            className="w-full bg-[#4361EE] text-white hover:bg-[#3651DE] transition-colors" 
-            size="lg"
-            onClick={handleUpload}
-            disabled={!file || !email || isUploading}
-          >
-            {isUploading ? 'Uploading...' : 'Submit for Analysis'}
-          </Button>
-
-          {uploadSuccess && (
-            <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-md flex items-center">
-              <CheckCircle className="mr-2" />
-              <span>Thank you for uploading your policy document. Your reports will be sent shortly to the email address you provided.</span>
+          <CardContent className="space-y-6">
+            <div 
+              className="border-2 border-dashed border-gray-300 p-6 rounded-lg text-center cursor-pointer hover:border-[#4361EE] transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
+              <Upload className="mx-auto mb-3 text-[#4361EE]" size={32} />
+              <p className="mb-1 text-gray-600">Drag and drop your file here or click to browse</p>
+              <p className="text-sm text-gray-500">Supported format: PDF (Max 2 MB)</p>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept=".pdf"
+                className="hidden"
+              />
             </div>
-          )}
-        </div>
+            
+            {file && (
+              <p className="text-sm text-green-600">Selected file: {file.name}</p>
+            )}
+
+            {error && (
+              <p className="text-sm text-red-600">{error}</p>
+            )}
+            
+            <div>
+              <label htmlFor="email" className="block mb-2 font-medium text-[#4361EE]">
+                Email for Report Delivery
+              </label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="border-gray-300 focus:border-[#4361EE] focus:ring-[#4361EE]"
+              />
+            </div>
+            
+            <Button 
+              className="w-full bg-[#4361EE] text-white hover:bg-[#3651DE] transition-colors" 
+              size="lg"
+              onClick={handleUpload}
+              disabled={!file || !email || isUploading}
+            >
+              {isUploading ? 'Uploading...' : 'Submit for Analysis'}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </section>
   )
 }
+
