@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Upload } from 'lucide-react'
@@ -18,13 +18,17 @@ interface UploadResponse {
 }
 
 export function UploadInterface({ token }: UploadInterfaceProps) {
-  console.log('New UploadInterface component rendered');
   const [email, setEmail] = useState('')
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    console.log('UploadInterface mounted with token:', token)
+    console.log('Is mock token:', token.includes('_mock'))
+  }, [token])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
@@ -79,6 +83,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     setUploadSuccess(false)
 
     try {
+      console.log('Starting upload with token:', token)
       const formData = new FormData()
       formData.append('data0', file)
       formData.append('metadata', JSON.stringify({
@@ -86,6 +91,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         token: token
       }))
 
+      console.log('Sending request to /api/upload')
       const response = await fetch('/api/upload', {
         method: 'POST',
         headers: {
@@ -95,7 +101,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       })
 
       const responseText = await response.text()
-      console.log('n8n response:', responseText)
+      console.log('API response:', responseText)
 
       let data: UploadResponse
       try {
