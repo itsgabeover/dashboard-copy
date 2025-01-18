@@ -17,7 +17,7 @@ export const Hero: FC = () => {
     <section className="bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16">
       <div className="container mx-auto px-4 text-center">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
-          Is Your Life Insurance Policy Worth Keeping?
+          Confused about your life insurance policy?
         </h1>
         <h2 className="text-2xl md:text-3xl mb-12 text-gray-600 font-light">
           Paying premiums but not sure why?  Been putting off a policy review?
@@ -27,7 +27,7 @@ export const Hero: FC = () => {
           <div className="p-8">
             <h3 className="text-3xl font-bold mb-6 text-[#4B6FEE] flex items-center justify-center">
               <Zap className="w-8 h-8 mr-2" aria-hidden="true" />
-              Professional Analysis, Powered by Insurance Planner AI
+              AI-powered policy reviews in minutes
             </h3>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
               Upload your policy&apos;s in-force illustration and get clear insights in minutes.  Insurance Planner AI helps you read between the lines, understanding each feature, benefit, and provision. From core benefits to subtle nuances, Insurance Planner AI works hard to ensure nothing is overlooked. 
