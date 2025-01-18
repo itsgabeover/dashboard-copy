@@ -15,7 +15,7 @@ export default function AboutPage() {
             Every Life Insurance Policy Tells a Story. Are You Reading Yours?
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-3xl">
-            Behind the complex terms and numbers lies a powerful narrative of protection, growth, and security for your family. Let's uncover it together.
+            Behind the complex terms and numbers lies a powerful narrative of protection, growth, and security for your family. Let&apos;s uncover it together.
           </p>
         </div>
 
@@ -25,7 +25,7 @@ export default function AboutPage() {
             Why Your Policy Needs a Deeper Look
           </h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-3xl mx-auto">
-            Your life insurance is more than just a bill – it's a complex financial instrument designed to protect and provide for your loved ones. Let's explore what might be hiding in the fine print.
+            Your life insurance is more than just a bill – it&apos;s a complex financial instrument designed to protect and provide for your loved ones. Let&apos;s explore what might be hiding in the fine print.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             {[
