@@ -17,10 +17,10 @@ export const Hero: FC = () => {
     <section className="bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0] py-16">
       <div className="container mx-auto px-4 text-center">
         <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
-          Is Your Life Insurance Policy Still Working For You?
+          Is Your Life Insurance Policy Worth Keeping?
         </h1>
         <h2 className="text-2xl md:text-3xl mb-12 text-gray-600 font-light">
-          Paying premiums but unsure of the value?  Been putting off a professional policy review?
+          Paying premiums but not sure why?  Been putting off a policy review?
         </h2>
 
         <div className="max-w-4xl mx-auto mb-16 bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
@@ -30,9 +30,9 @@ export const Hero: FC = () => {
               Professional Analysis, Powered by Advanced AI
             </h3>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              Upload your policy&apos;s in-force illustration for a comprehensive review delivered to your inbox.  
-              Our AI-driven analysis helps you and your advisor(s) understand your coverage&apos;s performance and true value – all while maintaining the highest standards of 
-              a professional review.  Here is what you&apos;ll receive:
+              Upload your policy&apos;s in-force illustration and get clear insights in minutes.  
+              Our AI-driven analysis helps you and your advisor(s) understand your coverage's true value and make confident decisions.  
+              Here is what you&apos;ll receive:
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
               <div className="flex items-center">
@@ -40,14 +40,14 @@ export const Hero: FC = () => {
                   className="w-6 h-6 text-green-500 mr-2"
                   aria-hidden="true"
                 />
-                <span>A straightforward email summary in plain English</span>
+                <span>Crystal-clear email summary</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle
                   className="w-6 h-6 text-green-500 mr-2"
                   aria-hidden="true"
                 />
-                <span>A comprehensive professional analysis PDF</span>
+                <span>Professional policy review analysis PDF</span>
               </div>
             </div>
             <p className="mt-6 text-xl font-semibold text-[#4B6FEE] flex items-center justify-center">
