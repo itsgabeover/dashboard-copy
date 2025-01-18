@@ -27,11 +27,10 @@ export const Hero: FC = () => {
           <div className="p-8">
             <h3 className="text-3xl font-bold mb-6 text-[#4B6FEE] flex items-center justify-center">
               <Zap className="w-8 h-8 mr-2" aria-hidden="true" />
-              Professional Analysis, Powered by Advanced AI
+              Professional Analysis, Powered by Insurance Planner AI
             </h3>
             <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              Upload your policy&apos;s in-force illustration and get clear insights in minutes.  
-              Our AI-driven analysis helps you and your advisor(s) understand your coverage's true value and make confident decisions.  
+              Upload your policy&apos;s in-force illustration and get clear insights in minutes.  Insurance Planner AI helps you read between the lines, understanding each feature, benefit, and provision. From core benefits to subtle nuances, Insurance Planner AI works hard to ensure nothing is overlooked. 
               Here is what you&apos;ll receive:
             </p>
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
