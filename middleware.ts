@@ -25,10 +25,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle existing upload logic
+  // Handle existing upload logic - modified to use mock token
   if (pathname === '/upload') {
     console.log('Base /upload path accessed');
-    return NextResponse.redirect(new URL('/pre-payment-info', request.url));
+    const mockToken = `pi_${Date.now()}_mock`;
+    return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url));
   }
   
   // Handle existing upload/token logic
@@ -36,9 +37,11 @@ export function middleware(request: NextRequest) {
     const token = pathname.split('/').pop();
     console.log('Token path accessed:', token);
     
+    // Accept both pi_ tokens and mock tokens
     if (!token || !token.startsWith('pi_') || !token.includes('_')) {
       console.log('Invalid token:', token);
-      return NextResponse.redirect(new URL('/pre-payment-info', request.url));
+      const mockToken = `pi_${Date.now()}_mock`;
+      return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url));
     }
     
     console.log('Valid token, proceeding');
@@ -54,6 +57,7 @@ export function middleware(request: NextRequest) {
     redirectUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(redirectUrl);
   }
+
   return NextResponse.next();
 }
 
