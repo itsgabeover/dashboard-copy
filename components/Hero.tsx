@@ -1,7 +1,6 @@
 'use client'
 
 import { Upload, Clock, FileText, CheckCircle, Zap, ArrowRight, Shield, Sparkles, TrendingUp, Lock } from 'lucide-react'
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { FC } from "react"
@@ -169,15 +168,14 @@ export const Hero: FC = () => {
                     </li>
                   ))}
                 </ul>
-                <Button asChild className="w-full mt-8">
-                  <a
-                    href="/sample_reports/SAMPLE_CLIENT_SUMMARY.docx"
-                    download="SAMPLE_CLIENT_SUMMARY.docx"
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <FileText className="w-5 h-5" />
-                    View Sample Summary
-                  </a>
+                <Button 
+                  className="w-full mt-8 flex items-center justify-center gap-2"
+                  onClick={() => {
+                    window.location.href = '/sample_reports/SAMPLE_CLIENT_SUMMARY.docx';
+                  }}
+                >
+                  <FileText className="w-5 h-5" />
+                  View Sample Summary
                 </Button>
               </CardContent>
             </Card>
@@ -195,15 +193,14 @@ export const Hero: FC = () => {
                     </li>
                   ))}
                 </ul>
-                <Button asChild className="w-full mt-8">
-                  <a
-                    href="/sample_reports/SAMPLE_POLICY_REVIEW.docx"
-                    download="SAMPLE_POLICY_REVIEW.docx"
-                    className="flex items-center justify-center gap-2"
-                  >
-                    <FileText className="w-5 h-5" />
-                    View Sample Analysis
-                  </a>
+                <Button 
+                  className="w-full mt-8 flex items-center justify-center gap-2"
+                  onClick={() => {
+                    window.location.href = '/sample_reports/SAMPLE_POLICY_REVIEW.docx';
+                  }}
+                >
+                  <FileText className="w-5 h-5" />
+                  View Sample Analysis
                 </Button>
               </CardContent>
             </Card>
@@ -221,17 +218,17 @@ export const Hero: FC = () => {
               <p className="text-xl mt-2">From confusion to confidence in 5 minutes</p>
             </CardHeader>
             <CardContent className="flex justify-center p-8">
-             <Button
-  size="lg"
-  className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full flex items-center gap-2"
-  onClick={() => {
-    const mockToken = `pi_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
-    window.location.href = `/upload/${mockToken}`;
-  }}
->
-  Analyze My Policy
-  <ArrowRight className="w-5 h-5" />
-</Button>
+              <Button
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full flex items-center gap-2"
+                onClick={() => {
+                  const mockToken = `pi_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+                  window.location.href = `/upload/${mockToken}`;
+                }}
+              >
+                Analyze My Policy
+                <ArrowRight className="w-5 h-5" />
+              </Button>
             </CardContent>
           </Card>
         </div>
