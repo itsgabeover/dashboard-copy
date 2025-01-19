@@ -238,4 +238,3 @@ export const Hero: FC = () => {
     </section>
   )
 }
-
