@@ -226,7 +226,7 @@ export const Hero: FC = () => {
                 size="lg"
                 className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full"
               >
-                <Link href="/pre-payment-info" className="flex items-center gap-2">
+                <Link href="/upload" className="flex items-center gap-2">
                   Analyze My Policy
                   <ArrowRight className="w-5 h-5" />
                 </Link>
