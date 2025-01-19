@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
   // Handle existing upload logic
   if (pathname === '/upload') {
     console.log('Base /upload path accessed');
-    return NextResponse.redirect(new URL('/pre-payment-info', request.url));
+    return NextResponse.redirect(new URL('/upload', request.url));
   }
   
   // Handle existing upload/token logic
@@ -38,7 +38,7 @@ export function middleware(request: NextRequest) {
     
     if (!token || !token.startsWith('pi_') || !token.includes('_')) {
       console.log('Invalid token:', token);
-      return NextResponse.redirect(new URL('/pre-payment-info', request.url));
+      return NextResponse.redirect(new URL('/upload', request.url));
     }
     
     console.log('Valid token, proceeding');
