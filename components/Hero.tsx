@@ -8,7 +8,7 @@ import type { FC } from "react"
 
 export const Hero: FC = () => {
   return (
-    <section className="w-full bg-gradient-to-b from-blue-50 via-white to-blue-50">
+    <section className="w-full bg-white">
       {/* Main Hero Section */}
       <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
         <div className="flex flex-col items-center space-y-6 text-center">
@@ -24,7 +24,7 @@ export const Hero: FC = () => {
         </div>
 
         {/* AI Analysis Card */}
-        <Card className="max-w-4xl mx-auto mt-12 border-2 border-blue-100">
+        <Card className="max-w-4xl mx-auto mt-12 bg-white border-2 border-blue-100">
           <CardContent className="p-8">
             <div className="flex flex-col items-center space-y-6">
               <h2 className="text-2xl md:text-3xl font-bold text-blue-600 flex items-center gap-3">
@@ -50,7 +50,7 @@ export const Hero: FC = () => {
 
         {/* Key Benefits Grid */}
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mt-16">
-          <Card className="transition-all hover:shadow-lg">
+          <Card className="transition-all hover:shadow-lg bg-white">
             <CardHeader className="flex flex-row items-center gap-4 pb-2">
               <Shield className="h-8 w-8 text-blue-600" />
               <h3 className="text-xl font-semibold">Protection Confidence</h3>
@@ -60,7 +60,7 @@ export const Hero: FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="transition-all hover:shadow-lg">
+          <Card className="transition-all hover:shadow-lg bg-white">
             <CardHeader className="flex flex-row items-center gap-4 pb-2">
               <Sparkles className="h-8 w-8 text-blue-600" />
               <h3 className="text-xl font-semibold">Premium Optimization</h3>
@@ -70,7 +70,7 @@ export const Hero: FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="transition-all hover:shadow-lg">
+          <Card className="transition-all hover:shadow-lg bg-white">
             <CardHeader className="flex flex-row items-center gap-4 pb-2">
               <TrendingUp className="h-8 w-8 text-blue-600" />
               <h3 className="text-xl font-semibold">Growth Potential</h3>
@@ -80,7 +80,7 @@ export const Hero: FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="transition-all hover:shadow-lg">
+          <Card className="transition-all hover:shadow-lg bg-white">
             <CardHeader className="flex flex-row items-center gap-4 pb-2">
               <Lock className="h-8 w-8 text-blue-600" />
               <h3 className="text-xl font-semibold">Future Security</h3>
@@ -97,7 +97,7 @@ export const Hero: FC = () => {
             How It Works
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center transition-all hover:shadow-lg">
+            <Card className="text-center transition-all hover:shadow-lg bg-white">
               <CardContent className="pt-6">
                 <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Upload className="w-8 h-8 text-blue-600" />
@@ -113,7 +113,7 @@ export const Hero: FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center transition-all hover:shadow-lg">
+            <Card className="text-center transition-all hover:shadow-lg bg-white">
               <CardContent className="pt-6">
                 <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <Clock className="w-8 h-8 text-blue-600" />
@@ -129,7 +129,7 @@ export const Hero: FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="text-center transition-all hover:shadow-lg">
+            <Card className="text-center transition-all hover:shadow-lg bg-white">
               <CardContent className="pt-6">
                 <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                   <FileText className="w-8 h-8 text-blue-600" />
@@ -156,7 +156,7 @@ export const Hero: FC = () => {
             What You&apos;ll Receive
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <Card className="transition-all hover:shadow-lg">
+            <Card className="transition-all hover:shadow-lg bg-white">
               <CardHeader>
                 <h3 className="text-2xl font-semibold text-center">Email Summary</h3>
               </CardHeader>
@@ -182,7 +182,7 @@ export const Hero: FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="transition-all hover:shadow-lg">
+            <Card className="transition-all hover:shadow-lg bg-white">
               <CardHeader>
                 <h3 className="text-2xl font-semibold text-center">Professional Analysis PDF</h3>
               </CardHeader>
@@ -212,7 +212,7 @@ export const Hero: FC = () => {
 
         {/* Final CTA Section */}
         <div className="max-w-4xl mx-auto mt-24 mb-16">
-          <Card className="border-2 border-blue-100">
+          <Card className="border-2 border-blue-100 bg-white">
             <CardHeader className="text-center bg-blue-600 text-white">
               <div className="flex items-center justify-center gap-3">
                 <Zap className="w-8 h-8" />
