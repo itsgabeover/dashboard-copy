@@ -4,11 +4,12 @@ import { Zap, Shield, TrendingUp, AlertTriangle, CheckCircle, Clock, FileText, S
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import type { FC } from "react"
 
-export default function AboutPage() {
+const AboutPage: FC = () => {
   return (
-    <main className="w-full bg-gradient-to-b from-blue-50 via-white to-blue-50">
-      <section className="container mx-auto px-4 py-16 md:py-24 lg:py-32">
+    <section className="w-full bg-white">
+      <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
         {/* Hero Section */}
         <div className="flex flex-col items-center space-y-6 text-center mb-16">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-blue-600 max-w-4xl">
@@ -57,7 +58,7 @@ export default function AboutPage() {
                 ]
               }
             ].map((section, index) => (
-              <Card key={index} className="transition-all hover:shadow-lg">
+              <Card key={index} className="transition-all hover:shadow-lg bg-white">
                 <CardHeader className="flex flex-col items-center pb-2">
                   <div className="bg-blue-100 rounded-full p-3 mb-4">
                     <section.icon className="w-8 h-8 text-blue-600" />
@@ -84,8 +85,8 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold text-center text-blue-600 mb-12">
             Traditional Review vs Insurance Planner AI
           </h2>
-          <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-xl p-8 shadow-lg">
-            <div className="grid md:grid-cols-2 gap-8">
+          <Card className="bg-gradient-to-r from-purple-100 to-indigo-100 p-8">
+            <CardContent className="grid md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <h3 className="text-2xl font-semibold text-purple-800 mb-4">Traditional Review</h3>
                 {[
@@ -93,13 +94,15 @@ export default function AboutPage() {
                   { icon: AlertTriangle, title: "Key details often missed", description: "Human limitations lead to oversights" },
                   { icon: FileText, title: "Basic policy summary", description: "Surface-level understanding" },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 bg-white bg-opacity-50 rounded-lg p-4 transition-all hover:bg-opacity-70">
-                    <item.icon className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
-                    <div>
-                      <p className="font-medium text-gray-900">{item.title}</p>
-                      <p className="text-sm text-gray-600">{item.description}</p>
-                    </div>
-                  </div>
+                  <Card key={index} className="flex items-start gap-4 bg-white bg-opacity-50 transition-all hover:bg-opacity-70">
+                    <CardContent className="flex items-start gap-4">
+                      <item.icon className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <p className="font-medium text-gray-900">{item.title}</p>
+                        <p className="text-sm text-gray-600">{item.description}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
               <div className="space-y-6">
@@ -109,22 +112,24 @@ export default function AboutPage() {
                   { icon: Search, title: "Every feature examined", description: "Comprehensive review" },
                   { icon: Lightbulb, title: "Deep insights you can act on", description: "Clear, actionable recommendations" },
                 ].map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 bg-white bg-opacity-50 rounded-lg p-4 transition-all hover:bg-opacity-70">
-                    <item.icon className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
-                    <div>
-                      <p className="font-medium text-gray-900">{item.title}</p>
-                      <p className="text-sm text-gray-600">{item.description}</p>
-                    </div>
-                  </div>
+                  <Card key={index} className="flex items-start gap-4 bg-white bg-opacity-50 transition-all hover:bg-opacity-70">
+                    <CardContent className="flex items-start gap-4">
+                      <item.icon className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
+                      <div>
+                        <p className="font-medium text-gray-900">{item.title}</p>
+                        <p className="text-sm text-gray-600">{item.description}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Call to Action */}
-        <div className="max-w-4xl mx-auto">
-          <Card className="border-2 border-blue-100">
+        <div className="max-w-4xl mx-auto mb-16">
+          <Card className="border-2 border-blue-100 bg-white">
             <CardHeader className="text-center bg-blue-600 text-white">
               <div className="flex items-center justify-center gap-3">
                 <Zap className="w-8 h-8" />
@@ -146,8 +151,10 @@ export default function AboutPage() {
             </CardContent>
           </Card>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   )
 }
+
+export default AboutPage
 
