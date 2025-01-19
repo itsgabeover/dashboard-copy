@@ -34,6 +34,11 @@ export function middleware(request: NextRequest) {
   
   // Handle existing upload/token logic
   if (pathname.startsWith('/upload/')) {
+    // Allow direct access to success page
+    if (pathname === '/upload/success') {
+      return NextResponse.next();
+    }
+
     const token = pathname.split('/').pop();
     console.log('Token path accessed:', token);
     
