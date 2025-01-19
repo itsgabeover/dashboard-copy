@@ -1,8 +1,8 @@
-'use client'
+"use client"
 
-import { useRouter } from 'next/navigation'
-import { useEffect, useState, use } from 'react'
-import { Upload, AlertTriangle, X, Info } from 'lucide-react'
+import { useRouter } from "next/navigation"
+import { useEffect, useState, use } from "react"
+import { Upload, AlertTriangle, X, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -10,13 +10,15 @@ import type { FC } from "react"
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  const validTLDs = ['.com', '.net', '.org', '.edu', '.gov', '.mil', '.info', '.io', '.co.uk', '.ca']
-  return emailRegex.test(email) && 
-         !email.endsWith('.con') && 
-         !email.endsWith('.cim') && 
-         !email.includes('..') && 
-         email.length <= 254 && 
-         validTLDs.some(tld => email.toLowerCase().endsWith(tld))
+  const validTLDs = [".com", ".net", ".org", ".edu", ".gov", ".mil", ".info", ".io", ".co.uk", ".ca"]
+  return (
+    emailRegex.test(email) &&
+    !email.endsWith(".con") &&
+    !email.endsWith(".cim") &&
+    !email.includes("..") &&
+    email.length <= 254 &&
+    validTLDs.some((tld) => email.toLowerCase().endsWith(tld))
+  )
 }
 
 const UploadPage: FC<{ params: Promise<{ token: string }> }> = ({ params }) => {
@@ -24,28 +26,28 @@ const UploadPage: FC<{ params: Promise<{ token: string }> }> = ({ params }) => {
   const { token } = use(params)
   const [isLoading, setIsLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
-  const [email, setEmail] = useState('')
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
-  const [errorMessage, setErrorMessage] = useState('')
+  const [email, setEmail] = useState("")
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle")
+  const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
     if (token) {
       try {
-        sessionStorage.setItem('upload_token', token)
+        sessionStorage.setItem("upload_token", token)
         setIsLoading(false)
       } catch (error) {
-        console.error('Session storage error:', error)
-        router.push('/')
+        console.error("Session storage error:", error)
+        router.push("/")
       }
     } else {
-      router.push('/')
+      router.push("/")
     }
   }, [token, router])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
     if (selectedFile) {
-      if (selectedFile.type !== 'application/pdf') {
+      if (selectedFile.type !== "application/pdf") {
         setErrorMessage("Please select a PDF file.")
         return
       }
@@ -54,7 +56,7 @@ const UploadPage: FC<{ params: Promise<{ token: string }> }> = ({ params }) => {
         return
       }
       setFile(selectedFile)
-      setErrorMessage('')
+      setErrorMessage("")
     }
   }
 
@@ -66,46 +68,46 @@ const UploadPage: FC<{ params: Promise<{ token: string }> }> = ({ params }) => {
       return
     }
 
-    setUploadStatus('uploading')
-    setErrorMessage('')
+    setUploadStatus("uploading")
+    setErrorMessage("")
 
     const formData = new FormData()
-    formData.append('file', file)
-    formData.append('email', email)
-    
-    const storedToken = sessionStorage.getItem('upload_token')
+    formData.append("file", file)
+    formData.append("email", email)
+
+    const storedToken = sessionStorage.getItem("upload_token")
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
     try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      const response = await fetch("/api/upload", {
+        method: "POST",
         headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${storedToken}`
+          Accept: "application/json",
+          Authorization: `Bearer ${storedToken}`,
         },
         body: formData,
-        signal: controller.signal
+        signal: controller.signal,
       })
       clearTimeout(timeoutId)
 
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.statusText}`)
       }
-      setUploadStatus('success')
-      router.push('/upload/success') // Redirect to success page
+      setUploadStatus("success")
+      router.push("/upload/success") // Redirect to success page
     } catch (error: unknown) {
-      console.error('Upload error:', error)
+      console.error("Upload error:", error)
       if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          setErrorMessage('Upload timed out. Please try again.')
+        if (error.name === "AbortError") {
+          setErrorMessage("Upload timed out. Please try again.")
         } else {
-          setErrorMessage('Upload failed. Please try again or contact support.')
+          setErrorMessage("Upload failed. Please try again or contact support.")
         }
       } else {
-        setErrorMessage('Upload failed. Please try again or contact support.')
+        setErrorMessage("Upload failed. Please try again or contact support.")
       }
-      setUploadStatus('error')
+      setUploadStatus("error")
     }
   }
 
@@ -121,17 +123,17 @@ const UploadPage: FC<{ params: Promise<{ token: string }> }> = ({ params }) => {
     )
   }
 
-  const isSubmitDisabled = uploadStatus === 'uploading' || !file || !email || (email.length > 0 && !isValidEmail(email))
+  const isSubmitDisabled = uploadStatus === "uploading" || !file || !email || (email.length > 0 && !isValidEmail(email))
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-gradient-to-b from-white to-blue-50/50">
       <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
         <Card className="max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl font-bold text-[#4B6FEE]">Upload Your Policy</CardTitle>
             <CardDescription>
-              Please upload your life insurance policy&apos;s in-force illustration for analysis. 
-              Our AI will review your policy and provide detailed insights within minutes.
+              Please upload your life insurance policy&apos;s in-force illustration for analysis. Our AI will review
+              your policy and provide detailed insights within minutes.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -144,7 +146,10 @@ const UploadPage: FC<{ params: Promise<{ token: string }> }> = ({ params }) => {
                   <div className="space-y-1 text-center">
                     <Upload className="mx-auto h-12 w-12 text-gray-400" />
                     <div className="flex text-sm text-gray-600">
-                      <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]">
+                      <label
+                        htmlFor="file-upload"
+                        className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]"
+                      >
                         <span>Upload a file</span>
                         <Input
                           id="file-upload"
@@ -189,37 +194,31 @@ const UploadPage: FC<{ params: Promise<{ token: string }> }> = ({ params }) => {
                     if (e.target.value && !isValidEmail(e.target.value)) {
                       setErrorMessage("Please enter a valid email address")
                     } else {
-                      setErrorMessage('')
+                      setErrorMessage("")
                     }
                   }}
                   placeholder="your@email.com"
                   required
-                  className={`w-full ${email && !isValidEmail(email) ? 'border-red-500' : ''}`}
+                  className={`w-full ${email && !isValidEmail(email) ? "border-red-500" : ""}`}
                 />
                 <div className="mt-2 flex items-start space-x-2 text-sm text-gray-600">
                   <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
                   <p>
-                    Please double-check your email address carefully. Your analysis will be sent to this email.
-                    If you don&apos;t receive it within 30 minutes, please check your spam/junk folders.
-                    Still can&apos;t find it? Contact us at{' '}
+                    Please double-check your email address carefully. Your analysis will be sent to this email. If you
+                    don&apos;t receive it within 30 minutes, please check your spam/junk folders. Still can&apos;t find
+                    it? Contact us at{" "}
                     <a href="mailto:support@fpai.com" className="text-[#4B6FEE] hover:text-[#3B4FDE]">
                       support@fpai.com
                     </a>
                   </p>
                 </div>
                 {email && !isValidEmail(email) && (
-                  <p className="mt-1 text-sm text-red-500">
-                    Please enter a valid email address
-                  </p>
+                  <p className="mt-1 text-sm text-red-500">Please enter a valid email address</p>
                 )}
               </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE]"
-                disabled={isSubmitDisabled}
-              >
-                {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload Policy'}
+              <Button type="submit" className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE]" disabled={isSubmitDisabled}>
+                {uploadStatus === "uploading" ? "Uploading..." : "Upload Policy"}
               </Button>
             </form>
 
