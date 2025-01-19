@@ -221,16 +221,17 @@ export const Hero: FC = () => {
               <p className="text-xl mt-2">From confusion to confidence in 5 minutes</p>
             </CardHeader>
             <CardContent className="flex justify-center p-8">
-              <Button
-                asChild
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full"
-              >
-                <Link href="/upload" className="flex items-center gap-2">
-                  Analyze My Policy
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </Button>
+             <Button
+  size="lg"
+  className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full flex items-center gap-2"
+  onClick={() => {
+    const mockToken = `pi_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    window.location.href = `/upload/${mockToken}`;
+  }}
+>
+  Analyze My Policy
+  <ArrowRight className="w-5 h-5" />
+</Button>
             </CardContent>
           </Card>
         </div>
