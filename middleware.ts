@@ -14,50 +14,59 @@ export function middleware(request: NextRequest) {
   // Public paths that don't need authentication
   const publicPaths = ['/login'];
   
+  // Get auth token and verify authentication status
+  const authToken = request.cookies.get('auth-token');
+  const isAuthenticated = authToken && verifyToken(authToken.value);
+  
   // Check if the path is public
   if (publicPaths.includes(pathname)) {
-    // Check if user is already authenticated
-    const authToken = request.cookies.get('auth-token');
-    if (authToken && verifyToken(authToken.value)) {
+    if (isAuthenticated) {
       // If authenticated, redirect to home
       return NextResponse.redirect(new URL('/', request.url));
     }
     return NextResponse.next();
   }
 
-  // Handle existing upload logic - modified to use mock token
-  if (pathname === '/upload') {
-    console.log('Base /upload path accessed');
-    const mockToken = `pi_${Date.now()}_mock`;
-    return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url));
-  }
-  
-  // Handle existing upload/token logic
-  if (pathname.startsWith('/upload/')) {
-    // Allow direct access to success page
-    if (pathname === '/upload/success') {
-      return NextResponse.next();
+  // Require authentication for all upload-related paths
+  if (pathname.startsWith('/upload')) {
+    if (!isAuthenticated) {
+      // Redirect unauthenticated users to login
+      const redirectUrl = new URL('/login', request.url);
+      redirectUrl.searchParams.set('callbackUrl', pathname);
+      return NextResponse.redirect(redirectUrl);
     }
 
-    const token = pathname.split('/').pop();
-    console.log('Token path accessed:', token);
-    
-    // Accept both pi_ tokens and mock tokens
-    if (!token || !token.startsWith('pi_') || !token.includes('_')) {
-      console.log('Invalid token:', token);
+    // Handle base upload path - only for authenticated users
+    if (pathname === '/upload') {
+      console.log('Base /upload path accessed');
       const mockToken = `pi_${Date.now()}_mock`;
       return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url));
     }
-    
-    console.log('Valid token, proceeding');
-    return NextResponse.next();
+
+    // Handle success page - only for authenticated users
+    if (pathname === '/upload/success') {
+      console.log('Success page accessed');
+      return NextResponse.next();
+    }
+
+    // Handle token paths - only for authenticated users
+    if (pathname.startsWith('/upload/')) {
+      const token = pathname.split('/').pop();
+      console.log('Token path accessed:', token);
+      
+      if (token && (token.startsWith('pi_') && token.includes('_'))) {
+        console.log('Valid token, proceeding');
+        return NextResponse.next();
+      }
+      
+      console.log('Invalid token, redirecting to new mock token');
+      const mockToken = `pi_${Date.now()}_mock`;
+      return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url));
+    }
   }
 
   // Check authentication for all other routes
-  const authToken = request.cookies.get('auth-token');
-  
-  if (!authToken || !verifyToken(authToken.value)) {
-    // Store the current URL to redirect back after login
+  if (!isAuthenticated) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(redirectUrl);
