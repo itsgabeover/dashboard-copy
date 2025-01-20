@@ -14,8 +14,8 @@ export default function Navigation() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/resources', label: 'Resources' }
+    { href: '/about', label: 'Why Review?' },
+    { href: '/resources', label: 'Help Center' }
   ]
 
   const isActivePath = (path: string) => pathname === path
@@ -129,7 +129,7 @@ export default function Navigation() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  Chat with Sage
+                  Ask Our AI Helper
                 </button>
               </div>
             </div>
