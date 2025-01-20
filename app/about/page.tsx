@@ -17,7 +17,7 @@ const AboutPage: FC = () => {
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-3xl">
             Your policy changes as your life changes. Behind the complex terms and numbers lies a powerful story of
-            protection, growth, and security. Let's uncover it together.
+            protection, growth, and security. Let&apos;s uncover it together.
           </p>
         </div>
 
@@ -25,8 +25,8 @@ const AboutPage: FC = () => {
         <div className="max-w-5xl mx-auto mb-24">
           <h2 className="text-3xl font-bold text-center text-[#4B6FEE] mb-4">Why Your Policy Needs a Deeper Look</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-3xl mx-auto">
-            Your life insurance isn't static - it's a dynamic financial instrument that evolves over time. Small changes
-            can have big impacts on your coverage and goals.
+            Your life insurance isn&apos;t static - it&apos;s a dynamic financial instrument that evolves over time.
+            Small changes can have big impacts on your coverage and goals.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
             {[
