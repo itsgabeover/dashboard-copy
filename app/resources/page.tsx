@@ -1,22 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import {
-  Compass,
-  FileText,
-  BarChart,
-  ChevronDown,
-  ChevronUp,
-  PlayCircle,
-  BookOpen,
-  FileCheck,
-  AlertTriangle,
-} from "lucide-react"
+import { Compass, FileText, BarChart, ChevronDown, ChevronUp, PlayCircle, BookOpen, FileCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface QuickAccessTile {
   title: string
@@ -252,15 +241,6 @@ export default function ResourcesPage() {
   return (
     <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50">
       <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
-        {/* Under Construction Alert */}
-        <Alert variant="warning" className="mb-8">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Under Construction</AlertTitle>
-          <AlertDescription>
-            This page is currently under development. Some features may be limited or unavailable.
-          </AlertDescription>
-        </Alert>
-
         {/* Header */}
         <div className="flex flex-col items-center space-y-6 text-center mb-16">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
@@ -364,7 +344,7 @@ export default function ResourcesPage() {
         <Card className="bg-[#4B6FEE] text-white text-center p-8 mb-16">
           <CardContent>
             <h2 className="text-3xl font-bold mb-4">Ready to Review Your Policy?</h2>
-            <Button size="lg" variant="secondary" className="bg-green-500 hover:bg-green-600" disabled>
+            <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white" disabled>
               Start My Analysis
             </Button>
           </CardContent>
