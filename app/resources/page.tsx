@@ -1,139 +1,221 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState } from "react"
+import Link from "next/link"
 import {
-  BookOpen,
+  Compass,
   FileText,
-  Download,
+  BarChart,
   ChevronDown,
   ChevronUp,
   X,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Card } from "@/components/ui/card";
+  Download,
+  PlayCircle,
+  Search,
+  BookOpen,
+  FileCheck,
+  Clock,
+  HelpCircle,
+  Zap,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 
-// Type definitions
-type ResourceContent = {
-  name: string;
-  type: string;
-  action: string;
-  link?: string;
-};
+type QuickAccessTile = {
+  title: string
+  icon: React.ElementType
+  description: string
+  link: string
+}
 
-type Resource = {
-  title: string;
-  icon: React.ElementType;
-  description: string;
-  content: ResourceContent[];
-};
+type ExpandableSection = {
+  title: string
+  icon: React.ElementType
+  content: React.ReactNode
+}
 
-type FAQQuestion = {
-  question: string;
-  answer: React.ReactNode;
-};
+type CaseStudy = {
+  title: string
+  problem: string
+  solution: string
+  result: string
+}
 
 type FAQCategory = {
-  category: string;
-  questions: FAQQuestion[];
-};
+  category: string
+  questions: { question: string; answer: string }[]
+}
 
 export default function ResourcesPage() {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [expandedSection, setExpandedSection] = useState<string | null>(null)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const toggleSection = (section: string) => {
-    if (expandedSection === section) {
-      setExpandedSection(null);
-    } else {
-      setExpandedSection(section);
-      setTimeout(() => {
-        const element = document.getElementById(section);
-        element?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
-    }
-  };
+    setExpandedSection(expandedSection === section ? null : section)
+  }
 
-  const resources: Resource[] = [
+  const quickAccessTiles: QuickAccessTile[] = [
     {
-      title: "Getting Started",
-      icon: BookOpen,
-      description: "Essential Resources for Understanding Your Policy",
-      content: [
-        {
-          name: "Illustration Request Template",
-          type: "PDF",
-          action: "Download",
-          link: "/resources/illustration_request_template.txt",
-        },
-        { name: "Common Insurance Terms", type: "PDF", action: "Download",
-          link: "/resources/common_insurance_terms.txt",
-          },
-      ],
+      title: "Quick Start Guide",
+      icon: Compass,
+      description: "New to policy reviews? Start here",
+      link: "/quick-start-guide",
+    },
+    {
+      title: "Request Templates",
+      icon: FileText,
+      description: "Ready-to-use carrier request forms",
+      link: "/request-templates",
     },
     {
       title: "Sample Reports",
-      icon: FileText,
-      description: "See How We Analyze Your Policy",
-      content: [
-        {
-          name: "Sample Professional Analysis PDF",
-          type: "PDF",
-          action: "Download",
-          link: "/sample_reports/SAMPLE_POLICY_REVIEW.docx",
-        },
-        {
-          name: "Sample Email Summary",
-          type: "PDF",
-          action: "Download",
-          link: "/sample_reports/SAMPLE_CLIENT_SUMMARY.docx",
-        },
-      ],
+      icon: BarChart,
+      description: "See how we analyze your policy",
+      link: "/sample-reports",
     },
-  ];
+  ]
 
-  const faqs: FAQCategory[] = [
+  const essentialTools: ExpandableSection = {
+    title: "Essential Tools",
+    icon: FileCheck,
+    content: (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Template Library</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>All request forms by policy type</li>
+              <li>Carrier contact directory</li>
+              <li>Policy identifier guide</li>
+              <li>Request instructions PDF</li>
+              <li>Policy review checklist</li>
+              <li>Timeline expectations guide</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+    ),
+  }
+
+  const learningCenter: ExpandableSection = {
+    title: "Learning Center",
+    icon: BookOpen,
+    content: (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Video Tutorials</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { title: "How to Request an IFL", duration: "2 min" },
+                { title: "Reading Your Analysis", duration: "3 min" },
+                { title: "Understanding Policy Values", duration: "4 min" },
+                { title: "Working with Your Advisor", duration: "2 min" },
+              ].map((video, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <PlayCircle className="text-[#4B6FEE]" />
+                  <div>
+                    <p className="font-medium">{video.title}</p>
+                    <p className="text-sm text-gray-500">{video.duration}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Insurance Terms Glossary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input
+              type="search"
+              placeholder="Search terms..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mb-4"
+            />
+            <p>Comprehensive terms list with simple explanations and common features guide.</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Educational Guides</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Policy types explained</li>
+              <li>Premium structure guide</li>
+              <li>Policy values explained</li>
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+    ),
+  }
+
+  const caseStudies: CaseStudy[] = [
     {
-      category: "What We Do",
-      questions: [
-        {
-          question: "What is Insurance Planner AI?",
-          answer:
-            "We provide objective AI-powered analysis of life insurance policy illustrations. We're not an insurance company, agent, or advisor - we don't sell, solicit, recommend, or endorse any insurance products or companies. Our role is simply to help you understand your existing policy better.",
-        },
-        {
-          question: "What exactly do you analyze?",
-          answer:
-            "Our AI analyzes only the information contained in your in-force illustration. We deliver two outputs: a clear email summary and a detailed PDF report. Remember that our analysis is based solely on your illustration - actual policy performance may vary based on market conditions and insurance company performance.",
-        },
-        {
-          question: "Are you providing financial advice?",
-          answer:
-            "No. We provide policy analysis, not advice. We don't offer tax, legal, insurance, or financial advice. Think of us as a translation tool - we help you understand your policy details so you can have more informed discussions with your professional advisors.",
-        },
-      ],
+      title: "Premium Optimization Case",
+      problem: "High premiums affecting budget",
+      solution: "Restructured payment schedule",
+      result: "20% reduction in annual costs",
     },
+    {
+      title: "Coverage Gap Discovery",
+      problem: "Insufficient life insurance",
+      solution: "Identified coverage shortfall",
+      result: "Increased protection by $500,000",
+    },
+    {
+      title: "Policy Rescue Story",
+      problem: "Policy nearing lapse",
+      solution: "Adjusted premium allocation",
+      result: "Extended coverage by 15 years",
+    },
+    {
+      title: "Value Enhancement Example",
+      problem: "Underutilized cash value",
+      solution: "Explored policy loan options",
+      result: "Funded child's education",
+    },
+  ]
+
+  const faqCategories: FAQCategory[] = [
     {
       category: "Getting Started",
       questions: [
         {
-          question: "What do I need to begin?",
-          answer:
-            "Just two things: a current in-force illustration (we'll show you how to get one) and an email address. Our analysis is based solely on the illustration provided.",
+          question: "How do I request an illustration?",
+          answer: "Contact your insurance carrier using our provided template.",
         },
         {
-          question: "How do I get my in-force illustration?",
-          answer:
-            "Request it from your insurance carrier - we provide a template letter and contact information. Typically takes 2-3 weeks. Remember, you'll want a current illustration as policy values and projections can change over time.",
+          question: "What documents do I need?",
+          answer: "You'll need your most recent policy statement and in-force illustration.",
         },
         {
-          question: "What types of policies can be analyzed?",
-          answer:
-            "We analyze permanent life insurance policies including: Universal Life, Indexed Universal Life, Variable Universal Life, and Whole Life.",
+          question: "How long does the process take?",
+          answer: "Typically 2-3 weeks from request to analysis completion.",
+        },
+      ],
+    },
+    {
+      category: "Understanding Results",
+      questions: [
+        { question: "How do I read my analysis?", answer: "We provide a step-by-step guide in your results email." },
+        {
+          question: "What are the key terms I should know?",
+          answer: "Refer to our glossary for explanations of common insurance terms.",
+        },
+        {
+          question: "What actions should I take after receiving my results?",
+          answer: "Review our recommended next steps in your analysis report.",
         },
       ],
     },
@@ -141,209 +223,151 @@ export default function ResourcesPage() {
       category: "Working with Advisors",
       questions: [
         {
-          question: "Can I share the analysis with my advisor?",
-          answer:
-            "Yes! We provide both a consumer-friendly summary and a detailed professional analysis specifically designed for advisor review.",
+          question: "Can I share my analysis with my financial advisor?",
+          answer: "Yes, we encourage collaboration with your trusted professionals.",
         },
         {
-          question: "Do I need an advisor to use this service?",
-          answer:
-            "No - our service is designed for both direct consumer use and professional advisor collaboration.",
+          question: "How can my advisor use this information?",
+          answer: "They can use our insights to refine your overall financial strategy.",
+        },
+        {
+          question: "Do you recommend specific advisors?",
+          answer: "No, we remain neutral but support your existing advisory relationships.",
         },
       ],
     },
     {
-      category: "Understanding Results",
+      category: "Technical Support",
       questions: [
         {
-          question: "What will I receive?",
-          answer:
-            "You'll receive two items: 1) A clear email summary in plain English, and 2) A detailed Professional Analysis PDF suitable for your advisor. Both are based on your illustration and should be used as discussion tools with your advisors, not as the sole basis for decisions.",
+          question: "How is my data kept secure?",
+          answer: "We use bank-level encryption and never store your personal information.",
         },
         {
-          question: "How quickly do I receive results?",
-          answer:
-            "Once you upload your illustration, the analysis takes about 5 minutes. While our AI technology is efficient, it can occasionally misinterpret information, which is why we encourage reviewing results with your professional advisors.",
+          question: "What file formats do you accept?",
+          answer: "We accept PDF and Excel files for policy illustrations.",
+        },
+        {
+          question: "How can I get help if I'm stuck?",
+          answer: "Contact our support team at support@insuranceplanner-ai.com",
         },
       ],
     },
-    {
-      category: "Support & Policies",
-      questions: [
-        {
-          question: "What if I need help?",
-          answer: (
-            <>
-              Support is available at{" "}
-              <a
-                href="mailto:support@financialplanner-ai.com"
-                className="text-[#4B6FEE] hover:underline"
-              >
-                support@financialplanner-ai.com
-              </a>
-              . We typically respond within one business day. We can help with
-              technical issues but cannot provide insurance, financial, legal,
-              or tax advice.
-            </>
-          ),
-        },
-        {
-          question: "What's your refund policy?",
-          answer:
-            "We offer a 14-day money-back guarantee for first-time users if you're not satisfied with your analysis. Simply email support with your request.",
-        },
-      ],
-    },
-  ];
+  ]
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E2E8F0]">
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold text-[#4B6FEE] mb-6 tracking-tight">
-              Policy Analysis Resources
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to understand and review your life insurance
-              policy
-            </p>
-          </div>
+    <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50">
+      <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
+        {/* Header */}
+        <div className="flex flex-col items-center space-y-6 text-center mb-16">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
+            Policy Analysis Resources
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl">
+            Everything you need for a successful policy review - from getting started to understanding your results
+          </p>
+        </div>
 
-          {/* Resource Cards */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
-            {resources.map((resource, index) => (
-              <Card
-                key={index}
-                className="relative overflow-hidden transition-all duration-300 hover:shadow-lg bg-white"
-              >
-                <div className="p-8">
-                  <div className="flex flex-col items-center text-center mb-6">
-                    <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-4">
-                      <resource.icon
-                        className="w-12 h-12 text-[#4B6FEE]"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                      {resource.title}
-                    </h3>
-                    <p className="text-gray-600">{resource.description}</p>
-                  </div>
-
-                  <Button
-                    onClick={() => toggleSection(resource.title)}
-                    className="w-full bg-white border-2 border-[#4B6FEE] text-[#4B6FEE] hover:bg-[#4B6FEE] hover:text-white transition-colors"
-                    aria-expanded={expandedSection === resource.title}
-                    aria-controls={`${resource.title}-content`}
-                  >
-                    {expandedSection === resource.title ? (
-                      <ChevronUp className="mr-2 h-5 w-5" />
-                    ) : (
-                      <ChevronDown className="mr-2 h-5 w-5" />
-                    )}
-                    {expandedSection === resource.title
-                      ? "Close"
-                      : "View Resources"}
-                  </Button>
+        {/* Quick Access Tiles */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {quickAccessTiles.map((tile, index) => (
+            <Card
+              key={index}
+              className="transition-all hover:shadow-lg bg-white transform hover:scale-105 duration-300"
+            >
+              <CardContent className="p-6 flex flex-col items-center text-center">
+                <div className="bg-[#4B6FEE]/10 p-3 rounded-full mb-4">
+                  <tile.icon className="w-8 h-8 text-[#4B6FEE]" />
                 </div>
+                <CardTitle className="text-xl font-semibold mb-2">{tile.title}</CardTitle>
+                <CardDescription className="mb-4">{tile.description}</CardDescription>
+                <Button asChild variant="outline" className="mt-auto">
+                  <Link href={tile.link}>Learn More</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="space-y-8 mb-16">
+          {[essentialTools, learningCenter].map((section, index) => (
+            <Card key={index} className="transition-all hover:shadow-lg bg-white">
+              <CardHeader
+                className="flex flex-row items-center justify-between cursor-pointer"
+                onClick={() => toggleSection(section.title)}
+              >
+                <div className="flex items-center">
+                  <section.icon className="w-6 h-6 text-[#4B6FEE] mr-2" />
+                  <CardTitle>{section.title}</CardTitle>
+                </div>
+                {expandedSection === section.title ? <ChevronUp /> : <ChevronDown />}
+              </CardHeader>
+              {expandedSection === section.title && <CardContent>{section.content}</CardContent>}
+            </Card>
+          ))}
+        </div>
+
+        {/* Case Studies & Success Stories */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-[#4B6FEE] mb-8">Case Studies & Success Stories</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {caseStudies.map((study, index) => (
+              <Card key={index} className="transition-all hover:shadow-lg bg-white">
+                <CardHeader>
+                  <CardTitle>{study.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>
+                    <strong>Challenge:</strong> {study.problem}
+                  </p>
+                  <p>
+                    <strong>Solution:</strong> {study.solution}
+                  </p>
+                  <p>
+                    <strong>Outcome:</strong> {study.result}
+                  </p>
+                </CardContent>
               </Card>
             ))}
           </div>
-
-          {/* Expanded Resource Section */}
-          {expandedSection && (
-            <div
-              id={expandedSection}
-              className="bg-white rounded-lg shadow-md p-6 mb-16 max-w-5xl mx-auto animate-fadeIn"
-              role="region"
-              aria-labelledby={`${expandedSection}-title`}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h3
-                  id={`${expandedSection}-title`}
-                  className="text-2xl font-semibold text-[#4B6FEE]"
-                >
-                  {expandedSection}
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setExpandedSection(null)}
-                  className="text-gray-500 hover:text-gray-700"
-                  aria-label="Close section"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {resources
-                  .find((r) => r.title === expandedSection)
-                  ?.content.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:border-[#4B6FEE] transition-colors"
-                    >
-                      <span className="font-medium text-gray-700">
-                        {item.name}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-[#4B6FEE] text-[#4B6FEE] hover:bg-[#4B6FEE] hover:text-white"
-                        disabled={!item.link}
-                        aria-label={`Download ${item.name}`}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        <a href={item.link} target="_blank" rel="noopener noreferrer" download>
-                        {item.action}
-                        </a>
-                      </Button>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-
-          {/* FAQ Section */}
-          <div className="bg-white rounded-lg shadow-md p-8 max-w-5xl mx-auto">
-            <h2 className="text-3xl font-bold text-[#4B6FEE] mb-8">
-              Frequently Asked Questions
-            </h2>
-            <Accordion type="single" collapsible className="w-full">
-              {faqs.map((category, categoryIndex) => (
-                <AccordionItem
-                  key={categoryIndex}
-                  value={`category-${categoryIndex}`}
-                  className="border-b border-gray-200"
-                >
-                  <AccordionTrigger className="text-xl font-semibold text-[#4B6FEE] hover:no-underline">
-                    {category.category}
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Accordion type="single" collapsible className="w-full">
-                      {category.questions.map((faq, faqIndex) => (
-                        <AccordionItem
-                          key={faqIndex}
-                          value={`faq-${categoryIndex}-${faqIndex}`}
-                          className="border-b border-gray-100"
-                        >
-                          <AccordionTrigger className="text-lg font-medium hover:no-underline">
-                            {faq.question}
-                          </AccordionTrigger>
-                          <AccordionContent className="text-gray-700 leading-relaxed">
-                            {faq.answer}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
         </div>
-      </section>
-    </main>
-  );
+
+        {/* Support Resources */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-[#4B6FEE] mb-8">Support Resources</h2>
+          <Accordion type="single" collapsible className="w-full">
+            {faqCategories.map((category, categoryIndex) => (
+              <AccordionItem key={categoryIndex} value={`category-${categoryIndex}`}>
+                <AccordionTrigger className="text-xl font-semibold text-[#4B6FEE]">
+                  {category.category}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Accordion type="single" collapsible>
+                    {category.questions.map((faq, faqIndex) => (
+                      <AccordionItem key={faqIndex} value={`faq-${categoryIndex}-${faqIndex}`}>
+                        <AccordionTrigger className="text-lg font-medium">{faq.question}</AccordionTrigger>
+                        <AccordionContent className="text-gray-700">{faq.answer}</AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+
+        {/* Bottom Call to Action */}
+        <Card className="bg-[#4B6FEE] text-white text-center p-8 mb-16">
+          <CardContent>
+            <h2 className="text-3xl font-bold mb-4">Ready to Review Your Policy?</h2>
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/start-analysis">Start My Analysis</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  )
 }
+
