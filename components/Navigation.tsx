@@ -80,7 +80,7 @@ export default function Navigation() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                Chat with Sage
+                Ask Our AI Helper
               </button>
             </div>
           </div>
