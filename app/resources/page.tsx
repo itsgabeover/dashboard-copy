@@ -2,48 +2,33 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import {
-  Compass,
-  FileText,
-  BarChart,
-  ChevronDown,
-  ChevronUp,
-  X,
-  Download,
-  PlayCircle,
-  Search,
-  BookOpen,
-  FileCheck,
-  Clock,
-  HelpCircle,
-  Zap,
-} from "lucide-react"
+import { Compass, FileText, BarChart, ChevronDown, ChevronUp, PlayCircle, BookOpen, FileCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 
-type QuickAccessTile = {
+interface QuickAccessTile {
   title: string
   icon: React.ElementType
   description: string
   link: string
 }
 
-type ExpandableSection = {
+interface ExpandableSection {
   title: string
   icon: React.ElementType
   content: React.ReactNode
 }
 
-type CaseStudy = {
+interface CaseStudy {
   title: string
   problem: string
   solution: string
   result: string
 }
 
-type FAQCategory = {
+interface FAQCategory {
   category: string
   questions: { question: string; answer: string }[]
 }
@@ -208,7 +193,10 @@ export default function ResourcesPage() {
     {
       category: "Understanding Results",
       questions: [
-        { question: "How do I read my analysis?", answer: "We provide a step-by-step guide in your results email." },
+        {
+          question: "How do I read my analysis?",
+          answer: "We provide a step-by-step guide in your results email.",
+        },
         {
           question: "What are the key terms I should know?",
           answer: "Refer to our glossary for explanations of common insurance terms.",
