@@ -12,43 +12,38 @@ export const Hero: FC = () => {
       {/* Main Hero Section */}
       <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
         <div className="flex flex-col items-center space-y-6 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-blue-600 max-w-4xl">
-            Transform Your Life Insurance Policy into Clear Insights
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl">
-            Insurance Planner AI: From Complex Policy to Confident Decisions
-          </p>
-          <p className="text-lg text-gray-500 max-w-3xl">
-            Our AI analyzes every detail of your policy, uncovering opportunities, revealing potential risks, and
-            ensuring your premiums are working as hard as you do
-          </p>
-        </div>
-
-        {/* AI Analysis Card */}
-        <Card className="max-w-4xl mx-auto mt-12 bg-white border-2 border-blue-100">
-          <CardContent className="p-8">
-            <div className="flex flex-col items-center space-y-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-blue-600 flex items-center gap-3">
-                <Zap className="w-8 h-8" />
-                AI-powered policy reviews in minutes
-              </h2>
-              <p className="text-gray-600 text-lg text-center max-w-2xl">
-                Upload your policy&apos;s in-force illustration and get clear insights in minutes. Insurance Planner AI
-                helps you read between the lines, understanding each feature, benefit, and provision.
-              </p>
-              <div className="flex flex-col md:flex-row gap-6 items-center justify-center text-gray-700">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span>Crystal-clear email summary</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span>Professional policy review analysis PDF</span>
-                </div>
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
+          Life Insurance Policy Reviews<br />
+          <span className="text-4xl md:text-5xl lg:text-6xl">in Minutes</span>
+        </h1>
+          <h2 className="text-2xl md:text-3xl mb-12 text-gray-600 font-light">
+          AI-Powered Life Insurance Analysis
+        </h2>
+           <div className="max-w-4xl mx-auto mb-16 bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
+          <div className="p-8">
+            <h3 className="text-3xl font-bold mb-6 text-[#4B6FEE] flex items-center justify-center">
+              <Zap className="w-8 h-8 mr-2" aria-hidden="true" /> 
+              From Illustration to Impact in Minutes
+            </h3>
+            <p className="text-gray-700 mb-6 text-lg leading-relaxed">
+              Get clarity on how your policy supports your financial planning – our AI turns complex illustrations into confident decisions that drive your strategy.
+            </p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
+              <div className="flex items-center">
+                <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
+                <span>No questionnaires needed</span>
+              </div>
+              <div className="flex items-center">
+                <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
+                <span>No back-and-forth delays</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <p className="mt-6 text-xl font-semibold text-[#4B6FEE] flex items-center justify-center">
+              <Upload className="w-6 h-6 mr-2" aria-hidden="true" />
+              Simply upload your in-force illustration and let our AI handle the rest
+            </p>
+          </div>
+        </div>
 
         {/* Key Benefits Grid */}
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mt-16">
