@@ -28,7 +28,7 @@ export function ChatInterface({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
       <div className="fixed inset-0 bg-white flex flex-col">
         <div className="flex justify-between items-center p-2 border-b bg-white h-12">
-          <h2 className="text-lg font-semibold text-[#4B6FEE]">Chat with Sage</h2>
+          <h2 className="text-lg font-semibold text-[#4B6FEE]">Ask Our AI Helper</h2>
           <button 
             onClick={onClose} 
             className="text-gray-500 hover:text-gray-700 p-1"
