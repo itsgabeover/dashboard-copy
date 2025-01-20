@@ -1,6 +1,6 @@
 "use client"
 
-import { Upload, Clock, FileText, CheckCircle, Zap, ArrowRight, Shield, Sparkles, TrendingUp, Lock } from "lucide-react"
+import { Upload, FileText, CheckCircle, Zap, ArrowRight, Shield, Sparkles, TrendingUp, Lock } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
