@@ -143,10 +143,14 @@ export default function LoginPage() {
           {/* Footer Links */}
           <div className="mt-8 text-center space-y-2">
             <p className="text-gray-600">
-              New to IP-AI?{' '}
+              New to Insurance Planner AI?{' '}
               <a href="#" className="text-blue-600 hover:underline">
                 Request Beta Access
-              </a>
+              <a
+                href="mailto:support@financial-planner-ai.com"
+                className="text-blue-600 hover:underline"
+              >
+                support@financial-planner-ai.com
             </p>
             <p className="text-gray-600">
               Need help? Contact{' '}
