@@ -1,26 +1,30 @@
-// app/view-pdf/page.tsx
-"use client";
-import React from "react";
-import { useSearchParams } from "next/navigation";
+"use client"
 
-const ViewPDF = () => {
-  const searchParams = useSearchParams();
-  const pdfUrl = searchParams.get("pdfUrl");
+import React, { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
+
+const PDFViewer = () => {
+  const searchParams = useSearchParams()
+  const pdfUrl = searchParams.get("pdfUrl")
 
   return (
-    <div className="pdf-container">
+    <div className="pdf-container h-screen">
       {pdfUrl ? (
-        <iframe
-          src={pdfUrl}
-          width="100%"
-          height="100%"
-          style={{ border: "none" }}
-        />
+        <iframe src={pdfUrl} width="100%" height="100%" style={{ border: "none" }} title="PDF Viewer" />
       ) : (
-        <p>Loading PDF...</p>
+        <p className="text-center py-4">No PDF URL provided</p>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ViewPDF;
+const ViewPDF = () => {
+  return (
+    <Suspense fallback={<div className="text-center py-4">Loading PDF viewer...</div>}>
+      <PDFViewer />
+    </Suspense>
+  )
+}
+
+export default ViewPDF
+
