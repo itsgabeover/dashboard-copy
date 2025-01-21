@@ -6,19 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { ErrorBoundary } from "react-error-boundary"
 import type { FC } from "react"
-
-const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => {
-  return (
-    <div className="text-center p-4">
-      <h2 className="text-xl font-bold text-red-600">Something went wrong</h2>
-      <Button onClick={resetErrorBoundary} className="mt-4">
-        Try again
-      </Button>
-    </div>
-  )
-}
 
 export const Hero: FC = () => {
   const router = useRouter()
@@ -28,8 +16,7 @@ export const Hero: FC = () => {
   }
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <section className="w-full" aria-labelledby="hero-title">
+         <section className="w-full" aria-labelledby="hero-title">
         {/* Hero Section */}
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-100 to-blue-100/50 py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -264,8 +251,7 @@ export const Hero: FC = () => {
           </div>
         </div>
       </section>
-    </ErrorBoundary>
-  )
+     )
 }
 
 export default Hero
