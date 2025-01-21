@@ -11,9 +11,9 @@ export const Hero: FC = () => {
 
     const router = useRouter();
 
-    const handleViewSample = ( pdfUrl ) => {
-      router.push(`/view-pdf?pdfUrl=/${pdfUrl}`); // Update this path accordingly
-    };
+    const handleViewSample = (pdfUrl: string) => {
+    router.push(`/view-pdf?pdfUrl=/${pdfUrl}`)
+  }
 
   return (
     <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50">
