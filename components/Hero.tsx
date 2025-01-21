@@ -12,7 +12,7 @@ export const Hero: FC = () => {
     const router = useRouter();
 
     const handleViewSample = ( pdfUrl ) => {
-      router.push(`/view-pdf?pdfUrl=/${pdfUrl}`); // Update the path accordingly
+      router.push(`/view-pdf?pdfUrl=/${pdfUrl}`); // Update this path accordingly
     };
 
   return (
