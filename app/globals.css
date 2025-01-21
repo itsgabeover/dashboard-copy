@@ -68,3 +68,9 @@ button, a {
   transition: all 0.2s ease-in-out;
 }
 
+.pdf-container {
+  width: 100%; /* or a specific width like 800px */
+  height: 600px; /* increase the height as needed */
+  margin: 0 auto; /* to center the element */
+  overflow: hidden; /* optional, to handle overflow */
+}

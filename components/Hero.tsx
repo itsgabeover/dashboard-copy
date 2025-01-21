@@ -2,11 +2,19 @@
 
 import { Upload, FileText, CheckCircle, Zap, ArrowRight, Shield, Sparkles, TrendingUp, Lock } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { FC } from "react"
 
 export const Hero: FC = () => {
+
+    const router = useRouter();
+
+    const handleViewSample = ( pdfUrl ) => {
+      router.push(`/view-pdf?pdfUrl=/${pdfUrl}`); // Update the path accordingly
+    };
+
   return (
     <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50">
       <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
@@ -16,7 +24,9 @@ export const Hero: FC = () => {
             <br />
             <span className="text-4xl md:text-5xl lg:text-6xl">in Minutes</span>
           </h1>
-          <h2 className="text-2xl md:text-3xl mb-12 text-gray-600 font-light">AI-Powered Life Insurance Analysis</h2>
+          <h2 className="text-2xl md:text-3xl mb-12 text-gray-600 font-light">
+            AI-Powered Life Insurance Analysis
+          </h2>
           <div className="max-w-4xl mx-auto mb-16 bg-white rounded-lg shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
             <div className="p-8">
               <h3 className="text-3xl font-bold mb-6 text-[#4B6FEE] flex items-center justify-center">
@@ -24,22 +34,30 @@ export const Hero: FC = () => {
                 From Illustration to Impact in Minutes
               </h3>
               <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-                Get clarity on how your policy supports your financial planning – our AI turns complex illustrations
-                into confident decisions that drive your strategy.
+                Get clarity on how your policy supports your financial planning
+                – our AI turns complex illustrations into confident decisions
+                that drive your strategy.
               </p>
               <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
                 <div className="flex items-center">
-                  <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
+                  <CheckCircle
+                    className="w-6 h-6 text-green-500 mr-2"
+                    aria-hidden="true"
+                  />
                   <span>No questionnaires needed</span>
                 </div>
                 <div className="flex items-center">
-                  <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
+                  <CheckCircle
+                    className="w-6 h-6 text-green-500 mr-2"
+                    aria-hidden="true"
+                  />
                   <span>No back-and-forth delays</span>
                 </div>
               </div>
               <p className="mt-6 text-xl font-semibold text-[#4B6FEE] flex items-center justify-center">
                 <Upload className="w-6 h-6 mr-2" aria-hidden="true" />
-                Simply upload your in-force illustration and let our AI handle the rest
+                Simply upload your in-force illustration and let our AI handle
+                the rest
               </p>
             </div>
           </div>
@@ -94,7 +112,9 @@ export const Hero: FC = () => {
 
           {/* How It Works Section */}
           <div className="max-w-4xl mx-auto mt-24">
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-blue-600 mb-12">How It Works</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-blue-600 mb-12">
+              How It Works
+            </h2>
             <div className="relative">
               <div className="absolute top-1/2 left-0 right-0 h-1 bg-blue-200 transform -translate-y-1/2 hidden md:block"></div>
               <div className="grid md:grid-cols-3 gap-8 relative z-10">
@@ -103,9 +123,12 @@ export const Hero: FC = () => {
                     <div className="bg-blue-600 text-white rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
                       1
                     </div>
-                    <h3 className="text-xl font-semibold mb-4 text-blue-600">Get Your Illustration</h3>
+                    <h3 className="text-xl font-semibold mb-4 text-blue-600">
+                      Get Your Illustration
+                    </h3>
                     <p className="text-gray-600">
-                      Request a current policy illustration from your insurer. Takes about a week.
+                      Request a current policy illustration from your insurer.
+                      Takes about a week.
                     </p>
                   </CardContent>
                 </Card>
@@ -115,8 +138,13 @@ export const Hero: FC = () => {
                     <div className="bg-blue-600 text-white rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
                       2
                     </div>
-                    <h3 className="text-xl font-semibold mb-4 text-blue-600">Upload & Analyze</h3>
-                    <p className="text-gray-600">Upload your illustration and our AI analyzes it in minutes.</p>
+                    <h3 className="text-xl font-semibold mb-4 text-blue-600">
+                      Upload & Analyze
+                    </h3>
+                    <p className="text-gray-600">
+                      Upload your illustration and our AI analyzes it in
+                      minutes.
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -125,8 +153,13 @@ export const Hero: FC = () => {
                     <div className="bg-blue-600 text-white rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
                       3
                     </div>
-                    <h3 className="text-xl font-semibold mb-4 text-blue-600">Get Your Results</h3>
-                    <p className="text-gray-600">Receive your email summary and detailed PDF report instantly.</p>
+                    <h3 className="text-xl font-semibold mb-4 text-blue-600">
+                      Get Your Results
+                    </h3>
+                    <p className="text-gray-600">
+                      Receive your email summary and detailed PDF report
+                      instantly.
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -142,7 +175,9 @@ export const Hero: FC = () => {
             <div className="grid md:grid-cols-2 gap-8">
               <Card className="transition-all hover:shadow-lg bg-white">
                 <CardHeader>
-                  <h3 className="text-2xl font-semibold text-center">Clear Email Summary</h3>
+                  <h3 className="text-2xl font-semibold text-center">
+                    Clear Email Summary
+                  </h3>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-4">
@@ -158,14 +193,23 @@ export const Hero: FC = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button asChild className="w-full mt-8">
+                  <Button
+                    onClick={() => handleViewSample(
+                      "sample_reports/SAMPLE_CLIENT_SUMMARY.pdf"
+                    )}
+                    className="w-full mt-8"
+                  >
+                    <FileText className="w-5 h-5" />
+                    View Sample
+                  </Button>
+                  <Button className="w-full mt-8">
                     <a
-                      href="/sample_reports/SAMPLE_CLIENT_SUMMARY.docx"
-                      download="SAMPLE_CLIENT_SUMMARY.docx"
+                      href="/sample_reports/SAMPLE_CLIENT_SUMMARY.pdf"
+                      download="SAMPLE_CLIENT_SUMMARY.pdf"
                       className="flex items-center justify-center gap-2"
                     >
                       <FileText className="w-5 h-5" />
-                      View Sample
+                      Download Sample
                     </a>
                   </Button>
                 </CardContent>
@@ -173,7 +217,9 @@ export const Hero: FC = () => {
 
               <Card className="transition-all hover:shadow-lg bg-white">
                 <CardHeader>
-                  <h3 className="text-2xl font-semibold text-center">Professional PDF Report</h3>
+                  <h3 className="text-2xl font-semibold text-center">
+                    Professional PDF Report
+                  </h3>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-4">
@@ -189,10 +235,19 @@ export const Hero: FC = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button asChild className="w-full mt-8">
+                  <Button
+                    onClick={() => handleViewSample(
+                      "sample_reports/SAMPLE_POLICY_REVIEW.pdf"
+                    )}
+                    className="w-full mt-8"
+                  >
+                    <FileText className="w-5 h-5" />
+                    View Sample
+                  </Button>
+                  <Button className="w-full mt-8">
                     <a
-                      href="/sample_reports/SAMPLE_POLICY_REVIEW.docx"
-                      download="SAMPLE_POLICY_REVIEW.docx"
+                      href="/sample_reports/SAMPLE_POLICY_REVIEW.pdf"
+                      download="SAMPLE_POLICY_REVIEW.pdf"
                       className="flex items-center justify-center gap-2"
                     >
                       <FileText className="w-5 h-5" />
@@ -210,12 +265,20 @@ export const Hero: FC = () => {
               <CardHeader className="text-center bg-blue-600 text-white">
                 <div className="flex items-center justify-center gap-3">
                   <Zap className="w-8 h-8" />
-                  <h2 className="text-2xl md:text-3xl font-bold">Get Your Policy Analysis Now</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold">
+                    Get Your Policy Analysis Now
+                  </h2>
                 </div>
-                <p className="text-xl mt-2">From questions to clarity in minutes</p>
+                <p className="text-xl mt-2">
+                  From questions to clarity in minutes
+                </p>
               </CardHeader>
               <CardContent className="flex justify-center p-8">
-                <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full"
+                >
                   <Link href="/upload" className="flex items-center gap-2">
                     Start My Analysis
                     <ArrowRight className="w-5 h-5" />
@@ -227,7 +290,7 @@ export const Hero: FC = () => {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 export default Hero
