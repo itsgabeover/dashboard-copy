@@ -202,16 +202,6 @@ export const Hero: FC = () => {
                     <FileText className="w-5 h-5" />
                     View Sample
                   </Button>
-                  <Button className="w-full mt-8">
-                    <a
-                      href="/sample_reports/SAMPLE_CLIENT_SUMMARY.pdf"
-                      download="SAMPLE_CLIENT_SUMMARY.pdf"
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <FileText className="w-5 h-5" />
-                      Download Sample
-                    </a>
-                  </Button>
                 </CardContent>
               </Card>
 
@@ -243,16 +233,6 @@ export const Hero: FC = () => {
                   >
                     <FileText className="w-5 h-5" />
                     View Sample
-                  </Button>
-                  <Button className="w-full mt-8">
-                    <a
-                      href="/sample_reports/SAMPLE_POLICY_REVIEW.pdf"
-                      download="SAMPLE_POLICY_REVIEW.pdf"
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <FileText className="w-5 h-5" />
-                      View Sample
-                    </a>
                   </Button>
                 </CardContent>
               </Card>
