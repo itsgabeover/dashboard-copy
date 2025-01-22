@@ -46,8 +46,8 @@ const AboutPage: FC = () => {
               Every Life Insurance Policy Tells a Story
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8">
-              Behind complex terms and numbers lies a powerful story of protection, growth, and security. Let's uncover
-              yours.
+              Behind complex terms and numbers lies a powerful story of protection, growth, and security. Let&apos;s
+              uncover yours.
             </p>
             <Button
               size="lg"
