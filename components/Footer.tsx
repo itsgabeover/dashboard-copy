@@ -12,7 +12,7 @@ export function Footer() {
               Insurance Planner AI (IP-AI)
             </h3>
             <p className="text-text-light text-sm md:text-base">
-              Insurance Planner AI (IP-AI) is a proprietary AI-driven service provided by Financial Planner AI, LLC.
+              IP-AI is a proprietary AI-driven service provided by Financial Planner AI, LLC.
             </p>
           </div>
 
@@ -93,7 +93,7 @@ export function Footer() {
 
         <div className="mt-6 pt-6 md:mt-8 md:pt-8 border-t border-border text-center">
           <p className="text-text-light text-sm md:text-base">
-            © {new Date().getFullYear()} Financial PLanner AI, LLC. All rights reserved.
+            © {new Date().getFullYear()} Financial Planner AI, LLC. All rights reserved.
           </p>
         </div>
       </div>
