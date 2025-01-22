@@ -244,20 +244,20 @@ export const Hero: FC = () => {
                   {
                     title: "Clear Email Summary",
                     features: [
-                      "Current coverage snapshot",
-                      "Key performance insights",
-                      "Strategic recommendations",
-                      "Action steps explained",
+                      "Policy Overview & Structure",
+                      "Protection Features & Benefits",
+                      "Built-in Policy Advantages",
+                      "Critical Management Points",
                     ],
                     sample: "sample_reports/SAMPLE_CLIENT_SUMMARY.pdf",
                   },
                   {
                     title: "Professional PDF Report",
                     features: [
-                      "In-depth policy analysis",
-                      "Optimization strategies",
-                      "Clear recommendations",
-                      "Advisor-ready details",
+                      "Comprehensive Policy Analysis",
+                      "Detailed Feature Assessment",
+                      "Risk & Opportunity Insights",
+                      "Advisor Discussion Topics",
                     ],
                     sample: "sample_reports/SAMPLE_POLICY_REVIEW.pdf",
                   },
