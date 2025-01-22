@@ -35,7 +35,7 @@ export function Footer() {
                   href="/about" 
                   className="text-text-light hover:text-text block py-2 md:py-0"
                 >
-                  About
+                  Why Review?
                 </Link>
               </li>
               <li>
