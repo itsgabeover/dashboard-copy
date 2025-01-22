@@ -141,19 +141,17 @@ export default function LoginPage() {
           </form>
 
           {/* Footer Links */}
-          <div className="mt-8 text-center space-y-2">
-           
-            <p className="text-gray-600">
-              Need help? Contact{' '}
-              <a
-                href="mailto:support@financial-planner-ai.com"
-                className="text-blue-600 hover:underline"
-              >
-                support@financial-planner-ai.com
-              </a>
-            </p>
-          </div>
-        </div>
+<div className="mt-8 text-center">
+  <div className="text-gray-600 flex flex-col gap-1 items-center">
+    <span>Need help? Contact</span>
+    
+      href="mailto:support@financial-planner-ai.com"
+      className="text-blue-600 hover:underline"
+    >
+      support@financial-planner-ai.com
+    </a>
+  </div>
+</div>
 
         {/* Beta Info */}
         <div className="text-center pt-8">
