@@ -190,7 +190,7 @@ export default function ResourcesPage() {
         },
         {
           question: "What documents do I need?",
-          answer: "You&apos;ll need your most recent policy in-force illustration.",
+          answer: "You will need your most recent policy in-force illustration.",
         },
         {
           question: "How long does it take to get an in-force illustration?",
@@ -244,7 +244,7 @@ answer: "No - Insurance Planner AI is an analytical tool, not a advisory service
           answer: "We accept PDF files for policy illustrations.",
         },
         {
-          question: "How can I get help if I&apos;m stuck?",
+          question: "How can I get help if I'm stuck?",
           answer: "Contact our support team at support@insuranceplanner-ai.com",
         },
       ],
