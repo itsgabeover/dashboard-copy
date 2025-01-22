@@ -179,7 +179,7 @@ const AboutPage: FC = () => {
                       {
                         icon: Lightbulb,
                         title: "Deep insights you can act on",
-                        description: "Personalized recommendations",
+                        description: "Personalized actions",
                       },
                     ].map((item, index) => (
                       <Card key={index} className="group transition-all duration-300 hover:shadow-md bg-gray-50">
