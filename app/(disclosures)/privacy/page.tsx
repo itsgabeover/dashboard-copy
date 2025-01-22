@@ -9,109 +9,104 @@ export default function PrivacyPage() {
           Privacy Policy
         </h1>
         <p className="text-base text-gray-700 mb-4">
-          At [Your Company Name] (&quot;Company&quot;, &quot;we&quot;,
-          &quot;our&quot;, &quot;us&quot;), your privacy is important to us.
-          This Privacy Policy explains how we collect, use, disclose, and
-          safeguard your information when you use our services. Please read this
-          policy carefully to understand our practices.
+          This Privacy Policy describes how [Your Company Name]
+          (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;)
+          collects, uses, and protects your information when you use our
+          services. By using our services, you consent to the collection and use
+          of your information as outlined in this policy.
         </p>
 
         <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">
           1. Information We Collect
         </h2>
         <p className="text-base text-gray-700 mb-4">
-          We may collect the following types of information:
-          <ul className="list-disc list-inside mt-2 mb-4">
-            <li>
-              <strong>Personal Information:</strong> Such as your name, email
-              address, phone number, and other information you provide directly
-              to us.
-            </li>
-            <li>
-              <strong>Usage Data:</strong> Information about how you use our
-              website and services, including IP address, browser type, and
-              pages visited.
-            </li>
-            <li>
-              <strong>Cookies and Tracking Technologies:</strong> Data collected
-              through cookies and similar tools. (See our{" "}
-              <a href="/cookie-policy" className="text-primary-blue underline">
-                Cookie Policy
-              </a>{" "}
-              for more details.)
-            </li>
-          </ul>
+          We collect the following types of information:
         </p>
+        <ul className="list-disc list-inside mb-4 text-gray-700">
+          <li>
+            <strong>Personal Information:</strong> Information you provide
+            directly, such as your name, email address, phone number, and
+            payment details.
+          </li>
+          <li>
+            <strong>Usage Data:</strong> Information about how you interact with
+            our services, such as IP address, browser type, and pages visited.
+          </li>
+          <li>
+            <strong>Cookies and Tracking Technologies:</strong> Data collected
+            through cookies and similar technologies as described in our Cookie
+            Policy.
+          </li>
+        </ul>
 
         <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">
           2. How We Use Your Information
         </h2>
         <p className="text-base text-gray-700 mb-4">
-          We may use the information we collect to:
-          <ul className="list-disc list-inside mt-2 mb-4">
-            <li>Provide, maintain, and improve our services.</li>
-            <li>
-              Communicate with you about updates, promotions, and other relevant
-              information.
-            </li>
-            <li>Ensure the security and integrity of our services.</li>
-            <li>Comply with legal obligations and resolve disputes.</li>
-          </ul>
+          We use the information we collect to:
         </p>
+        <ul className="list-disc list-inside mb-4 text-gray-700">
+          <li>Provide, operate, and maintain our services.</li>
+          <li>Process transactions and send confirmations.</li>
+          <li>Respond to your inquiries and provide customer support.</li>
+          <li>Improve, personalize, and expand our services.</li>
+          <li>Comply with legal obligations and enforce our terms.</li>
+        </ul>
 
         <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">
-          3. How We Share Your Information
+          3. Sharing Your Information
         </h2>
         <p className="text-base text-gray-700 mb-4">
-          We do not sell your personal information. We may share your
-          information with:
-          <ul className="list-disc list-inside mt-2 mb-4">
-            <li>
-              <strong>Service Providers:</strong> Third parties that assist us
-              in providing our services.
-            </li>
-            <li>
-              <strong>Legal Authorities:</strong> When required by law or to
-              protect our legal rights.
-            </li>
-            <li>
-              <strong>Business Transfers:</strong> In the event of a merger,
-              acquisition, or sale of our assets.
-            </li>
-          </ul>
+          We may share your information with:
         </p>
+        <ul className="list-disc list-inside mb-4 text-gray-700">
+          <li>
+            <strong>Service Providers:</strong> Third-party vendors who perform
+            services on our behalf.
+          </li>
+          <li>
+            <strong>Legal Authorities:</strong> When required to comply with
+            legal obligations or to protect our rights.
+          </li>
+          <li>
+            <strong>Business Transfers:</strong> In connection with a merger,
+            acquisition, or sale of assets.
+          </li>
+        </ul>
 
         <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">
-          4. Your Rights and Choices
+          4. Your Rights
         </h2>
         <p className="text-base text-gray-700 mb-4">
-          You have rights regarding your personal information, including:
-          <ul className="list-disc list-inside mt-2 mb-4">
-            <li>The right to access, update, or delete your information.</li>
-            <li>The right to opt-out of marketing communications.</li>
-            <li>The right to data portability where applicable.</li>
-          </ul>
-          To exercise your rights, please contact us at [Your Contact
-          Information].
+          Depending on your location, you may have the following rights
+          regarding your personal data:
         </p>
+        <ul className="list-disc list-inside mb-4 text-gray-700">
+          <li>The right to access, correct, or delete your information.</li>
+          <li>
+            The right to restrict or object to the processing of your data.
+          </li>
+          <li>The right to data portability.</li>
+          <li>The right to withdraw consent at any time.</li>
+        </ul>
 
         <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">
           5. Data Security
         </h2>
         <p className="text-base text-gray-700 mb-4">
-          We implement reasonable security measures to protect your information
-          from unauthorized access, use, or disclosure. However, no system is
-          completely secure, and we cannot guarantee the absolute security of
-          your data.
+          We take appropriate security measures to protect your information from
+          unauthorized access, alteration, disclosure, or destruction. However,
+          no method of transmission over the internet is 100% secure.
         </p>
 
         <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">
           6. Changes to This Privacy Policy
         </h2>
         <p className="text-base text-gray-700 mb-4">
-          We may update this Privacy Policy from time to time to reflect changes
-          in our practices or for other operational, legal, or regulatory
-          reasons. We encourage you to review this page periodically.
+          We may update this Privacy Policy from time to time. Any changes will
+          be posted on this page, and we encourage you to review it
+          periodically. Your continued use of our services constitutes your
+          acceptance of the updated policy.
         </p>
 
         <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">

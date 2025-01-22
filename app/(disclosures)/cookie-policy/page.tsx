@@ -8,40 +8,36 @@ export default function CookiePage() {
         <div className="cookie-policy bg-white p-6 rounded-lg shadow-md mb-4">
   <h1 className="text-3xl font-bold text-primary-blue mb-6">Cookie Policy</h1>
   <p className="text-base text-gray-700 mb-4">
-    This Cookie Policy explains how [Your Company Name] (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;) uses cookies and similar technologies to recognize you when you visit our website. It explains what these technologies are and why we use them, as well as your rights to control their use.
+    This Cookie Policy explains how [Your Company Name] (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;) uses cookies and similar technologies when you visit our website. By using our website, you agree to the use of cookies as described in this policy.
   </p>
 
   <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">1. What Are Cookies?</h2>
   <p className="text-base text-gray-700 mb-4">
-    Cookies are small data files that are placed on your computer or device when you visit a website. They are widely used to make websites work more efficiently and to provide reporting information.
+    Cookies are small text files stored on your device when you visit a website. They help the website remember your actions and preferences (such as login details, language settings, etc.) over a period of time.
   </p>
 
-  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">2. How We Use Cookies</h2>
+  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">2. Types of Cookies We Use</h2>
+  <p className="text-base text-gray-700 mb-4">We use the following types of cookies:</p>
+  <ul className="list-disc list-inside mb-4 text-gray-700">
+    <li><strong>Essential Cookies:</strong> These are necessary for the website to function properly and cannot be disabled.</li>
+    <li><strong>Performance Cookies:</strong> These cookies help us understand how visitors interact with our website by collecting anonymous information.</li>
+    <li><strong>Functional Cookies:</strong> These cookies enable enhanced functionality and personalization, such as remembering your preferences.</li>
+    <li><strong>Advertising Cookies:</strong> These cookies are used to deliver advertisements that are relevant to you and measure the effectiveness of our advertising campaigns.</li>
+  </ul>
+
+  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">3. Managing Cookies</h2>
   <p className="text-base text-gray-700 mb-4">
-    We use cookies to improve your experience on our website, including:
-    <ul className="list-disc list-inside mt-2 mb-4">
-      <li>Remembering your preferences and settings.</li>
-      <li>Providing personalized content and advertisements.</li>
-      <li>Analyzing website traffic and performance.</li>
-    </ul>
+    You can manage or delete cookies through your browser settings. Please note that disabling cookies may affect the functionality of our website. To learn how to manage your cookie preferences, refer to the help documentation of your browser.
   </p>
 
-  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">3. Types of Cookies We Use</h2>
+  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">4. Third-Party Cookies</h2>
   <p className="text-base text-gray-700 mb-4">
-    <strong>Essential Cookies:</strong> Necessary for the website to function and cannot be turned off. <br />
-    <strong>Performance Cookies:</strong> Help us understand how visitors interact with our website. <br />
-    <strong>Functionality Cookies:</strong> Enable enhanced features and personalization. <br />
-    <strong>Targeting Cookies:</strong> Collect information about your browsing habits for advertising purposes.
+    We may allow third-party service providers to place cookies on your device to enhance your experience or deliver tailored advertisements. These providers are responsible for their own cookie policies.
   </p>
 
-  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">4. Managing Cookies</h2>
+  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">5. Updates to This Policy</h2>
   <p className="text-base text-gray-700 mb-4">
-    You have the right to accept or reject cookies. You can manage your cookie preferences through your browser settings. Please note that disabling cookies may affect the functionality of our website.
-  </p>
-
-  <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">5. Changes to This Policy</h2>
-  <p className="text-base text-gray-700 mb-4">
-    We may update this Cookie Policy from time to time to reflect changes in technology, laws, or business operations. We encourage you to review this page periodically for the latest information on our use of cookies.
+    We may update this Cookie Policy from time to time. Any changes will be posted on this page with the updated date. Your continued use of our website after any changes indicates your acceptance of the updated policy.
   </p>
 
   <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">6. Contact Us</h2>
@@ -49,6 +45,7 @@ export default function CookiePage() {
     If you have any questions about this Cookie Policy, please contact us at [Your Contact Information].
   </p>
 </div>
+
 
         <div className="prose max-w-none">
         <Button
