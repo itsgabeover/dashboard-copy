@@ -140,9 +140,9 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Footer Links */}
+         {/* Footer Links */}
 <div className="mt-8 text-center">
-  <div className="text-gray-600 flex flex-col gap-1 items-center">
+  <p className="text-gray-600 flex flex-col gap-1 items-center">
     <span>Need help? Contact</span>
     
       href="mailto:support@financial-planner-ai.com"
@@ -150,7 +150,7 @@ export default function LoginPage() {
     >
       support@financial-planner-ai.com
     </a>
-  </div>
+  </p>
 </div>
 
         {/* Beta Info */}
