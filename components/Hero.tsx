@@ -116,7 +116,7 @@ export const Hero: FC = () => {
                   {
                     step: 1,
                     title: "Get Your Illustration",
-                    description: "Request a current policy illustration from your insurer. Takes about a week.",
+                    description: "Request an in-force policy illustration from your insurer.",
                     icon: <FileText className="w-6 h-6" />,
                   },
                   {
@@ -128,7 +128,7 @@ export const Hero: FC = () => {
                   {
                     step: 3,
                     title: "Get Your Results",
-                    description: "Receive your email summary and detailed PDF report instantly.",
+                    description: "Receive your email summary and detailed PDF report.",
                     icon: <Zap className="w-6 h-6" />,
                   },
                 ].map((item) => (
