@@ -55,7 +55,7 @@ export const Hero: FC = () => {
               <span className="mb-2">Life Insurance</span>
               <span className="flex items-center gap-2">
                 <span className="text-3xl md:text-5xl lg:text-6xl opacity-90">Policy Reviews</span>
-                <span className="bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white text-lg md:text-xl lg:text-2xl px-4 py-1 rounded-full transform -rotate-2 shadow-md font-bold">
+                <span className="bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white text-lg md:text-xl lg:text-2xl px-4 py-1 rounded-full transform -rotate-2 shadow-md font-medium">
                   in minutes
                 </span>
               </span>
