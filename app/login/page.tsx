@@ -140,7 +140,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-         {/* Footer Links */}
+        {/* Footer Links */}
 <div className="mt-8 text-center">
   <p className="text-gray-600 flex flex-col gap-1 items-center">
     <span>Need help? Contact</span>
