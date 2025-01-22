@@ -1,7 +1,20 @@
 "use client"
 
 import { useState } from "react"
-import { Compass, FileText, BarChart, ChevronDown, ChevronUp, PlayCircle, BookOpen, FileCheck } from "lucide-react"
+import {
+  Compass,
+  FileText,
+  BarChart,
+  ChevronDown,
+  ChevronUp,
+  PlayCircle,
+  BookOpen,
+  FileCheck,
+  Zap,
+  ArrowRight,
+  ChevronRight,
+} from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -163,7 +176,7 @@ export default function ResourcesPage() {
       title: "Value Enhancement Example",
       problem: "Underutilized cash value",
       solution: "Explored policy loan options",
-      result: "Funded child's education",
+      result: "Funded child&apos;s education",
     },
   ]
 
@@ -177,7 +190,7 @@ export default function ResourcesPage() {
         },
         {
           question: "What documents do I need?",
-          answer: "You'll need your most recent policy statement and in-force illustration.",
+          answer: "You&apos;ll need your most recent policy statement and in-force illustration.",
         },
         {
           question: "How long does the process take?",
@@ -231,7 +244,7 @@ export default function ResourcesPage() {
           answer: "We accept PDF and Excel files for policy illustrations.",
         },
         {
-          question: "How can I get help if I'm stuck?",
+          question: "How can I get help if I&apos;m stuck?",
           answer: "Contact our support team at support@insuranceplanner-ai.com",
         },
       ],
@@ -239,118 +252,145 @@ export default function ResourcesPage() {
   ]
 
   return (
-    <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50">
-      <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
-        {/* Header */}
-        <div className="flex flex-col items-center space-y-6 text-center mb-16">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
-            Policy Analysis Resources
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl">
-            Everything you need for a successful policy review - from getting started to understanding your results
-          </p>
-        </div>
+    <div className="flex flex-col min-h-screen">
+      {/* Advisor Banner */}
+      <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 text-blue-700 py-2 px-4 text-center border-b border-blue-100/50">
+        <Link
+          href="/advisor-demo"
+          className="text-base font-medium hover:underline inline-flex items-center gap-2 transition-colors hover:text-blue-800"
+        >
+          Financial Advisor? Schedule a Demo <ChevronRight className="w-4 h-4" />
+        </Link>
+      </div>
 
-        {/* Quick Access Tiles */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {quickAccessTiles.map((tile, index) => (
-            <Card
-              key={index}
-              className="transition-all hover:shadow-lg bg-white transform hover:scale-105 duration-300"
-            >
-              <CardContent className="p-6 flex flex-col items-center text-center">
-                <div className="bg-[#4B6FEE]/10 p-3 rounded-full mb-4">
-                  <tile.icon className="w-8 h-8 text-[#4B6FEE]" />
-                </div>
-                <CardTitle className="text-xl font-semibold mb-2">{tile.title}</CardTitle>
-                <CardDescription className="mb-4">{tile.description}</CardDescription>
-                <Button variant="outline" className="mt-auto" disabled>
-                  Learn More
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50 flex-grow">
+        <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
+          {/* Header */}
+          <div className="flex flex-col items-center space-y-6 text-center mb-16">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
+              Policy Analysis Resources
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl">
+              Everything you need for a successful policy review - from getting started to understanding your results
+            </p>
+          </div>
 
-        {/* Main Content Grid */}
-        <div className="space-y-8 mb-16">
-          {[essentialTools, learningCenter].map((section, index) => (
-            <Card key={index} className="transition-all hover:shadow-lg bg-white">
-              <CardHeader
-                className="flex flex-row items-center justify-between cursor-pointer"
-                onClick={() => toggleSection(section.title)}
+          {/* Quick Access Tiles */}
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {quickAccessTiles.map((tile, index) => (
+              <Card
+                key={index}
+                className="transition-all hover:shadow-lg bg-white transform hover:scale-105 duration-300"
               >
-                <div className="flex items-center">
-                  <section.icon className="w-6 h-6 text-[#4B6FEE] mr-2" />
-                  <CardTitle>{section.title}</CardTitle>
-                </div>
-                {expandedSection === section.title ? <ChevronUp /> : <ChevronDown />}
-              </CardHeader>
-              {expandedSection === section.title && <CardContent>{section.content}</CardContent>}
-            </Card>
-          ))}
-        </div>
-
-        {/* Case Studies & Success Stories */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-[#4B6FEE] mb-8">Case Studies & Success Stories</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {caseStudies.map((study, index) => (
-              <Card key={index} className="transition-all hover:shadow-lg bg-white">
-                <CardHeader>
-                  <CardTitle>{study.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>
-                    <strong>Challenge:</strong> {study.problem}
-                  </p>
-                  <p>
-                    <strong>Solution:</strong> {study.solution}
-                  </p>
-                  <p>
-                    <strong>Outcome:</strong> {study.result}
-                  </p>
+                <CardContent className="p-6 flex flex-col items-center text-center">
+                  <div className="bg-[#4B6FEE]/10 p-3 rounded-full mb-4">
+                    <tile.icon className="w-8 h-8 text-[#4B6FEE]" />
+                  </div>
+                  <CardTitle className="text-xl font-semibold mb-2">{tile.title}</CardTitle>
+                  <CardDescription className="mb-4">{tile.description}</CardDescription>
+                  <Button variant="outline" className="mt-auto">
+                    Learn More
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </div>
 
-        {/* Support Resources */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-[#4B6FEE] mb-8">Support Resources</h2>
-          <Accordion type="single" collapsible className="w-full">
-            {faqCategories.map((category, categoryIndex) => (
-              <AccordionItem key={categoryIndex} value={`category-${categoryIndex}`}>
-                <AccordionTrigger className="text-xl font-semibold text-[#4B6FEE]">
-                  {category.category}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <Accordion type="single" collapsible>
-                    {category.questions.map((faq, faqIndex) => (
-                      <AccordionItem key={faqIndex} value={`faq-${categoryIndex}-${faqIndex}`}>
-                        <AccordionTrigger className="text-lg font-medium">{faq.question}</AccordionTrigger>
-                        <AccordionContent className="text-gray-700">{faq.answer}</AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </AccordionContent>
-              </AccordionItem>
+          {/* Main Content Grid */}
+          <div className="space-y-8 mb-16">
+            {[essentialTools, learningCenter].map((section, index) => (
+              <Card key={index} className="transition-all hover:shadow-lg bg-white">
+                <CardHeader
+                  className="flex flex-row items-center justify-between cursor-pointer"
+                  onClick={() => toggleSection(section.title)}
+                >
+                  <div className="flex items-center">
+                    <section.icon className="w-6 h-6 text-[#4B6FEE] mr-2" />
+                    <CardTitle>{section.title}</CardTitle>
+                  </div>
+                  {expandedSection === section.title ? <ChevronUp /> : <ChevronDown />}
+                </CardHeader>
+                {expandedSection === section.title && <CardContent>{section.content}</CardContent>}
+              </Card>
             ))}
-          </Accordion>
-        </div>
+          </div>
 
-        {/* Bottom Call to Action */}
-        <Card className="bg-[#4B6FEE] text-white text-center p-8 mb-16">
-          <CardContent>
-            <h2 className="text-3xl font-bold mb-4">Ready to Review Your Policy?</h2>
-            <Button size="lg" className="bg-green-500 hover:bg-green-600 text-white" disabled>
-              Start My Analysis
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
+          {/* Case Studies & Success Stories */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-[#4B6FEE] mb-8">Case Studies & Success Stories</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              {caseStudies.map((study, index) => (
+                <Card key={index} className="transition-all hover:shadow-lg bg-white">
+                  <CardHeader>
+                    <CardTitle>{study.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>
+                      <strong>Challenge:</strong> {study.problem}
+                    </p>
+                    <p>
+                      <strong>Solution:</strong> {study.solution}
+                    </p>
+                    <p>
+                      <strong>Outcome:</strong> {study.result}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Support Resources */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-[#4B6FEE] mb-8">Support Resources</h2>
+            <Accordion type="single" collapsible className="w-full">
+              {faqCategories.map((category, categoryIndex) => (
+                <AccordionItem key={categoryIndex} value={`category-${categoryIndex}`}>
+                  <AccordionTrigger className="text-xl font-semibold text-[#4B6FEE]">
+                    {category.category}
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Accordion type="single" collapsible>
+                      {category.questions.map((faq, faqIndex) => (
+                        <AccordionItem key={faqIndex} value={`faq-${categoryIndex}-${faqIndex}`}>
+                          <AccordionTrigger className="text-lg font-medium">{faq.question}</AccordionTrigger>
+                          <AccordionContent className="text-gray-700">{faq.answer}</AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+
+          {/* Bottom Call to Action */}
+          <Card className="border-2 border-blue-100 bg-white transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden mb-16">
+            <CardHeader className="text-center bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white p-8">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <div className="rounded-full bg-white/10 p-2 transition-transform duration-300 group-hover:scale-110">
+                  <Zap className="w-8 h-8" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold">Get Your Policy Analysis Now</h2>
+              </div>
+              <p className="text-xl text-blue-100">From questions to clarity in minutes</p>
+            </CardHeader>
+            <CardContent className="flex justify-center p-8 bg-gradient-to-b from-white to-blue-50/30">
+              <Button
+                asChild
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                <Link href="/upload" className="flex items-center gap-2">
+                  Start My Analysis
+                  <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </div>
   )
 }
 
