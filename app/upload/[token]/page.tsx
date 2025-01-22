@@ -210,7 +210,7 @@ export default function UploadPage() {
                     <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
                     <p>
                       Please double-check your email address carefully. Your analysis will be sent to this email. If you
-                      don&apos;t receive it within 30 minutes, please check your spam/junk folders. Still can&apos;t
+                      don&apos;t receive it within 30 minutes, please check your spam or junk folders. Still can&apos;t
                       find it? Contact us at{" "}
                       <a href="mailto:support@financialplanner-ai.com" className="text-[#4B6FEE] hover:text-[#3B4FDE]">
                         support@financialplanner-ai.com
