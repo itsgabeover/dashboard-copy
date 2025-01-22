@@ -190,58 +190,58 @@ export default function ResourcesPage() {
         },
         {
           question: "What documents do I need?",
-          answer: "You&apos;ll need your most recent policy statement and in-force illustration.",
+          answer: "You&apos;ll need your most recent policy in-force illustration.",
         },
         {
-          question: "How long does the process take?",
-          answer: "Typically 2-3 weeks from request to analysis completion.",
+          question: "How long does it take to get an in-force illustration?",
+          answer: "It can vary but typically takes a few days.",
         },
       ],
     },
-    {
-      category: "Understanding Results",
-      questions: [
-        {
-          question: "How do I read my analysis?",
-          answer: "We provide a step-by-step guide in your results email.",
-        },
-        {
-          question: "What are the key terms I should know?",
-          answer: "Refer to our glossary for explanations of common insurance terms.",
-        },
-        {
-          question: "What actions should I take after receiving my results?",
-          answer: "Review our recommended next steps in your analysis report.",
-        },
-      ],
-    },
-    {
-      category: "Working with Advisors",
-      questions: [
-        {
-          question: "Can I share my analysis with my financial advisor?",
-          answer: "Yes, we encourage collaboration with your trusted professionals.",
-        },
-        {
-          question: "How can my advisor use this information?",
-          answer: "They can use our insights to refine your overall financial strategy.",
-        },
-        {
-          question: "Do you recommend specific advisors?",
-          answer: "No, we remain neutral but support your existing advisory relationships.",
-        },
-      ],
-    },
+   {
+category: "Understanding Results",
+questions: [
+{
+question: "How do I read my analysis?",
+answer: "Your analysis is organized into key sections covering Protection Overview, Policy Features, Benefits & Riders, and Management Strategy. Each section highlights Hidden Gems, Blind Spots, and Red Flags to help you understand your coverage.",
+},
+{
+question: "What are the key terms I should know?",
+answer: "Essential terms include Death Benefit (your policy's payout amount), Cash Value (your policy's accumulated value), Premium (your payment), and Riders (additional benefits). Each section of your analysis explains relevant terms in context.",
+},
+{
+question: "What actions should I take after receiving my results?",
+answer: "Review your policy's 'Key Takeaways' sections, note questions for your advisor, and focus on any Red Flags identified in the analysis. Pay special attention to premium payment requirements and guarantee provisions.",
+},
+],
+},
+   {
+category: "Working with Advisors",
+questions: [
+{
+question: "Can I share my analysis with my financial advisor?",
+answer: "Absolutely! While Insurance Planner AI provides data-driven insights, your financial advisor brings invaluable expertise to interpret these findings within your broader financial picture. We encourage sharing this analysis to spark meaningful discussions about your coverage.",
+},
+{
+question: "How can my advisor use this information?",
+answer: "Your advisor can use our AI-generated insights as a starting point to evaluate your coverage needs, assess policy performance, and align your insurance strategy with your financial goals. Remember: we provide analysis, but your advisor provides the professional guidance to act on these insights.",
+},
+{
+question: "Do you recommend specific advisors?",
+answer: "No - Insurance Planner AI is an analytical tool, not a advisory service. We never recommend, endorse, or replace financial advisors. Our role is to provide clear policy insights that enhance the valuable conversations you have with your trusted financial professional.",
+},
+],
+},
     {
       category: "Technical Support",
       questions: [
         {
           question: "How is my data kept secure?",
-          answer: "We use bank-level encryption and never store your personal information.",
+          answer: "Our platform employs end-to-end TLS 1.2+ encryption with HTTPS enforcement across all system components, including client browsers, cloud services, and third-party API integrations, ensuring data security during transit.",
         },
         {
           question: "What file formats do you accept?",
-          answer: "We accept PDF and Excel files for policy illustrations.",
+          answer: "We accept PDF files for policy illustrations.",
         },
         {
           question: "How can I get help if I&apos;m stuck?",
