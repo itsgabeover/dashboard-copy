@@ -134,7 +134,7 @@ export default function LoginPage() {
           <div className="mt-8 text-center">
             <p className="text-gray-600 flex flex-col gap-1 items-center">
               <span>Need help? Contact</span>
-              <a href="mailto:support@financial-planner-ai.com" className="text-blue-600 hover:underline">
+              <a href="mailto:support@financialplanner-ai.com" className="text-blue-600 hover:underline">
                 support@financial-planner-ai.com
               </a>
             </p>
