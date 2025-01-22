@@ -245,7 +245,7 @@ answer: "No - Insurance Planner AI is an analytical tool, not a advisory service
         },
         {
           question: "How can I get help if I'm stuck?",
-          answer: "Contact our support team at support@insuranceplanner-ai.com",
+          answer: "Contact our support team at support@financialplanner-ai.com",
         },
       ],
     },
