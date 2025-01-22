@@ -142,12 +142,7 @@ export default function LoginPage() {
 
           {/* Footer Links */}
           <div className="mt-8 text-center space-y-2">
-            <p className="text-gray-600">
-              New to IP-AI?{' '}
-              <a href="#" className="text-blue-600 hover:underline">
-                Request Beta Access
-              </a>
-            </p>
+           
             <p className="text-gray-600">
               Need help? Contact{' '}
               <a
