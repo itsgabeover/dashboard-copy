@@ -186,7 +186,7 @@ export const Hero: FC = () => {
         <div className="bg-white p-8 rounded-lg max-w-md">
           <h3 className="text-xl font-bold mb-4">Need Help?</h3>
           <p>
-            Don't have an in-force illustration? Use{" "}
+            Don&apos;t have an in-force illustration? Use{" "}
             <a
               href="/sample_reports/IFL_REQUEST_FORM.pdf"
               target="_blank"
