@@ -184,7 +184,7 @@ export default function UploadPage() {
               >
                 2
               </div>
-              <span className={cn("ml-2 font-medium", step === 2 ? "text-[#4B6FEE]" : "text-gray-400")}>Confirm</span>
+              <span className={cn("ml-2 font-medium", step === 2 ? "text-[#4B6FEE]" : "text-gray-400")}>Confirm email</span>
             </div>
           </div>
 
