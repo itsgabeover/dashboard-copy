@@ -2,10 +2,11 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Upload, AlertTriangle, X, Info, ChevronRight, Zap } from "lucide-react"
+import { Upload, AlertTriangle, Info, ChevronRight, Zap, FileText, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 import Link from "next/link"
 
 const isValidEmail = (email: string): boolean => {
@@ -28,16 +29,13 @@ const UploadPage = () => {
   const [email, setEmail] = useState("")
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
+  const [step, setStep] = useState(1)
 
   useEffect(() => {
-    // Get token from URL path
     const pathToken = window.location.pathname.split("/").pop()
-
-    // Validate token format (starts with pi_ and contains underscore)
     if (pathToken && pathToken.startsWith("pi_") && pathToken.includes("_")) {
       setIsLoading(false)
     } else {
-      // No valid token, redirect to home
       router.push("/")
     }
   }, [router])
@@ -55,6 +53,7 @@ const UploadPage = () => {
       }
       setFile(selectedFile)
       setErrorMessage("")
+      setStep(2)
     }
   }
 
@@ -73,7 +72,6 @@ const UploadPage = () => {
     formData.append("file", file)
     formData.append("email", email)
 
-    // Get token from current URL
     const pathToken = window.location.pathname.split("/").pop()
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
@@ -110,10 +108,6 @@ const UploadPage = () => {
     }
   }
 
-  const clearFileSelection = () => {
-    setFile(null)
-  }
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -122,10 +116,8 @@ const UploadPage = () => {
     )
   }
 
-  const isSubmitDisabled = uploadStatus === "uploading" || !file || !email || (email.length > 0 && !isValidEmail(email))
-
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-blue-50/30">
       {/* Advisor Banner */}
       <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 text-blue-700 py-2 px-4 text-center border-b border-blue-100/50">
         <Link
@@ -136,161 +128,194 @@ const UploadPage = () => {
         </Link>
       </div>
 
-      <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50 flex-grow">
-        <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
-          <Card className="max-w-3xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-3xl font-bold text-[#4B6FEE] mb-4">
-                Upload Your In-Force Illustration
-              </CardTitle>
-              <CardDescription className="text-lg text-gray-600">
-                Our AI transforms your illustration into actionable insights through two detailed reports:
-              </CardDescription>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <Card className="bg-gray-50">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">Clear Email Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Policy Overview & Structure</li>
-                      <li>Protection Features & Benefits</li>
-                      <li>Built-in Policy Advantages</li>
-                      <li>Critical Management Points</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                <Card className="bg-gray-50">
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold">Professional PDF Report</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li>Comprehensive Policy Analysis</li>
-                      <li>Detailed Feature Assessment</li>
-                      <li>Risk & Opportunity Insights</li>
-                      <li>Advisor Discussion Topics</li>
-                    </ul>
-                  </CardContent>
-                </Card>
+      <main className="flex-1 container max-w-4xl mx-auto px-4 py-12">
+        <div className="space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold text-[#4B6FEE]">Upload Your In-Force Illustration</h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Our AI transforms your illustration into actionable insights through two detailed reports
+            </p>
+          </div>
+
+          {/* Progress Steps */}
+          <div className="relative">
+            <Progress value={step === 1 ? 33 : step === 2 ? 66 : 100} className="h-2" />
+            <div className="mt-4 grid grid-cols-3 gap-4">
+              <div className={`text-sm font-medium ${step >= 1 ? "text-[#4B6FEE]" : "text-gray-400"}`}>
+                1. Upload Illustration
               </div>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload In-Force Illustration (PDF)
-                  </label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                    <div className="space-y-1 text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <div className="flex text-sm text-gray-600">
-                        <label
-                          htmlFor="file-upload"
-                          className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]"
-                        >
-                          <span>Upload a file</span>
-                          <Input
-                            id="file-upload"
-                            name="file-upload"
-                            type="file"
-                            className="sr-only"
-                            onChange={handleFileChange}
-                            accept=".pdf"
-                          />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-gray-500">Maximum file size: 2MB</p>
-                    </div>
-                  </div>
-                  {file && (
-                    <div className="mt-2 flex items-center justify-between">
-                      <p className="text-sm text-gray-600">Selected file: {file.name}</p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearFileSelection}
-                        className="text-red-500 hover:text-red-700"
+              <div className={`text-sm font-medium text-center ${step >= 2 ? "text-[#4B6FEE]" : "text-gray-400"}`}>
+                2. Confirm Email
+              </div>
+              <div className={`text-sm font-medium text-right ${step === 3 ? "text-[#4B6FEE]" : "text-gray-400"}`}>
+                3. Get Analysis
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="grid md:grid-cols-2 gap-8 items-start">
+            {/* Left Column - Upload Form */}
+            <Card className="border-0 shadow-lg">
+              <CardContent className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {step === 1 && (
+                    <div className="space-y-4">
+                      <div
+                        className={`relative border-2 border-dashed rounded-xl p-6 transition-all ${
+                          file ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-[#4B6FEE]"
+                        }`}
                       >
-                        <X className="h-4 w-4" />
-                      </Button>
+                        <input
+                          type="file"
+                          id="file-upload"
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          onChange={handleFileChange}
+                          accept=".pdf"
+                        />
+                        <div className="text-center space-y-4">
+                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                          <div className="space-y-2">
+                            <p className="text-sm text-gray-500">
+                              {file ? file.name : "Drag and drop your PDF or click to browse"}
+                            </p>
+                            <p className="text-xs text-gray-400">Maximum file size: 2MB</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-500 flex items-start gap-2">
+                        <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <p>We analyze in-force illustrations only. Please ensure all pages are included.</p>
+                      </div>
                     </div>
                   )}
-                  <div className="mt-4 bg-blue-50 border border-blue-200 rounded-md p-4">
-                    <h4 className="font-semibold text-blue-800 mb-2">Important Notes:</h4>
-                    <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
-                      <li>We analyze in-force illustrations only</li>
-                      <li>Most recent illustration recommended</li>
-                      <li>All illustration pages must be included</li>
-                      <li>Results delivered within minutes</li>
-                    </ul>
-                  </div>
-                </div>
 
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <Input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value)
-                      if (e.target.value && !isValidEmail(e.target.value)) {
-                        setErrorMessage("Please enter a valid email address")
-                      } else {
-                        setErrorMessage("")
-                      }
-                    }}
-                    placeholder="your@email.com"
-                    required
-                    className={`w-full ${email && !isValidEmail(email) ? "border-red-500" : ""}`}
-                  />
-                  <div className="mt-2 flex items-start space-x-2 text-sm text-gray-600">
-                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <p>
-                      Please double-check your email address carefully. Your analysis will be sent to this email. If you
-                      don&apos;t receive it within 30 minutes, please check your spam/junk folders. Still can&apos;t
-                      find it? Contact us at{" "}
-                      <a href="mailto:support@financialplanner-ai.com" className="text-[#4B6FEE] hover:text-[#3B4FDE]">
-                        support@financialplanner-ai.com
-                      </a>
-                    </p>
-                  </div>
-                  {email && !isValidEmail(email) && (
-                    <p className="mt-1 text-sm text-red-500">Please enter a valid email address</p>
+                  {step === 2 && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                          Email Address
+                        </label>
+                        <Input
+                          type="email"
+                          id="email"
+                          value={email}
+                          onChange={(e) => {
+                            setEmail(e.target.value)
+                            if (e.target.value && !isValidEmail(e.target.value)) {
+                              setErrorMessage("Please enter a valid email address")
+                            } else {
+                              setErrorMessage("")
+                            }
+                          }}
+                          placeholder="your@email.com"
+                          className={`w-full ${email && !isValidEmail(email) ? "border-red-500" : ""}`}
+                        />
+                      </div>
+                      <div className="text-sm text-gray-500 flex items-start gap-2">
+                        <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <p>
+                          Your analysis will be sent to this email within minutes. Check spam folders if not received.
+                        </p>
+                      </div>
+                    </div>
                   )}
-                </div>
 
-                <Button
-                  type="submit"
-                  className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
-                  disabled={isSubmitDisabled}
-                >
-                  {uploadStatus === "uploading" ? (
-                    "Uploading..."
-                  ) : (
-                    <>
-                      Start Analysis
-                      <Zap className="ml-2 h-5 w-5" />
-                    </>
-                  )}
-                </Button>
-              </form>
+                  <div className="flex justify-between">
+                    {step > 1 && (
+                      <Button type="button" variant="ghost" onClick={() => setStep(step - 1)}>
+                        Back
+                      </Button>
+                    )}
+                    {step === 1 && file && (
+                      <Button type="button" className="ml-auto" onClick={() => setStep(2)}>
+                        Continue
+                      </Button>
+                    )}
+                    {step === 2 && (
+                      <Button
+                        type="submit"
+                        className="ml-auto bg-[#4B6FEE] hover:bg-[#3B4FDE]"
+                        disabled={!isValidEmail(email) || uploadStatus === "uploading"}
+                      >
+                        {uploadStatus === "uploading" ? (
+                          "Processing..."
+                        ) : (
+                          <>
+                            Start Analysis
+                            <Zap className="ml-2 h-4 w-4" />
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </form>
 
-              {errorMessage && (
-                <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
-                  <AlertTriangle className="mr-2" />
-                  <span>{errorMessage}</span>
+                {errorMessage && (
+                  <div className="p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="text-sm">{errorMessage}</span>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Right Column - Report Information */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl p-6 shadow-lg space-y-6">
+                <div className="flex items-center gap-3 text-[#4B6FEE]">
+                  <Mail className="h-5 w-5" />
+                  <h3 className="font-semibold">Clear Email Summary</h3>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Policy Overview & Structure
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Protection Features & Benefits
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Built-in Policy Advantages
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Critical Management Points
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-white rounded-xl p-6 shadow-lg space-y-6">
+                <div className="flex items-center gap-3 text-[#4B6FEE]">
+                  <FileText className="h-5 w-5" />
+                  <h3 className="font-semibold">Professional PDF Report</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Comprehensive Policy Analysis
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Detailed Feature Assessment
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Risk & Opportunity Insights
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-[#4B6FEE]" />
+                    Advisor Discussion Topics
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
+      </main>
     </div>
   )
 }
