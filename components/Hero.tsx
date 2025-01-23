@@ -72,7 +72,7 @@ export const Hero: FC = () => {
                     <Zap className="w-8 h-8 text-[#4B6FEE]" aria-hidden="true" />
                   </div>
                   <h3 className="text-2xl md:text-3xl font-bold text-[#4B6FEE]">
-                    Your Policy&apos;s True Value, Revealed in Minutes
+                   From Policy Confusion to Peace of Mind in Minutes
                   </h3>
                   <p className="text-gray-700 text-lg leading-relaxed max-w-3xl">
                     Get clarity on what your life insurance actually provides – our AI transforms complex insurance
