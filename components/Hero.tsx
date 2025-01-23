@@ -157,7 +157,7 @@ export const Hero: FC = () => {
                       </CardContent>
                     </Card>
                     {index < 2 && (
-                      <div className="absolute right-0 top-1/2 transform translate-x-[75%] -translate-y-1/2 z-20">
+                      <div className="absolute right-0 top-1/2 transform translate-x-[100%] -translate-y-1/2 z-20">
                         <div className="hidden md:flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-md">
                           <ArrowRight className="w-5 h-5 text-blue-400" />
                         </div>
