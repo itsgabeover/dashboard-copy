@@ -6,8 +6,12 @@ import { Upload, AlertTriangle, Info, ChevronRight, Zap, FileText, Mail } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import Link from "next/link"
+
+interface UploadStatus {
+  state: "idle" | "uploading" | "success" | "error"
+  message?: string
+}
 
 const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -22,13 +26,12 @@ const isValidEmail = (email: string): boolean => {
   )
 }
 
-const UploadPage = () => {
+export default function UploadPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState("")
-  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle")
-  const [errorMessage, setErrorMessage] = useState("")
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({ state: "idle" })
   const [step, setStep] = useState(1)
 
   useEffect(() => {
@@ -44,15 +47,15 @@ const UploadPage = () => {
     const selectedFile = event.target.files?.[0]
     if (selectedFile) {
       if (selectedFile.type !== "application/pdf") {
-        setErrorMessage("Please select a PDF file.")
+        setUploadStatus({ state: "error", message: "Please select a PDF file." })
         return
       }
       if (selectedFile.size > 2 * 1024 * 1024) {
-        setErrorMessage("File size exceeds 2MB.")
+        setUploadStatus({ state: "error", message: "File size exceeds 2MB." })
         return
       }
       setFile(selectedFile)
-      setErrorMessage("")
+      setUploadStatus({ state: "idle" })
       setStep(2)
     }
   }
@@ -61,12 +64,11 @@ const UploadPage = () => {
     event.preventDefault()
     if (!file || !email) return
     if (!isValidEmail(email)) {
-      setErrorMessage("Please enter a valid email address.")
+      setUploadStatus({ state: "error", message: "Please enter a valid email address." })
       return
     }
 
-    setUploadStatus("uploading")
-    setErrorMessage("")
+    setUploadStatus({ state: "uploading" })
 
     const formData = new FormData()
     formData.append("file", file)
@@ -91,20 +93,19 @@ const UploadPage = () => {
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.statusText}`)
       }
-      setUploadStatus("success")
+      setUploadStatus({ state: "success" })
       router.push("/upload/success")
     } catch (error: unknown) {
       console.error("Upload error:", error)
       if (error instanceof Error) {
-        if (error.name === "AbortError") {
-          setErrorMessage("Upload timed out. Please try again.")
-        } else {
-          setErrorMessage("Upload failed. Please try again or contact support.")
-        }
-      } else {
-        setErrorMessage("Upload failed. Please try again or contact support.")
+        setUploadStatus({
+          state: "error",
+          message:
+            error.name === "AbortError"
+              ? "Upload timed out. Please try again."
+              : "Upload failed. Please try again or contact support.",
+        })
       }
-      setUploadStatus("error")
     }
   }
 
@@ -140,7 +141,12 @@ const UploadPage = () => {
 
           {/* Progress Steps */}
           <div className="relative">
-            <Progress value={step === 1 ? 33 : step === 2 ? 66 : 100} className="h-2" />
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#4B6FEE] transition-all duration-300 rounded-full"
+                style={{ width: `${step === 1 ? 33 : step === 2 ? 66 : 100}%` }}
+              />
+            </div>
             <div className="mt-4 grid grid-cols-3 gap-4">
               <div className={`text-sm font-medium ${step >= 1 ? "text-[#4B6FEE]" : "text-gray-400"}`}>
                 1. Upload Illustration
@@ -204,9 +210,12 @@ const UploadPage = () => {
                           onChange={(e) => {
                             setEmail(e.target.value)
                             if (e.target.value && !isValidEmail(e.target.value)) {
-                              setErrorMessage("Please enter a valid email address")
+                              setUploadStatus({
+                                state: "error",
+                                message: "Please enter a valid email address",
+                              })
                             } else {
-                              setErrorMessage("")
+                              setUploadStatus({ state: "idle" })
                             }
                           }}
                           placeholder="your@email.com"
@@ -237,9 +246,9 @@ const UploadPage = () => {
                       <Button
                         type="submit"
                         className="ml-auto bg-[#4B6FEE] hover:bg-[#3B4FDE]"
-                        disabled={!isValidEmail(email) || uploadStatus === "uploading"}
+                        disabled={!isValidEmail(email) || uploadStatus.state === "uploading"}
                       >
-                        {uploadStatus === "uploading" ? (
+                        {uploadStatus.state === "uploading" ? (
                           "Processing..."
                         ) : (
                           <>
@@ -252,10 +261,10 @@ const UploadPage = () => {
                   </div>
                 </form>
 
-                {errorMessage && (
+                {uploadStatus.state === "error" && uploadStatus.message && (
                   <div className="p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4" />
-                    <span className="text-sm">{errorMessage}</span>
+                    <span className="text-sm">{uploadStatus.message}</span>
                   </div>
                 )}
               </CardContent>
@@ -319,6 +328,4 @@ const UploadPage = () => {
     </div>
   )
 }
-
-export default UploadPage
 
