@@ -1,255 +1,152 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { Upload, AlertTriangle, X, Info, ChevronRight, Zap } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import Link from "next/link"
+import type React from "react"
+import { useState } from "react"
+import { Eye, EyeOff } from "lucide-react"
 
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  const validTLDs = [".com", ".net", ".org", ".edu", ".gov", ".mil", ".info", ".io", ".co.uk", ".ca"]
-  return (
-    emailRegex.test(email) &&
-    !email.endsWith(".con") &&
-    !email.endsWith(".cim") &&
-    !email.includes("..") &&
-    email.length <= 254 &&
-    validTLDs.some((tld) => email.toLowerCase().endsWith(tld))
-  )
-}
-
-const UploadPage = () => {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-  const [file, setFile] = useState<File | null>(null)
+export default function LoginPage() {
   const [email, setEmail] = useState("")
-  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "success" | "error">("idle")
-  const [errorMessage, setErrorMessage] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState("")
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("upload_token")
-    if (token) {
-      setIsLoading(false)
-    } else {
-      router.push("/")
-    }
-  }, [router])
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
-    if (selectedFile) {
-      if (selectedFile.type !== "application/pdf") {
-        setErrorMessage("Please select a PDF file.")
-        return
-      }
-      if (selectedFile.size > 2 * 1024 * 1024) {
-        setErrorMessage("File size exceeds 2MB.")
-        return
-      }
-      setFile(selectedFile)
-      setErrorMessage("")
-    }
+  const validateEmail = (email: string): boolean => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return regex.test(email)
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (!file || !email) return
-    if (!isValidEmail(email)) {
-      setErrorMessage("Please enter a valid email address.")
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    console.log("Form submitted - attempting login with:", email)
+
+    setError("")
+
+    if (!email || !password) {
+      setError("Please fill in all fields")
       return
     }
 
-    setUploadStatus("uploading")
-    setErrorMessage("")
-
-    const formData = new FormData()
-    formData.append("file", file)
-    formData.append("email", email)
-
-    const storedToken = sessionStorage.getItem("upload_token")
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000)
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address")
+      return
+    }
 
     try {
-      const response = await fetch("/api/upload", {
+      console.log("Making fetch request to /api/login")
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${storedToken}`,
+          "Content-Type": "application/json",
         },
-        body: formData,
-        signal: controller.signal,
+        body: JSON.stringify({
+          email: email.trim(),
+          password: password,
+        }),
+        credentials: "include",
       })
-      clearTimeout(timeoutId)
+
+      console.log("Fetch response received:", response.status)
+
+      const contentType = response.headers.get("content-type")
+      console.log("Response content type:", contentType)
+
+      const data = await response.json()
+      console.log("Response data:", data)
 
       if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`)
+        throw new Error(data.error || "Invalid credentials")
       }
-      setUploadStatus("success")
-      router.push("/upload/success")
-    } catch (error: unknown) {
-      console.error("Upload error:", error)
-      if (error instanceof Error) {
-        if (error.name === "AbortError") {
-          setErrorMessage("Upload timed out. Please try again.")
-        } else {
-          setErrorMessage("Upload failed. Please try again or contact support.")
-        }
-      } else {
-        setErrorMessage("Upload failed. Please try again or contact support.")
-      }
-      setUploadStatus("error")
+
+      console.log("Login successful, redirecting...")
+      window.location.href = "/"
+    } catch (err) {
+      console.error("Login error:", err)
+      setError(err instanceof Error ? err.message : "Invalid email or password")
     }
   }
 
-  const clearFileSelection = () => {
-    setFile(null)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4B6FEE]" aria-label="Loading" />
-      </div>
-    )
-  }
-
-  const isSubmitDisabled = uploadStatus === "uploading" || !file || !email || (email.length > 0 && !isValidEmail(email))
-
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Advisor Banner */}
-      <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 text-blue-700 py-2 px-4 text-center border-b border-blue-100/50">
-        <Link
-          href="/advisor-demo"
-          className="text-base font-medium hover:underline inline-flex items-center gap-2 transition-colors hover:text-blue-800"
-        >
-          Financial Advisor? Schedule a Demo <ChevronRight className="w-4 h-4" />
-        </Link>
-      </div>
-
-      <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50 flex-grow">
-        <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
-          <Card className="max-w-3xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-3xl font-bold text-[#4B6FEE] mb-4">Upload Your Policy</CardTitle>
-              <CardDescription className="text-lg text-gray-600">
-                Please upload your life insurance policy&apos;s in-force illustration for analysis. Our AI will review
-                your policy and provide detailed insights within minutes.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
-                    Policy File (PDF)
-                  </label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
-                    <div className="space-y-1 text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <div className="flex text-sm text-gray-600">
-                        <label
-                          htmlFor="file-upload"
-                          className="relative cursor-pointer bg-white rounded-md font-medium text-[#4B6FEE] hover:text-[#3B4FDE] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#4B6FEE]"
-                        >
-                          <span>Upload a file</span>
-                          <Input
-                            id="file-upload"
-                            name="file-upload"
-                            type="file"
-                            className="sr-only"
-                            onChange={handleFileChange}
-                            accept=".pdf"
-                          />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-gray-500">PDF up to 2MB</p>
-                    </div>
-                  </div>
-                  {file && (
-                    <div className="mt-2 flex items-center justify-between">
-                      <p className="text-sm text-gray-600">Selected file: {file.name}</p>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearFileSelection}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
-                  </label>
-                  <Input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value)
-                      if (e.target.value && !isValidEmail(e.target.value)) {
-                        setErrorMessage("Please enter a valid email address")
-                      } else {
-                        setErrorMessage("")
-                      }
-                    }}
-                    placeholder="your@email.com"
-                    required
-                    className={`w-full ${email && !isValidEmail(email) ? "border-red-500" : ""}`}
-                  />
-                  <div className="mt-2 flex items-start space-x-2 text-sm text-gray-600">
-                    <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <p>
-                      Please double-check your email address carefully. Your analysis will be sent to this email. If you
-                      don&apos;t receive it within 30 minutes, please check your spam/junk folders. Still can&apos;t
-                      find it? Contact us at{" "}
-                      <a href="mailto:support@financialplanner-ai.com" className="text-[#4B6FEE] hover:text-[#3B4FDE]">
-                        support@financialplanner-ai.com
-                      </a>
-                    </p>
-                  </div>
-                  {email && !isValidEmail(email) && (
-                    <p className="mt-1 text-sm text-red-500">Please enter a valid email address</p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
-                  disabled={isSubmitDisabled}
-                >
-                  {uploadStatus === "uploading" ? (
-                    "Uploading..."
-                  ) : (
-                    <>
-                      Upload Policy
-                      <Zap className="ml-2 h-5 w-5" />
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              {errorMessage && (
-                <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-md flex items-center">
-                  <AlertTriangle className="mr-2" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-2">Welcome to Insurance Planner AI</h1>
+          <p className="text-xl text-gray-600 mb-8">
+            Transforming life insurance policy analysis through AI-powered technology
+          </p>
         </div>
-      </section>
+
+        {/* Sign In Form */}
+        <div className="bg-white rounded-lg">
+          <h2 className="text-2xl font-bold text-center mb-2">Sign In to Beta Platform</h2>
+          <p className="text-gray-600 text-center mb-8">Enter your credentials to access beta website</p>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && <div className="text-red-500 text-sm text-center bg-red-50 py-2 px-4 rounded">{error}</div>}
+
+            <div>
+              <label htmlFor="email" className="block text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@company.com"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Sign In
+            </button>
+          </form>
+
+          {/* Footer Links */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600 flex flex-col gap-1 items-center">
+              <span>Need help? Contact</span>
+              <a href="mailto:support@financialplanner-ai.com" className="text-blue-600 hover:underline">
+                support@financial-planner-ai.com
+              </a>
+            </p>
+          </div>
+
+          {/* Beta Info */}
+          <div className="text-center pt-8">
+            <h3 className="text-xl font-bold">Insurance Planner AI Beta</h3>
+            <p className="text-gray-600">Transforming life insurance reviews through AI</p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
-
-export default UploadPage
