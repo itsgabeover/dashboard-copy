@@ -30,17 +30,17 @@ const UploadPage = () => {
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
-  // Get token from URL path
-  const pathToken = window.location.pathname.split('/').pop()
-  
-  // Validate token format (starts with pi_ and contains underscore)
-  if (pathToken && pathToken.startsWith('pi_') && pathToken.includes('_')) {
-    setIsLoading(false)
-  } else {
-    // No valid token, redirect to home
-    router.push('/')
-  }
-}, [router])
+    // Get token from URL path
+    const pathToken = window.location.pathname.split("/").pop()
+
+    // Validate token format (starts with pi_ and contains underscore)
+    if (pathToken && pathToken.startsWith("pi_") && pathToken.includes("_")) {
+      setIsLoading(false)
+    } else {
+      // No valid token, redirect to home
+      router.push("/")
+    }
+  }, [router])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
@@ -73,8 +73,8 @@ const UploadPage = () => {
     formData.append("file", file)
     formData.append("email", email)
 
-   // Get token from current URL
-    const pathToken = window.location.pathname.split('/').pop()
+    // Get token from current URL
+    const pathToken = window.location.pathname.split("/").pop()
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
@@ -140,17 +140,46 @@ const UploadPage = () => {
         <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
           <Card className="max-w-3xl mx-auto">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-[#4B6FEE] mb-4">Upload Your Policy</CardTitle>
+              <CardTitle className="text-3xl font-bold text-[#4B6FEE] mb-4">
+                Upload Your In-Force Illustration
+              </CardTitle>
               <CardDescription className="text-lg text-gray-600">
-                Please upload your life insurance policy&apos;s in-force illustration for analysis. Our AI will review
-                your policy and provide detailed insights within minutes.
+                Our AI transforms your illustration into actionable insights through two detailed reports:
               </CardDescription>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <Card className="bg-gray-50">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold">Clear Email Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Policy Overview & Structure</li>
+                      <li>Protection Features & Benefits</li>
+                      <li>Built-in Policy Advantages</li>
+                      <li>Critical Management Points</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                <Card className="bg-gray-50">
+                  <CardHeader>
+                    <CardTitle className="text-xl font-semibold">Professional PDF Report</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Comprehensive Policy Analysis</li>
+                      <li>Detailed Feature Assessment</li>
+                      <li>Risk & Opportunity Insights</li>
+                      <li>Advisor Discussion Topics</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="file" className="block text-sm font-medium text-gray-700 mb-2">
-                    Policy File (PDF)
+                    Upload In-Force Illustration (PDF)
                   </label>
                   <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                     <div className="space-y-1 text-center">
@@ -172,7 +201,7 @@ const UploadPage = () => {
                         </label>
                         <p className="pl-1">or drag and drop</p>
                       </div>
-                      <p className="text-xs text-gray-500">PDF up to 2MB</p>
+                      <p className="text-xs text-gray-500">Maximum file size: 2MB</p>
                     </div>
                   </div>
                   {file && (
@@ -189,6 +218,15 @@ const UploadPage = () => {
                       </Button>
                     </div>
                   )}
+                  <div className="mt-4 bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <h4 className="font-semibold text-blue-800 mb-2">Important Notes:</h4>
+                    <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
+                      <li>We analyze in-force illustrations only</li>
+                      <li>Most recent illustration recommended</li>
+                      <li>All illustration pages must be included</li>
+                      <li>Results delivered within minutes</li>
+                    </ul>
+                  </div>
                 </div>
 
                 <div>
@@ -236,7 +274,7 @@ const UploadPage = () => {
                     "Uploading..."
                   ) : (
                     <>
-                      Upload Policy
+                      Start Analysis
                       <Zap className="ml-2 h-5 w-5" />
                     </>
                   )}
@@ -258,3 +296,4 @@ const UploadPage = () => {
 }
 
 export default UploadPage
+
