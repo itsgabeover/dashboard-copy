@@ -30,13 +30,17 @@ const UploadPage = () => {
   const [errorMessage, setErrorMessage] = useState("")
 
   useEffect(() => {
-    const token = sessionStorage.getItem("upload_token")
-    if (token) {
-      setIsLoading(false)
-    } else {
-      router.push("/")
-    }
-  }, [router])
+  // Get token from URL path
+  const pathToken = window.location.pathname.split('/').pop()
+  
+  // Validate token format (starts with pi_ and contains underscore)
+  if (pathToken && pathToken.startsWith('pi_') && pathToken.includes('_')) {
+    setIsLoading(false)
+  } else {
+    // No valid token, redirect to home
+    router.push('/')
+  }
+}, [router])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
@@ -69,7 +73,8 @@ const UploadPage = () => {
     formData.append("file", file)
     formData.append("email", email)
 
-    const storedToken = sessionStorage.getItem("upload_token")
+   // Get token from current URL
+    const pathToken = window.location.pathname.split('/').pop()
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
@@ -78,7 +83,7 @@ const UploadPage = () => {
         method: "POST",
         headers: {
           Accept: "application/json",
-          Authorization: `Bearer ${storedToken}`,
+          Authorization: `Bearer ${pathToken}`,
         },
         body: formData,
         signal: controller.signal,
