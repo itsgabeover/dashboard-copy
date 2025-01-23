@@ -55,7 +55,7 @@ export function ChatInterface({ onClose }: { onClose: () => void }) {
           ) : (
             <iframe
               key={iframeKey}
-              src="https://www.chatbase.co/chatbot-iframe/vViwWjQhSrHQ80RuRrDAI"
+  src={process.env.NEXT_PUBLIC_CHATBOT_URL}
               width="100%"
               height="100%"
               frameBorder="0"
