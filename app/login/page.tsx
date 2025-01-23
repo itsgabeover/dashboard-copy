@@ -6,7 +6,6 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -67,9 +66,9 @@ export default function LoginPage() {
             <p className="text-lg text-gray-600">
               Transforming life insurance policy analysis through AI-powered technology
             </p>
-            <Badge variant="secondary" className="text-blue-600 bg-blue-50 hover:bg-blue-50">
+            <div className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-blue-50 text-blue-600">
               Beta Access
-            </Badge>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -131,8 +130,8 @@ export default function LoginPage() {
 
           <div className="mt-8 text-center space-y-2">
             <p className="text-gray-600">Need help? Contact</p>
-            <a href="mailto:support@financialplanner-ai.com" className="text-blue-600 hover:underline block">
-              support@financialplanner-ai.com
+            <a href="mailto:support@financial-planner-ai.com" className="text-blue-600 hover:underline block">
+              support@financial-planner-ai.com
             </a>
           </div>
         </CardContent>
