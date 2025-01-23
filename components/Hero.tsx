@@ -60,10 +60,11 @@ export const Hero: FC = () => {
                 </span>
               </span>
             </h1>
-<h2 className="text-xl md:text-3xl mb-12 text-gray-600 font-light">
-  AI-Powered Life Insurance Analysis<br />
-  That Shows Your Policy&apos;s True Picture
-</h2>
+            <h2 className="text-xl md:text-3xl mb-12 text-gray-600 font-light">
+              AI-Powered Life Insurance Analysis
+              <br />
+              That Shows Your Policy&apos;s True Picture
+            </h2>
             <Card className="w-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 border-blue-100">
               <CardContent className="p-8">
                 <div className="flex flex-col items-center space-y-6">
@@ -74,7 +75,8 @@ export const Hero: FC = () => {
                     Your Policy&apos;s True Value, Revealed in Minutes
                   </h3>
                   <p className="text-gray-700 text-lg leading-relaxed max-w-3xl">
-                    Get clarity on what your life insurance actually provides – our AI transforms complex insurance documents into clear insights you and your advisor can act on.
+                    Get clarity on what your life insurance actually provides – our AI transforms complex insurance
+                    documents into clear insights you and your advisor can act on.
                   </p>
                   <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
                     <div className="flex items-center">
@@ -110,7 +112,6 @@ export const Hero: FC = () => {
             </div>
 
             <div className="relative">
-              <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-100 via-blue-200 to-blue-100 transform -translate-y-1/2 hidden md:block"></div>
               <div className="grid md:grid-cols-3 gap-8 relative z-10">
                 {[
                   {
@@ -131,19 +132,38 @@ export const Hero: FC = () => {
                     description: "Receive your email summary and detailed PDF report.",
                     icon: <Zap className="w-6 h-6" />,
                   },
-                ].map((item) => (
-                  <Card
-                    key={item.step}
-                    className="text-center transition-all duration-300 hover:shadow-lg bg-white group hover:-translate-y-1"
-                  >
-                    <CardContent className="p-6">
-                      <div className="bg-blue-50 text-[#4B6FEE] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center text-xl font-bold group-hover:bg-[#4B6FEE] group-hover:text-white transition-colors duration-300">
-                        {item.icon}
+                ].map((item, index) => (
+                  <div key={item.step} className="relative flex">
+                    <Card className="text-center transition-all duration-300 hover:shadow-lg bg-white group hover:-translate-y-1 w-full flex flex-col">
+                      <CardContent className="p-6 flex flex-col h-full justify-between">
+                        <div>
+                          <div className="bg-blue-50 text-[#4B6FEE] rounded-full p-4 w-16 h-16 mx-auto mb-6 flex items-center justify-center text-xl font-bold group-hover:bg-[#4B6FEE] group-hover:text-white transition-colors duration-300">
+                            {item.step}
+                          </div>
+                          <h3 className="text-xl font-semibold mb-4 text-[#4B6FEE]">{item.title}</h3>
+                          <p className="text-gray-600">{item.description}</p>
+                        </div>
+                        {item.step === 1 && (
+                          <button
+                            onClick={() => {
+                              const modal = document.getElementById("helpModal")
+                              if (modal) modal.style.display = "block"
+                            }}
+                            className="text-blue-500 hover:text-blue-700 underline mt-4 inline-block"
+                          >
+                            Need help?
+                          </button>
+                        )}
+                      </CardContent>
+                    </Card>
+                    {index < 2 && (
+                      <div className="absolute right-0 top-1/2 transform translate-x-[75%] -translate-y-1/2 z-20">
+                        <div className="hidden md:flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-md">
+                          <ArrowRight className="w-5 h-5 text-blue-400" />
+                        </div>
                       </div>
-                      <h3 className="text-xl font-semibold mb-3 text-[#4B6FEE]">{item.title}</h3>
-                      <p className="text-gray-600">{item.description}</p>
-                    </CardContent>
-                  </Card>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
@@ -158,6 +178,34 @@ export const Hero: FC = () => {
               </Button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Help Modal */}
+      <div id="helpModal" className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div className="bg-white p-8 rounded-lg max-w-md">
+          <h3 className="text-xl font-bold mb-4">Need Help?</h3>
+          <p>
+            Don't have an in-force illustration? Use{" "}
+            <a
+              href="/sample_reports/IFL_REQUEST_FORM.pdf"
+              target="_blank"
+              className="text-blue-500 hover:text-blue-700 underline"
+              rel="noreferrer"
+            >
+              this form
+            </a>{" "}
+            to obtain one.
+          </p>
+          <button
+            onClick={() => {
+              const modal = document.getElementById("helpModal")
+              if (modal) modal.style.display = "none"
+            }}
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Close
+          </button>
         </div>
       </div>
 
@@ -314,15 +362,15 @@ export const Hero: FC = () => {
               </CardHeader>
               <CardContent className="flex justify-center p-8 bg-gradient-to-b from-white to-blue-50/30">
                 <Button
-  onClick={() => router.push('/upload')}
-  size="lg"
-  className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
->
-  <span className="flex items-center gap-2">
-    Start My Analysis
-    <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
-  </span>
-</Button>
+                  onClick={() => router.push("/upload")}
+                  size="lg"
+                  className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                >
+                  <span className="flex items-center gap-2">
+                    Start My Analysis
+                    <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </Button>
               </CardContent>
             </Card>
           </div>
