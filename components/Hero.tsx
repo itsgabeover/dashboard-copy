@@ -167,7 +167,7 @@ export const Hero: FC = () => {
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16 space-y-4">
               <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">What Our AI Analysis Reveals</h2>
-              <p className="text-gray-600 text-lg">Comprehensive insights for informed decisions</p>
+              <p className="text-gray-600 text-lg">Comprehensive insights for you and your advisor</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
