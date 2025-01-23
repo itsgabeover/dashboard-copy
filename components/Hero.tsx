@@ -60,9 +60,10 @@ export const Hero: FC = () => {
                 </span>
               </span>
             </h1>
-            <h2 className="text-xl md:text-3xl mb-12 text-gray-600 font-light">
-              AI-Powered Life Insurance Analysis That Shows Your Policy&apos;s True Picture
-            </h2>
+<h2 className="text-xl md:text-3xl mb-12 text-gray-600 font-light">
+  AI-Powered Life Insurance Analysis<br />
+  That Shows Your Policy&apos;s True Picture
+</h2>
             <Card className="w-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 border-blue-100">
               <CardContent className="p-8">
                 <div className="flex flex-col items-center space-y-6">
@@ -72,7 +73,7 @@ export const Hero: FC = () => {
                   <h3 className="text-2xl md:text-3xl font-bold text-[#4B6FEE]">
                     Your Policy&apos;s True Value, Revealed in Minutes
                   </h3>
-                  <p className="text-gray-700 text-lg leading-relaxed max-w-2xl">
+                  <p className="text-gray-700 text-lg leading-relaxed max-w-3xl">
                     Get clarity on what your life insurance actually provides – our AI transforms complex insurance documents into clear insights you and your advisor can act on.
                   </p>
                   <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
