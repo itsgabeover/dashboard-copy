@@ -118,8 +118,6 @@ export default function UploadPage() {
       }
 
       setUploadStatus({ state: "success" })
-
-      // Redirect to success page with email parameter
       router.push(`/upload/success?email=${encodeURIComponent(email)}`)
     } catch (error: unknown) {
       console.error("Upload error:", error)
@@ -133,6 +131,11 @@ export default function UploadPage() {
         })
       }
     }
+  }
+
+  const handleChangeFile = () => {
+    setFile(null)
+    setStep(1)
   }
 
   if (isLoading) {
@@ -215,13 +218,25 @@ export default function UploadPage() {
                         </div>
                       </div>
                     </div>
+
+                    {file && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <FileText className="h-8 w-8 text-[#4B6FEE]" />
+                        <div>
+                          <p className="font-medium">{file.name}</p>
+                          <p className="text-sm text-gray-500">PDF • {(file.size / (1024 * 1024)).toFixed(1)} MB</p>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-2 text-gray-500 text-sm">
                       <span className="text-gray-400">ⓘ</span>
                       We analyze in-force illustrations only
                     </div>
+
                     <Button
                       type="button"
-                      className="w-full bg-gray-500 hover:bg-gray-600 h-12 rounded-lg"
+                      className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] h-12 rounded-lg text-white"
                       disabled={!file}
                       onClick={() => setStep(2)}
                     >
@@ -239,7 +254,7 @@ export default function UploadPage() {
                         </div>
                         <button
                           type="button"
-                          onClick={() => setFile(null)}
+                          onClick={handleChangeFile}
                           className="ml-auto text-[#4B6FEE] hover:underline"
                         >
                           Change
@@ -272,7 +287,7 @@ export default function UploadPage() {
                       </button>
                       <Button
                         type="submit"
-                        className="bg-gray-500 hover:bg-gray-600 px-8 h-12 rounded-lg"
+                        className="bg-green-500 hover:bg-green-600 px-8 h-12 rounded-lg text-white"
                         disabled={!isValidEmail(email) || uploadStatus.state === "uploading"}
                       >
                         {uploadStatus.state === "uploading" ? "Processing..." : "Start Analysis"}
