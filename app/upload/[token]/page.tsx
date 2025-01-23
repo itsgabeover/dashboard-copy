@@ -2,11 +2,10 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Upload, AlertTriangle, Info, ChevronRight, ChevronLeft, Zap, Check } from "lucide-react"
+import { Upload, ChevronLeft, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 interface UploadStatus {
@@ -117,8 +116,11 @@ export default function UploadPage() {
       if (!response.ok) {
         throw new Error(`Upload failed: ${response.statusText}`)
       }
+
       setUploadStatus({ state: "success" })
-      router.push("/upload/success")
+
+      // Redirect to success page with email parameter
+      router.push(`/upload/success?email=${encodeURIComponent(email)}`)
     } catch (error: unknown) {
       console.error("Upload error:", error)
       if (error instanceof Error) {
@@ -142,82 +144,60 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-blue-50/30">
-      {/* Advisor Banner */}
-      <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 text-blue-700 py-2 px-4 text-center border-b border-blue-100/50">
-        <Link
-          href="/advisor-demo"
-          className="text-base font-medium hover:underline inline-flex items-center gap-2 transition-colors hover:text-blue-800"
-        >
-          Financial Advisor? Schedule a Demo <ChevronRight className="w-4 h-4" />
-        </Link>
-      </div>
-
+    <div className="flex flex-col min-h-screen bg-white">
       <main className="flex-1 container max-w-2xl mx-auto px-4 py-12">
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-[#4B6FEE]">Upload Your In-Force Illustration</h1>
-            <p className="text-lg text-gray-600">
-              Our AI transforms your illustration into actionable insights through two detailed reports
-            </p>
+            <p className="text-lg text-gray-600">We&apos;ll transform your illustration into actionable insights</p>
           </div>
 
           {/* Progress Steps */}
-          <div className="relative pb-8">
-            <div className="absolute top-5 w-full h-[2px] bg-gray-200">
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="flex items-center">
               <div
-                className="h-full bg-[#4B6FEE] transition-all duration-500 ease-in-out"
-                style={{ width: step === 1 ? "50%" : "100%" }}
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center text-white",
+                  step === 1 ? "bg-[#4B6FEE]" : "bg-[#4B6FEE]",
+                )}
+              >
+                {step > 1 ? "✓" : "1"}
+              </div>
+              <span className="ml-2 font-medium text-[#4B6FEE]">Upload</span>
+            </div>
+            <div className="w-24 h-[2px] bg-gray-200">
+              <div
+                className="h-full bg-[#4B6FEE] transition-all duration-300"
+                style={{ width: step === 1 ? "0%" : "100%" }}
               />
             </div>
-            <div className="relative flex justify-between">
-              <div className="flex flex-col items-center gap-2">
-                <div
-                  className={cn(
-                    "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300",
-                    step >= 1 ? "border-[#4B6FEE] bg-[#4B6FEE] text-white" : "border-gray-300 text-gray-300",
-                  )}
-                >
-                  {step > 1 ? <Check className="w-5 h-5" /> : "1"}
-                </div>
-                <span className={cn("text-sm font-medium", step >= 1 ? "text-[#4B6FEE]" : "text-gray-400")}>
-                  Upload
-                </span>
+            <div className="flex items-center">
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center",
+                  step === 2 ? "bg-[#4B6FEE] text-white" : "bg-gray-100 text-gray-400",
+                )}
+              >
+                2
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <div
-                  className={cn(
-                    "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all duration-300",
-                    step >= 2 ? "border-[#4B6FEE] bg-[#4B6FEE] text-white" : "border-gray-300 text-gray-300",
-                  )}
-                >
-                  2
-                </div>
-                <span className={cn("text-sm font-medium", step >= 2 ? "text-[#4B6FEE]" : "text-gray-400")}>
-                  Confirm
-                </span>
-              </div>
+              <span className={cn("ml-2 font-medium", step === 2 ? "text-[#4B6FEE]" : "text-gray-400")}>Confirm</span>
             </div>
           </div>
 
           {/* Main Content */}
           <Card className="border-0 shadow-lg">
-            <CardContent className="p-6 space-y-6">
+            <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
-                {step === 1 && (
-                  <div className="space-y-4">
+                {step === 1 ? (
+                  <div className="space-y-6">
                     <div
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
                       onDrop={handleDrop}
                       className={cn(
-                        "relative border-2 border-dashed rounded-xl p-8 transition-all duration-300",
-                        isDragging
-                          ? "border-[#4B6FEE] bg-blue-50/50"
-                          : file
-                            ? "border-green-500 bg-green-50"
-                            : "border-gray-200 hover:border-[#4B6FEE]",
+                        "relative border-2 border-dashed rounded-xl p-12",
+                        isDragging ? "border-[#4B6FEE] bg-blue-50/50" : "border-gray-200",
                       )}
                     >
                       <input
@@ -228,113 +208,85 @@ export default function UploadPage() {
                         accept=".pdf"
                       />
                       <div className="text-center space-y-4">
-                        <Upload
-                          className={cn(
-                            "mx-auto h-12 w-12 transition-colors duration-300",
-                            file ? "text-green-500" : "text-gray-400",
-                          )}
-                        />
+                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
                         <div className="space-y-2">
-                          <p className="text-sm text-gray-500">
-                            {isDragging
-                              ? "Drop your file here"
-                              : file
-                                ? file.name
-                                : "Drag and drop your PDF or click to browse"}
-                          </p>
-                          <p className="text-xs text-gray-400">Maximum file size: 2MB</p>
+                          <p className="text-gray-600">Drag and drop your PDF or click to browse</p>
+                          <p className="text-sm text-gray-400">PDF files only, maximum 2MB</p>
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm text-gray-500 flex items-start gap-2">
-                      <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <p>We analyze in-force illustrations only. Please ensure all pages are included.</p>
+                    <div className="flex items-center gap-2 text-gray-500 text-sm">
+                      <span className="text-gray-400">ⓘ</span>
+                      We analyze in-force illustrations only
                     </div>
-                  </div>
-                )}
-
-                {step === 2 && (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                        Email Address
-                      </label>
-                      <Input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => {
-                          setEmail(e.target.value)
-                          if (e.target.value && !isValidEmail(e.target.value)) {
-                            setUploadStatus({
-                              state: "error",
-                              message: "Please enter a valid email address",
-                            })
-                          } else {
-                            setUploadStatus({ state: "idle" })
-                          }
-                        }}
-                        placeholder="your@email.com"
-                        className={cn(
-                          "w-full transition-all duration-300",
-                          email && !isValidEmail(email) ? "border-red-500 focus:ring-red-500" : "",
-                        )}
-                      />
-                    </div>
-                    <div className="text-sm text-gray-500 flex items-start gap-2">
-                      <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <p>
-                        Your analysis will be sent to this email within minutes. Check spam folders if not received.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-4">
-                  {step > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => setStep(step - 1)}
-                      className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      <span>Back</span>
-                    </button>
-                  )}
-                  {step === 1 ? (
                     <Button
                       type="button"
-                      className="ml-auto bg-[#4B6FEE] hover:bg-[#3B4FDE] transition-all duration-300"
+                      className="w-full bg-gray-500 hover:bg-gray-600 h-12 rounded-lg"
                       disabled={!file}
                       onClick={() => setStep(2)}
                     >
                       Continue
                     </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      className="ml-auto bg-[#4B6FEE] hover:bg-[#3B4FDE] transition-all duration-300"
-                      disabled={!isValidEmail(email) || uploadStatus.state === "uploading"}
-                    >
-                      {uploadStatus.state === "uploading" ? (
-                        "Processing..."
-                      ) : (
-                        <>
-                          Start Analysis
-                          <Zap className="ml-2 h-4 w-4" />
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </form>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {file && (
+                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                        <FileText className="h-8 w-8 text-[#4B6FEE]" />
+                        <div>
+                          <p className="font-medium">{file.name}</p>
+                          <p className="text-sm text-gray-500">PDF • {(file.size / (1024 * 1024)).toFixed(1)} MB</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setFile(null)}
+                          className="ml-auto text-[#4B6FEE] hover:underline"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <label className="text-gray-700 text-lg">Email Address</label>
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full h-12 text-lg"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2 text-gray-500 text-sm">
+                      <span className="text-gray-400">ⓘ</span>
+                      Your analysis will be sent to this email within minutes. Please check your spam folder if not
+                      received.
+                    </div>
+                    <div className="flex justify-between items-center pt-4">
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="flex items-center gap-1 text-gray-500 hover:text-gray-700"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Back
+                      </button>
+                      <Button
+                        type="submit"
+                        className="bg-gray-500 hover:bg-gray-600 px-8 h-12 rounded-lg"
+                        disabled={!isValidEmail(email) || uploadStatus.state === "uploading"}
+                      >
+                        {uploadStatus.state === "uploading" ? "Processing..." : "Start Analysis"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
-              {uploadStatus.state === "error" && uploadStatus.message && (
-                <div className="p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  <span className="text-sm">{uploadStatus.message}</span>
-                </div>
-              )}
+                {uploadStatus.state === "error" && uploadStatus.message && (
+                  <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
+                    <span className="text-sm">{uploadStatus.message}</span>
+                  </div>
+                )}
+              </form>
             </CardContent>
           </Card>
         </div>
