@@ -146,21 +146,23 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
               </div>
             </div>
           ) : (
-            <iframe
-              key={iframeKey}
-              src={CHATBOT_URL}
-              className={`
-                w-full h-full transition-all duration-500
-                ${iframeLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}
-              `}
-              frameBorder="0"
-              onLoad={() => setIframeLoaded(true)}
-              onError={handleIframeError}
-              allow="microphone *"
-              sandbox="allow-scripts allow-same-origin allow-forms"
-              style={{ isolation: "isolate" }}
-              title="Chat Interface"
-            />
+            <div className="relative w-full h-full">
+              <iframe
+                key={iframeKey}
+                src={CHATBOT_URL}
+                className={`
+                  w-full h-full transition-all duration-500
+                  ${iframeLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}
+                `}
+                frameBorder="0"
+                onLoad={() => setIframeLoaded(true)}
+                onError={handleIframeError}
+                allow="microphone *"
+                sandbox="allow-scripts allow-same-origin allow-forms"
+                title="Chat Interface"
+              />
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+            </div>
           )}
         </div>
       </div>
