@@ -161,7 +161,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
                 sandbox="allow-scripts allow-same-origin allow-forms"
                 title="Chat Interface"
               />
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white to-transparent pointer-events-none" />
             </div>
           )}
         </div>
