@@ -119,7 +119,7 @@ const AboutPage: FC = () => {
                 className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:transform hover:scale-105 shadow-lg"
                 onClick={() => scrollToSection("revolutionizing-reviews")}
               >
-                Your AI Advantage
+                Insurance Planner AI Advantage
               </Button>
             </div>
           </div>
