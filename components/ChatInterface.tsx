@@ -63,8 +63,9 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out
-        ${isMinimized ? "bg-transparent pointer-events-none" : "bg-black/50 backdrop-blur-sm"}`}
+      className={`fixed inset-0 transition-all duration-300 ease-in-out
+        ${isMinimized ? "bg-transparent pointer-events-none" : "bg-black/50 backdrop-blur-sm"}
+        ${isMinimized ? "z-40" : "z-50"}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby="chat-title"
@@ -133,7 +134,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
           )}
 
           {loadError ? (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-white">
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-white rounded-b-2xl">
               <div className="max-w-md text-center space-y-4">
                 <p className="text-red-500 font-medium">{loadError}</p>
                 <button
@@ -146,7 +147,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
               </div>
             </div>
           ) : (
-            <div className="relative w-full h-full">
+            <div className="relative w-full h-full rounded-b-2xl overflow-hidden">
               <iframe
                 key={iframeKey}
                 src={CHATBOT_URL}
@@ -161,7 +162,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
                 sandbox="allow-scripts allow-same-origin allow-forms"
                 title="Chat Interface"
               />
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white to-transparent pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white to-transparent pointer-events-none rounded-b-2xl" />
             </div>
           )}
         </div>
