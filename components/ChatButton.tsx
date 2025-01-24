@@ -8,20 +8,18 @@ export function ChatButton() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
-    // Check for authentication token
-    const hasAuthToken = document.cookie.includes('auth-token')
-    setIsAuthenticated(hasAuthToken)
+    const checkAuth = () => {
+      const hasAuthToken = document.cookie.includes('auth-token')
+      setIsAuthenticated(hasAuthToken)
+    }
+    
+    checkAuth()
+    window.addEventListener('storage', checkAuth)
+    
+    return () => window.removeEventListener('storage', checkAuth)
   }, [])
 
-  const handleChatClick = () => {
-    if (!isAuthenticated) {
-      alert('Please log in to chat with our AI Helper')
-      return
-    }
-    setShowChat(true)
-  }
-
-  // Completely hide the button if not authenticated
+  // Don't render anything if not authenticated
   if (!isAuthenticated) {
     return null
   }
@@ -29,12 +27,17 @@ export function ChatButton() {
   return (
     <>
       <button
-        onClick={handleChatClick}
+        onClick={() => setShowChat(true)}
         className="fixed bottom-4 right-4 bg-primary-blue text-white rounded-full p-4 shadow-lg hover:bg-secondary-blue transition-colors z-40"
       >
         Ask Our AI Helper
       </button>
-      {showChat && <ChatInterface onClose={() => setShowChat(false)} />}
+      {showChat && (
+        <ChatInterface 
+          onClose={() => setShowChat(false)} 
+          isAuthenticated={isAuthenticated} 
+        />
+      )}
     </>
   )
 }
