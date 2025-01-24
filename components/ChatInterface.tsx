@@ -13,10 +13,33 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
   const [loadError, setLoadError] = useState<string | null>(null)
   const [iframeKey, setIframeKey] = useState(0)
 
+  // Debug mounting and prop values
   useEffect(() => {
-    const timer = setTimeout(() => setIframeLoaded(true), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    console.log('ChatInterface mounted with:', {
+      isAuthenticated,
+      hasOnClose: !!onClose,
+      chatbotUrl: process.env.NEXT_PUBLIC_CHATBOT_URL
+    });
+
+    if (!process.env.NEXT_PUBLIC_CHATBOT_URL) {
+      console.error('Missing NEXT_PUBLIC_CHATBOT_URL configuration');
+    }
+  }, [isAuthenticated, onClose]);
+
+  // Handle iframe loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!iframeLoaded && !loadError) {
+        console.log('Iframe load timeout reached');
+        setIframeLoaded(true)
+      }
+    }, 1000)
+
+    return () => {
+      console.log('Cleaning up iframe load timer');
+      clearTimeout(timer)
+    }
+  }, [iframeLoaded, loadError])
 
   const handleIframeError = (e: React.SyntheticEvent<HTMLIFrameElement, Event>) => {
     console.error('Iframe loading error:', e)
@@ -25,10 +48,19 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
   }
 
   const handleRetry = () => {
+    console.log('Retrying iframe load');
     setLoadError(null)
     setIframeLoaded(false)
     setIframeKey(prev => prev + 1)
   }
+
+  // Monitor authentication status
+  useEffect(() => {
+    if (!isAuthenticated) {
+      console.log('User not authenticated, ChatInterface will not render');
+      return;
+    }
+  }, [isAuthenticated]);
 
   // Don't render if not authenticated
   if (!isAuthenticated) {
@@ -41,7 +73,10 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
         <div className="flex justify-between items-center p-2 border-b bg-white h-12">
           <h2 className="text-lg font-semibold text-[#4B6FEE]">Ask Our AI Helper</h2>
           <button 
-            onClick={onClose} 
+            onClick={() => {
+              console.log('Close button clicked');
+              onClose();
+            }} 
             className="text-gray-500 hover:text-gray-700 p-1"
           >
             <X size={20} />
@@ -71,7 +106,10 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
               height="100%"
               frameBorder="0"
               className={`w-full h-full ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
-              onLoad={() => setIframeLoaded(true)}
+              onLoad={() => {
+                console.log('Iframe loaded successfully');
+                setIframeLoaded(true);
+              }}
               onError={handleIframeError}
               allow="microphone *"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
