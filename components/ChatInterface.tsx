@@ -14,14 +14,9 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
   const [iframeKey, setIframeKey] = useState(0)
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      onClose()
-      return
-    }
-
     const timer = setTimeout(() => setIframeLoaded(true), 1000)
     return () => clearTimeout(timer)
-  }, [isAuthenticated, onClose])
+  }, [])
 
   const handleIframeError = (e: React.SyntheticEvent<HTMLIFrameElement, Event>) => {
     console.error('Iframe loading error:', e)
@@ -35,6 +30,7 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
     setIframeKey(prev => prev + 1)
   }
 
+  // Don't render if not authenticated
   if (!isAuthenticated) {
     return null
   }
