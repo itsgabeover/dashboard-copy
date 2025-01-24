@@ -1,21 +1,24 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
-import { Logo } from '@/components/Logo'
-import { ChatInterface } from '@/components/ChatInterface'
+import { useState } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Menu, X } from "lucide-react"
+import { Logo } from "@/components/Logo"
+import { ChatInterface } from "@/components/ChatInterface"
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [showChat, setShowChat] = useState(false)
   const pathname = usePathname()
 
+  // If the current path is /login, don't render anything
+  if (pathname === "/login") return null
+
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'Why Review?' },
-    { href: '/resources', label: 'Help Center' }
+    { href: "/", label: "Home" },
+    { href: "/about", label: "Why Review?" },
+    { href: "/resources", label: "Help Center" },
   ]
 
   const isActivePath = (path: string) => pathname === path
@@ -43,17 +46,14 @@ export default function Navigation() {
                   key={link.href}
                   href={link.href}
                   className={`relative py-2 text-base transition-colors duration-200 
-                    ${isActivePath(link.href) 
-                      ? 'text-[#4B6FEE] font-semibold' 
-                      : 'text-gray-600 hover:text-[#4B6FEE]'
-                    }
+                    ${isActivePath(link.href) ? "text-[#4B6FEE] font-semibold" : "text-gray-600 hover:text-[#4B6FEE]"}
                     group
                   `}
                 >
                   {link.label}
-                  <span 
+                  <span
                     className={`absolute bottom-0 left-0 w-full h-0.5 bg-[#4B6FEE] transform origin-left transition-transform duration-200 
-                      ${isActivePath(link.href) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}
+                      ${isActivePath(link.href) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}
                     `}
                   />
                 </Link>
@@ -64,19 +64,19 @@ export default function Navigation() {
                 onClick={() => setShowChat(true)}
                 className="bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white rounded-full px-6 py-2 flex items-center gap-2 transition-all duration-300"
               >
-                <svg 
-                  width="20" 
-                  height="20" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   className="text-white"
                 >
-                  <path 
-                    d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 13.4876 3.36093 14.891 4 16.1272L3 21L7.87279 20C9.10904 20.6391 10.5124 21 12 21Z" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+                  <path
+                    d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 13.4876 3.36093 14.891 4 16.1272L3 21L7.87279 20C9.10904 20.6391 10.5124 21 12 21Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
@@ -94,9 +94,10 @@ export default function Navigation() {
                     key={link.href}
                     href={link.href}
                     className={`block px-4 py-3 text-base transition-colors duration-200 rounded-md
-                      ${isActivePath(link.href)
-                        ? 'text-[#4B6FEE] font-semibold bg-blue-50'
-                        : 'text-gray-600 hover:text-[#4B6FEE] hover:bg-gray-50'
+                      ${
+                        isActivePath(link.href)
+                          ? "text-[#4B6FEE] font-semibold bg-blue-50"
+                          : "text-gray-600 hover:text-[#4B6FEE] hover:bg-gray-50"
                       }
                     `}
                     onClick={() => setIsOpen(false)}
@@ -104,28 +105,28 @@ export default function Navigation() {
                     {link.label}
                   </Link>
                 ))}
-                
+
                 {/* Mobile Chat Button */}
                 <button
                   onClick={() => {
-                    setShowChat(true);
-                    setIsOpen(false);
+                    setShowChat(true)
+                    setIsOpen(false)
                   }}
                   className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white rounded-full px-6 py-2 flex items-center justify-center gap-2 my-2"
                 >
-                  <svg 
-                    width="20" 
-                    height="20" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     className="text-white"
                   >
-                    <path 
-                      d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 13.4876 3.36093 14.891 4 16.1272L3 21L7.87279 20C9.10904 20.6391 10.5124 21 12 21Z" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <path
+                      d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 13.4876 3.36093 14.891 4 16.1272L3 21L7.87279 20C9.10904 20.6391 10.5124 21 12 21Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
@@ -142,3 +143,4 @@ export default function Navigation() {
     </>
   )
 }
+
