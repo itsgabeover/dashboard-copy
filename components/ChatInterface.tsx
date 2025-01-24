@@ -158,6 +158,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
               onError={handleIframeError}
               allow="microphone *"
               sandbox="allow-scripts allow-same-origin allow-forms"
+              style={{ isolation: "isolate" }}
               title="Chat Interface"
             />
           )}
