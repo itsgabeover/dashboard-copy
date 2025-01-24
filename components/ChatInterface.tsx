@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 
-interface ChatInterfaceProps {
-  onClose: () => void;
-  isAuthenticated: boolean;
+type ChatInterfaceProps = {
+  onClose: () => void
+  isAuthenticated: boolean
 }
 
 export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) {
@@ -14,7 +14,6 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
   const [iframeKey, setIframeKey] = useState(0)
 
   useEffect(() => {
-    // If not authenticated, close the chat interface
     if (!isAuthenticated) {
       onClose()
       return
@@ -36,7 +35,6 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
     setIframeKey(prev => prev + 1)
   }
 
-  // Don't render anything if not authenticated
   if (!isAuthenticated) {
     return null
   }
@@ -70,20 +68,18 @@ export function ChatInterface({ onClose, isAuthenticated }: ChatInterfaceProps) 
               </button>
             </div>
           ) : (
-            isAuthenticated && (
-              <iframe
-                key={iframeKey}
-                src={process.env.NEXT_PUBLIC_CHATBOT_URL}
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                className={`w-full h-full ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
-                onLoad={() => setIframeLoaded(true)}
-                onError={handleIframeError}
-                allow="microphone *"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              ></iframe>
-            )
+            <iframe
+              key={iframeKey}
+              src={process.env.NEXT_PUBLIC_CHATBOT_URL}
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              className={`w-full h-full ${iframeLoaded ? 'opacity-100' : 'opacity-0'}`}
+              onLoad={() => setIframeLoaded(true)}
+              onError={handleIframeError}
+              allow="microphone *"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            />
           )}
         </div>
       </div>
