@@ -53,6 +53,10 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
         return `Please provide an in-force illustration calculating the minimum premium required to keep this policy in-force to age ${formData.minimumPremiumAge}.`
       case "zero":
         return "Please provide an in-force illustration showing projected values with no further premium payments."
+      case "reduced":
+        return "Please provide an in-force illustration showing the reduced coverage amount I can maintain without paying any additional premiums."
+      case "maximum":
+        return "Please provide an in-force illustration showing the maximum coverage amount possible while maintaining my current premium payments."
       default:
         return ""
     }
