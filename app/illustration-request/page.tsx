@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import dynamic from "next/dynamic"
-import ProgressIndicator from "./components/ProgressIndicator"
+import { Card } from "../../components/ui/card"
 
-const TypeSelection = dynamic(() => import("./components/TypeSelection"), { ssr: false })
-const InformationCollection = dynamic(() => import("./components/InformationCollection"), { ssr: false })
-const ReviewAndDownload = dynamic(() => import("./components/ReviewAndDownload"), { ssr: false })
+const TypeSelection = dynamic(() => import("./components/TypeSelection"))
+const InformationCollection = dynamic(() => import("./components/InformationCollection"))
+const ReviewAndDownload = dynamic(() => import("./components/ReviewAndDownload"))
 
 interface FormData {
   illustrationType: string
@@ -27,26 +27,28 @@ interface FormData {
   }
 }
 
+const initialFormData: FormData = {
+  illustrationType: "",
+  minimumPremiumAge: "",
+  ownerInfo: {
+    firstName: "",
+    lastName: "",
+    streetAddress: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    phoneNumber: "",
+    emailAddress: "",
+  },
+  policyInfo: {
+    policyNumber: "",
+    insuranceCompanyName: "",
+  },
+}
+
 export default function IllustrationRequest() {
   const [step, setStep] = useState(1)
-  const [formData, setFormData] = useState<FormData>({
-    illustrationType: "",
-    minimumPremiumAge: "",
-    ownerInfo: {
-      firstName: "",
-      lastName: "",
-      streetAddress: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      phoneNumber: "",
-      emailAddress: "",
-    },
-    policyInfo: {
-      policyNumber: "",
-      insuranceCompanyName: "",
-    },
-  })
+  const [formData, setFormData] = useState<FormData>(initialFormData)
 
   const updateFormData = (newData: Partial<FormData>) => {
     setFormData((prev) => ({
@@ -58,23 +60,42 @@ export default function IllustrationRequest() {
   const nextStep = () => {
     setStep((prev) => prev + 1)
   }
-  const prevStep = () => setStep((prevStep) => prevStep - 1)
+
+  const prevStep = () => {
+    setStep((prev) => prev - 1)
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-blue-100/50">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-[#4B6FEE] mb-8 text-center">Request an In-Force Illustration</h1>
-        <ProgressIndicator currentStep={step} totalSteps={3} />
-        {step === 1 && <TypeSelection formData={formData} updateFormData={updateFormData} nextStep={nextStep} />}
-        {step === 2 && (
-          <InformationCollection
-            formData={formData}
-            updateFormData={updateFormData}
-            nextStep={nextStep}
-            prevStep={prevStep}
-          />
-        )}
-        {step === 3 && <ReviewAndDownload formData={formData} prevStep={prevStep} />}
+    <div className="min-h-screen bg-gray-50/50 py-8 px-4">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <h1 className="text-4xl font-bold text-[#4B6FEE] text-center">Request an In-Force Illustration</h1>
+
+        <div className="flex justify-center items-center gap-4 mb-8">
+          {[1, 2, 3].map((num) => (
+            <div key={num} className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                  ${step === num ? "bg-[#4B6FEE] text-white" : "bg-gray-200 text-gray-600"}`}
+              >
+                {num}
+              </div>
+              {num < 3 && <div className="w-16 h-0.5 mx-2 bg-gray-200" />}
+            </div>
+          ))}
+        </div>
+
+        <Card className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+          {step === 1 && <TypeSelection formData={formData} updateFormData={updateFormData} nextStep={nextStep} />}
+          {step === 2 && (
+            <InformationCollection
+              formData={formData}
+              updateFormData={updateFormData}
+              nextStep={nextStep}
+              prevStep={prevStep}
+            />
+          )}
+          {step === 3 && <ReviewAndDownload formData={formData} prevStep={prevStep} />}
+        </Card>
       </div>
     </div>
   )
