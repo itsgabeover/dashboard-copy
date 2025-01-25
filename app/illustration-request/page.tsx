@@ -91,7 +91,7 @@ export default function IllustrationRequest() {
           ))}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 relative">
           {step === 1 && <TypeSelection formData={formData} updateFormData={updateFormData} nextStep={nextStep} />}
           {step === 2 && (
             <InformationCollection
