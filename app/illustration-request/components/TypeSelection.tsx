@@ -75,7 +75,7 @@ export default function TypeSelection({ formData, updateFormData, nextStep }: Ty
           no cost to help you understand your coverage better.
         </CardDescription>
         <CardDescription className="mt-4">
-          First, let's choose the type of illustration that best fits your needs.
+          First, let&apos;s choose the type of illustration that best fits your needs.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -119,5 +119,4 @@ export default function TypeSelection({ formData, updateFormData, nextStep }: Ty
     </Card>
   )
 }
-
 
