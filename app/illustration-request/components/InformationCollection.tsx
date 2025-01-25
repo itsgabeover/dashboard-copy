@@ -7,6 +7,7 @@ import { Input } from "../../../components/ui/input"
 import { Label } from "../../../components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select"
 import { ArrowLeft, ArrowRight, User, Building2, Phone, Mail, MapPin } from "lucide-react"
+import HomeButton from "./HomeButton"
 
 const states = [
   "AL",
@@ -162,7 +163,8 @@ export default function InformationCollection({
   }
 
   return (
-    <div className="p-8">
+    <div className="relative p-8">
+      <HomeButton />
       <div className="max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold text-center text-[#4B6FEE] mb-4">Add Your Information</h2>
 
@@ -248,9 +250,9 @@ export default function InformationCollection({
                   <SelectTrigger className={errors.state ? "border-red-500" : ""}>
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     {states.map((state) => (
-                      <SelectItem key={state} value={state}>
+                      <SelectItem key={state} value={state} className="hover:bg-gray-100">
                         {state}
                       </SelectItem>
                     ))}
@@ -378,9 +380,9 @@ export default function InformationCollection({
                   <SelectTrigger className="bg-white">
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     {states.map((state) => (
-                      <SelectItem key={state} value={state}>
+                      <SelectItem key={state} value={state} className="hover:bg-gray-100">
                         {state}
                       </SelectItem>
                     ))}
