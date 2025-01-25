@@ -1,5 +1,6 @@
 "use client"
 
+import type React from "react"
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
 import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group"
@@ -12,7 +13,7 @@ interface IllustrationType {
   id: string
   title: string
   description: string
-  icon: JSX.Element
+  icon: React.ReactNode
   tooltip?: string
 }
 
