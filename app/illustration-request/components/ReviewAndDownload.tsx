@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Download, Printer, Send, CheckCircle, Loader2 } from "lucide-react"
@@ -79,9 +78,9 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
     yPos += lineHeight * 2
 
     // Subject Line
-    doc.setFont(undefined, 'bold')
+    doc.setFont(undefined, "bold")
     doc.text("RE: In-Force Illustration Request", 20, yPos)
-    doc.setFont(undefined, 'normal')
+    doc.setFont(undefined, "normal")
     yPos += lineHeight
     doc.text(`Policy Number: ${formData.policyInfo.policyNumber}`, 20, yPos)
     yPos += lineHeight * 2
@@ -91,7 +90,8 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
     yPos += lineHeight * 2
 
     // Body
-    const bodyText = "I am requesting an in-force illustration for the above-referenced life insurance policy. Please provide the following analysis:"
+    const bodyText =
+      "I am requesting an in-force illustration for the above-referenced life insurance policy. Please provide the following analysis:"
     const wrappedBody = doc.splitTextToSize(bodyText, 170)
     doc.text(wrappedBody, 20, yPos)
     yPos += wrappedBody.length * lineHeight + lineHeight
@@ -112,11 +112,7 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
     yPos += lineHeight
     doc.text(formData.ownerInfo.streetAddress, 20, yPos)
     yPos += lineHeight
-    doc.text(
-      `${formData.ownerInfo.city}, ${formData.ownerInfo.state} ${formData.ownerInfo.zipCode}`,
-      20,
-      yPos
-    )
+    doc.text(`${formData.ownerInfo.city}, ${formData.ownerInfo.state} ${formData.ownerInfo.zipCode}`, 20, yPos)
     yPos += lineHeight
 
     if (formData.ownerInfo.phoneNumber) {
@@ -167,18 +163,13 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div>
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="space-y-6">
-          <CardTitle className="text-3xl font-bold text-center text-[#4B6FEE]">
-            Review Your Request Letter
-          </CardTitle>
+          <CardTitle className="text-3xl font-bold text-center text-[#4B6FEE]">Review Your Request Letter</CardTitle>
           <CardDescription className="text-lg text-center max-w-2xl mx-auto">
-            Here&apos;s your completed in-force illustration request letter. Review it to make sure everything is correct.
+            Here&apos;s your completed in-force illustration request letter. Review it to make sure everything is
+            correct.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -199,12 +190,10 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
                 <div className="mt-6">
                   <p>Dear Policy Services Representative:</p>
                   <p className="mt-4">
-                    I am requesting an in-force illustration for the above-referenced life insurance policy. 
-                    Please provide the following analysis:
+                    I am requesting an in-force illustration for the above-referenced life insurance policy. Please
+                    provide the following analysis:
                   </p>
-                  <p className="mt-4 pl-4 border-l-4 border-[#4B6FEE] bg-blue-50/30 p-4">
-                    {getIllustrationType()}
-                  </p>
+                  <p className="mt-4 pl-4 border-l-4 border-[#4B6FEE] bg-blue-50/30 p-4">{getIllustrationType()}</p>
                   <p className="mt-4">
                     Please include both guaranteed and non-guaranteed projections based on current assumptions.
                   </p>
@@ -224,20 +213,13 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
                   </div>
                 </div>
                 <p className="mt-6">
-                  I understand this illustration will be based on current policy values and assumptions that 
-                  are not guaranteed.
+                  I understand this illustration will be based on current policy values and assumptions that are not
+                  guaranteed.
                 </p>
                 <div className="mt-6">
                   <p>Sincerely,</p>
                   <div className="mt-8">
-                    <p className="border-b border-gray-400 w-48">
-                      &nbsp;
-                    </p>
-                    <p>
-                      {formData.ownerInfo.firstNameLet me continue from the exact cut off point:
-
-```tsx
-p>
+                    <p className="border-b border-gray-400 w-48">&nbsp;</p>
                     <p>
                       {formData.ownerInfo.firstName} {formData.ownerInfo.lastName}
                     </p>
@@ -261,8 +243,14 @@ p>
                   { icon: <Printer className="h-5 w-5" />, text: "Print your letter" },
                   { icon: <Send className="h-5 w-5" />, text: "Sign and date it" },
                   { icon: <Send className="h-5 w-5" />, text: "Send it to your insurance company" },
-                  { icon: <Loader2 className="h-5 w-5" />, text: "The company will process your request (response times vary)" },
-                  { icon: <CheckCircle className="h-5 w-5" />, text: "You'll receive a detailed projection of your policy's performance" },
+                  {
+                    icon: <Loader2 className="h-5 w-5" />,
+                    text: "The company will process your request (response times vary)",
+                  },
+                  {
+                    icon: <CheckCircle className="h-5 w-5" />,
+                    text: "You'll receive a detailed projection of your policy's performance",
+                  },
                   { icon: <CheckCircle className="h-5 w-5" />, text: "This service is provided at no cost" },
                 ].map((step, index) => (
                   <li key={index} className="flex items-center gap-3">
@@ -277,11 +265,7 @@ p>
 
             {/* Action Buttons */}
             <div className="flex justify-between items-center pt-6">
-              <Button
-                onClick={prevStep}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
+              <Button onClick={prevStep} variant="outline" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Edit Information
               </Button>
@@ -290,7 +274,7 @@ p>
                 disabled={isDownloading}
                 className={`bg-[#4B6FEE] hover:bg-blue-600 text-white px-8 py-6 rounded-full text-lg font-semibold 
                   transition-all duration-300 hover:transform hover:scale-105 flex items-center gap-2
-                  ${downloadComplete ? 'bg-green-500 hover:bg-green-600' : ''}`}
+                  ${downloadComplete ? "bg-green-500 hover:bg-green-600" : ""}`}
               >
                 {isDownloading ? (
                   <>
@@ -313,7 +297,7 @@ p>
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   )
 }
 
