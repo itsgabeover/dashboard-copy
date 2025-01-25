@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { Button } from "../../../components/ui/button"
-import { ArrowLeft, Download, Printer, Send, CheckCircle, Loader2 } from "lucide-react"
+import { ArrowLeft, Download, CheckCircle, Loader2 } from "lucide-react"
 
 interface FormData {
   illustrationType: string
