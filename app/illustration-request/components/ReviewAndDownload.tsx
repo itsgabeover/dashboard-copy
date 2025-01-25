@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { Button } from "../../../components/ui/button"
 import { ArrowLeft, Download, CheckCircle, Loader2 } from "lucide-react"
+import HomeButton from "./HomeButton"
 
 interface FormData {
   illustrationType: string
@@ -87,7 +88,8 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
   }
 
   return (
-    <div className="p-8">
+    <div className="relative p-8">
+      <HomeButton />
       <div className="max-w-2xl mx-auto space-y-8">
         <h2 className="text-2xl font-bold text-center text-[#4B6FEE]">Review Your Request Letter</h2>
 
