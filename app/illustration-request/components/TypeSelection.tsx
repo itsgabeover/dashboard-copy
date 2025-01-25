@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Card, CardContent } from "../../../components/ui/card"
 import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
@@ -58,15 +57,15 @@ export default function TypeSelection({ formData, updateFormData, nextStep }: Ty
 
   return (
     <div className="p-8">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <h2 className="text-2xl font-bold text-center text-[#4B6FEE]">Type Selection</h2>
+      <div className="max-w-2xl mx-auto">
+        <h2 className="text-2xl font-bold text-center text-[#4B6FEE] mb-4">Type Selection</h2>
 
-        <p className="text-gray-600 text-center">
+        <p className="text-gray-600 text-center mb-6">
           An in-force illustration (IFL) shows you exactly how your life insurance policy is performing and what to
           expect in the future. Think of it as a detailed forecast of your policy.
         </p>
 
-        <p className="text-[#4B6FEE] text-center font-medium">
+        <p className="text-[#4B6FEE] text-center font-medium mb-6">
           Choose the type of illustration that best fits your needs:
         </p>
 
