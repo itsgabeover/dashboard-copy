@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -261,7 +260,7 @@ export default function InformationCollection({
   ]
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+    <div>
       <Card className="w-full max-w-4xl mx-auto">
         <CardHeader className="space-y-6">
           <CardTitle className="text-3xl font-bold text-center text-[#4B6FEE]">Add Your Information</CardTitle>
@@ -273,12 +272,7 @@ export default function InformationCollection({
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-8">
             {formSections.map((section) => (
-              <motion.div
-                key={section.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
+              <div key={section.title}>
                 <div className="mb-6">
                   <div className="flex items-center gap-2 mb-6">
                     {section.icon}
@@ -335,7 +329,7 @@ export default function InformationCollection({
                     ))}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
             <div className="flex justify-between pt-6">
               <Button type="button" variant="outline" onClick={prevStep} className="flex items-center gap-2">
@@ -353,7 +347,7 @@ export default function InformationCollection({
           </form>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   )
 }
 
