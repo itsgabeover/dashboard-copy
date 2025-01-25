@@ -72,7 +72,7 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
     setIsDownloading(true)
     try {
       const doc = generatePDF()
-      const fileName = `illustration_request_${formData.policyNumber}.pdf`
+      const fileName = `illustration_request_${formData.policyInfo.policyNumber}.pdf`
       doc.save(fileName)
       setDownloadComplete(true)
       setTimeout(() => setDownloadComplete(false), 3000)
