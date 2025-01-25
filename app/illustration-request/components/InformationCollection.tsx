@@ -75,6 +75,10 @@ interface FormData {
   policyInfo: {
     policyNumber: string
     insuranceCompanyName: string
+    insuranceCompanyAddress: string
+    insuranceCompanyCity: string
+    insuranceCompanyState: string
+    insuranceCompanyZip: string
   }
 }
 
@@ -335,6 +339,65 @@ export default function InformationCollection({
                   className={errors.insuranceCompanyName ? "border-red-500" : ""}
                 />
                 {errors.insuranceCompanyName && <p className="text-red-500 text-sm">{errors.insuranceCompanyName}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="insuranceCompanyAddress" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  Insurance Company Address
+                </Label>
+                <Input
+                  id="insuranceCompanyAddress"
+                  value={localFormData.policyInfo.insuranceCompanyAddress}
+                  onChange={(e) => handleInputChange("policyInfo", "insuranceCompanyAddress", e.target.value)}
+                  placeholder="[Insurance Company Address]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="insuranceCompanyCity" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  City
+                </Label>
+                <Input
+                  id="insuranceCompanyCity"
+                  value={localFormData.policyInfo.insuranceCompanyCity}
+                  onChange={(e) => handleInputChange("policyInfo", "insuranceCompanyCity", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="insuranceCompanyState" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  State
+                </Label>
+                <Select
+                  value={localFormData.policyInfo.insuranceCompanyState}
+                  onValueChange={(value) => handleInputChange("policyInfo", "insuranceCompanyState", value)}
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {states.map((state) => (
+                      <SelectItem key={state} value={state}>
+                        {state}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="insuranceCompanyZip" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  ZIP Code
+                </Label>
+                <Input
+                  id="insuranceCompanyZip"
+                  value={localFormData.policyInfo.insuranceCompanyZip}
+                  onChange={(e) => handleInputChange("policyInfo", "insuranceCompanyZip", e.target.value)}
+                />
               </div>
             </div>
           </div>
