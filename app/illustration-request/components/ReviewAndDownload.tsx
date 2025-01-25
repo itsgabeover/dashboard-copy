@@ -1,9 +1,11 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useRef } from "react"
 import { Button } from "../../../components/ui/button"
 import { ArrowLeft, Download, CheckCircle, Loader2 } from "lucide-react"
 import HomeButton from "./HomeButton"
+import { toPng } from "html-to-image"
+import { jsPDF } from "jspdf"
 
 interface FormData {
   illustrationType: string
@@ -36,6 +38,7 @@ interface ReviewAndDownloadProps {
 export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownloadProps) {
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadComplete, setDownloadComplete] = useState(false)
+  const letterRef = useRef<HTMLDivElement>(null)
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -63,12 +66,34 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
   }
 
   const handleDownload = async () => {
+    if (!letterRef.current) return
+
     setIsDownloading(true)
-    // Simulated download process
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsDownloading(false)
-    setDownloadComplete(true)
-    setTimeout(() => setDownloadComplete(false), 3000)
+    try {
+      // Convert the letter div to an image
+      const dataUrl = await toPng(letterRef.current, { quality: 0.95 })
+
+      // Create a new PDF
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [800, 1100], // Adjust size as needed
+      })
+
+      // Add the image to the PDF
+      pdf.addImage(dataUrl, "PNG", 20, 20, 760, 1060)
+
+      // Download the PDF
+      pdf.save(`illustration-request-${formData.policyInfo.policyNumber}.pdf`)
+
+      setDownloadComplete(true)
+      setTimeout(() => setDownloadComplete(false), 3000)
+    } catch (error) {
+      console.error("Error generating PDF:", error)
+      alert("There was an error generating your PDF. Please try again.")
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   const formatAddress = () => {
@@ -101,7 +126,7 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
           Here&apos;s your completed in-force illustration request letter. Review it to make sure everything is correct.
         </p>
 
-        <div className="bg-white p-8 rounded-lg border border-gray-200 shadow-sm space-y-6">
+        <div ref={letterRef} className="bg-white p-8 rounded-lg border border-gray-200 shadow-sm space-y-6">
           <p className="text-gray-600">{formatDate(new Date())}</p>
 
           <div>
