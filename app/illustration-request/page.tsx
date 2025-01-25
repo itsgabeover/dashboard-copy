@@ -1,12 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import dynamic from "next/dynamic"
-import { Card } from "../../components/ui/card"
-
-const TypeSelection = dynamic(() => import("./components/TypeSelection"))
-const InformationCollection = dynamic(() => import("./components/InformationCollection"))
-const ReviewAndDownload = dynamic(() => import("./components/ReviewAndDownload"))
+import TypeSelection from "./components/TypeSelection"
+import InformationCollection from "./components/InformationCollection"
+import ReviewAndDownload from "./components/ReviewAndDownload"
 
 interface FormData {
   illustrationType: string
@@ -66,9 +63,9 @@ export default function IllustrationRequest() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <h1 className="text-4xl font-bold text-[#4B6FEE] text-center">Request an In-Force Illustration</h1>
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-[#4B6FEE] text-center mb-8">Request an In-Force Illustration</h1>
 
         <div className="flex justify-center items-center gap-4 mb-8">
           {[1, 2, 3].map((num) => (
@@ -79,12 +76,12 @@ export default function IllustrationRequest() {
               >
                 {num}
               </div>
-              {num < 3 && <div className="w-16 h-0.5 mx-2 bg-gray-200" />}
+              {num < 3 && <div className={`w-16 h-0.5 ${num < step ? "bg-[#4B6FEE]" : "bg-gray-200"}`} />}
             </div>
           ))}
         </div>
 
-        <Card className="bg-white shadow-sm border border-gray-100 rounded-lg overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100">
           {step === 1 && <TypeSelection formData={formData} updateFormData={updateFormData} nextStep={nextStep} />}
           {step === 2 && (
             <InformationCollection
@@ -95,7 +92,7 @@ export default function IllustrationRequest() {
             />
           )}
           {step === 3 && <ReviewAndDownload formData={formData} prevStep={prevStep} />}
-        </Card>
+        </div>
       </div>
     </div>
   )
