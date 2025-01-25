@@ -1,10 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Button } from "../../../components/ui/button"
 import { ArrowLeft, Download, Printer, Send, CheckCircle, Loader2 } from "lucide-react"
-import { jsPDF } from "jspdf"
 
 interface FormData {
   illustrationType: string
@@ -60,91 +59,13 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
   }
 
   const generatePDF = () => {
-    const doc = new jsPDF()
-    const lineHeight = 7
-    let yPos = 20
-
-    // Header
-    doc.setFontSize(12)
-    doc.text(formatDate(new Date()), 20, yPos)
-    yPos += lineHeight * 2
-
-    // Insurance Company Info
-    doc.text(formData.policyInfo.insuranceCompanyName, 20, yPos)
-    yPos += lineHeight
-    doc.text("[Insurance Company Address]", 20, yPos)
-    yPos += lineHeight
-    doc.text("[City, State ZIP]", 20, yPos)
-    yPos += lineHeight * 2
-
-    // Subject Line
-    doc.setFont(undefined, "bold")
-    doc.text("RE: In-Force Illustration Request", 20, yPos)
-    doc.setFont(undefined, "normal")
-    yPos += lineHeight
-    doc.text(`Policy Number: ${formData.policyInfo.policyNumber}`, 20, yPos)
-    yPos += lineHeight * 2
-
-    // Salutation
-    doc.text("Dear Policy Services Representative:", 20, yPos)
-    yPos += lineHeight * 2
-
-    // Body
-    const bodyText =
-      "I am requesting an in-force illustration for the above-referenced life insurance policy. Please provide the following analysis:"
-    const wrappedBody = doc.splitTextToSize(bodyText, 170)
-    doc.text(wrappedBody, 20, yPos)
-    yPos += wrappedBody.length * lineHeight + lineHeight
-
-    const illustrationType = getIllustrationType()
-    const wrappedType = doc.splitTextToSize(illustrationType, 170)
-    doc.text(wrappedType, 20, yPos)
-    yPos += wrappedType.length * lineHeight + lineHeight
-
-    const projections = "Please include both guaranteed and non-guaranteed projections based on current assumptions."
-    doc.text(projections, 20, yPos)
-    yPos += lineHeight * 2
-
-    // Mailing Address
-    doc.text("Please send the illustration to:", 20, yPos)
-    yPos += lineHeight
-    doc.text(`${formData.ownerInfo.firstName} ${formData.ownerInfo.lastName}`, 20, yPos)
-    yPos += lineHeight
-    doc.text(formData.ownerInfo.streetAddress, 20, yPos)
-    yPos += lineHeight
-    doc.text(`${formData.ownerInfo.city}, ${formData.ownerInfo.state} ${formData.ownerInfo.zipCode}`, 20, yPos)
-    yPos += lineHeight
-
-    if (formData.ownerInfo.phoneNumber) {
-      doc.text(`Phone: ${formData.ownerInfo.phoneNumber}`, 20, yPos)
-      yPos += lineHeight
+    // Simulated PDF generation
+    console.log("Generating PDF with the following data:", formData)
+    return {
+      save: (fileName: string) => {
+        console.log(`Saving PDF as ${fileName}`)
+      },
     }
-    if (formData.ownerInfo.emailAddress) {
-      doc.text(`Email: ${formData.ownerInfo.emailAddress}`, 20, yPos)
-      yPos += lineHeight
-    }
-
-    yPos += lineHeight
-
-    // Disclaimer
-    const disclaimer =
-      "I understand this illustration will be based on current policy values and assumptions that are not guaranteed."
-    const wrappedDisclaimer = doc.splitTextToSize(disclaimer, 170)
-    doc.text(wrappedDisclaimer, 20, yPos)
-    yPos += wrappedDisclaimer.length * lineHeight * 2
-
-    // Signature
-    doc.text("Sincerely,", 20, yPos)
-    yPos += lineHeight * 3
-    doc.text("____________________", 20, yPos)
-    yPos += lineHeight
-    doc.text(`${formData.ownerInfo.firstName} ${formData.ownerInfo.lastName}`, 20, yPos)
-    yPos += lineHeight
-    doc.text("Policy Owner", 20, yPos)
-    yPos += lineHeight * 2
-    doc.text("Date: ____________________", 20, yPos)
-
-    return doc
   }
 
   const handleDownload = async () => {
