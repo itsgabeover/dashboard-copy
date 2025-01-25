@@ -1,13 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
+import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group"
+import { Label } from "../../../components/ui/label"
+import { Input } from "../../../components/ui/input"
+import { Button } from "../../../components/ui/button"
 import { FileText, ArrowRight, HelpCircle } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface IllustrationType {
   id: string
@@ -91,56 +90,43 @@ export default function TypeSelection({ formData, updateFormData, nextStep }: Ty
           <form onSubmit={handleSubmit} className="space-y-6">
             <RadioGroup value={selectedType} onValueChange={setSelectedType} className="grid gap-4">
               {illustrationTypes.map((type) => (
-                <TooltipProvider key={type.id}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="relative">
-                        <div>
-                          <div
-                            className={`
-                            flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer
-                            ${selectedType === type.id ? "border-[#4B6FEE] bg-blue-50/50" : "border-gray-200"}
-                            hover:border-[#4B6FEE] hover:bg-blue-50/30 transition-all duration-200
-                          `}
-                          >
-                            <RadioGroupItem value={type.id} id={type.id} className="mt-1" />
-                            <div className="flex-1 space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Label htmlFor={type.id} className="text-lg font-semibold cursor-pointer">
-                                  {type.title}
-                                </Label>
-                                {type.tooltip && <HelpCircle className="h-4 w-4 text-gray-400" />}
-                              </div>
-                              <p className="text-gray-600">{type.description}</p>
-                              {type.id === "minimum" && selectedType === "minimum" && (
-                                <div className="pt-4">
-                                  <Label htmlFor="minimumPremiumAge" className="text-sm font-medium block mb-2">
-                                    Until what age? (most people choose 95)
-                                  </Label>
-                                  <Input
-                                    type="number"
-                                    id="minimumPremiumAge"
-                                    value={minimumPremiumAge}
-                                    onChange={(e) => setMinimumPremiumAge(e.target.value)}
-                                    min={65}
-                                    max={121}
-                                    className="w-32"
-                                    placeholder="95"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
+                <div key={type.id}>
+                  <div
+                    className={`
+                    flex items-start space-x-4 p-6 rounded-lg border-2 cursor-pointer
+                    ${selectedType === type.id ? "border-[#4B6FEE] bg-blue-50/50" : "border-gray-200"}
+                    hover:border-[#4B6FEE] hover:bg-blue-50/30 transition-all duration-200
+                  `}
+                  >
+                    <RadioGroupItem value={type.id} id={type.id} className="mt-1" />
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Label htmlFor={type.id} className="text-lg font-semibold cursor-pointer">
+                          {type.title}
+                        </Label>
+                        {type.tooltip && <HelpCircle className="h-4 w-4 text-gray-400" />}
                       </div>
-                    </TooltipTrigger>
-                    {type.tooltip && (
-                      <TooltipContent side="right" className="max-w-xs">
-                        <p>{type.tooltip}</p>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
+                      <p className="text-gray-600">{type.description}</p>
+                      {type.id === "minimum" && selectedType === "minimum" && (
+                        <div className="pt-4">
+                          <Label htmlFor="minimumPremiumAge" className="text-sm font-medium block mb-2">
+                            Until what age? (most people choose 95)
+                          </Label>
+                          <Input
+                            type="number"
+                            id="minimumPremiumAge"
+                            value={minimumPremiumAge}
+                            onChange={(e) => setMinimumPremiumAge(e.target.value)}
+                            min={65}
+                            max={121}
+                            className="w-32"
+                            placeholder="95"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
               ))}
             </RadioGroup>
             <div className="flex justify-end pt-6">
