@@ -65,7 +65,9 @@ export default function IllustrationRequest() {
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-[#4B6FEE] text-center mb-8">Request an In-Force Illustration</h1>
+        <h1 className="text-4xl font-bold text-[#4B6FEE] text-center mb-8">
+          Create Your In-Force Illustration Request Document
+        </h1>
 
         <div className="flex justify-center items-center gap-4 mb-8">
           {[1, 2, 3].map((num) => (
