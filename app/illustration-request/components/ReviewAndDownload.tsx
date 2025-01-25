@@ -4,8 +4,6 @@ import React, { useState, useRef } from "react"
 import { Button } from "../../../components/ui/button"
 import { ArrowLeft, Download, CheckCircle, Loader2 } from "lucide-react"
 import HomeButton from "./HomeButton"
-import { toPng } from "html-to-image"
-import { jsPDF } from "jspdf"
 
 interface FormData {
   illustrationType: string
@@ -70,27 +68,70 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
 
     setIsDownloading(true)
     try {
-      // Convert the letter div to an image
-      const dataUrl = await toPng(letterRef.current, { quality: 0.95 })
+      // Get the letter content
+      const letterContent = letterRef.current.innerHTML
 
-      // Create a new PDF
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "px",
-        format: [800, 1100], // Adjust size as needed
-      })
+      // Create a new document with proper styling
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Illustration Request</title>
+          <style>
+            body {
+              font-family: system-ui, -apple-system, sans-serif;
+              line-height: 1.5;
+              padding: 40px;
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            .letter-content {
+              background: white;
+              padding: 32px;
+            }
+            .space-y-6 > * + * {
+              margin-top: 1.5rem;
+            }
+            .highlight {
+              border-left: 4px solid #4B6FEE;
+              background-color: rgba(75, 111, 238, 0.1);
+              padding: 1rem;
+              margin: 1rem 0;
+            }
+            .mt-4 { margin-top: 1rem; }
+            .mt-8 { margin-top: 2rem; }
+            .font-medium { font-weight: 500; }
+            .text-gray-600 { color: #4B5563; }
+            .pl-4 { padding-left: 1rem; }
+          </style>
+        </head>
+        <body>
+          <div class="letter-content space-y-6">
+            ${letterContent}
+          </div>
+        </body>
+        </html>
+      `
 
-      // Add the image to the PDF
-      pdf.addImage(dataUrl, "PNG", 20, 20, 760, 1060)
+      // Create a Blob with the HTML content
+      const blob = new Blob([htmlContent], { type: "text/html" })
+      const url = URL.createObjectURL(blob)
 
-      // Download the PDF
-      pdf.save(`illustration-request-${formData.policyInfo.policyNumber}.pdf`)
+      // Create a download link and trigger it
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `illustration-request-${formData.policyInfo.policyNumber}.html`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
 
       setDownloadComplete(true)
       setTimeout(() => setDownloadComplete(false), 3000)
     } catch (error) {
-      console.error("Error generating PDF:", error)
-      alert("There was an error generating your PDF. Please try again.")
+      console.error("Error generating document:", error)
+      alert("There was an error generating your document. Please try again.")
     } finally {
       setIsDownloading(false)
     }
