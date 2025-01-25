@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card"
+import React, { useState } from "react"
 import { Button } from "../../../components/ui/button"
 import { ArrowLeft, Download, Printer, Send, CheckCircle, Loader2 } from "lucide-react"
 
@@ -49,175 +48,118 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
         return `Please provide an in-force illustration calculating the minimum premium required to keep this policy in-force to age ${formData.minimumPremiumAge}.`
       case "zero":
         return "Please provide an in-force illustration showing projected values with no further premium payments."
-      case "reduced":
-        return "Please provide an in-force illustration showing the reduced face amount that could be maintained with no further premium payments."
-      case "maximum":
-        return "Please provide an in-force illustration showing the maximum face amount that could be sustained using my current premium amount."
       default:
         return ""
     }
   }
 
-  const generatePDF = () => {
-    // Simulated PDF generation
-    console.log("Generating PDF with the following data:", formData)
-    return {
-      save: (fileName: string) => {
-        console.log(`Saving PDF as ${fileName}`)
-      },
-    }
-  }
-
   const handleDownload = async () => {
     setIsDownloading(true)
-    try {
-      const doc = generatePDF()
-      const fileName = `illustration_request_${formData.policyInfo.policyNumber}.pdf`
-      doc.save(fileName)
-      setDownloadComplete(true)
-      setTimeout(() => setDownloadComplete(false), 3000)
-    } catch (error) {
-      console.error("Error generating PDF:", error)
-    } finally {
-      setIsDownloading(false)
-    }
+    // Simulated download process
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    setIsDownloading(false)
+    setDownloadComplete(true)
+    setTimeout(() => setDownloadComplete(false), 3000)
   }
 
   return (
-    <div>
-      <Card className="w-full max-w-4xl mx-auto">
-        <CardHeader className="space-y-6">
-          <CardTitle className="text-3xl font-bold text-center text-[#4B6FEE]">Review Your Request Letter</CardTitle>
-          <CardDescription className="text-lg text-center max-w-2xl mx-auto">
-            Here&apos;s your completed in-force illustration request letter. Review it to make sure everything is
-            correct.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-8">
-            {/* Letter Preview */}
-            <div className="bg-white p-8 rounded-lg border border-gray-200 shadow-sm space-y-6">
-              <div className="prose max-w-none">
-                <p className="text-gray-600">{formatDate(new Date())}</p>
-                <div className="mt-6">
-                  <p className="font-medium">{formData.policyInfo.insuranceCompanyName}</p>
-                  <p className="text-gray-600">[Insurance Company Address]</p>
-                  <p className="text-gray-600">[City, State ZIP]</p>
-                </div>
-                <div className="mt-6">
-                  <p className="font-medium">RE: In-Force Illustration Request</p>
-                  <p className="text-gray-600">Policy Number: {formData.policyInfo.policyNumber}</p>
-                </div>
-                <div className="mt-6">
-                  <p>Dear Policy Services Representative:</p>
-                  <p className="mt-4">
-                    I am requesting an in-force illustration for the above-referenced life insurance policy. Please
-                    provide the following analysis:
-                  </p>
-                  <p className="mt-4 pl-4 border-l-4 border-[#4B6FEE] bg-blue-50/30 p-4">{getIllustrationType()}</p>
-                  <p className="mt-4">
-                    Please include both guaranteed and non-guaranteed projections based on current assumptions.
-                  </p>
-                </div>
-                <div className="mt-6">
-                  <p className="font-medium">Please send the illustration to:</p>
-                  <div className="mt-2 pl-4">
-                    <p>
-                      {formData.ownerInfo.firstName} {formData.ownerInfo.lastName}
-                    </p>
-                    <p>{formData.ownerInfo.streetAddress}</p>
-                    <p>
-                      {formData.ownerInfo.city}, {formData.ownerInfo.state} {formData.ownerInfo.zipCode}
-                    </p>
-                    {formData.ownerInfo.phoneNumber && <p>Phone: {formData.ownerInfo.phoneNumber}</p>}
-                    {formData.ownerInfo.emailAddress && <p>Email: {formData.ownerInfo.emailAddress}</p>}
-                  </div>
-                </div>
-                <p className="mt-6">
-                  I understand this illustration will be based on current policy values and assumptions that are not
-                  guaranteed.
-                </p>
-                <div className="mt-6">
-                  <p>Sincerely,</p>
-                  <div className="mt-8">
-                    <p className="border-b border-gray-400 w-48">&nbsp;</p>
-                    <p>
-                      {formData.ownerInfo.firstName} {formData.ownerInfo.lastName}
-                    </p>
-                    <p>Policy Owner</p>
-                  </div>
-                  <div className="mt-6">
-                    <p className="border-b border-gray-400 w-48">Date: </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <div className="p-8">
+      <div className="max-w-2xl mx-auto space-y-8">
+        <h2 className="text-2xl font-bold text-center text-[#4B6FEE]">Review Your Request Letter</h2>
 
-            {/* What Happens Next Section */}
-            <div className="bg-blue-50 p-8 rounded-lg border border-blue-200">
-              <h3 className="text-xl font-semibold mb-4 text-[#4B6FEE] flex items-center gap-2">
-                <CheckCircle className="h-6 w-6" />
-                What Happens Next
-              </h3>
-              <ol className="space-y-3 list-none">
-                {[
-                  { icon: <Printer className="h-5 w-5" />, text: "Print your letter" },
-                  { icon: <Send className="h-5 w-5" />, text: "Sign and date it" },
-                  { icon: <Send className="h-5 w-5" />, text: "Send it to your insurance company" },
-                  {
-                    icon: <Loader2 className="h-5 w-5" />,
-                    text: "The company will process your request (response times vary)",
-                  },
-                  {
-                    icon: <CheckCircle className="h-5 w-5" />,
-                    text: "You'll receive a detailed projection of your policy's performance",
-                  },
-                  { icon: <CheckCircle className="h-5 w-5" />, text: "This service is provided at no cost" },
-                ].map((step, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                      {step.icon}
-                    </div>
-                    <span className="text-gray-700">{step.text}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
+        <p className="text-gray-600 text-center">
+          Here&apos;s your completed in-force illustration request letter. Review it to make sure everything is correct.
+        </p>
 
-            {/* Action Buttons */}
-            <div className="flex justify-between items-center pt-6">
-              <Button onClick={prevStep} variant="outline" className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Edit Information
-              </Button>
-              <Button
-                onClick={handleDownload}
-                disabled={isDownloading}
-                className={`bg-[#4B6FEE] hover:bg-blue-600 text-white px-8 py-6 rounded-full text-lg font-semibold 
-                  transition-all duration-300 hover:transform hover:scale-105 flex items-center gap-2
-                  ${downloadComplete ? "bg-green-500 hover:bg-green-600" : ""}`}
-              >
-                {isDownloading ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Generating PDF...
-                  </>
-                ) : downloadComplete ? (
-                  <>
-                    <CheckCircle className="h-5 w-5" />
-                    Downloaded!
-                  </>
-                ) : (
-                  <>
-                    <Download className="h-5 w-5" />
-                    Download Letter
-                  </>
-                )}
-              </Button>
+        <div className="bg-white p-8 rounded-lg border border-gray-200 shadow-sm space-y-6">
+          <p className="text-gray-600">{formatDate(new Date())}</p>
+
+          <div>
+            <p className="font-medium">{formData.policyInfo.insuranceCompanyName}</p>
+            <p className="text-gray-600">[Insurance Company Address]</p>
+            <p className="text-gray-600">[City, State ZIP]</p>
+          </div>
+
+          <div>
+            <p className="font-medium">RE: In-Force Illustration Request</p>
+            <p className="text-gray-600">Policy Number: {formData.policyInfo.policyNumber}</p>
+          </div>
+
+          <div>
+            <p>Dear Policy Services Representative:</p>
+            <p className="mt-4">
+              I am requesting an in-force illustration for the above-referenced life insurance policy. Please provide
+              the following analysis:
+            </p>
+            <p className="mt-4 pl-4 border-l-4 border-[#4B6FEE] bg-blue-50/30 p-4">{getIllustrationType()}</p>
+            <p className="mt-4">
+              Please include both guaranteed and non-guaranteed projections based on current assumptions.
+            </p>
+          </div>
+
+          <div>
+            <p className="font-medium">Please send the illustration to:</p>
+            <div className="mt-2 pl-4">
+              <p>
+                {formData.ownerInfo.firstName} {formData.ownerInfo.lastName}
+              </p>
+              <p>{formData.ownerInfo.streetAddress}</p>
+              <p>
+                {formData.ownerInfo.city}, {formData.ownerInfo.state} {formData.ownerInfo.zipCode}
+              </p>
+              {formData.ownerInfo.phoneNumber && <p>Phone: {formData.ownerInfo.phoneNumber}</p>}
+              {formData.ownerInfo.emailAddress && <p>Email: {formData.ownerInfo.emailAddress}</p>}
             </div>
           </div>
-        </CardContent>
-      </Card>
+
+          <p>
+            I understand this illustration will be based on current policy values and assumptions that are not
+            guaranteed.
+          </p>
+
+          <div>
+            <p>Sincerely,</p>
+            <div className="mt-8">
+              <p className="border-b border-gray-400 w-48">&nbsp;</p>
+              <p>
+                {formData.ownerInfo.firstName} {formData.ownerInfo.lastName}
+              </p>
+              <p>Policy Owner</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center pt-6">
+          <Button onClick={prevStep} variant="outline" className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Edit Information
+          </Button>
+          <Button
+            onClick={handleDownload}
+            disabled={isDownloading}
+            className={`bg-[#4B6FEE] text-white px-8 py-2 rounded-full font-medium 
+              hover:bg-blue-600 transition-colors flex items-center gap-2
+              ${downloadComplete ? "bg-green-500 hover:bg-green-600" : ""}`}
+          >
+            {isDownloading ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Generating PDF...
+              </>
+            ) : downloadComplete ? (
+              <>
+                <CheckCircle className="h-5 w-5" />
+                Downloaded!
+              </>
+            ) : (
+              <>
+                <Download className="h-5 w-5" />
+                Download Letter
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
