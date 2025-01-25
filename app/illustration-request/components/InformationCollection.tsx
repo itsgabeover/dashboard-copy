@@ -114,8 +114,8 @@ export default function InformationCollection({
       <CardHeader>
         <CardTitle className="text-2xl">Add Your Information</CardTitle>
         <CardDescription>
-          Now let's create your request letter. Fill in your details below and we'll generate a professional letter for
-          your insurance company.
+          Now let&apos;s create your request letter. Fill in your details below and we&apos;ll generate a professional
+          letter for your insurance company.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -254,5 +254,4 @@ export default function InformationCollection({
     </Card>
   )
 }
-
 
