@@ -7,6 +7,7 @@ import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
 import { ArrowRight } from "lucide-react"
+import HomeButton from "./HomeButton"
 
 interface IllustrationType {
   id: string
@@ -62,7 +63,8 @@ export default function TypeSelection({ formData, updateFormData, nextStep }: Ty
   }
 
   return (
-    <div className="p-8">
+    <div className="relative p-8">
+      <HomeButton />
       <div className="max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold text-center text-[#4B6FEE] mb-4">Type Selection</h2>
 
