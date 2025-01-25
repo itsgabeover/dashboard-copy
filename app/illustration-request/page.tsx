@@ -21,6 +21,10 @@ interface FormData {
   policyInfo: {
     policyNumber: string
     insuranceCompanyName: string
+    insuranceCompanyAddress: string
+    insuranceCompanyCity: string
+    insuranceCompanyState: string
+    insuranceCompanyZip: string
   }
 }
 
@@ -40,6 +44,10 @@ const initialFormData: FormData = {
   policyInfo: {
     policyNumber: "",
     insuranceCompanyName: "",
+    insuranceCompanyAddress: "",
+    insuranceCompanyCity: "",
+    insuranceCompanyState: "",
+    insuranceCompanyZip: "",
   },
 }
 
