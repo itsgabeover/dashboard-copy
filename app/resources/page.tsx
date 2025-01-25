@@ -59,9 +59,9 @@ export default function ResourcesPage() {
       description: "New to policy reviews? Start here",
     },
     {
-      title: "Request Templates",
+      title: "Illustration Request",
       icon: FileText,
-      description: "Ready-to-use carrier request forms",
+      description: "Complete this form to obtain an in-force illustration",
     },
     {
       title: "Sample Reports",
@@ -198,46 +198,53 @@ export default function ResourcesPage() {
         },
       ],
     },
-   {
-category: "Understanding Results",
-questions: [
-{
-question: "How do I read my analysis?",
-answer: "Your analysis is organized into key sections covering Protection Overview, Policy Features, Benefits & Riders, and Management Strategy. Each section highlights Hidden Gems, Blind Spots, and Red Flags to help you understand your coverage.",
-},
-{
-question: "What are the key terms I should know?",
-answer: "Essential terms include Death Benefit (your policy's payout amount), Cash Value (your policy's accumulated value), Premium (your payment), and Riders (additional benefits). Each section of your analysis explains relevant terms in context.",
-},
-{
-question: "What actions should I take after receiving my results?",
-answer: "Review your policy's 'Key Takeaways' sections, note questions for your advisor, and focus on any Red Flags identified in the analysis. Pay special attention to premium payment requirements and guarantee provisions.",
-},
-],
-},
-   {
-category: "Working with Advisors",
-questions: [
-{
-question: "Can I share my analysis with my financial advisor?",
-answer: "Absolutely! While Insurance Planner AI provides data-driven insights, your financial advisor brings invaluable expertise to interpret these findings within your broader financial picture. We encourage sharing this analysis to spark meaningful discussions about your coverage.",
-},
-{
-question: "How can my advisor use this information?",
-answer: "Your advisor can use our AI-generated insights as a starting point to evaluate your coverage needs, assess policy performance, and align your insurance strategy with your financial goals. Remember: we provide analysis, but your advisor provides the professional guidance to act on these insights.",
-},
-{
-question: "Do you recommend specific advisors?",
-answer: "No - Insurance Planner AI is an analytical tool, not a advisory service. We never recommend, endorse, or replace financial advisors. Our role is to provide clear policy insights that enhance the valuable conversations you have with your trusted financial professional.",
-},
-],
-},
+    {
+      category: "Understanding Results",
+      questions: [
+        {
+          question: "How do I read my analysis?",
+          answer:
+            "Your analysis is organized into key sections covering Protection Overview, Policy Features, Benefits & Riders, and Management Strategy. Each section highlights Hidden Gems, Blind Spots, and Red Flags to help you understand your coverage.",
+        },
+        {
+          question: "What are the key terms I should know?",
+          answer:
+            "Essential terms include Death Benefit (your policy's payout amount), Cash Value (your policy's accumulated value), Premium (your payment), and Riders (additional benefits). Each section of your analysis explains relevant terms in context.",
+        },
+        {
+          question: "What actions should I take after receiving my results?",
+          answer:
+            "Review your policy's 'Key Takeaways' sections, note questions for your advisor, and focus on any Red Flags identified in the analysis. Pay special attention to premium payment requirements and guarantee provisions.",
+        },
+      ],
+    },
+    {
+      category: "Working with Advisors",
+      questions: [
+        {
+          question: "Can I share my analysis with my financial advisor?",
+          answer:
+            "Absolutely! While Insurance Planner AI provides data-driven insights, your financial advisor brings invaluable expertise to interpret these findings within your broader financial picture. We encourage sharing this analysis to spark meaningful discussions about your coverage.",
+        },
+        {
+          question: "How can my advisor use this information?",
+          answer:
+            "Your advisor can use our AI-generated insights as a starting point to evaluate your coverage needs, assess policy performance, and align your insurance strategy with your financial goals. Remember: we provide analysis, but your advisor provides the professional guidance to act on these insights.",
+        },
+        {
+          question: "Do you recommend specific advisors?",
+          answer:
+            "No - Insurance Planner AI is an analytical tool, not a advisory service. We never recommend, endorse, or replace financial advisors. Our role is to provide clear policy insights that enhance the valuable conversations you have with your trusted financial professional.",
+        },
+      ],
+    },
     {
       category: "Technical Support",
       questions: [
         {
           question: "How is my data kept secure?",
-          answer: "Our platform employs end-to-end TLS 1.2+ encryption with HTTPS enforcement across all system components, including client browsers, cloud services, and third-party API integrations, ensuring data security during transit.",
+          answer:
+            "Our platform employs end-to-end TLS 1.2+ encryption with HTTPS enforcement across all system components, including client browsers, cloud services, and third-party API integrations, ensuring data security during transit.",
         },
         {
           question: "What file formats do you accept?",
@@ -289,7 +296,7 @@ answer: "No - Insurance Planner AI is an analytical tool, not a advisory service
                   <CardTitle className="text-xl font-semibold mb-2">{tile.title}</CardTitle>
                   <CardDescription className="mb-4">{tile.description}</CardDescription>
                   <Button variant="outline" className="mt-auto">
-                    Learn More
+                    {tile.title === "Illustration Request" ? "Request Illustration" : "Learn More"}
                   </Button>
                 </CardContent>
               </Card>
