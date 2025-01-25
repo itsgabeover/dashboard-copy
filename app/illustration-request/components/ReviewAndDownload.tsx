@@ -20,6 +20,10 @@ interface FormData {
   policyInfo: {
     policyNumber: string
     insuranceCompanyName: string
+    insuranceCompanyAddress?: string
+    insuranceCompanyCity?: string
+    insuranceCompanyState?: string
+    insuranceCompanyZip?: string
   }
 }
 
@@ -62,6 +66,26 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
     setTimeout(() => setDownloadComplete(false), 3000)
   }
 
+  const formatAddress = () => {
+    if (!formData.policyInfo.insuranceCompanyAddress) return null
+
+    const parts = []
+    if (formData.policyInfo.insuranceCompanyAddress) {
+      parts.push(formData.policyInfo.insuranceCompanyAddress)
+    }
+
+    const cityStateZip = []
+    if (formData.policyInfo.insuranceCompanyCity) cityStateZip.push(formData.policyInfo.insuranceCompanyCity)
+    if (formData.policyInfo.insuranceCompanyState) cityStateZip.push(formData.policyInfo.insuranceCompanyState)
+    if (formData.policyInfo.insuranceCompanyZip) cityStateZip.push(formData.policyInfo.insuranceCompanyZip)
+
+    if (cityStateZip.length > 0) {
+      parts.push(cityStateZip.join(", "))
+    }
+
+    return parts
+  }
+
   return (
     <div className="p-8">
       <div className="max-w-2xl mx-auto space-y-8">
@@ -76,8 +100,11 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
 
           <div>
             <p className="font-medium">{formData.policyInfo.insuranceCompanyName}</p>
-            <p className="text-gray-600">[Insurance Company Address]</p>
-            <p className="text-gray-600">[City, State ZIP]</p>
+            {formatAddress()?.map((line, index) => (
+              <p key={index} className="text-gray-600">
+                {line}
+              </p>
+            ))}
           </div>
 
           <div>
