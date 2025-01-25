@@ -72,7 +72,7 @@ export const Hero: FC = () => {
                     <Zap className="w-8 h-8 text-[#4B6FEE]" aria-hidden="true" />
                   </div>
                   <h3 className="text-2xl md:text-3xl font-bold text-[#4B6FEE]">
-                   From Policy Confusion to Peace of Mind in Minutes
+                    From Policy Confusion to Peace of Mind in Minutes
                   </h3>
                   <p className="text-gray-700 text-lg leading-relaxed max-w-3xl">
                     Get clarity on what your life insurance actually provides – our AI transforms complex insurance
@@ -187,14 +187,9 @@ export const Hero: FC = () => {
           <h3 className="text-xl font-bold mb-4">Need Help?</h3>
           <p>
             Don&apos;t have an in-force illustration? Use{" "}
-            <a
-              href="/sample_reports/IFL_REQUEST_FORM.pdf"
-              target="_blank"
-              className="text-blue-500 hover:text-blue-700 underline"
-              rel="noreferrer"
-            >
+            <Link href="/illustration-request" className="text-blue-500 hover:text-blue-700 underline">
               this form
-            </a>{" "}
+            </Link>{" "}
             to obtain one.
           </p>
           <button
