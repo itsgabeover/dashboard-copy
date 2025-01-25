@@ -49,10 +49,15 @@ export default function IllustrationRequest() {
   })
 
   const updateFormData = (newData: Partial<FormData>) => {
-    setFormData((prevData) => ({ ...prevData, ...newData }))
+    setFormData((prev) => ({
+      ...prev,
+      ...newData,
+    }))
   }
 
-  const nextStep = () => setStep((prevStep) => prevStep + 1)
+  const nextStep = () => {
+    setStep((prev) => prev + 1)
+  }
   const prevStep = () => setStep((prevStep) => prevStep - 1)
 
   return (
