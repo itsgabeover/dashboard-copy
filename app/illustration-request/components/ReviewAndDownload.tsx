@@ -67,7 +67,7 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
       <CardHeader>
         <CardTitle className="text-2xl">Review Your Request Letter</CardTitle>
         <CardDescription>
-          Here's your completed in-force illustration request letter. Review it to make sure everything is correct.
+          Here&apos;s your completed in-force illustration request letter. Review it to make sure everything is correct.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -117,7 +117,7 @@ export default function ReviewAndDownload({ formData, prevStep }: ReviewAndDownl
               <li>Sign and date it</li>
               <li>Send it to your insurance company</li>
               <li>The company will process your request (response times vary)</li>
-              <li>You'll receive a detailed projection of your policy's performance</li>
+              <li>You&apos;ll receive a detailed projection of your policy&apos;s performance</li>
               <li>This service is provided at no cost</li>
             </ol>
           </div>
