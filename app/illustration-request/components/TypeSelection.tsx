@@ -6,13 +6,12 @@ import { RadioGroup, RadioGroupItem } from "../../../components/ui/radio-group"
 import { Label } from "../../../components/ui/label"
 import { Input } from "../../../components/ui/input"
 import { Button } from "../../../components/ui/button"
-import { HelpCircle, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 
 interface IllustrationType {
   id: string
   title: string
   description: string
-  tooltip?: string
 }
 
 const illustrationTypes: IllustrationType[] = [
@@ -20,19 +19,26 @@ const illustrationTypes: IllustrationType[] = [
     id: "current",
     title: "Current In-Force Illustration",
     description: "Shows how your policy performs if you continue your current premium payments.",
-    tooltip: "Most common request - gives you a clear picture of your policy's current path",
   },
   {
     id: "minimum",
     title: "Minimum Premium In-Force Illustration",
     description: "Calculates the smallest premium needed to maintain your coverage.",
-    tooltip: "Helpful if you're looking to reduce your payments",
   },
   {
     id: "zero",
     title: "Zero Premium In-Force Illustration",
     description: "Shows what happens if you stop paying premiums now.",
-    tooltip: "Understand your options if considering stopping payments",
+  },
+  {
+    id: "reduced",
+    title: "Reduced Coverage In-Force Illustration",
+    description: "Shows coverage you can keep without paying more premiums.",
+  },
+  {
+    id: "maximum",
+    title: "Maximum Coverage In-Force Illustration",
+    description: "Shows highest coverage possible with current premium.",
   },
 ]
 
@@ -74,19 +80,20 @@ export default function TypeSelection({ formData, updateFormData, nextStep }: Ty
             {illustrationTypes.map((type) => (
               <div
                 key={type.id}
-                className={`relative rounded-lg border p-4 transition-colors
-                  ${selectedType === type.id ? "border-[#4B6FEE] bg-blue-50/30" : "border-gray-200"}
+                className={`relative rounded-lg border-2 p-4 transition-colors cursor-pointer
+                  ${
+                    selectedType === type.id
+                      ? "border-[#4B6FEE] bg-blue-50/30"
+                      : "border-gray-200 hover:border-gray-300"
+                  }
                 `}
               >
                 <div className="flex items-start gap-4">
-                  <RadioGroupItem value={type.id} id={type.id} className="mt-1" />
+                  <RadioGroupItem value={type.id} id={type.id} className="mt-1 w-5 h-5 border-2" />
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Label htmlFor={type.id} className="text-lg font-semibold">
-                        {type.title}
-                      </Label>
-                      {type.tooltip && <HelpCircle className="h-4 w-4 text-gray-400" />}
-                    </div>
+                    <Label htmlFor={type.id} className="text-lg font-semibold">
+                      {type.title}
+                    </Label>
                     <p className="text-gray-600 mt-1">{type.description}</p>
                     {type.id === "minimum" && selectedType === "minimum" && (
                       <div className="mt-4">
