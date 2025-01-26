@@ -92,7 +92,7 @@ function OptionCard({ icon, title, description, onClick }: OptionCardProps) {
       <p className="mb-6 text-gray-600">{description}</p>
       <Button
         onClick={onClick}
-        className="mt-auto flex items-center justify-between bg-[#4B6FEE] hover:bg-[#4B6FEE]/90"
+        className="mt-auto flex items-center justify-between bg-[#4B6FEE] hover:bg-[#4B6FEE]/90 text-white"
       >
         Select
         <ArrowRight className="ml-2 h-4 w-4" />
@@ -257,7 +257,7 @@ export default function IllustrationHelper() {
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <Button onClick={() => setStep(2)} className="bg-[#4B6FEE] hover:bg-[#4B6FEE]/90">
+          <Button onClick={() => setStep(2)} className="bg-[#4B6FEE] hover:bg-[#4B6FEE]/90 text-white">
             Start Now <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           <Button variant="outline" className="gap-2" onClick={() => router.push("/")}>
