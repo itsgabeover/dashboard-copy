@@ -144,15 +144,12 @@ export const Hero: FC = () => {
                           <p className="text-gray-600">{item.description}</p>
                         </div>
                         {item.step === 1 && (
-                          <button
-                            onClick={() => {
-                              const modal = document.getElementById("helpModal")
-                              if (modal) modal.style.display = "block"
-                            }}
+                          <Link
+                            href="/illustration-helper"
                             className="text-blue-500 hover:text-blue-700 underline mt-4 inline-block"
                           >
                             Need help?
-                          </button>
+                          </Link>
                         )}
                       </CardContent>
                     </Card>
@@ -178,29 +175,6 @@ export const Hero: FC = () => {
               </Button>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Help Modal */}
-      <div id="helpModal" className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-        <div className="bg-white p-8 rounded-lg max-w-md">
-          <h3 className="text-xl font-bold mb-4">Need Help?</h3>
-          <p>
-            Don&apos;t have an in-force illustration? Use{" "}
-            <Link href="/illustration-request" className="text-blue-500 hover:text-blue-700 underline">
-              this form
-            </Link>{" "}
-            to obtain one.
-          </p>
-          <button
-            onClick={() => {
-              const modal = document.getElementById("helpModal")
-              if (modal) modal.style.display = "none"
-            }}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Close
-          </button>
         </div>
       </div>
 
