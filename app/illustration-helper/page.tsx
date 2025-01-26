@@ -164,26 +164,26 @@ export default function IllustrationHelper() {
     },
   }
 
-  const features: FeatureCardProps[] = [
+ const features: FeatureCardProps[] = [
     {
       icon: <CheckCircle className="h-5 w-5" />,
-      title: "Free for Policyowners",
-      description: "Available to all active policies",
-    },
-    {
-      icon: <Zap className="h-5 w-5" />,
-      title: "Current Performance",
-      description: "Shows your policy's current performance",
+      title: "Step 1: Pick Your Question",
+      description: `• "How is my policy really doing?"\n• Can I lower my payments?"\n• "What if I stop paying?"`,
     },
     {
       icon: <Shield className="h-5 w-5" />,
-      title: "Make Informed Decisions",
-      description: "Helps you make informed decisions",
+      title: "Step 2: Get Request Script",
+      description: `• We provide the exact words\n• Different script for each need\n• Insurance company knows what to send`,
     },
     {
       icon: <Clock className="h-5 w-5" />,
-      title: "Quick Turnaround",
-      description: "Usually arrives within 3-5 business days",
+      title: "Step 3: Follow Simple Steps",
+      description: `• Find your policy number\n• Choose how to contact insurer\n• Get document in 3-5 days`,
+    },
+    {
+      icon: <Zap className="h-5 w-5" />,
+      title: "Quick Results",
+      description: "Your policy illustration arrives in 3-5 business days",
     },
   ]
 
@@ -242,11 +242,11 @@ export default function IllustrationHelper() {
         <ProgressSteps currentStep={1} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">In-Force Illustration Request Helper</h1>
-          <p className="text-xl text-gray-600 mb-4">Get the right policy report from your insurance company</p>
+          <h1 className="text-4xl font-bold mb-3">How to Get Your Policy Illustration</h1>
+          <p className="text-xl text-gray-600 mb-4">Get the in-force illustration you need for your AI analysis</p>
           <p className="text-gray-600 max-w-3xl mx-auto">
-            An in-force illustration shows exactly how your policy is performing and what to expect in the future. Think
-            of it as a detailed forecast of your policy&apos;s health.
+           Tell us what's on your mind about your policy, and we'll help you get the right in-force illustration.
+          </p>
           </p>
         </div>
 
