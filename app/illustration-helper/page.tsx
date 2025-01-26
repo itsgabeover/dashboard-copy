@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Home,
@@ -63,13 +63,13 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
-    <div className="flex items-start gap-6 p-8 rounded-xl hover:bg-gray-50 transition-all duration-300">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[#4B6FEE]">
+    <div className="flex items-start gap-4 p-6">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#4B6FEE]/10 text-[#4B6FEE]">
         {icon}
       </div>
       <div>
-        <h3 className="text-xl font-semibold mb-2 text-gray-900">{title}</h3>
-        <p className="text-gray-600 text-lg leading-relaxed">{description}</p>
+        <h3 className="font-semibold">{title}</h3>
+        <p className="text-gray-600">{description}</p>
       </div>
     </div>
   )
@@ -238,7 +238,7 @@ export default function IllustrationHelper() {
 
   if (step === 1) {
     return (
-      <div className="container mx-auto px-6 py-16 max-w-5xl">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <ProgressSteps currentStep={1} />
 
         <div className="text-center mb-12">
@@ -250,25 +250,18 @@ export default function IllustrationHelper() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-12 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
           {features.map((feature, index) => (
             <FeatureCard key={index} {...feature} />
           ))}
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <Button
-            onClick={() => setStep(2)}
-            className="bg-[#4B6FEE] hover:bg-[#4B6FEE]/90 text-white font-medium px-8 py-6 rounded-full text-lg transition-all duration-300 hover:transform hover:scale-105 flex items-center gap-2"
-          >
-            Start Now <ArrowRight className="w-5 h-5" />
+          <Button onClick={() => setStep(2)} className="bg-[#4B6FEE] hover:bg-[#4B6FEE]/90">
+            Start Now <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <Button
-            variant="outline"
-            className="gap-2 px-6 py-3 rounded-full hover:bg-gray-50 flex items-center gap-2"
-            onClick={() => router.push("/")}
-          >
-            <Home className="w-4 h-4" /> Return to Home
+          <Button variant="outline" className="gap-2" onClick={() => router.push("/")}>
+            <Home className="h-4 w-4" /> Return to Home
           </Button>
         </div>
       </div>
@@ -277,7 +270,7 @@ export default function IllustrationHelper() {
 
   if (step === 2) {
     return (
-      <div className="container mx-auto px-6 py-16 max-w-5xl">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <ProgressSteps currentStep={2} />
 
         <div className="text-center mb-12">
@@ -292,19 +285,11 @@ export default function IllustrationHelper() {
         </div>
 
         <div className="flex justify-between">
-          <Button
-            variant="outline"
-            className="gap-2 px-6 py-3 rounded-full hover:bg-gray-50 flex items-center gap-2"
-            onClick={() => setStep(1)}
-          >
+          <Button variant="outline" className="gap-2" onClick={() => setStep(1)}>
             <ArrowLeft className="h-4 w-4" /> Back
           </Button>
-          <Button
-            variant="outline"
-            className="gap-2 px-6 py-3 rounded-full hover:bg-gray-50 flex items-center gap-2"
-            onClick={() => router.push("/")}
-          >
-            <Home className="w-4 h-4" /> Return to Home
+          <Button variant="outline" className="gap-2" onClick={() => router.push("/")}>
+            <Home className="h-4 w-4" /> Return to Home
           </Button>
         </div>
       </div>
@@ -315,7 +300,7 @@ export default function IllustrationHelper() {
   const content = results[selectedOption]
 
   return (
-    <div className="container mx-auto px-6 py-16 max-w-5xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <ProgressSteps currentStep={3} />
 
       <div className="text-center mb-8">
@@ -427,19 +412,11 @@ export default function IllustrationHelper() {
       </Card>
 
       <div className="flex justify-between mt-8">
-        <Button
-          variant="outline"
-          className="gap-2 px-6 py-3 rounded-full hover:bg-gray-50 flex items-center gap-2"
-          onClick={() => setStep(2)}
-        >
+        <Button variant="outline" className="gap-2" onClick={() => setStep(2)}>
           <ArrowLeft className="h-4 w-4" /> Back to Options
         </Button>
-        <Button
-          variant="outline"
-          className="gap-2 px-6 py-3 rounded-full hover:bg-gray-50 flex items-center gap-2"
-          onClick={() => router.push("/")}
-        >
-          <Home className="w-4 h-4" /> Return to Home
+        <Button variant="outline" className="gap-2" onClick={() => router.push("/")}>
+          <Home className="h-4 w-4" /> Return to Home
         </Button>
       </div>
     </div>
