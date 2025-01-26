@@ -63,14 +63,12 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
-    <div className="flex items-start gap-4 p-6">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#4B6FEE]/10 text-[#4B6FEE]">
+    <div className="flex flex-col items-start p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#4B6FEE]/10 text-[#4B6FEE] mb-4">
         {icon}
       </div>
-      <div>
-        <h3 className="font-semibold">{title}</h3>
-        <p className="text-gray-600">{description}</p>
-      </div>
+      <h3 className="text-xl font-semibold mb-2 text-gray-900">{title}</h3>
+      <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
   )
 }
@@ -166,25 +164,20 @@ export default function IllustrationHelper() {
 
   const features: FeatureCardProps[] = [
     {
-      icon: <CheckCircle className="h-5 w-5" />,
+      icon: <CheckCircle className="h-6 w-6" />,
       title: "Step 1: Pick Your Question",
-      description: '• "How is my policy really doing?"\n• "Can I lower my payments?"\n• "What if I stop paying?"',
+      description: "Choose from three simple options to get exactly what you need to know about your policy",
     },
     {
-      icon: <Shield className="h-5 w-5" />,
+      icon: <Shield className="h-6 w-6" />,
       title: "Step 2: Get Request Script",
       description:
-        "• We provide the exact words\n• Different script for each need\n• Insurance company knows what to send",
+        "Receive a pre-written script that ensures you get the right illustration from your insurance company",
     },
     {
-      icon: <Clock className="h-5 w-5" />,
+      icon: <Clock className="h-6 w-6" />,
       title: "Step 3: Follow Simple Steps",
-      description: "• Find your policy number\n• Choose how to contact insurer\n• Get document in 3-5 days",
-    },
-    {
-      icon: <Zap className="h-5 w-5" />,
-      title: "Quick Results",
-      description: "Your policy illustration arrives in 3-5 business days",
+      description: "Use your policy number and our guided process to submit your request and get your illustration",
     },
   ]
 
@@ -251,7 +244,9 @@ export default function IllustrationHelper() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          {" "}
+          {/* Updated grid layout */}
           {features.map((feature, index) => (
             <FeatureCard key={index} {...feature} />
           ))}
