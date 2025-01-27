@@ -134,7 +134,7 @@ export const Hero: FC = () => {
                               illustration
                               <HelpCircle className="w-4 h-4 ml-1 inline text-blue-500" />
                             </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
+                            <TooltipContent className="max-w-xs bg-white">
                               A free report showing your current policy details - available from your insurance company.
                               Just ask for an &apos;in-force illustration&apos;!
                             </TooltipContent>
@@ -147,13 +147,13 @@ export const Hero: FC = () => {
                     {
                       step: 2,
                       title: "AI Analysis",
-                      description: "Our AI analyzes your policy illustration details in minutes.",
+                      description: "Insurance Planner AI analyzes your illustration details in minutes.",
                       icon: <Upload className="w-6 h-6" />,
                     },
                     {
                       step: 3,
                       title: "Get Your Analysis",
-                      description: "Delivered to your inbox: summary and full 14-page analysis",
+                      description: "Delivered to your inbox: clear email summary and professional PDF report",
                       icon: <Zap className="w-6 h-6" />,
                     },
                   ].map((item, index) => (
