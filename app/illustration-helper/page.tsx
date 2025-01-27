@@ -129,35 +129,36 @@ export default function IllustrationHelper() {
         "Policy loan details (if you have any)",
         "All policy costs and charges",
       ],
-      script: "I am requesting a current in-force illustration for my policy. Please include:\n\n• Policy performance based on my current annual premium\n• Both guaranteed and non-guaranteed values\n• Cash value projections\n• Death benefit projections\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 95\n• Impact of any existing policy loans\n\nPlease make sure all values and projections match my current premium payment schedule.",
+      script:
+        "I am requesting a current in-force illustration for my policy. Please include:\n\n• Policy performance based on my current annual premium\n• Both guaranteed and non-guaranteed values\n• Cash value projections\n• Death benefit projections\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 95\n• Impact of any existing policy loans\n\nPlease make sure all values and projections match my current premium payment schedule.",
     },
     lower_premium: {
-      title: "Minimum Premium Illustration",
-      description: "This report will show options for maintaining coverage with lower payments",
+      title: "Lower Premium Illustration",
+      description: "See how reducing your premium affects your policy",
       items: [
-        "Minimum required premium to maintain coverage",
-        "Year-by-year breakdown of minimum premium amounts",
-        "Impact on cash value accumulation",
-        "Death benefit projections at minimum funding",
-        "Policy expense impact at minimum funding",
-        "Any potential risks of minimum funding",
+        "Your lowest possible premium to keep coverage",
+        "How your payments could change year by year",
+        "What happens to your policy's cash value",
+        "How your coverage amount may change",
+        "All costs and fees at lower funding",
+        "Important considerations and trade-offs",
       ],
       script:
-        "I am requesting a minimum premium in-force illustration. Please calculate the lowest possible premium amount needed to maintain the current death benefit until age 95. The illustration should show:\n1. The minimum annual premium required each year\n2. How this minimum funding affects the cash value\n3. Both guaranteed and non-guaranteed projections\n4. Any years where the minimum premium might need to be adjusted\nPlease note any assumptions used in calculating these minimums.",
+        "I am requesting a minimum premium in-force illustration for my policy. Please include:\n\n• The lowest premium amount needed to maintain my current death benefit\n• Year-by-year minimum premium requirements\n• Impact on cash value at minimum funding\n• Both guaranteed and non-guaranteed values\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 95\n• Any years requiring premium adjustments\n\nPlease note all assumptions used in these calculations.",
     },
     stop_paying: {
       title: "Zero Premium Illustration",
-      description: "This report will show what happens if you stop premium payments now",
+      description: "See exactly how long your policy can last without more payments",
       items: [
-        "Projected policy performance with no future premiums",
-        "Year-by-year cash value erosion",
-        "Projected year of policy lapse (if applicable)",
-        "Death benefit duration without premium",
-        "Impact on policy riders or benefits",
-        "Required cash value to sustain coverage",
+        "How your policy performs without future payments",
+        "Year-by-year changes to your policy's cash value",
+        "When your coverage might end (if it does)",
+        "How long your death benefit lasts",
+        "Changes to your policy's extra benefits",
+        "Cash value needed to keep coverage going",
       ],
       script:
-        "I am requesting a zero-premium in-force illustration. I need to see what happens if all premium payments stop immediately. Specifically, please show:\n1. How long the current death benefit can remain in force\n2. The year-by-year impact on cash value\n3. When the policy would lapse without additional premiums\n4. Both guaranteed and non-guaranteed scenarios\n5. Any impact on existing riders or benefits\nPlease project this to age 95 or until lapse, whichever comes first.",
+        "I am requesting a zero-premium in-force illustration for my policy. Please show what happens if I stop all premium payments now. Please include:\n\n• How long my current death benefit can continue\n• Year-by-year changes to the cash value\n• When the policy would end without more payments\n• Both guaranteed and non-guaranteed projections\n• Effects on any policy benefits or riders\n• All policy expenses and fees\n• Current interest rate assumptions\n\nPlease run this to age 95 or until the policy ends, whichever comes first.",
     },
   }
 
@@ -170,8 +171,7 @@ export default function IllustrationHelper() {
     {
       icon: <Shield className="h-6 w-6" />,
       title: "Then: Get Your Request Script",
-      description:
-        "We'll give you the exact words to use with your insurance company",
+      description: "We'll give you the exact words to use with your insurance company",
     },
     {
       icon: <Clock className="h-6 w-6" />,
@@ -207,7 +207,8 @@ export default function IllustrationHelper() {
       description: "Look for this on your policy statement or online account",
     },
     {
-      title: "Contact Your Insurance Company: [
+      title: "Contact Your Insurance Company",
+      description: [
         "Call: Use the phone number on your policy or statement",
         "Email: Contact your agent or the service department",
         "Online: Log into your insurance company's website",
@@ -219,10 +220,11 @@ export default function IllustrationHelper() {
     },
     {
       title: "What to expect",
-      description: "Your illustration should arrive within 3-5 business days",
-      "Expect your illustration within 3-5 business days",
-"You'll receive it by email or mail",
-"Once you have it, return here to upload",
+      description: [
+        "Expect your illustration within 3-5 business days",
+        "You'll receive it by email or mail",
+        "Once you have it, return here to upload",
+      ],
     },
   ]
 
@@ -238,15 +240,15 @@ export default function IllustrationHelper() {
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-3">How to Get Your Policy Illustration</h1>
-          <p className="text-xl text-gray-600 mb-4">We&apos;ll help you get the illustration needed for your AI analysis</p>
+          <p className="text-xl text-gray-600 mb-4">
+            We&apos;ll help you get the illustration needed for your AI analysis
+          </p>
           <p className="text-gray-600 max-w-3xl mx-auto">
             Tell us what matters to you, and we&apos;ll help you get the right illustration.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {" "}
-          {/* Updated grid layout */}
           {features.map((feature, index) => (
             <FeatureCard key={index} {...feature} />
           ))}
@@ -375,7 +377,6 @@ export default function IllustrationHelper() {
                       {index + 1}
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="font-medium">Step {index + 1}:</div>
                       <div className="font-medium">{step.title}</div>
                     </div>
                     {expandedStep === index ? (
