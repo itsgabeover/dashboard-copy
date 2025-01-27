@@ -280,7 +280,7 @@ export const Hero: FC = () => {
               {/* Sample Reports */}
               <div>
                 <div className="text-center mb-12 space-y-4">
-                  <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">Your AI Analysis Package</h2>
+                  <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">Your Insurance Planner AI Analysis Package</h2>
                   <p className="text-gray-600 text-lg">Comprehensive reports tailored to your needs</p>
                 </div>
 
@@ -353,7 +353,7 @@ export const Hero: FC = () => {
                     <div className="rounded-full bg-white/10 p-2 transition-transform duration-300 group-hover:scale-110">
                       <Zap className="w-8 h-8" />
                     </div>
-                    <h2 className="text-2xl md:text-3xl font-bold">Get Your Policy Analysis Now</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold">Get Your Insurance Planner AI Analysis Now</h2>
                   </div>
                   <p className="text-xl text-blue-100">From Policy Confusion to Peace of Mind in Minutes</p>
                 </CardHeader>
