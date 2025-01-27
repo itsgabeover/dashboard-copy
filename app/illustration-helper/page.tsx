@@ -165,8 +165,8 @@ export default function IllustrationHelper() {
   const features: FeatureCardProps[] = [
     {
       icon: <CheckCircle className="h-6 w-6" />,
-      title: "First: Pick Your Question",
-      description: "Choose what you want to know about your policy from three simple options",
+      title: "First: Tell Us What You Need",
+      description: "We'll help you get the right illustration from three simple options",
     },
     {
       icon: <Shield className="h-6 w-6" />,
@@ -272,8 +272,8 @@ export default function IllustrationHelper() {
         <ProgressSteps currentStep={2} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">What Would You Like to Know About Your Policy?</h1>
-          <p className="text-xl text-gray-600">Select what matters to you</p>
+          <h1 className="text-4xl font-bold mb-3">Which Type of Illustration Do You Need?</h1>
+          <p className="text-xl text-gray-600">Tell us what you want to learn about your policy</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
