@@ -116,13 +116,13 @@ export const Hero: FC = () => {
                 {[
                   {
                     step: 1,
-                    title: "Get Your Illustration",
-                    description: "Request an in-force policy illustration from your insurer.",
+                    title: "Upload & Email",
+                    description: "Upload your policy illustration and provide your email address.",
                     icon: <FileText className="w-6 h-6" />,
                   },
                   {
                     step: 2,
-                    title: "Upload & Analyze",
+                    title: "AI Analysis",
                     description: "Upload your illustration and our AI analyzes it in minutes.",
                     icon: <Upload className="w-6 h-6" />,
                   },
@@ -148,7 +148,7 @@ export const Hero: FC = () => {
                             href="/illustration-helper"
                             className="text-blue-500 hover:text-blue-700 underline mt-4 inline-block"
                           >
-                            Need help?
+                            Need help getting an illustration?
                           </Link>
                         )}
                       </CardContent>
