@@ -123,13 +123,13 @@ export const Hero: FC = () => {
                   {
                     step: 2,
                     title: "AI Analysis",
-                    description: "Upload your illustration and our AI analyzes it in minutes.",
+                    description: "Our AI analyzes your policy details in minutes.",
                     icon: <Upload className="w-6 h-6" />,
                   },
                   {
                     step: 3,
-                    title: "Get Your Results",
-                    description: "Receive your email summary and detailed PDF report.",
+                    title: "Get Your Analysis",
+                    description: "Delivered to your inbox: summary and full analysis",
                     icon: <Zap className="w-6 h-6" />,
                   },
                 ].map((item, index) => (
