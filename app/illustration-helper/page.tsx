@@ -79,10 +79,9 @@ interface OptionCardProps {
   title: string
   description: string
   onClick: () => void
-  value: string
 }
 
-function OptionCard({ icon, title, description, onClick, value }: OptionCardProps) {
+function OptionCard({ icon, title, description, onClick }: OptionCardProps) {
   return (
     <Card className="flex flex-col p-6">
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#4B6FEE]/10 text-[#4B6FEE]">
@@ -280,8 +279,14 @@ export default function IllustrationHelper() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {options.map((option, index) => (
-            <OptionCard key={index} {...option} onClick={() => handleOptionSelect(option.value)} />
+          {options.map((option) => (
+            <OptionCard
+              key={option.value}
+              icon={option.icon}
+              title={option.title}
+              description={option.description}
+              onClick={() => handleOptionSelect(option.value)}
+            />
           ))}
         </div>
 
