@@ -118,19 +118,18 @@ export default function IllustrationHelper() {
 
   const results: IllustrationResults = {
     current_review: {
-      title: "Current Performance Illustration",
-      description: "This report will show exactly how your policy is performing now and in the future",
+      title: "Current Policy Illustration",
+      description: "See exactly where your policy stands today and in years ahead",
       items: [
-        "Current death benefit amount and type (Level or Increasing)",
-        "Projected cash value accumulation year by year",
-        "Current premium amount and payment frequency",
-        "Current crediting rate/interest rate assumptions",
-        "Guaranteed vs. non-guaranteed values",
-        "Current loan balance and impact (if applicable)",
-        "Policy expenses and charges",
+        "Your coverage amount and type (Level or Increasing)",
+        "Year-by-year projected cash value growth",
+        "Your current premium and payment schedule",
+        "Current interest rates and growth assumptions",
+        "Guaranteed and potential future values",
+        "Policy loan details (if you have any)",
+        "All policy costs and charges",
       ],
-      script:
-        "I am requesting a current in-force illustration that shows the policy performance maintaining the current annual premium. Please include both guaranteed and non-guaranteed values, current cash value projections, and death benefit projections. We need to see all policy expenses and current crediting rate assumptions. Please run this to age 95. If there are any current loans on the policy, please show their impact on the projections.",
+      script: "I am requesting a current in-force illustration for my policy. Please include:\n\n• Policy performance based on my current annual premium\n• Both guaranteed and non-guaranteed values\n• Cash value projections\n• Death benefit projections\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 95\n• Impact of any existing policy loans\n\nPlease make sure all values and projections match my current premium payment schedule.",
     },
     lower_premium: {
       title: "Minimum Premium Illustration",
@@ -204,24 +203,26 @@ export default function IllustrationHelper() {
 
   const steps: Step[] = [
     {
-      title: "Locate your policy number",
-      description: "Find this on your policy documents or statements",
+      title: "Find Your Policy Number",
+      description: "Look for this on your policy statement or online account",
     },
     {
-      title: "Choose how to contact your insurance company",
-      description: [
+      title: "Contact Your Insurance Company: [
         "Call: Use the phone number on your policy or statement",
         "Email: Contact your agent or the service department",
         "Online: Log into your insurance company's website",
       ],
     },
     {
-      title: "Use our request script",
-      description: "Copy the script above for your request",
+      title: "Request Your Illustration",
+      description: "Copy and paste our prepared script",
     },
     {
       title: "What to expect",
       description: "Your illustration should arrive within 3-5 business days",
+      "Expect your illustration within 3-5 business days",
+"You'll receive it by email or mail",
+"Once you have it, return here to upload",
     },
   ]
 
@@ -236,7 +237,7 @@ export default function IllustrationHelper() {
         <ProgressSteps currentStep={1} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">Get Your Policy Illustration</h1>
+          <h1 className="text-4xl font-bold mb-3">How to Get Your Policy Illustration</h1>
           <p className="text-xl text-gray-600 mb-4">We&apos;ll help you get the illustration needed for your AI analysis</p>
           <p className="text-gray-600 max-w-3xl mx-auto">
             Tell us what matters to you, and we&apos;ll help you get the right illustration.
