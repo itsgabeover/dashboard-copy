@@ -136,7 +136,7 @@ export const Hero: FC = () => {
   </TooltipTrigger>
   <TooltipContent side="left" align="center" className="max-w-xs bg-white z-50">
     A free report showing your current policy details - available from your insurance company.
-    Just ask for an &apos;in-force illustration&apos;!
+    Just ask for an &apos;in-force illustration&apos;
   </TooltipContent>
                           </Tooltip>{" "}
                           and provide your email address.
@@ -355,13 +355,13 @@ export const Hero: FC = () => {
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold">Get Your Policy Analysis Now</h2>
                   </div>
-                  <p className="text-xl text-blue-100">From questions to clarity in minutes</p>
+                  <p className="text-xl text-blue-100">From Policy Confusion to Peace of Mind in Minutes</p>
                 </CardHeader>
                 <CardContent className="flex justify-center p-8 bg-gradient-to-b from-white to-blue-50/30">
                   <Button
                     onClick={() => router.push("/upload")}
                     size="lg"
-                    className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                    className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl text-white"
                   >
                     <span className="flex items-center gap-2">
                       Start My Analysis
