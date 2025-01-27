@@ -127,35 +127,33 @@ export const Hero: FC = () => {
                       step: 1,
                       title: "Upload & Email",
                       description: (
-                        <span>
+                        <div className="text-gray-600">
                           Upload your{" "}
                           <Tooltip>
                             <TooltipTrigger className="font-bold inline-flex items-center">
-                              policy illustration
+                              illustration
                               <HelpCircle className="w-4 h-4 ml-1 inline text-blue-500" />
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
-                              <p>
-                                A free report showing your current policy details - available from your insurance
-                                company. Just ask for an &apos;in-force illustration&apos;!
-                              </p>
+                              A free report showing your current policy details - available from your insurance company.
+                              Just ask for an &apos;in-force illustration&apos;!
                             </TooltipContent>
                           </Tooltip>{" "}
                           and provide your email address.
-                        </span>
+                        </div>
                       ),
                       icon: <FileText className="w-6 h-6" />,
                     },
                     {
                       step: 2,
                       title: "AI Analysis",
-                      description: "Our AI analyzes your policy details in minutes.",
+                      description: "Our AI analyzes your policy illustration details in minutes.",
                       icon: <Upload className="w-6 h-6" />,
                     },
                     {
                       step: 3,
                       title: "Get Your Analysis",
-                      description: "Delivered to your inbox: summary and full analysis",
+                      description: "Delivered to your inbox: summary and full 14-page analysis",
                       icon: <Zap className="w-6 h-6" />,
                     },
                   ].map((item, index) => (
@@ -172,7 +170,7 @@ export const Hero: FC = () => {
                           {item.step === 1 && (
                             <Link
                               href="/illustration-helper"
-                              className="text-blue-500 hover:text-blue-700 underline mt-4 inline-block"
+                              className="text-blue-500 hover:text-blue-700 underline mt-4 inline-block bg-white"
                             >
                               Need help getting an illustration?
                             </Link>
