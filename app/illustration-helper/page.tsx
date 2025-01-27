@@ -191,13 +191,13 @@ export default function IllustrationHelper() {
     {
       icon: <Shield className="h-6 w-6" />,
       title: "Find ways to lower my payments",
-      description: "Explore options to reduce premiums",
+      description: "Discover ways to make your payments more affordable",
       value: "lower_premium",
     },
     {
       icon: <Clock className="h-6 w-6" />,
       title: "See what happens if I stop paying",
-      description: "Understand your options if payments stop",
+      description: "Learn what happens to your coverage if payments stop",
       value: "stop_paying",
     },
   ]
