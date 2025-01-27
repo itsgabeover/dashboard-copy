@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils"
 interface Step {
   title: string
   description: string | string[]
+  script?: boolean
 }
 
 interface IllustrationContent {
@@ -78,9 +79,10 @@ interface OptionCardProps {
   title: string
   description: string
   onClick: () => void
+  value: string
 }
 
-function OptionCard({ icon, title, description, onClick }: OptionCardProps) {
+function OptionCard({ icon, title, description, onClick, value }: OptionCardProps) {
   return (
     <Card className="flex flex-col p-6">
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#4B6FEE]/10 text-[#4B6FEE]">
@@ -216,7 +218,8 @@ export default function IllustrationHelper() {
     },
     {
       title: "Request Your Illustration",
-      description: "Copy and paste our prepared script",
+      description: "Use this script when contacting your insurance company:",
+      script: true,
     },
     {
       title: "What to expect",
@@ -342,10 +345,13 @@ export default function IllustrationHelper() {
 
           <TabsContent value="request-script" className="mt-0">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-700">
-                  Copy this script when contacting your insurance company:
-                </h3>
+              <h3 className="text-lg font-medium text-gray-700">
+                Use this script when contacting your insurance company:
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-4 text-gray-700">
+                <p className="whitespace-pre-line">{content.script}</p>
+              </div>
+              <div className="flex items-center justify-end">
                 <Button
                   variant="outline"
                   size="sm"
@@ -358,9 +364,6 @@ export default function IllustrationHelper() {
                   {copySuccess ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   {copySuccess ? "Copied!" : "Copy"}
                 </Button>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 text-gray-700">
-                <p className="whitespace-pre-line">{content.script}</p>
               </div>
             </div>
           </TabsContent>
@@ -387,7 +390,28 @@ export default function IllustrationHelper() {
                   </button>
                   {expandedStep === index && (
                     <div className="px-4 pb-4 pl-16 text-gray-600">
-                      {Array.isArray(step.description) ? (
+                      {step.script ? (
+                        <>
+                          <p className="mb-2">{step.description}</p>
+                          <div className="bg-gray-50 rounded-lg p-4 text-gray-700">
+                            <p className="whitespace-pre-line">{content.script}</p>
+                          </div>
+                          <div className="flex items-center justify-end mt-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className={cn(
+                                "gap-2 transition-colors",
+                                copySuccess && "bg-[#4B6FEE] text-white hover:bg-[#4B6FEE]/90",
+                              )}
+                              onClick={() => handleCopyClick(content.script)}
+                            >
+                              {copySuccess ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                              {copySuccess ? "Copied!" : "Copy"}
+                            </Button>
+                          </div>
+                        </>
+                      ) : Array.isArray(step.description) ? (
                         <ul className="space-y-2">
                           {step.description.map((item, i) => (
                             <li key={i} className="flex items-center gap-2">
