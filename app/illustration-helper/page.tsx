@@ -165,27 +165,27 @@ export default function IllustrationHelper() {
   const features: FeatureCardProps[] = [
     {
       icon: <CheckCircle className="h-6 w-6" />,
-      title: "Step 1: Pick Your Question",
-      description: "Choose from three simple options to get exactly what you need to know about your policy",
+      title: "First: Pick Your Question",
+      description: "Choose what you want to know about your policy from three simple options",
     },
     {
       icon: <Shield className="h-6 w-6" />,
-      title: "Step 2: Get Request Script",
+      title: "Then: Get Your Request Script",
       description:
-        "Receive a pre-written script that ensures you get the right illustration from your insurance company",
+        "We'll give you the exact words to use with your insurance company",
     },
     {
       icon: <Clock className="h-6 w-6" />,
-      title: "Step 3: Follow Simple Steps",
-      description: "Use your policy number and our guided process to submit your request and get your illustration",
+      title: "Finally: Follow Our Guide",
+      description: "We'll walk you through submitting your request using your policy number",
     },
   ]
 
   const options = [
     {
       icon: <Zap className="h-6 w-6" />,
-      title: "See how my policy is doing",
-      description: "Check current performance and future outlook",
+      title: "See how my policy is performing",
+      description: "Get a complete picture of your policy's health and future",
       value: "current_review",
     },
     {
@@ -197,7 +197,7 @@ export default function IllustrationHelper() {
     {
       icon: <Clock className="h-6 w-6" />,
       title: "See what happens if I stop paying",
-      description: "Understand my options without more payments",
+      description: "Understand your options if payments stop",
       value: "stop_paying",
     },
   ]
@@ -236,11 +236,10 @@ export default function IllustrationHelper() {
         <ProgressSteps currentStep={1} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">How to Get Your Policy Illustration</h1>
-          <p className="text-xl text-gray-600 mb-4">Get the in-force illustration you need for your AI analysis</p>
+          <h1 className="text-4xl font-bold mb-3">Get Your Policy Illustration</h1>
+          <p className="text-xl text-gray-600 mb-4">We&apos;ll help you get the illustration needed for your AI analysis</p>
           <p className="text-gray-600 max-w-3xl mx-auto">
-            Tell us what&apos;s on your mind about your policy, and we&apos;ll help you get the right in-force
-            illustration.
+            Tell us what matters to you, and we&apos;ll help you get the right illustration.
           </p>
         </div>
 
@@ -270,8 +269,8 @@ export default function IllustrationHelper() {
         <ProgressSteps currentStep={2} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">What do you want to know about your policy?</h1>
-          <p className="text-xl text-gray-600">We&apos;ll help you request exactly what you need</p>
+          <h1 className="text-4xl font-bold mb-3">What Would You Like to Know About Your Policy?</h1>
+          <p className="text-xl text-gray-600">Select what matters to you</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
