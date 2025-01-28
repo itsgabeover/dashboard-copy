@@ -249,7 +249,7 @@ export default function UploadPage() {
 
                     <div className="flex items-center gap-2 p-4 bg-blue-50 rounded-lg text-sm text-gray-600">
                       <span className="text-[#4B6FEE]">ⓘ</span>
-                      <span>We analyze in-force illustrations only</span>
+                      <span>We analyze life insurance policy illustrations only</span>
                     </div>
 
                     <Button
@@ -319,7 +319,7 @@ export default function UploadPage() {
                             Processing...
                           </span>
                         ) : (
-                          "Start Analysis"
+                          "Get My Analysis"
                         )}
                       </Button>
                     </div>
