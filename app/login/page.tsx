@@ -167,7 +167,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-gray-900 hover:bg-gray-800">
+            <Button type="submit" className="w-full bg-gray-600 hover:bg-gray-600 text-white">
               Access Pilot Platform
             </Button>
           </form>
