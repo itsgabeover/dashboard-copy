@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import {
   Compass,
-  FileText,
   BarChart,
   ChevronDown,
   ChevronUp,
@@ -13,7 +13,6 @@ import {
   ArrowRight,
   ChevronRight,
 } from "lucide-react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -59,7 +58,7 @@ export default function ResourcesPage() {
     },
     {
       title: "Get Your Illustration",
-      icon: FileText,
+      icon: BarChart,
       description: "Easy instructions to get the right policy illustration",
     },
     {
@@ -157,7 +156,7 @@ export default function ResourcesPage() {
       title: "Value Enhancement Example",
       problem: "Underutilized cash value",
       solution: "Explored policy loan options",
-      result: "Funded child&apos;s education",
+      result: "Funded child's education",
     },
   ]
 
@@ -202,12 +201,12 @@ export default function ResourcesPage() {
         {
           question: "What are the key terms I should know?",
           answer:
-            "Essential terms include Death Benefit (your policy&apos;s payout amount), Cash Value (your policy&apos;s accumulated value), Premium (your payment), and Riders (additional benefits). Each section of your analysis explains relevant terms in context.",
+            "Essential terms include Death Benefit (your policy's payout amount), Cash Value (your policy's accumulated value), Premium (your payment), and Riders (additional benefits). Each section of your analysis explains relevant terms in context.",
         },
         {
           question: "What actions should I take after receiving my results?",
           answer:
-            "Review your policy&apos;s &apos;Key Takeaways&apos; sections, note questions for your advisor, and focus on any Red Flags identified in the analysis. Pay special attention to premium payment requirements and guarantee provisions.",
+            "Review your policy's 'Key Takeaways' sections, note questions for your advisor, and focus on any Red Flags identified in the analysis. Pay special attention to premium payment requirements and guarantee provisions.",
         },
       ],
     },
@@ -227,7 +226,7 @@ export default function ResourcesPage() {
         {
           question: "Do you recommend specific advisors?",
           answer:
-            "No - Insurance Planner AI is an analytical tool, not a advisory service. We never recommend, endorse, or replace financial advisors. Our role is to provide clear policy insights that enhance the valuable conversations you have with your trusted financial professional.",
+            "No - Insurance Planner AI is an analytical tool, not an advisory service. We never recommend, endorse, or replace financial advisors. Our role is to provide clear policy insights that enhance the valuable conversations you have with your trusted financial professional.",
         },
       ],
     },
@@ -244,7 +243,7 @@ export default function ResourcesPage() {
           answer: "We accept PDF files for policy illustrations.",
         },
         {
-          question: "How can I get help if I&apos;m stuck?",
+          question: "How can I get help if I'm stuck?",
           answer: "Contact our support team at support@financialplanner-ai.com",
         },
       ],
