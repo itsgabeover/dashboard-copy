@@ -167,7 +167,7 @@ export default function UploadPage() {
               >
                 {step > 1 ? "✓" : "1"}
               </div>
-              <span className="ml-2 font-medium text-[#4B6FEE]">Upload</span>
+              <span className="ml-2 font-medium text-[#4B6FEE]">Upload your in-force illustration (PDF)</span>
             </div>
             <div className="w-24 h-[2px] bg-gray-200">
               <div
@@ -184,7 +184,7 @@ export default function UploadPage() {
               >
                 2
               </div>
-              <span className={cn("ml-2 font-medium", step === 2 ? "text-[#4B6FEE]" : "text-gray-400")}>Confirm email</span>
+              <span className={cn("ml-2 font-medium", step === 2 ? "text-[#4B6FEE]" : "text-gray-400")}>Enter your email address</span>
             </div>
           </div>
 
