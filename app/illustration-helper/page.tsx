@@ -131,7 +131,7 @@ export default function IllustrationHelper() {
         "All policy costs and charges",
       ],
       script:
-        "I am requesting a current in-force illustration for my policy. Please include:\n\n• Policy performance based on my current annual premium\n• Both guaranteed and non-guaranteed values\n• Cash value projections\n• Death benefit projections\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 95\n• Impact of any existing policy loans\n\nPlease make sure all values and projections match my current premium payment schedule.",
+        "I am requesting a current in-force illustration for my policy. Please include:\n\n• Policy performance based on my current annual premium\n• Both guaranteed and non-guaranteed values\n• Cash value projections\n• Death benefit projections\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 100\n• Impact of any existing policy loans\n\nPlease make sure all values and projections match my current premium payment schedule.",
     },
     lower_premium: {
       title: "Lower Premium Illustration",
@@ -145,7 +145,7 @@ export default function IllustrationHelper() {
         "Important considerations and trade-offs",
       ],
       script:
-        "I am requesting a minimum premium in-force illustration for my policy. Please include:\n\n• The lowest premium amount needed to maintain my current death benefit\n• Year-by-year minimum premium requirements\n• Impact on cash value at minimum funding\n• Both guaranteed and non-guaranteed values\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 95\n• Any years requiring premium adjustments\n\nPlease note all assumptions used in these calculations.",
+        "I am requesting a minimum premium in-force illustration for my policy. Please include:\n\n• The lowest premium amount needed to maintain my current death benefit\n• Year-by-year minimum premium requirements\n• Impact on cash value at minimum funding\n• Both guaranteed and non-guaranteed values\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 100\n• Any years requiring premium adjustments\n\nPlease note all assumptions used in these calculations.",
     },
     stop_paying: {
       title: "Zero Premium Illustration",
@@ -159,7 +159,7 @@ export default function IllustrationHelper() {
         "Cash value needed to keep coverage going",
       ],
       script:
-        "I am requesting a zero-premium in-force illustration for my policy. Please show what happens if I stop all premium payments now. Please include:\n\n• How long my current death benefit can continue\n• Year-by-year changes to the cash value\n• When the policy would end without more payments\n• Both guaranteed and non-guaranteed projections\n• Effects on any policy benefits or riders\n• All policy expenses and fees\n• Current interest rate assumptions\n\nPlease run this to age 95 or until the policy ends, whichever comes first.",
+        "I am requesting a zero-premium in-force illustration for my policy. Please show what happens if I stop all premium payments now. Please include:\n\n• How long my current death benefit can continue\n• Year-by-year changes to the cash value\n• When the policy would end without more payments\n• Both guaranteed and non-guaranteed projections\n• Effects on any policy benefits or riders\n• All policy expenses and fees\n• Current interest rate assumptions\n\nPlease run this to age 100 or until the policy ends, whichever comes first.",
     },
   }
 
@@ -225,7 +225,7 @@ export default function IllustrationHelper() {
       description: [
         "Expect your illustration within 3-5 business days",
         "You'll receive it by email or mail",
-        "Once you have it, return here to upload",
+        "Once you have it, return to website and upload your illustration",
       ],
     },
   ]
