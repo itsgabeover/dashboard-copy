@@ -6,7 +6,7 @@ import { Eye, EyeOff, Mail, Lock, Glasses, Share2, MessageSquareMore } from "luc
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Logo } from "../components/Logo"
+import { Logo } from "@/components/Logo"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
