@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 interface UploadStatus {
   state: "idle" | "uploading" | "success" | "error"
@@ -249,7 +250,19 @@ export default function UploadPage() {
 
                     <div className="flex items-center gap-2 p-4 bg-blue-50 rounded-lg text-sm text-gray-600">
                       <span className="text-[#4B6FEE]">ⓘ</span>
-                      <span>We analyze life insurance policy illustrations only</span>
+                      <span>We analyze in-force illustrations only</span>
+                    </div>
+
+                    <div className="text-center">
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50/50 rounded-full">
+                        <span className="text-gray-600">Don't have an illustration?</span>
+                        <Link
+                          href="/illustration-helper"
+                          className="text-[#4B6FEE] hover:text-[#3B4FDE] font-medium hover:underline transition-colors"
+                        >
+                          We'll help you get one →
+                        </Link>
+                      </div>
                     </div>
 
                     <Button
@@ -319,7 +332,7 @@ export default function UploadPage() {
                             Processing...
                           </span>
                         ) : (
-                          "Get My Analysis"
+                          "Start Analysis"
                         )}
                       </Button>
                     </div>
