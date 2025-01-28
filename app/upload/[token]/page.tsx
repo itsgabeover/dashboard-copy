@@ -152,8 +152,8 @@ export default function UploadPage() {
         <div className="space-y-8">
           {/* Header */}
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-[#4B6FEE]">Upload Your In-Force Illustration</h1>
-            <p className="text-lg text-gray-600">We&apos;ll transform your illustration into actionable insights</p>
+            <h1 className="text-4xl font-bold text-[#4B6FEE]">Ready to Analyze Your Policy?</h1>
+            <p className="text-lg text-gray-600"> Just 2 quick steps to get your Insurance Planner AI analysis package</p>
           </div>
 
           {/* Progress Steps */}
