@@ -1,355 +1,381 @@
 "use client"
 
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { Upload, ChevronLeft, FileText } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+import type { FC } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import {
+  Upload,
+  FileText,
+  CheckCircle,
+  Zap,
+  ArrowRight,
+  Shield,
+  Sparkles,
+  TrendingUp,
+  Lock,
+  HelpCircle,
+  LineChart,
+  ChevronRight,
+  ChevronDown,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
-interface UploadStatus {
-  state: "idle" | "uploading" | "success" | "error"
-  message?: string
-}
-
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  const validTLDs = [".com", ".net", ".org", ".edu", ".gov", ".mil", ".info", ".io", ".co.uk", ".ca"]
-  return (
-    emailRegex.test(email) &&
-    !email.endsWith(".con") &&
-    !email.endsWith(".cim") &&
-    !email.includes("..") &&
-    email.length <= 254 &&
-    validTLDs.some((tld) => email.toLowerCase().endsWith(tld))
-  )
-}
-
-export default function UploadPage() {
+export const Hero: FC = () => {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(true)
-  const [file, setFile] = useState<File | null>(null)
-  const [email, setEmail] = useState("")
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({ state: "idle" })
-  const [step, setStep] = useState(1)
-  const [isDragging, setIsDragging] = useState(false)
 
-  useEffect(() => {
-    const pathToken = window.location.pathname.split("/").pop()
-    if (pathToken && pathToken.startsWith("pi_") && pathToken.includes("_")) {
-      setIsLoading(false)
-    } else {
-      router.push("/")
-    }
-  }, [router])
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
+  const handleViewSample = (pdfUrl: string) => {
+    router.push(`/view-pdf?pdfUrl=/${pdfUrl}`)
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-    const droppedFile = e.dataTransfer.files[0]
-    handleFileSelection(droppedFile)
-  }
-
-  const handleFileSelection = (selectedFile: File) => {
-    if (selectedFile) {
-      if (selectedFile.type !== "application/pdf") {
-        setUploadStatus({ state: "error", message: "Please select a PDF file." })
-        return
-      }
-      if (selectedFile.size > 2 * 1024 * 1024) {
-        setUploadStatus({ state: "error", message: "File size exceeds 2MB." })
-        return
-      }
-      setFile(selectedFile)
-      setUploadStatus({ state: "idle" })
-    }
-  }
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0]
-    if (selectedFile) {
-      handleFileSelection(selectedFile)
-    }
-  }
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    if (!file || !email) return
-    if (!isValidEmail(email)) {
-      setUploadStatus({ state: "error", message: "Please enter a valid email address." })
-      return
-    }
-
-    setUploadStatus({ state: "uploading" })
-
-    const formData = new FormData()
-    formData.append("file", file)
-    formData.append("email", email)
-
-    const pathToken = window.location.pathname.split("/").pop()
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000)
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${pathToken}`,
-        },
-        body: formData,
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        throw new Error(`Upload failed: ${response.statusText}`)
-      }
-
-      setUploadStatus({ state: "success" })
-      router.push(`/upload/success?email=${encodeURIComponent(email)}`)
-    } catch (error: unknown) {
-      console.error("Upload error:", error)
-      if (error instanceof Error) {
-        setUploadStatus({
-          state: "error",
-          message:
-            error.name === "AbortError"
-              ? "Upload timed out. Please try again."
-              : "Upload failed. Please try again or contact support.",
-        })
-      }
-    }
-  }
-
-  const handleChangeFile = () => {
-    setFile(null)
-    setStep(1)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4B6FEE]" aria-label="Loading" />
-      </div>
-    )
+  const scrollToSection = (elementId: string) => {
+    const element = document.getElementById(elementId)
+    element?.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <main className="flex-1 container max-w-2xl mx-auto px-4 py-12">
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#4B6FEE] to-[#3B4FDE]">
-              Ready to Analyze Your Policy?
-            </h1>
-            <p className="text-lg text-gray-600 font-medium">
-              Just 2 quick steps to get your Insurance Planner AI analysis package
-            </p>
-          </div>
-
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center gap-6 mb-8">
-            <div className="flex items-center group">
-              <div
-                className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105",
-                  step === 1 ? "bg-[#4B6FEE]" : "bg-[#4B6FEE]",
-                )}
-              >
-                {step > 1 ? "✓" : "1"}
-              </div>
-              <div className="ml-3 space-y-1">
-                <span className="block font-semibold text-[#4B6FEE]">Upload PDF</span>
-                <span className="block text-sm text-gray-500">In-force illustration</span>
-              </div>
-            </div>
-            <div className="w-24 h-[3px] bg-gray-200">
-              <div
-                className="h-full bg-[#4B6FEE] transition-all duration-300"
-                style={{ width: step === 1 ? "0%" : "100%" }}
-              />
-            </div>
-            <div className="flex items-center group">
-              <div
-                className={cn(
-                  "w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-transform group-hover:scale-105",
-                  step === 2 ? "bg-[#4B6FEE] text-white" : "bg-gray-100 text-gray-400",
-                )}
-              >
-                2
-              </div>
-              <div className="ml-3 space-y-1">
-                <span className={cn("block font-semibold", step === 2 ? "text-[#4B6FEE]" : "text-gray-400")}>
-                  Email Address
-                </span>
-                <span className="block text-sm text-gray-500">Get your analysis</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {step === 1 ? (
-                  <div className="space-y-6">
-                    <div
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      className={cn(
-                        "relative border-2 border-dashed rounded-xl p-12 transition-all duration-200",
-                        isDragging
-                          ? "border-[#4B6FEE] bg-blue-50/50 scale-[1.02]"
-                          : "border-gray-200 hover:border-[#4B6FEE]/50",
-                      )}
-                    >
-                      <input
-                        type="file"
-                        id="file-upload"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        onChange={handleFileChange}
-                        accept=".pdf"
-                      />
-                      <div className="text-center space-y-4">
-                        <div className="relative">
-                          <Upload className="mx-auto h-16 w-16 text-[#4B6FEE] animate-pulse" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent" />
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-lg font-medium text-gray-700">Upload your in-force illustration</p>
-                          <p className="text-sm text-gray-500">Drag and drop your PDF or click to browse</p>
-                          <p className="text-xs text-gray-400">PDF files only • Maximum 2MB</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {file && (
-                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                        <FileText className="h-8 w-8 text-[#4B6FEE]" />
-                        <div>
-                          <p className="font-medium">{file.name}</p>
-                          <p className="text-sm text-gray-500">PDF • {(file.size / (1024 * 1024)).toFixed(1)} MB</p>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 p-4 bg-blue-50 rounded-lg text-sm text-gray-600">
-                      <span className="text-[#4B6FEE]">ⓘ</span>
-                      <span>We analyze in-force illustrations only</span>
-                    </div>
-
-                    <div className="text-center">
-                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50/50 rounded-full">
-                        <span className="text-gray-600">Don't have an illustration?</span>
-                        <Link
-                          href="/illustration-helper"
-                          className="text-[#4B6FEE] hover:text-[#3B4FDE] font-medium hover:underline transition-colors"
-                        >
-                          We'll help you get one →
-                        </Link>
-                      </div>
-                    </div>
-
-                    <Button
-                      type="button"
-                      className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] h-12 rounded-lg text-white font-medium shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-200 transition-all"
-                      disabled={!file}
-                      onClick={() => setStep(2)}
-                    >
-                      Continue
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {file && (
-                      <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                        <FileText className="h-8 w-8 text-[#4B6FEE]" />
-                        <div>
-                          <p className="font-medium">{file.name}</p>
-                          <p className="text-sm text-gray-500">PDF • {(file.size / (1024 * 1024)).toFixed(1)} MB</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleChangeFile}
-                          className="ml-auto text-[#4B6FEE] hover:underline"
-                        >
-                          Change
-                        </button>
-                      </div>
-                    )}
-                    <div className="space-y-3">
-                      <label className="block text-lg font-medium text-gray-700">Enter your email address</label>
-                      <Input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full h-12 text-lg border-gray-300 focus:border-[#4B6FEE] focus:ring-[#4B6FEE]"
-                      />
-                    </div>
-
-                    <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg text-sm text-gray-600">
-                      <span className="text-[#4B6FEE] mt-0.5">ⓘ</span>
-                      <p>
-                        Your analysis will be sent to this email within minutes. Please check your spam folder if not
-                        received.
-                      </p>
-                    </div>
-
-                    <div className="flex justify-between items-center pt-4">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setStep(1)}
-                        className="flex items-center gap-1 text-gray-500 hover:text-gray-700"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        Back
-                      </Button>
-                      <Button
-                        type="submit"
-                        className="bg-green-500 hover:bg-green-600 px-8 h-12 rounded-lg text-white font-medium shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-200 transition-all"
-                        disabled={!isValidEmail(email) || uploadStatus.state === "uploading"}
-                      >
-                        {uploadStatus.state === "uploading" ? (
-                          <span className="flex items-center gap-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                            Processing...
-                          </span>
-                        ) : (
-                          "Start Analysis"
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
-                {uploadStatus.state === "error" && uploadStatus.message && (
-                  <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
-                    <span className="text-sm font-medium">{uploadStatus.message}</span>
-                  </div>
-                )}
-              </form>
-            </CardContent>
-          </Card>
+    <TooltipProvider>
+      <section className="w-full relative" aria-labelledby="hero-title">
+        {/* Advisor Banner */}
+        <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50 text-blue-700 py-2 px-4 text-center border-b border-blue-100/50">
+          <Link
+            href="/advisor-demo"
+            className="text-base font-medium hover:underline inline-flex items-center gap-2 transition-colors hover:text-blue-800"
+          >
+            Financial Advisor? Schedule a Demo <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
-      </main>
-    </div>
+
+        {/* Hero Section */}
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-100 to-blue-100/50 py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-center space-y-6 text-center max-w-4xl mx-auto">
+              <h1
+                id="hero-title"
+                className="text-4xl md:text-6xl lg:text-7xl font-bold text-[#4B6FEE] mb-4 tracking-tight flex flex-col items-center"
+              >
+                <span className="mb-2">Life Insurance</span>
+                <span className="flex items-center gap-2">
+                  <span className="text-3xl md:text-5xl lg:text-6xl opacity-90">Policy Reviews</span>
+                  <span className="bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white text-lg md:text-xl lg:text-2xl px-4 py-2 rounded-full shadow-md font-semibold relative overflow-hidden">
+                    <span className="relative z-10">in minutes</span>
+                    <span className="absolute inset-0 bg-white opacity-20 transform -skew-x-12"></span>
+                  </span>
+                </span>
+              </h1>
+              <h2 className="text-xl md:text-3xl mb-12 text-gray-600 font-light">
+                AI-Powered Life Insurance Analysis
+                <br />
+                That Shows Your Policy&apos;s True Picture
+              </h2>
+              <Card className="w-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 border-blue-100">
+                <CardContent className="p-8">
+                  <div className="flex flex-col items-center space-y-6">
+                    <div className="rounded-full bg-blue-50 p-3">
+                      <Zap className="w-8 h-8 text-[#4B6FEE]" aria-hidden="true" />
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-[#4B6FEE]">
+                      From Policy Confusion to Peace of Mind in Minutes
+                    </h3>
+                    <p className="text-gray-700 text-lg leading-relaxed max-w-3xl">
+                      Get clarity on what your life insurance actually provides – our AI transforms complex insurance
+                      documents into clear insights you and your advisor can act on.
+                    </p>
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
+                      <div className="flex items-center">
+                        <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
+                        <span>No questionnaires needed</span>
+                      </div>
+                      <div className="flex items-center">
+                        <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
+                        <span>No back-and-forth delays</span>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-col items-center space-y-2">
+                      <Button
+                        onClick={() => scrollToSection("how-it-works")}
+                        className="bg-[#4B6FEE] hover:bg-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold transition-all duration-300 hover:transform hover:scale-105 group"
+                      >
+                        <span className="flex items-center gap-2">
+                          How it works
+                          <ChevronDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
+                        </span>
+                      </Button>
+                      <p className="text-sm text-gray-600">↓ See the process</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+
+        {/* How It Works Section */}
+        <div id="how-it-works" className="py-24 bg-white relative">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-16 space-y-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">How It Works</h2>
+                <p className="text-gray-600 text-lg">Three simple steps to understand your policy</p>
+              </div>
+
+              <div className="relative">
+                <div className="grid md:grid-cols-3 gap-8 relative z-10">
+                  {[
+                    {
+                      step: 1,
+                      title: "Upload & Email",
+                      description: (
+                        <div className="text-gray-600">
+                          Upload your{" "}
+                          <Tooltip>
+                             <TooltipTrigger className="font-bold inline-flex items-center">
+    illustration
+    <HelpCircle className="w-4 h-4 ml-1 inline text-blue-500" />
+  </TooltipTrigger>
+  <TooltipContent side="left" align="center" className="max-w-xs bg-white z-50">
+    A free report showing your current policy details - available from your insurance company.
+    Just ask for an &apos;in-force illustration&apos;
+  </TooltipContent>
+                          </Tooltip>{" "}
+                          and provide your email address.
+                        </div>
+                      ),
+                      icon: <FileText className="w-6 h-6" />,
+                    },
+                    {
+                      step: 2,
+                      title: "AI Analysis",
+                      description: "Insurance Planner AI analyzes your illustration details in minutes.",
+                      icon: <Upload className="w-6 h-6" />,
+                    },
+                    {
+                      step: 3,
+                      title: "Get Your Analysis",
+                      description: "Delivered to your inbox: clear email summary and professional PDF report",
+                      icon: <Zap className="w-6 h-6" />,
+                    },
+                  ].map((item, index) => (
+                    <div key={item.step} className="relative flex">
+                      <Card className="text-center transition-all duration-300 hover:shadow-lg bg-white group hover:-translate-y-1 w-full flex flex-col">
+                        <CardContent className="p-6 flex flex-col h-full justify-between">
+                          <div>
+                            <div className="bg-blue-50 text-[#4B6FEE] rounded-full p-4 w-16 h-16 mx-auto mb-6 flex items-center justify-center text-xl font-bold group-hover:bg-[#4B6FEE] group-hover:text-white transition-colors duration-300">
+                              {item.step}
+                            </div>
+                            <h3 className="text-xl font-semibold mb-4 text-[#4B6FEE]">{item.title}</h3>
+                            <p className="text-gray-600">{item.description}</p>
+                          </div>
+                          {item.step === 1 && (
+                            <Link
+                              href="/illustration-helper"
+                              className="text-blue-500 hover:text-blue-700 underline mt-4 inline-block bg-white"
+                            >
+                              Need help getting an illustration?
+                            </Link>
+                          )}
+                        </CardContent>
+                      </Card>
+                      {index < 2 && (
+                        <div className="absolute right-0 top-1/2 transform translate-x-[100%] -translate-y-1/2 z-20">
+                          <div className="hidden md:flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-md">
+                            <ArrowRight className="w-5 h-5 text-blue-400" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-16 flex flex-col items-center space-y-2">
+                <Button
+                  onClick={() => scrollToSection("ai-analysis")}
+                  className="bg-[#4B6FEE] hover:bg-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold group transition-all duration-300 hover:transform hover:scale-105 flex items-center"
+                >
+                  <LineChart className="w-6 h-6 mr-2 group-hover:animate-pulse" aria-hidden="true" />
+                  <span>Explore AI Analysis</span>
+                  <ChevronDown className="w-5 h-5 ml-2 transition-transform group-hover:translate-y-1" />
+                </Button>
+                <p className="text-sm text-gray-600">↓ See what&apos;s included</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Benefits Section */}
+        <div id="ai-analysis" className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-16 space-y-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">What Our AI Analysis Reveals</h2>
+                <p className="text-gray-600 text-lg">Comprehensive insights for you and your advisor</p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                {[
+                  {
+                    icon: <Shield className="h-8 w-8" />,
+                    title: "Protection Confidence",
+                    description:
+                      "Understand exactly how your coverage aligns with your family's needs and get clarity on your policy's true protection power",
+                  },
+                  {
+                    icon: <Sparkles className="h-8 w-8" />,
+                    title: "Premium Strategy",
+                    description:
+                      "See if your premium structure is optimized and learn how to maintain your coverage efficiently over time",
+                  },
+                  {
+                    icon: <TrendingUp className="h-8 w-8" />,
+                    title: "Growth Analysis",
+                    description:
+                      "Get clear insights into your policy's accumulation potential and understand your options for accessing benefits",
+                  },
+                  {
+                    icon: <Lock className="h-8 w-8" />,
+                    title: "Policy Security",
+                    description:
+                      "Review your policy guarantees and discover strategies to keep your coverage strong for the long term",
+                  },
+                ].map((item, index) => (
+                  <Card
+                    key={index}
+                    className="group transition-all duration-300 hover:shadow-lg bg-white transform hover:scale-102"
+                  >
+                    <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                      <div className="p-2 rounded-full bg-blue-50 group-hover:bg-[#4B6FEE] transition-colors duration-300">
+                        <div className="text-[#4B6FEE] group-hover:text-white transition-colors duration-300">
+                          {item.icon}
+                        </div>
+                      </div>
+                      <h3 className="text-xl font-semibold">{item.title}</h3>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <div className="flex flex-col items-center mt-12 space-y-2">
+                <Button
+                  onClick={() => scrollToSection("sample-reports")}
+                  className="bg-[#4B6FEE] hover:bg-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold group transition-all duration-300 hover:transform hover:scale-105 flex items-center"
+                >
+                  <FileText className="w-6 h-6 mr-2 group-hover:animate-pulse" aria-hidden="true" />
+                  <span>Sample Reports</span>
+                  <ChevronDown className="w-5 h-5 ml-2 transition-transform group-hover:translate-y-1" />
+                </Button>
+                <p className="text-sm text-gray-600">↓ View example analyses</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Combined Sample Reports and CTA Section */}
+        <div id="sample-reports" className="py-24 bg-white relative">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto space-y-16">
+              {/* Sample Reports */}
+              <div>
+                <div className="text-center mb-12 space-y-4">
+                  <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">Your AI Analysis Package</h2>
+                  <p className="text-gray-600 text-lg">Comprehensive reports tailored to your needs</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  {[
+                    {
+                      title: "Clear Email Summary",
+                      features: [
+                        "Policy Overview & Structure",
+                        "Protection Features & Benefits",
+                        "Built-in Policy Advantages",
+                        "Critical Management Points",
+                      ],
+                      sample: "sample_reports/SAMPLE_CLIENT_SUMMARY.pdf",
+                    },
+                    {
+                      title: "Professional PDF Report",
+                      features: [
+                        "Comprehensive Policy Analysis",
+                        "Detailed Feature Assessment",
+                        "Risk & Opportunity Insights",
+                        "Advisor Discussion Topics",
+                      ],
+                      sample: "sample_reports/SAMPLE_POLICY_REVIEW.pdf",
+                    },
+                  ].map((item, index) => (
+                    <Card
+                      key={index}
+                      className="group transition-all duration-300 hover:shadow-xl bg-white hover:-translate-y-1 relative overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent rounded-lg" />
+                      <CardHeader className="relative pb-0">
+                        <div className="flex items-center justify-center mb-6">
+                          <div className="rounded-full bg-blue-50 p-3 group-hover:bg-[#4B6FEE] transition-colors duration-300">
+                            <FileText className="h-6 w-6 text-[#4B6FEE] group-hover:text-white transition-colors duration-300" />
+                          </div>
+                        </div>
+                        <h3 className="text-2xl font-semibold text-center text-gray-900">{item.title}</h3>
+                      </CardHeader>
+                      <CardContent className="relative pt-6">
+                        <ul className="space-y-4">
+                          {item.features.map((feature) => (
+                            <li key={feature} className="flex items-center gap-3 group/item">
+                              <div className="flex-shrink-0 rounded-full p-1 transition-colors duration-300 group-hover/item:bg-green-50">
+                                <CheckCircle className="text-green-500 h-5 w-5" />
+                              </div>
+                              <span className="text-gray-600 transition-colors duration-300 group-hover/item:text-gray-900">
+                                {feature}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        <Button
+                          onClick={() => handleViewSample(item.sample)}
+                          className="w-full mt-8 bg-[#4B6FEE] hover:bg-blue-600 text-white transition-all duration-300 group-hover:transform group-hover:scale-102"
+                        >
+                          <FileText className="w-5 h-5 mr-2" />
+                          View Sample
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA Card */}
+              <Card className="border-2 border-blue-100 bg-white transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
+                <CardHeader className="text-center bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white p-8">
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <div className="rounded-full bg-white/10 p-2 transition-transform duration-300 group-hover:scale-110">
+                      <Zap className="w-8 h-8" />
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-bold">Get Your Insurance Planner AI Analysis Now</h2>
+                  </div>
+                  <p className="text-xl text-blue-100">From Policy Confusion to Peace of Mind in Minutes</p>
+                </CardHeader>
+                <CardContent className="flex justify-center p-8 bg-gradient-to-b from-white to-blue-50/30">
+                  <Button
+                    onClick={() => router.push("/upload")}
+                    size="lg"
+                    className="bg-green-600 hover:bg-green-700 text-lg px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl text-white"
+                  >
+                    <span className="flex items-center gap-2">
+                      Start My Analysis
+                      <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
+                    </span>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+    </TooltipProvider>
   )
 }
 
+export default Hero
