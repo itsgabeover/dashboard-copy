@@ -54,45 +54,21 @@ export default function ResourcesPage() {
 
   const quickAccessTiles: QuickAccessTile[] = [
     {
-      title: "Quick Start Guide",
+      title: "Getting Started Guide",
       icon: Compass,
-      description: "New to policy reviews? Start here",
+      description: "See how our AI analysis works in 3 simple steps",
     },
     {
-      title: "Illustration Request",
+      title: "Get Your Illustration",
       icon: FileText,
-      description: "Complete this form to obtain an in-force illustration",
+      description: "Easy instructions to get the right policy illustration",
     },
     {
-      title: "Sample Reports",
+      title: "Your Analysis Guide",
       icon: BarChart,
-      description: "See how we analyze your policy",
+      description: "A guide to understanding your AI policy analysis",
     },
   ]
-
-  const essentialTools: ExpandableSection = {
-    title: "Essential Tools",
-    icon: FileCheck,
-    content: (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Template Library</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>All request forms by policy type</li>
-              <li>Carrier contact directory</li>
-              <li>Policy identifier guide</li>
-              <li>Request instructions PDF</li>
-              <li>Policy review checklist</li>
-              <li>Timeline expectations guide</li>
-            </ul>
-          </CardContent>
-        </Card>
-      </div>
-    ),
-  }
 
   const learningCenter: ExpandableSection = {
     title: "Learning Center",
@@ -104,17 +80,22 @@ export default function ResourcesPage() {
             <CardTitle>Video Tutorials</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
-                { title: "How to Request an IFL", duration: "2 min" },
-                { title: "Reading Your Analysis", duration: "3 min" },
-                { title: "Understanding Policy Values", duration: "4 min" },
-                { title: "Working with Your Advisor", duration: "2 min" },
+                { title: "How to Request Your Illustration", duration: "2 min" },
+                { title: "Uploading Your Policy Documents", duration: "2 min" },
+                { title: "Reading Your AI Analysis", duration: "4 min" },
+                { title: "Taking Action on Your Results", duration: "3 min" },
               ].map((video, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <PlayCircle className="text-[#4B6FEE]" />
+                <div
+                  key={index}
+                  className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div className="bg-[#4B6FEE]/10 p-2 rounded-full">
+                    <PlayCircle className="w-6 h-6 text-[#4B6FEE]" />
+                  </div>
                   <div>
-                    <p className="font-medium">{video.title}</p>
+                    <p className="font-medium text-gray-900">{video.title}</p>
                     <p className="text-sm text-gray-500">{video.duration}</p>
                   </div>
                 </div>
@@ -134,7 +115,7 @@ export default function ResourcesPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="mb-4"
             />
-            <p>Comprehensive terms list with simple explanations and common features guide.</p>
+            <p>Insurance terms in plain English - search common policy terms and get clear explanations</p>
           </CardContent>
         </Card>
         <Card>
@@ -143,9 +124,10 @@ export default function ResourcesPage() {
           </CardHeader>
           <CardContent>
             <ul className="list-disc pl-5 space-y-2">
-              <li>Policy types explained</li>
-              <li>Premium structure guide</li>
-              <li>Policy values explained</li>
+              <li>Your Policy Type Explained Simply</li>
+              <li>Understanding Your Premium Payments</li>
+              <li>How Your Policy Creates Value</li>
+              <li>Policy Benefits Guide</li>
             </ul>
           </CardContent>
         </Card>
@@ -186,7 +168,19 @@ export default function ResourcesPage() {
       questions: [
         {
           question: "How do I request an illustration?",
-          answer: "Contact your insurance carrier using our provided template.",
+          answer: (
+            <div className="space-y-2">
+              <p>Contact your insurance carrier using our provided template.</p>
+              <p>
+                <Link
+                  href="/illustration-helper"
+                  className="text-blue-500 hover:text-blue-700 underline inline-flex items-center gap-1"
+                >
+                  Don't have an illustration? We'll help you get one <ChevronRight className="w-4 h-4" />
+                </Link>
+              </p>
+            </div>
+          ),
         },
         {
           question: "What documents do I need?",
@@ -270,15 +264,25 @@ export default function ResourcesPage() {
         </Link>
       </div>
 
+      {/* Construction Notice */}
+      <div className="bg-yellow-50 border-b border-yellow-100 p-4">
+        <div className="container mx-auto">
+          <p className="text-center text-yellow-800">
+            Page Under Construction - We're currently updating this help center. Button functionality is temporarily
+            disabled while we make improvements to better serve you.
+          </p>
+        </div>
+      </div>
+
       <section className="w-full bg-gradient-to-b from-gray-100 to-blue-100/50 flex-grow">
         <div className="container mx-auto px-4 pt-16 md:pt-24 lg:pt-32">
           {/* Header */}
           <div className="flex flex-col items-center space-y-6 text-center mb-16">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#4B6FEE] mb-4 tracking-tight">
-              Policy Analysis Resources
+              Policy Review Help Center
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl">
-              Everything you need for a successful policy review - from getting started to understanding your results
+              Everything you need to get the most from your AI policy analysis
             </p>
           </div>
 
@@ -287,17 +291,23 @@ export default function ResourcesPage() {
             {quickAccessTiles.map((tile, index) => (
               <Card
                 key={index}
-                className="transition-all hover:shadow-lg bg-white transform hover:scale-105 duration-300"
+                className="transition-all hover:shadow-lg bg-gradient-to-br from-white to-blue-50 transform hover:scale-105 duration-300 flex flex-col"
               >
-                <CardContent className="p-6 flex flex-col items-center text-center">
-                  <div className="bg-[#4B6FEE]/10 p-3 rounded-full mb-4">
-                    <tile.icon className="w-8 h-8 text-[#4B6FEE]" />
+                <CardContent className="p-6 flex flex-col items-center text-center h-full">
+                  <div className="flex-1 flex flex-col items-center justify-between w-full">
+                    <div>
+                      <div className="bg-[#4B6FEE]/10 p-4 rounded-full mb-6 transform transition-all duration-300 hover:scale-110 hover:bg-[#4B6FEE]/20">
+                        <tile.icon className="w-10 h-10 text-[#4B6FEE]" />
+                      </div>
+                      <CardTitle className="text-xl font-semibold mb-3">{tile.title}</CardTitle>
+                      <CardDescription className="mb-6">{tile.description}</CardDescription>
+                    </div>
+                    <Button variant="outline" className="w-full mt-4" asChild>
+                      <Link href={tile.title === "Get Your Illustration" ? "/illustration-helper" : "#"}>
+                        {tile.title === "Get Your Illustration" ? "Request Illustration" : "Learn More"}
+                      </Link>
+                    </Button>
                   </div>
-                  <CardTitle className="text-xl font-semibold mb-2">{tile.title}</CardTitle>
-                  <CardDescription className="mb-4">{tile.description}</CardDescription>
-                  <Button variant="outline" className="mt-auto">
-                    {tile.title === "Illustration Request" ? "Request Illustration" : "Learn More"}
-                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -305,7 +315,7 @@ export default function ResourcesPage() {
 
           {/* Main Content Grid */}
           <div className="space-y-8 mb-16">
-            {[essentialTools, learningCenter].map((section, index) => (
+            {[learningCenter].map((section, index) => (
               <Card key={index} className="transition-all hover:shadow-lg bg-white">
                 <CardHeader
                   className="flex flex-row items-center justify-between cursor-pointer"
@@ -386,7 +396,8 @@ export default function ResourcesPage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                disabled
+                className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Link href="/upload" className="flex items-center gap-2">
                   Start My Analysis
