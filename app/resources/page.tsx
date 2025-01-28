@@ -9,7 +9,6 @@ import {
   ChevronUp,
   PlayCircle,
   BookOpen,
-  FileCheck,
   Zap,
   ArrowRight,
   ChevronRight,
@@ -41,7 +40,7 @@ interface CaseStudy {
 
 interface FAQCategory {
   category: string
-  questions: { question: string; answer: string }[]
+  questions: { question: string; answer: string | React.ReactNode }[]
 }
 
 export default function ResourcesPage() {
@@ -176,7 +175,7 @@ export default function ResourcesPage() {
                   href="/illustration-helper"
                   className="text-blue-500 hover:text-blue-700 underline inline-flex items-center gap-1"
                 >
-                  Don't have an illustration? We'll help you get one <ChevronRight className="w-4 h-4" />
+                  Don&apos;t have an illustration? We&apos;ll help you get one <ChevronRight className="w-4 h-4" />
                 </Link>
               </p>
             </div>
@@ -203,12 +202,12 @@ export default function ResourcesPage() {
         {
           question: "What are the key terms I should know?",
           answer:
-            "Essential terms include Death Benefit (your policy's payout amount), Cash Value (your policy's accumulated value), Premium (your payment), and Riders (additional benefits). Each section of your analysis explains relevant terms in context.",
+            "Essential terms include Death Benefit (your policy&apos;s payout amount), Cash Value (your policy&apos;s accumulated value), Premium (your payment), and Riders (additional benefits). Each section of your analysis explains relevant terms in context.",
         },
         {
           question: "What actions should I take after receiving my results?",
           answer:
-            "Review your policy's 'Key Takeaways' sections, note questions for your advisor, and focus on any Red Flags identified in the analysis. Pay special attention to premium payment requirements and guarantee provisions.",
+            "Review your policy&apos;s &apos;Key Takeaways&apos; sections, note questions for your advisor, and focus on any Red Flags identified in the analysis. Pay special attention to premium payment requirements and guarantee provisions.",
         },
       ],
     },
@@ -218,7 +217,7 @@ export default function ResourcesPage() {
         {
           question: "Can I share my analysis with my financial advisor?",
           answer:
-            "Absolutely! While Insurance Planner AI provides data-driven insights, your financial advisor brings invaluable expertise to interpret these findings within your broader financial picture. We encourage sharing this analysis to spark meaningful discussions about your coverage.",
+            "While Insurance Planner AI provides data-driven insights, your financial advisor brings invaluable expertise to interpret these findings within your broader financial picture. We encourage sharing this analysis to spark meaningful discussions about your coverage.",
         },
         {
           question: "How can my advisor use this information?",
@@ -245,7 +244,7 @@ export default function ResourcesPage() {
           answer: "We accept PDF files for policy illustrations.",
         },
         {
-          question: "How can I get help if I'm stuck?",
+          question: "How can I get help if I&apos;m stuck?",
           answer: "Contact our support team at support@financialplanner-ai.com",
         },
       ],
@@ -268,8 +267,8 @@ export default function ResourcesPage() {
       <div className="bg-yellow-50 border-b border-yellow-100 p-4">
         <div className="container mx-auto">
           <p className="text-center text-yellow-800">
-            Page Under Construction - We're currently updating this help center. Button functionality is temporarily
-            disabled while we make improvements to better serve you.
+            Page Under Construction - We&apos;re currently updating this help center. Button functionality is
+            temporarily disabled while we make improvements to better serve you.
           </p>
         </div>
       </div>
