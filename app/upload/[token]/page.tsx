@@ -45,17 +45,17 @@ export default function UploadPage() {
     }
   }, [router])
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(true)
   }
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setIsDragging(false)
     const droppedFile = e.dataTransfer.files[0]
@@ -84,7 +84,7 @@ export default function UploadPage() {
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!file || !email) return
     if (!isValidEmail(email)) {
@@ -255,12 +255,12 @@ export default function UploadPage() {
 
                     <div className="text-center">
                       <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50/50 rounded-full">
-                        <span className="text-gray-600">Don't have an illustration?</span>
+                        <span className="text-gray-600">Don&apos;t have an illustration?</span>
                         <Link
                           href="/illustration-helper"
                           className="text-[#4B6FEE] hover:text-[#3B4FDE] font-medium hover:underline transition-colors"
                         >
-                          We'll help you get one →
+                          We&apos;ll help you get one →
                         </Link>
                       </div>
                     </div>
@@ -293,8 +293,11 @@ export default function UploadPage() {
                       </div>
                     )}
                     <div className="space-y-3">
-                      <label className="block text-lg font-medium text-gray-700">Enter your email address</label>
+                      <label htmlFor="email-input" className="block text-lg font-medium text-gray-700">
+                        Enter your email address
+                      </label>
                       <Input
+                        id="email-input"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
