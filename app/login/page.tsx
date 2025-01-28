@@ -52,7 +52,7 @@ export default function LoginPage() {
         throw new Error(data.error || "Invalid credentials")
       }
 
-      window.location.href = "/dashboard"
+      window.location.href = "/"
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid email or password")
     }
@@ -175,7 +175,7 @@ export default function LoginPage() {
           <div className="mt-8 text-center space-y-2">
             <p className="text-gray-600">Have questions? Want to share immediate feedback?</p>
             <p className="text-gray-600">Reach us at:</p>
-            <a href="mailto:pilot-support@financial-planner-ai.com" className="text-blue-600 hover:underline block">
+            <a href="mailto:pilot-support@financialplanner-ai.com" className="text-blue-600 hover:underline block">
               pilot-support@financial-planner-ai.com
             </a>
           </div>
