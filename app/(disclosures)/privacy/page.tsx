@@ -119,18 +119,6 @@ export default function PrivacyPage() {
       </div>
 
       <div className="prose max-w-none">
-        <Button
-          asChild
-          className="w-full bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white font-medium py-4 rounded-lg flex items-center justify-center gap-2"
-        >
-          <a
-            href="/disclosures/privacy_policy.txt"
-            download="/disclosures/privacy_policy.txt"
-          >
-            <FileText className="w-5 h-5" aria-hidden="true" />
-            Download
-          </a>
-        </Button>
       </div>
     </div>
   );
