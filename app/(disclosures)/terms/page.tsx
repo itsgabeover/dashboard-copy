@@ -10,7 +10,7 @@ return (
       <h1 className="text-3xl font-bold mb-8">Terms of Service</h1>
       <main className="w-full">
         <ScrollArea className="h-[calc(100vh-200px)]" aria-label="Terms of Service content">
-          <div className="prose prose-gray dark:prose-invert max-w-4xl mx-auto">
+          <div className="prose prose-gray dark:prose-invert">
             <h1 className="text-4xl font-bold mb-4"></h1>
             <p className="text-lg mb-6">
               <strong></strong>
