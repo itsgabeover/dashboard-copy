@@ -58,10 +58,10 @@ export default function TermsPage() {
                 1. INTRODUCTION AND ACCEPTANCE
               </h2>
               <p className="text-base mb-6">
-                Welcome to Financial Planner AI. These Terms of Service (the "Terms") constitute a legally binding
-                agreement between you and Financial Planner AI, LLC, a limited liability company organized under the
-                laws of New Jersey ("Financial Planner AI," "we," "our," or "us"). These Terms govern your access to and
-                use of our website located at{" "}
+                Welcome to Financial Planner AI. These Terms of Service (the &quot;Terms&quot;) constitute a legally
+                binding agreement between you and Financial Planner AI, LLC, a limited liability company organized under
+                the laws of New Jersey (&quot;Financial Planner AI,&quot; &quot;we,&quot; &quot;our,&quot; or
+                &quot;us&quot;). These Terms govern your access to and use of our website located at{" "}
                 <Link
                   href="https://www.lifeinsuranceplanner-ai.com"
                   className="text-primary hover:underline"
@@ -70,9 +70,9 @@ export default function TermsPage() {
                 >
                   https://www.lifeinsuranceplanner-ai.com
                 </Link>{" "}
-                (the "Website"), our proprietary web-based software application (the "Application"), our AI-powered
-                analysis feature ("Insurance Planner AI"), our chatbot service, and all related services (collectively,
-                the "Services").
+                (the &quot;Website&quot;), our proprietary web-based software application (the &quot;Application&quot;),
+                our AI-powered analysis feature (&quot;Insurance Planner AI&quot;), our chatbot service, and all related
+                services (collectively, the &quot;Services&quot;).
               </p>
               <p className="text-base mb-6">
                 These Terms incorporate by reference our Privacy Policy, available at{" "}
@@ -102,7 +102,7 @@ export default function TermsPage() {
                 to be bound by these Terms. If you don&apos;t agree to these Terms in their entirety, you must not
                 access or use our Services. If you are accessing or using our Services on behalf of a business entity,
                 you represent and warrant that you have the authority to bind such entity to these Terms, and references
-                to "you" and "your" in these Terms refer to both you individually and such entity.
+                to &quot;you&quot; and &quot;your&quot; in these Terms refer to both you individually and such entity.
               </p>
             </section>
             <section className="mb-12">
