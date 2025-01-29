@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { TermsContent } from "./terms-content.tsx"
+import { TermsContent } from "./terms-content"
 
 export default function TermsOfService() {
   const [activeSection, setActiveSection] = useState("1")
