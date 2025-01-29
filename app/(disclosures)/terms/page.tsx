@@ -564,8 +564,8 @@ export default function TermsPage() {
                 (a) WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY,
                 OR NON-INFRINGEMENT;
                 <br />
-                (b) WARRANTIES ARISING OUT OF COURSE OF DEALING, USAGE, OR TRADE <br />
-                (b) WARRANTIES ARISING OUT OF COURSE OF DEALING, USAGE, OR TRADE;
+                (b) WARRANTIES ARISING OUT OF COURSE OF DEALING, USAGE,br /> (b) WARRANTIES ARISING OUT OF COURSE OF
+                DEALING, USAGE, OR TRADE;
                 <br />
                 (c) WARRANTIES REGARDING THE SECURITY, RELIABILITY, TIMELINESS, OR PERFORMANCE OF THE SERVICES;
                 <br />
@@ -621,8 +621,8 @@ export default function TermsPage() {
               </p>
               <p className="text-base mb-4">
                 You and Financial Planner AI agree that any dispute, claim, or controversy arising out of or relating to
-                these Terms, or your use of the Services (collectively, "Disputes") will be resolved exclusively through
-                binding individual arbitration rather than in court.
+                these Terms, or your use of the Services (collectively, &quot;Disputes&quot;) will be resolved
+                exclusively through binding individual arbitration rather than in court.
               </p>
             </section>
             <section className="mb-12">
