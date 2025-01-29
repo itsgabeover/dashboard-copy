@@ -6,27 +6,27 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import Link from "next/link"
 
 export default function TermsPage() {
-  //const [activeSection, setActiveSection] = useState("1")
+  const [activeSection, setActiveSection] = useState("1")
 
-  //const sections = [
-  //  { id: "1", title: "Introduction and Acceptance" },
-  //  { id: "2", title: "Definitions and Interpretation" },
-  //  { id: "3", title: "Eligibility and Registration" },
-  //  { id: "4", title: "Service Description and Scope" },
-  //  { id: "5", title: "Critical Limitations and Disclaimers" },
-  //  { id: "6", title: "Data Rights and Privacy" },
-  //  { id: "7", title: "Payment Terms and Conditions" },
-  //  { id: "8", title: "Usage Restrictions and Requirements" },
-  //  { id: "9", title: "Intellectual Property Rights" },
-  //  { id: "10", title: "Third-Party Services and Content" },
-  //  { id: "11", title: "Warranties and Disclaimers" },
-  //  { id: "12", title: "Limitation of Liability" },
-  //  { id: "13", title: "Dispute Resolution and Arbitration" },
-  //  { id: "14", title: "Indemnification" },
-  //  { id: "15", title: "Term and Termination" },
-  //  { id: "16", title: "General Provisions" },
-  //  { id: "17", title: "Contact Information" },
-  //]
+  const sections = [
+    { id: "1", title: "Introduction and Acceptance" },
+    { id: "2", title: "Definitions and Interpretation" },
+    { id: "3", title: "Eligibility and Registration" },
+    { id: "4", title: "Service Description and Scope" },
+    { id: "5", title: "Critical Limitations and Disclaimers" },
+    { id: "6", title: "Data Rights and Privacy" },
+    { id: "7", title: "Payment Terms and Conditions" },
+    { id: "8", title: "Usage Restrictions and Requirements" },
+    { id: "9", title: "Intellectual Property Rights" },
+    { id: "10", title: "Third-Party Services and Content" },
+    { id: "11", title: "Warranties and Disclaimers" },
+    { id: "12", title: "Limitation of Liability" },
+    { id: "13", title: "Dispute Resolution and Arbitration" },
+    { id: "14", title: "Indemnification" },
+    { id: "15", title: "Term and Termination" },
+    { id: "16", title: "General Provisions" },
+    { id: "17", title: "Contact Information" },
+  ]
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -84,7 +84,7 @@ export default function TermsPage() {
                 >
                   https://www.lifeinsuranceplanner-ai.com/privacy
                 </Link>
-                , our Cookie Policy
+                , our Cookie Policy{" "}
                 <Link
                   href="https://www.lifeinsuranceplanner-ai.com/cookie-policy"
                   className="text-primary hover:underline"
@@ -160,13 +160,13 @@ export default function TermsPage() {
               </p>
               <h3 className="text-xl mb-4">2.2 In these Terms:</h3>
               <p className="text-base mb-4">
-                (a) the words "include," "includes," and "including" are deemed to be followed by the words "without
-                limitation";
+                (a) the words &quot;include,&quot; &quot;includes,&quot; and &quot;including&quot; are deemed to be
+                followed by the words &quot;without limitation&quot;;
                 <br />
-                (b) the word "or" is not exclusive;
+                (b) the word &quot;or&quot; is not exclusive;
                 <br />
-                (c) the words "herein," "hereof," "hereby," "hereto," and "hereunder" refer to these Terms as a whole;
-                and
+                (c) the words &quot;herein,&quot; &quot;hereof,&quot; &quot;hereby,&quot; &quot;hereto,&quot; and
+                &quot;hereunder&quot; refer to these Terms as a whole; and
                 <br />
                 (d) words denoting the singular have a comparable meaning when used in the plural, and vice-versa.
               </p>
@@ -555,17 +555,16 @@ export default function TermsPage() {
               </h2>
               <h3 className="text-xl mb-4">11.1 Disclaimer of Warranties</h3>
               <p className="text-base mb-4">
-                TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE,"
-                WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND. FINANCIAL PLANNER AI AND ITS LICENSORS EXPRESSLY
-                DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WITHOUT
-                LIMITATION:
+                TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICES ARE PROVIDED &quot;AS IS&quot; AND
+                &quot;AS AVAILABLE,&quot; WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND. FINANCIAL PLANNER AI AND ITS
+                LICENSORS EXPRESSLY DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE,
+                INCLUDING WITHOUT LIMITATION:
               </p>
               <p className="text-base mb-4">
                 (a) WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY,
                 OR NON-INFRINGEMENT;
                 <br />
-                (b) WARRANTIES ARISING OUT OF COURSE OF DEALING, USAGE,br /> (b) WARRANTIES ARISING OUT OF COURSE OF
-                DEALING, USAGE, OR TRADE;
+                (b) WARRANTIES ARISING OUT OF COURSE OF DEALING, USAGE, OR TRADE;
                 <br />
                 (c) WARRANTIES REGARDING THE SECURITY, RELIABILITY, TIMELINESS, OR PERFORMANCE OF THE SERVICES;
                 <br />
@@ -586,7 +585,7 @@ export default function TermsPage() {
               <h3 className="text-xl mb-4">12.1 Exclusion of Damages</h3>
               <p className="text-base mb-4">
                 TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL FINANCIAL PLANNER AI, ITS
-                AFFILIATES, LICENSORS, ORSERVICE PROVIDERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT,
+                AFFILIATES, LICENSORS, OR SERVICE PROVIDERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT,
                 CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES OF ANY KIND, INCLUDING WITHOUT LIMITATION DAMAGES FOR:
               </p>
               <p className="text-base mb-4">
