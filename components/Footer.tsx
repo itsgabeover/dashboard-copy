@@ -15,7 +15,6 @@ export function Footer() {
               IP-AI is a proprietary AI-driven service provided by Financial Planner AI, LLC.
             </p>
           </div>
-
           {/* Quick Links */}
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">
@@ -48,7 +47,6 @@ export function Footer() {
               </li>
             </ul>
           </div>
-
           {/* Company Links */}
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">
@@ -79,18 +77,9 @@ export function Footer() {
                   Cookie Policy
                 </Link>
               </li>
-              <li>
-                <Link 
-                  href="/trust" 
-                  className="text-text-light hover:text-text block py-2 md:py-0"
-                >
-                  Customer Subscription Agreement
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
-
         <div className="mt-6 pt-6 md:mt-8 md:pt-8 border-t border-border text-center">
           <p className="text-text-light text-sm md:text-base">
             © {new Date().getFullYear()} Financial Planner AI, LLC. All rights reserved.
@@ -100,4 +89,3 @@ export function Footer() {
     </footer>
   )
 }
-
