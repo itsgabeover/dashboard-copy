@@ -134,11 +134,11 @@ export const Hero: FC = () => {
                               illustration
                               <HelpCircle className="w-4 h-4 ml-1 inline text-blue-500" />
                             </TooltipTrigger>
-                            <TooltipContent side="left" sideOffset={20} className="max-w-xs bg-white z-[60]">
-                              <span className="p-2 block">
+                            <TooltipContent side="left" align="center" className="max-w-xs bg-white z-[60]">
+                              <p className="p-2">
                                 A free report showing your current policy details - available from your insurance
                                 company. Just ask for an &apos;in-force illustration&apos;
-                              </span>
+                              </p>
                             </TooltipContent>
                           </Tooltip>{" "}
                           and provide your email address.
