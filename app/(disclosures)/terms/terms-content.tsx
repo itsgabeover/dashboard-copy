@@ -17,15 +17,15 @@ export function TermsContent() {
       <section id="section-1" className="space-y-4">
         <h2 className="text-2xl font-bold">1. INTRODUCTION AND ACCEPTANCE</h2>
         <p>
-          Welcome to Financial Planner AI. These Terms of Service (the "Terms") constitute a legally binding agreement
-          between you and Financial Planner AI, LLC, a limited liability company organized under the laws of New Jersey
-          ("Financial Planner AI," "we," "our," or "us").
+          Welcome to Financial Planner AI. These Terms of Service (the &quot;Terms&quot;) constitute a legally binding
+          agreement between you and Financial Planner AI, LLC, a limited liability company organized under the laws of
+          New Jersey (&quot;Financial Planner AI,&quot; &quot;we,&quot; &quot;our,&quot; or &quot;us&quot;).
         </p>
         <p>
           These Terms govern your access to and use of our website located at https://www.lifeinsuranceplanner-ai.com
-          (the "Website"), our proprietary web-based software application (the "Application"), our AI-powered analysis
-          feature ("Insurance Planner AI"), our chatbot service, and all related services (collectively, the
-          "Services").
+          (the &quot;Website&quot;), our proprietary web-based software application (the &quot;Application&quot;), our
+          AI-powered analysis feature (&quot;Insurance Planner AI&quot;), our chatbot service, and all related services
+          (collectively, the &quot;Services&quot;).
         </p>
       </section>
 
