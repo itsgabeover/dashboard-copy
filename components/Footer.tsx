@@ -9,10 +9,10 @@ export function Footer() {
           {/* Company Info */}
           <div className="text-center md:text-left">
             <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">
-              Insurance Planner AI (IP-AI)
+              Insurance Planner AI
             </h3>
             <p className="text-text-light text-sm md:text-base">
-              IP-AI is a proprietary AI-driven service provided by Financial Planner AI, LLC.
+              AI-driven insurance analysis by Financial Planner AI, LLC.
             </p>
           </div>
           {/* Quick Links */}
