@@ -8,9 +8,8 @@ export function TermsContent() {
         <div className="bg-muted p-4 rounded-lg my-8">
           <p className="font-bold">IMPORTANT NOTICE REGARDING YOUR LEGAL RIGHTS</p>
           <p className="mt-2">
-            {
-              "PLEASE READ THESE TERMS OF SERVICE CAREFULLY. THEY CONTAIN AN ARBITRATION AGREEMENT AND CLASS ACTION WAIVER THAT AFFECT YOUR LEGAL RIGHTS."
-            }
+            PLEASE READ THESE TERMS OF SERVICE CAREFULLY. THEY CONTAIN AN ARBITRATION AGREEMENT AND CLASS ACTION WAIVER
+            THAT AFFECT YOUR LEGAL RIGHTS.
           </p>
         </div>
       </section>
@@ -18,18 +17,24 @@ export function TermsContent() {
       <section id="section-1" className="space-y-4">
         <h2 className="text-2xl font-bold">1. INTRODUCTION AND ACCEPTANCE</h2>
         <p>
-          {
-            'Welcome to Financial Planner AI. These Terms of Service (the "Terms") constitute a legally binding agreement between you and Financial Planner AI, LLC, a limited liability company organized under the laws of New Jersey ("Financial Planner AI," "we," "our," or "us").'
-          }
+          Welcome to Financial Planner AI. These Terms of Service (the "Terms") constitute a legally binding agreement
+          between you and Financial Planner AI, LLC, a limited liability company organized under the laws of New Jersey
+          ("Financial Planner AI," "we," "our," or "us").
         </p>
-        {/* Add all terms content here */}
+        <p>
+          These Terms govern your access to and use of our website located at https://www.lifeinsuranceplanner-ai.com
+          (the "Website"), our proprietary web-based software application (the "Application"), our AI-powered analysis
+          feature ("Insurance Planner AI"), our chatbot service, and all related services (collectively, the
+          "Services").
+        </p>
       </section>
+
+      {/* Add more sections here for the full terms of service content */}
 
       <footer className="pt-8 border-t">
         <p className="text-sm text-muted-foreground">
-          {"Last Updated: January 29, 2025"}
-          <br />
-          {"© 2025 Financial Planner AI, LLC. All rights reserved."}
+          Last Updated: January 29, 2025
+          <br />© 2025 Financial Planner AI, LLC. All rights reserved.
         </p>
       </footer>
     </div>
