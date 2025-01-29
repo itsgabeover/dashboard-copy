@@ -11,9 +11,9 @@ return (
       <main className="w-full">
         <ScrollArea className="h-[calc(100vh-200px)]" aria-label="Terms of Service content">
           <div className="prose prose-gray dark:prose-invert max-w-4xl mx-auto">
-            <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
+            <h1 className="text-4xl font-bold mb-4"></h1>
             <p className="text-lg mb-6">
-              <strong>Effective Date: January 1, 2025</strong>
+              <strong></strong>
             </p>
 
             <div className="bg-muted p-6 rounded-lg mb-8">
