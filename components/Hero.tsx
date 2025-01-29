@@ -129,16 +129,23 @@ export const Hero: FC = () => {
                       description: (
                         <div className="text-gray-600">
                           Upload your{" "}
-                          <Tooltip>
-                             <TooltipTrigger className="font-bold inline-flex items-center">
+                          {/* Replace the existing tooltip section with this: */}
+<Tooltip>
+  <TooltipTrigger className="font-bold inline-flex items-center">
     illustration
     <HelpCircle className="w-4 h-4 ml-1 inline text-blue-500" />
   </TooltipTrigger>
-  <TooltipContent side="left" align="center" className="max-w-xs bg-white z-50">
-    A free report showing your current policy details - available from your insurance company.
-    Just ask for an &apos;in-force illustration&apos;
+  <TooltipContent 
+    side="left"
+    sideOffset={20}
+    className="max-w-xs bg-white z-[60]" // increased z-index
+  >
+    <div className="p-2">
+      A free report showing your current policy details - available from your insurance company.
+      Just ask for an &apos;in-force illustration&apos;
+    </div>
   </TooltipContent>
-                          </Tooltip>{" "}
+</Tooltip>{" "}
                           and provide your email address.
                         </div>
                       ),
