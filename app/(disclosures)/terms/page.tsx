@@ -1,71 +1,94 @@
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 export default function TermsPage() {
+  const [activeSection, setActiveSection] = useState("1")
+
+  const sections = [
+    { id: "1", title: "Introduction and Acceptance" },
+    { id: "2", title: "Definitions and Interpretation" },
+    { id: "3", title: "Eligibility and Registration" },
+    { id: "4", title: "Service Description and Scope" },
+    { id: "5", title: "Critical Limitations and Disclaimers" },
+    { id: "6", title: "Data Rights and Privacy" },
+    { id: "7", title: "Payment Terms and Conditions" },
+    { id: "8", title: "Usage Restrictions and Requirements" },
+    { id: "9", title: "Intellectual Property Rights" },
+    { id: "10", title: "Third-Party Services and Content" },
+    { id: "11", title: "Warranties and Disclaimers" },
+    { id: "12", title: "Limitation of Liability" },
+    { id: "13", title: "Dispute Resolution and Arbitration" },
+    { id: "14", title: "Indemnification" },
+    { id: "15", title: "Term and Termination" },
+    { id: "16", title: "General Provisions" },
+    { id: "17", title: "Contact Information" },
+  ]
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-4">
-      <div className="terms-of-use bg-white p-6 rounded-lg shadow-md mb-4">
-        <h1 className="text-3xl font-bold text-primary-blue mb-6">Terms of Service</h1>
-        <p className="text-base text-gray-700 mb-4">
-          Welcome to [Your Company Name] (&quot;Company&quot;, &quot;we&quot;, &quot;our&quot;, &quot;us&quot;)! By
-          accessing or using our services, you agree to comply with and be bound by these Terms of Use
-          (&quot;Terms&quot;). Please read them carefully.
-        </p>
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
+      <div className="flex flex-col lg:flex-row gap-8">
+        <nav className="w-full lg:w-1/4">
+          <ScrollArea className="h-[calc(100vh-200px)]">
+            <div className="pr-4">
+              {sections.map((section) => (
+                <Button
+                  key={section.id}
+                  variant={activeSection === section.id ? "default" : "ghost"}
+                  className="w-full justify-start mb-2 text-left"
+                  onClick={() => setActiveSection(section.id)}
+                >
+                  <span className="truncate">{section.title}</span>
+                </Button>
+              ))}
+            </div>
+          </ScrollArea>
+        </nav>
+        <main className="w-full lg:w-3/4">
+          <ScrollArea className="h-[calc(100vh-200px)]">
+            <div className="prose prose-gray dark:prose-invert max-w-none">
+              <h1>TERMS OF SERVICE</h1>
+              <p>
+                <strong>Effective Date: January 1, 2025</strong>
+              </p>
 
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">1. Acceptance of Terms</h2>
-        <p className="text-base text-gray-700 mb-4">
-          By accessing our website and using our services, you agree to be bound by these Terms. If you do not agree,
-          you must not use our services.
-        </p>
+              <div className="bg-muted p-4 rounded-lg mb-8">
+                <strong>IMPORTANT NOTICE REGARDING YOUR LEGAL RIGHTS</strong>
+                <p className="mt-2">
+                  {
+                    "PLEASE READ THESE TERMS OF SERVICE CAREFULLY. THEY CONTAIN AN ARBITRATION AGREEMENT AND CLASS ACTION WAIVER THAT AFFECT YOUR LEGAL RIGHTS."
+                  }
+                </p>
+              </div>
 
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">2. Changes to Terms</h2>
-        <p className="text-base text-gray-700 mb-4">
-          We reserve the right to modify or replace these Terms at any time. We will notify you of any changes by
-          posting the new Terms on our website. Continued use of the services following the changes indicates your
-          acceptance of the new Terms.
-        </p>
+              <p>
+                {
+                  "By accessing or using the Services provided by Financial Planner AI, LLC, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service, including the binding arbitration provision and class action waiver found in Section 12."
+                }
+              </p>
 
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">3. User Accounts</h2>
-        <p className="text-base text-gray-700 mb-4">
-          To access certain features of our services, you may be required to register an account. You agree to provide
-          accurate, current, and complete information and to keep your account information updated.
-        </p>
+              <h2 id="section-1">1. INTRODUCTION AND ACCEPTANCE</h2>
+              <p>
+                {
+                  'Welcome to Financial Planner AI. These Terms of Service (the "Terms") constitute a legally binding agreement between you and Financial Planner AI, LLC, a limited liability company organized under the laws of New Jersey ("Financial Planner AI," "we," "our," or "us"). These Terms govern your access to and use of our website located at https://www.lifeinsuranceplanner-ai.com (the "Website"), our proprietary web-based software application (the "Application"), our AI-powered analysis feature ("Insurance Planner AI"), our chatbot service, and all related services (collectively, the "Services").'
+                }
+              </p>
 
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">4. Use of Services</h2>
-        <p className="text-base text-gray-700 mb-4">
-          You agree to use our services only for lawful purposes and in accordance with these Terms. You are prohibited
-          from using the services in any way that may damage, disable, overburden, or impair the services.
-        </p>
+              {/* Continue with all sections, ensuring proper escaping of quotes and apostrophes */}
 
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">5. Intellectual Property</h2>
-        <p className="text-base text-gray-700 mb-4">
-          All content, features, and functionality (including but not limited to text, graphics, logos, and software)
-          provided as part of the services are the property of [Your Company Name] or its licensors and are protected by
-          copyright, trademark, and other laws.
-        </p>
-
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">6. Termination</h2>
-        <p className="text-base text-gray-700 mb-4">
-          We may suspend or terminate your access to our services without prior notice or liability, for any reason,
-          including if you breach these Terms.
-        </p>
-
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">7. Limitation of Liability</h2>
-        <p className="text-base text-gray-700 mb-4">
-          To the maximum extent permitted by law, [Your Company Name] shall not be liable for any indirect, incidental,
-          special, consequential, or punitive damages, or any loss of profits or revenues.
-        </p>
-
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">8. Governing Law</h2>
-        <p className="text-base text-gray-700 mb-4">
-          These Terms shall be governed by and construed in accordance with the laws of [Your State/Country], without
-          regard to its conflict of law provisions.
-        </p>
-
-        <h2 className="text-2xl font-bold mt-6 mb-2 text-primary-blue">9. Contact Information</h2>
-        <p className="text-base text-gray-700 mb-4">
-          For any questions about these Terms, please contact us at [Your Contact Information].
-        </p>
-      </div>
-
-      <div className="prose max-w-none">
+              <div className="mt-8 pt-8 border-t">
+                <p className="text-sm text-muted-foreground">
+                  {"Last Updated: January 29, 2025"}
+                  <br />
+                  {"© 2025 Financial Planner AI, LLC. All rights reserved."}
+                </p>
+              </div>
+            </div>
+          </ScrollArea>
+        </main>
       </div>
     </div>
   )
