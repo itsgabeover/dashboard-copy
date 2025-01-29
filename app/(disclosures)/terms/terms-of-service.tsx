@@ -1,7 +1,9 @@
+"use client"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import TermsContent from "./terms-content.mdx"
+import { TermsContent } from "./terms-content.tsx"
 
 export default function TermsOfService() {
   const [activeSection, setActiveSection] = useState("1")
@@ -27,26 +29,28 @@ export default function TermsOfService() {
   ]
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
-      <div className="flex flex-col md:flex-row gap-8">
-        <nav className="w-full md:w-1/4">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <nav className="w-full lg:w-1/4">
           <ScrollArea className="h-[calc(100vh-200px)]">
-            {sections.map((section) => (
-              <Button
-                key={section.id}
-                variant={activeSection === section.id ? "default" : "ghost"}
-                className="w-full justify-start mb-2"
-                onClick={() => setActiveSection(section.id)}
-              >
-                {section.title}
-              </Button>
-            ))}
+            <div className="pr-4">
+              {sections.map((section) => (
+                <Button
+                  key={section.id}
+                  variant={activeSection === section.id ? "default" : "ghost"}
+                  className="w-full justify-start mb-2 text-left"
+                  onClick={() => setActiveSection(section.id)}
+                >
+                  <span className="truncate">{section.title}</span>
+                </Button>
+              ))}
+            </div>
           </ScrollArea>
         </nav>
-        <main className="w-full md:w-3/4">
+        <main className="w-full lg:w-3/4">
           <ScrollArea className="h-[calc(100vh-200px)]">
-            <div className="prose max-w-none">
+            <div className="prose prose-gray dark:prose-invert max-w-none">
               <TermsContent />
             </div>
           </ScrollArea>
