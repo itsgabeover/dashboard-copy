@@ -1,15 +1,6 @@
-import React from "react"
+ import React from "react"
 
-interface Section {
-  id: string
-  title: string
-}
-
-interface TermsContentProps {
-  sections: Section[]
-}
-
-export function TermsContent({ sections }: TermsContentProps) {
+export function TermsContent() {
   return (
     <div className="space-y-8">
       <section id="important-notice">
@@ -48,7 +39,6 @@ export function TermsContent({ sections }: TermsContentProps) {
           }
         </p>
       </section>
-
       <section id="section-2" className="space-y-4">
         <h2 className="text-2xl font-bold">2. DEFINITIONS AND INTERPRETATION</h2>
         <h3 className="text-xl font-semibold">2.1 Throughout these Terms, the following definitions apply:</h3>
@@ -702,7 +692,7 @@ export function TermsContent({ sections }: TermsContentProps) {
         </p>
       </section>
 
-      <section id="section-17" className="space-y-4">
+       <section id="section-17" className="space-y-4">
         <h2 className="text-2xl font-bold">17. CONTACT INFORMATION</h2>
         <h3 className="text-xl font-semibold">17.1 General Inquiries</h3>
         <p>{"For general inquiries about the Services or these Terms, please contact us at:"}</p>
