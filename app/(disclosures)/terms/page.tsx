@@ -6,7 +6,7 @@ import Link from "next/link"
 export default function TermsPage() {
   
 return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container py-8 px-4">
       <h1 className="text-3xl font-bold mb-8">Terms of Service</h1>
       <main className="w-full">
         <ScrollArea className="h-[calc(100vh-200px)]" aria-label="Terms of Service content">
