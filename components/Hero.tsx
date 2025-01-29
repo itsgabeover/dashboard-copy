@@ -127,27 +127,22 @@ export const Hero: FC = () => {
                       step: 1,
                       title: "Upload & Email",
                       description: (
-                        <div className="text-gray-600">
+                        <span className="text-gray-600">
                           Upload your{" "}
-                          {/* Replace the existing tooltip section with this: */}
-<Tooltip>
-  <TooltipTrigger className="font-bold inline-flex items-center">
-    illustration
-    <HelpCircle className="w-4 h-4 ml-1 inline text-blue-500" />
-  </TooltipTrigger>
-  <TooltipContent 
-    side="left"
-    sideOffset={20}
-    className="max-w-xs bg-white z-[60]" // increased z-index
-  >
-    <div className="p-2">
-      A free report showing your current policy details - available from your insurance company.
-      Just ask for an &apos;in-force illustration&apos;
-    </div>
-  </TooltipContent>
-</Tooltip>{" "}
+                          <Tooltip>
+                            <TooltipTrigger className="font-bold inline-flex items-center">
+                              illustration
+                              <HelpCircle className="w-4 h-4 ml-1 inline text-blue-500" />
+                            </TooltipTrigger>
+                            <TooltipContent side="left" sideOffset={20} className="max-w-xs bg-white z-[60]">
+                              <span className="p-2 block">
+                                A free report showing your current policy details - available from your insurance
+                                company. Just ask for an &apos;in-force illustration&apos;
+                              </span>
+                            </TooltipContent>
+                          </Tooltip>{" "}
                           and provide your email address.
-                        </div>
+                        </span>
                       ),
                       icon: <FileText className="w-6 h-6" />,
                     },
@@ -172,7 +167,11 @@ export const Hero: FC = () => {
                               {item.step}
                             </div>
                             <h3 className="text-xl font-semibold mb-4 text-[#4B6FEE]">{item.title}</h3>
-                            <p className="text-gray-600">{item.description}</p>
+                            {typeof item.description === "string" ? (
+                              <p className="text-gray-600">{item.description}</p>
+                            ) : (
+                              item.description
+                            )}
                           </div>
                           {item.step === 1 && (
                             <Link
@@ -386,3 +385,4 @@ export const Hero: FC = () => {
 }
 
 export default Hero
+
