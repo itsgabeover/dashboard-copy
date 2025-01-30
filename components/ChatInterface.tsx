@@ -19,7 +19,6 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
   const [iframeLoaded, setIframeLoaded] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [iframeKey, setIframeKey] = useState(0)
-
   const [showDisclosure, setShowDisclosure] = useState(false)
 
   useEffect(() => {
@@ -51,19 +50,18 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
       aria-labelledby="chat-title"
     >
       <div
-        className={`
+        className="
           fixed transition-all duration-300 ease-in-out shadow-2xl
           inset-0 sm:inset-2 sm:rounded-xl
           bg-gradient-to-b from-white to-gray-50
-        `}
+        "
       >
-        {/* Optimized header - reduced padding and height */}
+        {/* Header */}
         <div
-          className={`
+          className="
           flex justify-between items-center px-2 py-1.5 border-b 
-          bg-white/80 backdrop-blur-md
-          ${isMinimized ? "rounded-full" : "sm:rounded-t-xl"}
-        `}
+          bg-white/80 backdrop-blur-md sm:rounded-t-xl
+        "
         >
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-[#4B6FEE] flex items-center justify-center">
@@ -93,13 +91,6 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
               </Tooltip>
             </TooltipProvider>
             <button
-              onClick={() => setIsMinimized(!isMinimized)}
-              className="text-gray-500 hover:text-[#4B6FEE] p-1 rounded-full hover:bg-gray-100/80 transition-colors"
-              aria-label={isMinimized ? "Maximize chat" : "Minimize chat"}
-            >
-              {isMinimized ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
-            </button>
-            <button
               onClick={onClose}
               className="text-gray-500 hover:text-red-500 p-1 rounded-full hover:bg-gray-100/80 transition-colors"
               aria-label="Close chat interface"
@@ -110,12 +101,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
         </div>
 
         {/* Main chat area */}
-        <div
-          className={`
-          relative
-          ${isMinimized ? "hidden" : "flex-grow h-[calc(100%-2.5rem)]"}
-        `}
-        >
+        <div className="relative flex-grow h-[calc(100%-2.5rem)]">
           {!iframeLoaded && !loadError && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
               <div className="relative">
@@ -147,7 +133,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
                 className={`
                   w-full h-full transition-all duration-500
                   ${iframeLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}
-                  ${showDisclosure ? 'mb-24' : ''}
+                  ${showDisclosure ? "mb-24" : ""}
                 `}
                 onLoad={() => setIframeLoaded(true)}
                 onError={handleIframeError}
@@ -155,18 +141,24 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
                 sandbox="allow-scripts allow-same-origin allow-forms"
                 title="Chat Interface"
               />
-              {/* Bottom gradient overlay positioned above the disclosure when shown */}
-              <div className={`absolute left-0 right-0 h-16 bg-gradient-to-t from-white via-white to-transparent pointer-events-none sm:rounded-b-xl ${showDisclosure ? 'bottom-24' : 'bottom-0'}`} />
+              {/* Bottom gradient overlay */}
+              <div
+                className={`absolute left-0 right-0 h-16 bg-gradient-to-t from-white via-white to-transparent pointer-events-none sm:rounded-b-xl ${
+                  showDisclosure ? "bottom-24" : "bottom-0"
+                }`}
+              />
             </div>
           )}
         </div>
 
         {/* Disclosure panel */}
-        <div className={`
+        <div
+          className={`
           absolute bottom-0 left-0 right-0 
           transform transition-transform duration-300 ease-in-out
-          ${showDisclosure ? 'translate-y-0' : 'translate-y-full'}
-        `}>
+          ${showDisclosure ? "translate-y-0" : "translate-y-full"}
+        `}
+        >
           <div className="p-2 bg-white border-t text-xs text-gray-600 text-center">
             <p className="mb-1">
               This AI-powered chatbot provides automated responses and may be inaccurate or incomplete. It does not offer
