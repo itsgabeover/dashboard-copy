@@ -8,10 +8,6 @@ interface ChatInterfaceProps {
   onClose: () => void
 }
 
-interface IframeErrorEvent extends Event {
-  target: HTMLIFrameElement
-}
-
 // Get the chatbot URL from environment variable or use a default value
 const CHATBOT_URL = process.env.NEXT_PUBLIC_CHATBOT_URL || "https://default-chatbot-url.com"
 
@@ -32,13 +28,10 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
     }
   }, [])
 
-  const handleIframeError = (e: IframeErrorEvent) => {
-    const errorMessage =
-      (e.target as HTMLIFrameElement).contentWindow?.document?.body?.textContent ||
-      "Failed to load chat interface. Please try again later."
+  const handleIframeError = () => {
+    const errorMessage = "Failed to load chat interface. Please try again later."
 
     console.error("Iframe loading error:", {
-      error: e,
       url: CHATBOT_URL,
       timestamp: new Date().toISOString(),
     })
