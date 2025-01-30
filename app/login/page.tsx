@@ -176,7 +176,7 @@ export default function LoginPage() {
             <p className="text-gray-600">Have questions? Want to share immediate feedback?</p>
             <p className="text-gray-600">Reach us at:</p>
             <a href="mailto:pilot-support@financialplanner-ai.com" className="text-blue-600 hover:underline block">
-              pilot-support@financial-planner-ai.com
+              pilot-support@financialplanner-ai.com
             </a>
           </div>
 
