@@ -204,7 +204,7 @@ const AboutPage: FC = () => {
                 </div>
                 <p className="text-xl text-blue-100">
                   From questions to clarity in minutes. Our AI technology evaluates every aspect of your coverage to
-                  ensure it's working exactly as it should.
+                  ensure it is working exactly as it should.
                 </p>
               </CardHeader>
               <CardContent className="flex justify-center p-8 bg-gradient-to-b from-white to-blue-50/30">
