@@ -51,10 +51,10 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
         "
       >
         {/* Header */}
-        <div
+                  <div
           className="
-            flex justify-between items-center px-2 py-1.5 border-b 
-            bg-white/80 backdrop-blur-md sm:rounded-t-xl
+            flex justify-between items-center px-2 py-1 border-b 
+            bg-white/80 backdrop-blur-md sm:rounded-t-xl min-h-[40px]
           "
         >
           <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
         </div>
 
         {/* Main chat area with padding bottom for disclosure */}
-        <div className="relative flex-grow h-[calc(100%-6rem)]">
+        <div className="relative flex-grow h-[calc(100%-5rem)]">
           {!iframeLoaded && !loadError && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
               <div className="relative">
@@ -118,13 +118,13 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
           )}
         </div>
 
-        {/* Persistent disclosure footer */}
-        <div className="p-2 bg-white border-t text-xs text-gray-600 text-center">
-          <p>
+        {/* Persistent disclosure footer positioned to cover powered by text */}
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-white border-t text-xs text-gray-600 text-center">
+          <p className="mb-1">
             This AI-powered chatbot provides automated responses and may be inaccurate or incomplete. It does not offer
             financial, legal, or professional advice.
           </p>
-          <div className="flex gap-2 text-[#4B6FEE] justify-center mt-1">
+          <div className="flex gap-2 text-[#4B6FEE] justify-center">
             <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline">
               Privacy Policy
             </a>
@@ -133,6 +133,8 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
               Terms of Service
             </a>
           </div>
+          {/* Extra padding to ensure coverage of powered by text */}
+          <div className="h-4"></div>
         </div>
       </div>
     </div>
