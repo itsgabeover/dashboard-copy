@@ -53,7 +53,7 @@ const PolicyReviewQuiz = () => {
     if (score <= 2) {
       return "Your policy appears to be on track, but our AI review can uncover potential opportunities and confirm everything is working as intended."
     } else if (score <= 5) {
-      return "Your policy may benefit from a checkup. A review would help ensure you are not missing out on valuable benefits or needed updates."
+      return "Your policy may benefit from a checkup. An AI review would help ensure you are not missing out on valuable benefits or needed updates."
     } else {
       return "Your policy needs attention. Let us make sure it is properly aligned with your current needs and performing at its best."
     }
@@ -78,7 +78,7 @@ const PolicyReviewQuiz = () => {
             onClick={() => setStarted(true)}
             className="bg-[#4B6FEE] hover:bg-blue-700 text-white px-6 py-2 rounded-full"
           >
-            Start Quick Quiz →
+            Start Quick Assessment →
           </Button>
         </CardContent>
       </Card>
