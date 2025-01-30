@@ -109,7 +109,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
         <div
           className={`
           relative
-          ${isMinimized ? "hidden" : "flex-grow h-[calc(100%-7rem)] sm:h-[calc(100%-8rem)]"}
+          ${isMinimized ? "hidden" : "flex-grow h-[calc(100%-9rem)] sm:h-[calc(100%-10rem)]"}
         `}
         >
           {!iframeLoaded && !loadError && (
@@ -155,7 +155,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
         </div>
 
         {/* Disclosure and links */}
-        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-white/80 backdrop-blur-sm text-[10px] sm:text-xs text-gray-600 text-center border-t">
+        <div className="absolute bottom-0 left-0 right-0 p-2 bg-white/95 backdrop-blur-sm text-[10px] sm:text-xs text-gray-600 text-center border-t">
           <p className="mb-1">
             This AI-powered chatbot provides automated responses and may be inaccurate or incomplete. It does not offer
             financial, legal, or professional advice.
