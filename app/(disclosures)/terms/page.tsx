@@ -12,7 +12,7 @@ export default function TermsPage() {
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
-          
+
           <div className="text-sm text-muted-foreground mb-8">Effective: January 1, 2025</div>
 
           {/* Important Notice Box */}
@@ -36,16 +36,16 @@ export default function TermsPage() {
               1. INTRODUCTION AND ACCEPTANCE
             </h2>
             <p className="text-base mb-4">
-              Welcome to Financial Planner AI. These Terms of Service (the "Terms") constitute a legally
+              Welcome to Financial Planner AI. These Terms of Service (the &quot;Terms&quot;) constitute a legally
               binding agreement between you and Financial Planner AI, LLC, a limited liability company organized under
-              the laws of New Jersey ("Financial Planner AI," "we," "our," or
-              "us"). These Terms govern your access to and use of our website located at{" "}
+              the laws of New Jersey (&quot;Financial Planner AI,&quot; &quot;we,&quot; &quot;our,&quot; or
+              &quot;us&quot;). These Terms govern your access to and use of our website located at{" "}
               <Link href="https://www.lifeinsuranceplanner-ai.com" className="text-primary hover:underline">
                 https://www.lifeinsuranceplanner-ai.com
               </Link>{" "}
-              (the "Website"), our proprietary web-based software application (the "Application"),
-              our AI-powered analysis feature ("Insurance Planner AI"), our chatbot service, and all related
-              services (collectively, the "Services").
+              (the &quot;Website&quot;), our proprietary web-based software application (the &quot;Application&quot;),
+              our AI-powered analysis feature (&quot;Insurance Planner AI&quot;), our chatbot service, and all related
+              services (collectively, the &quot;Services&quot;).
             </p>
             <p className="text-base mb-4">
               These Terms incorporate by reference our Privacy Policy, available at{" "}
@@ -53,15 +53,18 @@ export default function TermsPage() {
                 https://www.lifeinsuranceplanner-ai.com/privacy
               </Link>
               , our Cookie Policy{" "}
-              <Link href="https://www.lifeinsuranceplanner-ai.com/cookie-policy" className="text-primary hover:underline">
+              <Link
+                href="https://www.lifeinsuranceplanner-ai.com/cookie-policy"
+                className="text-primary hover:underline"
+              >
                 https://www.lifeinsuranceplanner-ai.com/cookie-policy
               </Link>{" "}
               and any additional terms, conditions, or policies we may provide to you from time to time.
             </p>
             <p className="text-base mb-4">
-              By accessing or using our Services, you represent and warrant that you have read, understood, and agree
-              to be bound by these Terms. If you don't agree to these Terms in their entirety, you must not
-              access or use our Services.
+              By accessing or using our Services, you represent and warrant that you have read, understood, and agree to
+              be bound by these Terms. If you don&apos;t agree to these Terms in their entirety, you must not access or
+              use our Services.
             </p>
           </section>
 
@@ -72,26 +75,29 @@ export default function TermsPage() {
             </h2>
             <h3 className="text-xl font-medium mb-3">2.1 Throughout these Terms, the following definitions apply:</h3>
             <p className="text-base mb-4">
-              "Affiliate" means any entity that directly or indirectly controls, is controlled by, or is
-              under common control with Financial Planner AI, where "control" means the ownership of, or the
-              power to vote, at least fifty percent (50%) of the voting stock, shares or interests of such entity.
+              &quot;Affiliate&quot; means any entity that directly or indirectly controls, is controlled by, or is under
+              common control with Financial Planner AI, where &quot;control&quot; means the ownership of, or the power
+              to vote, at least fifty percent (50%) of the voting stock, shares or interests of such entity.
             </p>
             <p className="text-base mb-4">
-              "AI Technology" means our artificial intelligence and machine learning technologies,
-              algorithms, models, and systems used to provide the Services.
+              &quot;AI Technology&quot; means our artificial intelligence and machine learning technologies, algorithms,
+              models, and systems used to provide the Services.
             </p>
             <p className="text-base mb-4">
-              "Analyses" means the outputs, reports, summaries, and other materials generated by our AI
+              &quot;Analyses&quot; means the outputs, reports, summaries, and other materials generated by our AI
               Technology based on the information and documentation you provide.
             </p>
             {/* ... continued definitions ... */}
             <h3 className="text-xl font-medium mb-3">2.2 In these Terms:</h3>
             <p className="text-base mb-4">
-              (a) the words "include," "includes," and "including" are deemed to be
-              followed by the words "without limitation";<br />
-              (b) the word "or" is not exclusive;<br />
-              (c) the words "herein," "hereof," "hereby," "hereto," and
-              "hereunder" refer to these Terms as a whole; and<br />
+              (a) the words &quot;include,&quot; &quot;includes,&quot; and &quot;including&quot; are deemed to be
+              followed by the words &quot;without limitation&quot;;
+              <br />
+              (b) the word &quot;or&quot; is not exclusive;
+              <br />
+              (c) the words &quot;herein,&quot; &quot;hereof,&quot; &quot;hereby,&quot; &quot;hereto,&quot; and
+              &quot;hereunder&quot; refer to these Terms as a whole; and
+              <br />
               (d) words denoting the singular have a comparable meaning when used in the plural, and vice-versa.
             </p>
           </section>
@@ -109,9 +115,9 @@ export default function TermsPage() {
             {/* ... continued section 3 content ... */}
             <h3 className="text-xl font-medium mb-3">3.2 Registration Process</h3>
             <p className="text-base mb-4">
-              To access certain features of our Services, you must register for an account. When registering, you
-              agree to provide accurate, current, and complete information about yourself as prompted by our
-              registration process.
+              To access certain features of our Services, you must register for an account. When registering, you agree
+              to provide accurate, current, and complete information about yourself as prompted by our registration
+              process.
             </p>
             <h3 className="text-xl font-medium mb-3">3.3 Account Security</h3>
             <p className="text-base mb-4">
@@ -150,9 +156,6 @@ export default function TermsPage() {
             </p>
           </section>
 
-          {/* CHUNK 1 ENDS HERE - Continue with Chunk 2 starting with Section 5 */}
-          {/* CHUNK 2 STARTS HERE */}
-          
           {/* Section 5 */}
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4" id="section-5">
@@ -169,26 +172,33 @@ export default function TermsPage() {
               You must consult with qualified Professional Advisors before making any decisions about your life
               insurance policy or taking any actions based on information provided through our Services. The Analyses
               generated by our Services are intended solely as starting points for discussions with your Professional
-              Advisors and should never be relied upon as the sole basis for any decision or action regarding your
-              life insurance policy.
+              Advisors and should never be relied upon as the sole basis for any decision or action regarding your life
+              insurance policy.
             </p>
-            
+
             <h3 className="text-xl font-medium mb-3">5.2 AI Technology Limitations</h3>
             <p className="text-base mb-4">
               You expressly acknowledge and understand that our Services utilize automated artificial intelligence and
               machine learning technologies that have inherent limitations and potential for error. The accuracy and
-              reliability of our Analyses depend entirely on the quality, completeness, and accuracy of the
-              information and documentation you provide.
+              reliability of our Analyses depend entirely on the quality, completeness, and accuracy of the information
+              and documentation you provide.
             </p>
             <p className="text-base mb-4">Our AI Technology:</p>
             <p className="text-base mb-4">
-              (a) May contain errors, bugs, or inaccuracies;<br />
-              (b) May not capture all relevant factors or considerations;<br />
-              (c) May produce inconsistent or unexpected results;<br />
-              (d) Requires human review and professional verification;<br />
-              (e) Is subject to regular updates that may affect results;<br />
-              (f) Cannot verify the completeness or accuracy of input data;<br />
-              (g) May have biases or limitations we have not identified; and<br />
+              (a) May contain errors, bugs, or inaccuracies;
+              <br />
+              (b) May not capture all relevant factors or considerations;
+              <br />
+              (c) May produce inconsistent or unexpected results;
+              <br />
+              (d) Requires human review and professional verification;
+              <br />
+              (e) Is subject to regular updates that may affect results;
+              <br />
+              (f) Cannot verify the completeness or accuracy of input data;
+              <br />
+              (g) May have biases or limitations we have not identified; and
+              <br />
               (h) Should never be relied upon without independent verification.
             </p>
 
@@ -198,11 +208,16 @@ export default function TermsPage() {
               insurance or financial documents. You acknowledge and agree that:
             </p>
             <p className="text-base mb-4">
-              (a) We cannot verify the completeness, accuracy, or authenticity of any illustration you submit;<br />
-              (b) The accuracy of our Analyses depends entirely on the accuracy of the illustration provided;<br />
-              (c) We do not independently verify any information contained in policy illustrations;<br />
-              (d) Certain illustration formats or types may not be compatible with our Services;<br />
-              (e) Processing errors or failures may occur due to document formatting or quality issues; and<br />
+              (a) We cannot verify the completeness, accuracy, or authenticity of any illustration you submit;
+              <br />
+              (b) The accuracy of our Analyses depends entirely on the accuracy of the illustration provided;
+              <br />
+              (c) We do not independently verify any information contained in policy illustrations;
+              <br />
+              (d) Certain illustration formats or types may not be compatible with our Services;
+              <br />
+              (e) Processing errors or failures may occur due to document formatting or quality issues; and
+              <br />
               (f) We are not responsible for any errors or omissions in the illustrations you provide.
             </p>
           </section>
@@ -224,11 +239,11 @@ export default function TermsPage() {
             <h3 className="text-xl font-medium mb-3">6.2 Data Rights and Licenses</h3>
             <p className="text-base mb-4">
               You represent and warrant that you have all necessary rights, permissions, and consents to provide any
-              data you submit to our Services. You retain all ownership rights in your User Content but grant
-              Financial Planner AI and its Affiliates a worldwide, non-exclusive, royalty-free, sublicensable, and
-              transferable license to use, store, copy, modify, create derivative works from, distribute, publish,
-              transmit, stream, broadcast, and otherwise exploit such User Content for any purpose related to
-              providing and improving the Services.
+              data you submit to our Services. You retain all ownership rights in your User Content but grant Financial
+              Planner AI and its Affiliates a worldwide, non-exclusive, royalty-free, sublicensable, and transferable
+              license to use, store, copy, modify, create derivative works from, distribute, publish, transmit, stream,
+              broadcast, and otherwise exploit such User Content for any purpose related to providing and improving the
+              Services.
             </p>
 
             <h3 className="text-xl font-medium mb-3">6.3 Privacy Practices</h3>
@@ -239,8 +254,8 @@ export default function TermsPage() {
 
             <h3 className="text-xl font-medium mb-3">6.4 Data Security</h3>
             <p className="text-base mb-4">
-              We implement reasonable technical, administrative, and physical security measures designed to protect
-              your data from unauthorized access, disclosure, or misuse. However, no security measures are perfect or
+              We implement reasonable technical, administrative, and physical security measures designed to protect your
+              data from unauthorized access, disclosure, or misuse. However, no security measures are perfect or
               impenetrable.
             </p>
 
@@ -273,7 +288,7 @@ export default function TermsPage() {
             <h3 className="text-xl font-medium mb-3">7.3 Payment Processing</h3>
             <p className="text-base mb-4">
               We use third-party payment processors to process payments for our Services. Your use of these payment
-              services is subject to the applicable processor's terms of service and privacy policy.
+              services is subject to the applicable processor&apos;s terms of service and privacy policy.
             </p>
 
             <h3 className="text-xl font-medium mb-3">7.4 Late Payments and Collection</h3>
@@ -298,33 +313,39 @@ export default function TermsPage() {
             <h3 className="text-xl font-medium mb-3">8.1 Acceptable Use</h3>
             <p className="text-base mb-4">
               You agree to use the Services only for lawful purposes and in accordance with these Terms. You shall not
-              use the Services in any manner that could damage, disable, overburden, or impair our servers or
-              networks, or interfere with any other party's use and enjoyment of the Services.
+              use the Services in any manner that could damage, disable, overburden, or impair our servers or networks,
+              or interfere with any other party&apos;s use and enjoyment of the Services.
             </p>
 
             <h3 className="text-xl font-medium mb-3">8.2 Prohibited Activities</h3>
             <p className="text-base mb-4">Without limiting the generality of the foregoing, you shall not:</p>
             <p className="text-base mb-4">
-              (a) Use the Services to engage in any unlawful, fraudulent, deceptive, or manipulative activity;<br />
-              (b) Attempt to circumvent, disable, or otherwise interfere with any security-related features;<br />
-              (c) Use any robot, spider, crawler, scraper, or other automated means to access the Services;<br />
-              (d) Copy, reproduce, distribute, modify, create derivative works of, publicly display, or sell any portion of the Services;<br />
-              (e) Decompile, disassemble, or reverse engineer any part of the Services;<br />
+              (a) Use the Services to engage in any unlawful, fraudulent, deceptive, or manipulative activity;
+              <br />
+              (b) Attempt to circumvent, disable, or otherwise interfere with any security-related features;
+              <br />
+              (c) Use any robot, spider, crawler, scraper, or other automated means to access the Services;
+              <br />
+              (d) Copy, reproduce, distribute, modify, create derivative works of, publicly display, or sell any portion
+              of the Services;
+              <br />
+              (e) Decompile, disassemble, or reverse engineer any part of the Services;
+              <br />
               (f) Access the Services to build a similar or competitive product or service;
             </p>
 
             <h3 className="text-xl font-medium mb-3">8.3 Usage Monitoring and Enforcement</h3>
             <p className="text-base mb-4">We reserve the right to:</p>
             <p className="text-base mb-4">
-              (a) Monitor and record all use of the Services for compliance with these Terms;<br />
-              (b) Investigate any suspicious or reported violation of these Terms;<br />
-              (c) Take appropriate legal action against anyone who violates these Terms;<br />
+              (a) Monitor and record all use of the Services for compliance with these Terms;
+              <br />
+              (b) Investigate any suspicious or reported violation of these Terms;
+              <br />
+              (c) Take appropriate legal action against anyone who violates these Terms;
+              <br />
               (d) Remove or refuse any content that violates these Terms or may expose us to liability;
             </p>
           </section>
-
-          {/* CHUNK 2 ENDS HERE - Continue with Chunk 3 starting with Section 9 */}
-          {/* CHUNK 3 STARTS HERE */}
 
           {/* Section 9 */}
           <section className="mb-8">
@@ -333,11 +354,11 @@ export default function TermsPage() {
             </h2>
             <h3 className="text-xl font-medium mb-3">9.1 Ownership of Services</h3>
             <p className="text-base mb-4">
-              The Services, including all content, features, functionality, software, code, databases, user
-              interfaces, algorithms, machine learning models, and documentation, are owned by Financial Planner AI
-              and its licensors and are protected by United States and international intellectual property laws. These
-              Terms don't grant you any rights to use any of our trademarks, logos, domain names, or other
-              distinctive brand features except as expressly provided herein.
+              The Services, including all content, features, functionality, software, code, databases, user interfaces,
+              algorithms, machine learning models, and documentation, are owned by Financial Planner AI and its
+              licensors and are protected by United States and international intellectual property laws. These Terms
+              don&apos;t grant you any rights to use any of our trademarks, logos, domain names, or other distinctive
+              brand features except as expressly provided herein.
             </p>
 
             <h3 className="text-xl font-medium mb-3">9.2 Limited License Grant</h3>
@@ -350,18 +371,23 @@ export default function TermsPage() {
             <h3 className="text-xl font-medium mb-3">9.3 Restrictions on Use</h3>
             <p className="text-base mb-4">You shall not, and shall not permit any third party to:</p>
             <p className="text-base mb-4">
-              (a) Copy, modify, translate, or create derivative works based on the Services;<br />
-              (b) Sell, sublicense, transfer, lease, rent, loan, or otherwise distribute the Services;<br />
-              (c) Reverse engineer, decompile, disassemble, or attempt to discover the source code;<br />
-              (d) Remove, alter, or obscure any proprietary notices;<br />
-              (e) Use the Services to develop any similar or competitive product;<br />
+              (a) Copy, modify, translate, or create derivative works based on the Services;
+              <br />
+              (b) Sell, sublicense, transfer, lease, rent, loan, or otherwise distribute the Services;
+              <br />
+              (c) Reverse engineer, decompile, disassemble, or attempt to discover the source code;
+              <br />
+              (d) Remove, alter, or obscure any proprietary notices;
+              <br />
+              (e) Use the Services to develop any similar or competitive product;
+              <br />
               (f) Use any unauthorized third-party software or tools to extract data.
             </p>
 
             <h3 className="text-xl font-medium mb-3">9.4 Feedback and Suggestions</h3>
             <p className="text-base mb-4">
               If you provide any feedback, suggestions, comments, ideas, or recommendations regarding the Services
-              ("Feedback"), you hereby grant Financial Planner AI a worldwide, perpetual, irrevocable,
+              (&quot;Feedback&quot;), you hereby grant Financial Planner AI a worldwide, perpetual, irrevocable,
               royalty-free license to use and exploit such Feedback for any purpose without restriction or compensation.
             </p>
           </section>
@@ -374,20 +400,23 @@ export default function TermsPage() {
             <h3 className="text-xl font-medium mb-3">10.1 Third-Party Services</h3>
             <p className="text-base mb-4">
               The Services may contain links to integrate with, or enable access to third-party websites, services, or
-              resources ("Third-Party Services"). Your access and use of Third-Party Services is governed
+              resources (&quot;Third-Party Services&quot;). Your access and use of Third-Party Services is governed
               solely by the terms and conditions of such Third-Party Services.
             </p>
 
             <h3 className="text-xl font-medium mb-3">10.2 Third-Party Content</h3>
             <p className="text-base mb-4">
               The Services may display, include, or make available content, data, information, applications, or
-              materials from third parties ("Third-Party Content"). You acknowledge and agree that:
+              materials from third parties (&quot;Third-Party Content&quot;). You acknowledge and agree that:
             </p>
             <p className="text-base mb-4">
-              (a) We do not control, endorse, or adopt any Third-Party Content;<br />
-              (b) We make no representations or warranties regarding Third-Party Content;<br />
-              (c) We are not responsible for examining or evaluating the content, accuracy, completeness,
-              availability, timeliness, validity, legality, quality, or any other aspect of Third-Party Content;<br />
+              (a) We do not control, endorse, or adopt any Third-Party Content;
+              <br />
+              (b) We make no representations or warranties regarding Third-Party Content;
+              <br />
+              (c) We are not responsible for examining or evaluating the content, accuracy, completeness, availability,
+              timeliness, validity, legality, quality, or any other aspect of Third-Party Content;
+              <br />
               (d) We shall not be liable for any Third-Party Content, or any loss or damage caused by your use of or
               reliance on Third-Party Content.
             </p>
@@ -400,18 +429,23 @@ export default function TermsPage() {
             </h2>
             <h3 className="text-xl font-medium mb-3">11.1 Disclaimer of Warranties</h3>
             <p className="text-base mb-4">
-              TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICES ARE PROVIDED "AS IS" AND
-              "AS AVAILABLE," WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND. FINANCIAL PLANNER AI AND ITS
-              LICENSORS EXPRESSLY DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE,
-              INCLUDING WITHOUT LIMITATION:
+              TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICES ARE PROVIDED &quot;AS IS&quot; AND
+              &quot;AS AVAILABLE,&quot; WITH ALL FAULTS AND WITHOUT WARRANTY OF ANY KIND. FINANCIAL PLANNER AI AND ITS
+              LICENSORS EXPRESSLY DISCLAIM ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING
+              WITHOUT LIMITATION:
             </p>
             <p className="text-base mb-4">
-              (a) WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY,
-              OR NON-INFRINGEMENT;<br />
-              (b) WARRANTIES ARISING OUT OF COURSE OF DEALING, USAGE, OR TRADE;<br />
-              (c) WARRANTIES REGARDING THE SECURITY, RELIABILITY, TIMELINESS, OR PERFORMANCE OF THE SERVICES;<br />
-              (d) WARRANTIES REGARDING THE ACCURACY OR COMPLETENESS OF ANY ANALYSES;<br />
-              (e) WARRANTIES THAT THE SERVICES WILL MEET YOUR REQUIREMENTS OR BE UNINTERRUPTED;<br />
+              (a) WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, QUIET ENJOYMENT, ACCURACY, OR
+              NON-INFRINGEMENT;
+              <br />
+              (b) WARRANTIES ARISING OUT OF COURSE OF DEALING, USAGE, OR TRADE;
+              <br />
+              (c) WARRANTIES REGARDING THE SECURITY, RELIABILITY, TIMELINESS, OR PERFORMANCE OF THE SERVICES;
+              <br />
+              (d) WARRANTIES REGARDING THE ACCURACY OR COMPLETENESS OF ANY ANALYSES;
+              <br />
+              (e) WARRANTIES THAT THE SERVICES WILL MEET YOUR REQUIREMENTS OR BE UNINTERRUPTED;
+              <br />
               (f) WARRANTIES REGARDING THE QUALITY, ACCURACY, OR RELIABILITY OF ANY INFORMATION.
             </p>
           </section>
@@ -423,25 +457,30 @@ export default function TermsPage() {
             </h2>
             <h3 className="text-xl font-medium mb-3">12.1 Exclusion of Damages</h3>
             <p className="text-base mb-4">
-              TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL FINANCIAL PLANNER AI, ITS
-              AFFILIATES, LICENSORS, OR SERVICE PROVIDERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT,
-              CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES OF ANY KIND, INCLUDING WITHOUT LIMITATION DAMAGES FOR:
+              TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL FINANCIAL PLANNER AI, ITS AFFILIATES,
+              LICENSORS, OR SERVICE PROVIDERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, CONSEQUENTIAL, PUNITIVE,
+              OR EXEMPLARY DAMAGES OF ANY KIND, INCLUDING WITHOUT LIMITATION DAMAGES FOR:
             </p>
             <p className="text-base mb-4">
-              (a) LOSS OF PROFITS, REVENUE, BUSINESS, OR ANTICIPATED SAVINGS;<br />
-              (b) LOSS OF USE, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES;<br />
-              (c) BUSINESS INTERRUPTION OR DIMINUTION IN VALUE;<br />
-              (d) PERSONAL INJURY OR PROPERTY DAMAGE;<br />
-              (e) ANY INVESTMENT, EXPENDITURE, OR COMMITMENT BY YOU;<br />
-              (f) ANY ERRORS OR OMISSIONS IN ANY ANALYSIS OR OUTPUT;<br />
-              (g) ANY UNAUTHORIZED ACCESS TO OR USE OF OUR SERVERS;<br />
-              (h) ANY INTERRUPTION OR CESSATION OF TRANSMISSION;<br />
+              (a) LOSS OF PROFITS, REVENUE, BUSINESS, OR ANTICIPATED SAVINGS;
+              <br />
+              (b) LOSS OF USE, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES;
+              <br />
+              (c) BUSINESS INTERRUPTION OR DIMINUTION IN VALUE;
+              <br />
+              (d) PERSONAL INJURY OR PROPERTY DAMAGE;
+              <br />
+              (e) ANY INVESTMENT, EXPENDITURE, OR COMMITMENT BY YOU;
+              <br />
+              (f) ANY ERRORS OR OMISSIONS IN ANY ANALYSIS OR OUTPUT;
+              <br />
+              (g) ANY UNAUTHORIZED ACCESS TO OR USE OF OUR SERVERS;
+              <br />
+              (h) ANY INTERRUPTION OR CESSATION OF TRANSMISSION;
+              <br />
               (i) ANY BUGS, VIRUSES, OR OTHER HARMFUL CODE.
             </p>
           </section>
-
-          {/* CHUNK 3 ENDS HERE - Continue with Chunk 4 starting with Section 13 */}
-          {/* CHUNK 4 STARTS HERE */}
 
           {/* Section 13 */}
           <section className="mb-8">
@@ -450,13 +489,13 @@ export default function TermsPage() {
             </h2>
             <h3 className="text-xl font-medium mb-3">13.1 Agreement to Arbitrate</h3>
             <p className="text-base mb-4">
-              PLEASE READ THIS SECTION CAREFULLY AS IT AFFECTS YOUR LEGAL RIGHTS AND PROVIDES FOR RESOLUTION OF
-              DISPUTES THROUGH BINDING INDIVIDUAL ARBITRATION.
+              PLEASE READ THIS SECTION CAREFULLY AS IT AFFECTS YOUR LEGAL RIGHTS AND PROVIDES FOR RESOLUTION OF DISPUTES
+              THROUGH BINDING INDIVIDUAL ARBITRATION.
             </p>
             <p className="text-base mb-4">
               You and Financial Planner AI agree that any dispute, claim, or controversy arising out of or relating to
-              these Terms, or your use of the Services (collectively, "Disputes") will be resolved
-              exclusively through binding individual arbitration rather than in court.
+              these Terms, or your use of the Services (collectively, &quot;Disputes&quot;) will be resolved exclusively
+              through binding individual arbitration rather than in court.
             </p>
           </section>
 
@@ -470,7 +509,7 @@ export default function TermsPage() {
               You agree to defend, indemnify, and hold harmless Financial Planner AI, its Affiliates, licensors, and
               service providers, and their respective officers, directors, employees, contractors, agents, licensors,
               suppliers, successors, and assigns from and against any claims, liabilities, damages, judgments, awards,
-              losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or relating to
+              losses, costs, expenses, or fees (including reasonable attorneys&apos; fees) arising out of or relating to
               your violation of these Terms or use of the Services.
             </p>
           </section>
@@ -494,9 +533,9 @@ export default function TermsPage() {
             </h2>
             <h3 className="text-xl font-medium mb-3">16.1 Governing Law</h3>
             <p className="text-base mb-4">
-              These Terms and any dispute arising out of or related to these Terms or the Services shall be governed
-              by and construed in accordance with the laws of the State of New Jersey, without regard to its conflict
-              of law principles.
+              These Terms and any dispute arising out of or related to these Terms or the Services shall be governed by
+              and construed in accordance with the laws of the State of New Jersey, without regard to its conflict of
+              law principles.
             </p>
           </section>
 
@@ -510,7 +549,8 @@ export default function TermsPage() {
               For general inquiries about the Services or these Terms, please contact us at:
             </p>
             <p className="text-base mb-4">
-              Financial Planner AI, LLC<br />
+              Financial Planner AI, LLC
+              <br />
               <Link href="mailto:rpc@financialplanner-ai.com" className="text-primary hover:underline">
                 rpc@financialplanner-ai.com
               </Link>
@@ -519,10 +559,14 @@ export default function TermsPage() {
             <h3 className="text-xl font-medium mb-3">17.2 Legal Notices</h3>
             <p className="text-base mb-4">For legal notices, please contact us at:</p>
             <p className="text-base mb-4">
-              Financial Planner AI, LLC<br />
-              Attn: Legal Matter<br />
-              155 Glendale Drive<br />
-              Freehold, NJ 07728<br />
+              Financial Planner AI, LLC
+              <br />
+              Attn: Legal Matter
+              <br />
+              155 Glendale Drive
+              <br />
+              Freehold, NJ 07728
+              <br />
               <Link href="mailto:rpc@financialplanner-ai.com" className="text-primary hover:underline">
                 rpc@financialplanner-ai.com
               </Link>
@@ -533,8 +577,8 @@ export default function TermsPage() {
           <div className="mt-12 border-t pt-8">
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                Last Updated: January 29, 2025<br />
-                © 2025 Financial Planner AI, LLC. All rights reserved.
+                Last Updated: January 29, 2025
+                <br />© 2025 Financial Planner AI, LLC. All rights reserved.
               </p>
             </div>
           </div>
@@ -543,3 +587,4 @@ export default function TermsPage() {
     </div>
   )
 }
+
