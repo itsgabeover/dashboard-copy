@@ -326,7 +326,7 @@ export default function PrivacyPolicy() {
               </li>
               <li>
                 <strong>Marketing Emails.</strong> You may opt-out of marketing-related emails by clicking the
-                "unsubscribe" link at the bottom of the email or by contacting us.
+                &quot;unsubscribe&quot; link at the bottom of the email or by contacting us.
               </li>
               <li>
                 <strong>Text Messages.</strong> To stop receiving text messages from us, reply STOP to any text message
