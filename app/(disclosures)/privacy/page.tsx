@@ -17,12 +17,13 @@ export default function PrivacyPolicy() {
           {/* Introduction */}
           <section className="mb-8">
             <p>
-              This Privacy Policy ("Privacy Policy") describes how Financial Planner AI, LLC and its subsidiaries and
-              affiliates ("Financial Planner AI," "us," "we," or "our") may collect, use, and share your personal
-              information in connection with our website at: and any other websites we own and operate that link to this
-              Privacy Policy (collectively, the "Site") together with our products, services, social media pages,
-              events, emails, and other electronic communications (collectively, the "Services"), and the choices you
-              have with respect to your personal information. Financial Planner AI is based in the United States.
+              This Privacy Policy (&quot;Privacy Policy&quot;) describes how Financial Planner AI, LLC and its
+              subsidiaries and affiliates (&quot;Financial Planner AI,&quot; &quot;us,&quot; &quot;we,&quot; or
+              &quot;our&quot;) may collect, use, and share your personal information in connection with our website at:
+              and any other websites we own and operate that link to this Privacy Policy (collectively, the
+              &quot;Site&quot;) together with our products, services, social media pages, events, emails, and other
+              electronic communications (collectively, the &quot;Services&quot;), and the choices you have with respect
+              to your personal information. Financial Planner AI is based in the United States.
             </p>
             <p>
               This Privacy Policy does not apply to personal information that we may store, maintain, or process as a
@@ -31,11 +32,11 @@ export default function PrivacyPolicy() {
             </p>
             <p>
               Financial Planner AI reserves the right, at any time, to modify this Privacy Policy. If we modify how we
-              collect, use, or share personal information, we will notify you by revising the "Last Updated" date at the
-              top of this Privacy Policy and, in some cases, we may provide you with additional notice (such as sending
-              you an email notification). In all cases, your continued use of the Service following posting or other
-              notification of changes constitutes your acknowledgement of such changes. Please review this Privacy
-              Policy periodically to keep up to date on our most current policies and practices.
+              collect, use, or share personal information, we will notify you by revising the &quot;Last Updated&quot;
+              date at the top of this Privacy Policy and, in some cases, we may provide you with additional notice (such
+              as sending you an email notification). In all cases, your continued use of the Service following posting
+              or other notification of changes constitutes your acknowledgement of such changes. Please review this
+              Privacy Policy periodically to keep up to date on our most current policies and practices.
             </p>
           </section>
 
@@ -62,9 +63,9 @@ export default function PrivacyPolicy() {
               </li>
               <li>
                 Personal Information Contained in Insurance Policies, such as Life insurance policy illustrations may
-                include an owner's and/or the insured's name, insured's date of birth, address information, agent or
-                agency name, address and phone number. This information is redacted/removed from the policy illustration
-                before illustration data is passed to OpenAI and Anthropic for AI analysis.
+                include an owner&apos;s and/or the insured&apos;s name, insured&apos;s date of birth, address
+                information, agent or agency name, address and phone number. This information is redacted/removed from
+                the policy illustration before illustration data is passed to OpenAI and Anthropic for AI analysis.
               </li>
               <li>
                 Payment information, such as bank account number, credit or debit card number, or financial account
@@ -157,8 +158,8 @@ export default function PrivacyPolicy() {
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                Cookies, which are text files that websites store on a visitor's device to uniquely identify the
-                visitor's browser or to store information or settings in the browser for the purpose of helping you
+                Cookies, which are text files that websites store on a visitor&apos;s device to uniquely identify the
+                visitor&apos;s browser or to store information or settings in the browser for the purpose of helping you
                 navigate between pages efficiently, remembering your preferences, enabling functionality, helping us
                 understand user activity and patterns, and facilitating online advertising.
               </li>
@@ -168,16 +169,17 @@ export default function PrivacyPolicy() {
                 compile statistics about usage of websites and the success of marketing campaigns.
               </li>
               <li>
-                Local storage, which is used to save data on a visitor's device. We may use data from local storage to,
-                for example, turn on web navigation, store multimedia preferences, customize what we show you based on
-                your past interactions with our Service, and remember your preferences.
+                Local storage, which is used to save data on a visitor&apos;s device. We may use data from local storage
+                to, for example, turn on web navigation, store multimedia preferences, customize what we show you based
+                on your past interactions with our Service, and remember your preferences.
               </li>
               <li>
                 Session-replay technologies, which are third-party software programs that we may use on the Site to
-                record a video replay of user's interactions with the Site. The video replay may include users' clicks,
-                mouse movements, scrolls, mobile app touches, typing, and other activity taken during the session. We
-                use these replays for research and development purposes, such as to help us troubleshoot problems with
-                the Site, understand how users interact with and use the Site, and identify areas for improvement.
+                record a video replay of user&apos;s interactions with the Site. The video replay may include
+                users&apos; clicks, mouse movements, scrolls, mobile app touches, typing, and other activity taken
+                during the session. We use these replays for research and development purposes, such as to help us
+                troubleshoot problems with the Site, understand how users interact with and use the Site, and identify
+                areas for improvement.
               </li>
             </ul>
           </section>
@@ -227,8 +229,8 @@ export default function PrivacyPolicy() {
             <p>
               We may send you Financial Planner AI-related or other direct marketing communications as permitted by law,
               including materials, updates, information, special offers, and promotional material from us and our
-              business partners. You may opt-out of our marketing communications as described in the "YOUR CHOICES"
-              section below.
+              business partners. You may opt-out of our marketing communications as described in the &quot;YOUR
+              CHOICES&quot; section below.
             </p>
 
             <h3 className="text-xl font-medium mt-6 mb-3">Interest-Based Advertising</h3>
@@ -236,11 +238,12 @@ export default function PrivacyPolicy() {
               We work with third-party advertising companies and social media companies to help us advertise our
               business and to display ads for our Service. These companies may use cookies and similar technologies to
               collect information about you (including the online activity information and device information described
-              above in the section called "Personal Information Automatically Collected") over time across our Site and
-              other websites and services or your interaction with our emails, and use that information to serve ads
-              that they think will interest you. In addition, some of these companies may use hashed customer lists that
-              we share with them to deliver ads to you and to similar users on their platforms. You can learn more about
-              your choices for limiting interest-based advertising in the "YOUR CHOICES" section below.
+              above in the section called &quot;Personal Information Automatically Collected&quot;) over time across our
+              Site and other websites and services or your interaction with our emails, and use that information to
+              serve ads that they think will interest you. In addition, some of these companies may use hashed customer
+              lists that we share with them to deliver ads to you and to similar users on their platforms. You can learn
+              more about your choices for limiting interest-based advertising in the &quot;YOUR CHOICES&quot; section
+              below.
             </p>
 
             <h3 className="text-xl font-medium mt-6 mb-3">Customer Testimonials</h3>
@@ -260,8 +263,8 @@ export default function PrivacyPolicy() {
                 assets;
               </li>
               <li>
-                protect our, your, or others' rights, privacy, safety or property (including by making and defending
-                legal claims);
+                protect our, your, or others&apos; rights, privacy, safety or property (including by making and
+                defending legal claims);
               </li>
               <li>
                 audit our internal processes for compliance with legal and contractual requirements and internal
@@ -331,7 +334,7 @@ export default function PrivacyPolicy() {
               </li>
               <li>
                 <strong>Cookies.</strong> Most browsers let you remove and/or stop accepting cookies from the websites
-                you visit.
+                you visit. To do this, follow the instructions in your browser&apos;s settings.
               </li>
             </ul>
           </section>
@@ -339,7 +342,7 @@ export default function PrivacyPolicy() {
           {/* Children's Privacy */}
           <section className="mb-8">
             <h2 id="children" className="text-2xl font-semibold mb-4">
-              CHILDREN'S PRIVACY
+              CHILDREN&apos;S PRIVACY
             </h2>
             <p>
               The Service is not intended for use by anyone under the age of 18, and we do not knowingly collect
@@ -393,11 +396,11 @@ export default function PrivacyPolicy() {
               NOTICE TO NEVADA RESIDENTS
             </h2>
             <p>
-              Nevada Revised Statutes Chapter 603A allows Nevada residents to opt-out of the "sale" of certain types of
-              personal information. Subject to several exceptions, Nevada law defines "sale" to mean the exchange of
-              certain types of personal information for monetary consideration to another person. If you are a Nevada
-              resident who wishes to exercise your "sale" opt-out rights, you may submit a request to us using the
-              contact information listed at the end of this Privacy Policy.
+              Nevada Revised Statutes Chapter 603A allows Nevada residents to opt-out of the &quot;sale&quot; of certain
+              types of personal information. Subject to several exceptions, Nevada law defines &quot;sale&quot; to mean
+              the exchange of certain types of personal information for monetary consideration to another person. If you
+              are a Nevada resident who wishes to exercise your &quot;sale&quot; opt-out rights, you may submit a
+              request to us using the contact information listed at the end of this Privacy Policy.
             </p>
           </section>
 
