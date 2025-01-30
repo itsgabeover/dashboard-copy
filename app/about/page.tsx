@@ -19,6 +19,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { FC } from "react"
+import PolicyReviewQuiz from "@/components/PolicyReviewQuiz"
 
 const AboutPage: FC = () => {
   const scrollToSection = (elementId: string) => {
@@ -43,16 +44,16 @@ const AboutPage: FC = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#4B6FEE] mb-6 leading-tight">
-              Every Life Insurance Policy Tells a Story
+              When Was Your Last Policy Checkup?
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8">
-              Behind complex terms and numbers lies a powerful story of protection, growth, and security. Let&apos;s
-              uncover yours.
+              Life moves fast. Markets change. Opportunities emerge. Make sure your life insurance keeps pace with your
+              life.
             </p>
             <Button
               size="lg"
               className="bg-[#4B6FEE] hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:transform hover:scale-105 shadow-lg"
-              onClick={() => scrollToSection("why-deeper-look")}
+              onClick={() => scrollToSection("policy-signs")}
             >
               Learn More
             </Button>
@@ -61,29 +62,29 @@ const AboutPage: FC = () => {
         <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
       </section>
 
-      {/* Why Your Policy Needs a Deeper Look Section */}
-      <section id="why-deeper-look" className="bg-white py-20 md:py-32">
+      {/* Three Signs You Need a Policy Review Section with Quiz */}
+      <section id="policy-signs" className="bg-white py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-[#4B6FEE] mb-12">
-              Why Your Policy Needs a Deeper Look
+              Three Signs You Need a Policy Review
             </h2>
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="grid md:grid-cols-3 gap-8 mb-16">
               {[
                 {
-                  icon: AlertTriangle,
-                  title: "Silent Threats",
-                  items: ["Expiring guarantees", "Premium increases", "Coverage gaps"],
+                  icon: TrendingUp,
+                  title: "Life Changes",
+                  items: ["Major life events", "Career shifts", "New financial goals"],
                 },
                 {
-                  icon: TrendingUp,
-                  title: "Hidden Value",
-                  items: ["Growth opportunities", "Living benefits", "Tax advantages"],
+                  icon: AlertTriangle,
+                  title: "Policy Performance",
+                  items: ["Premium fluctuations", "Market impacts", "Expiring guarantees"],
                 },
                 {
                   icon: Shield,
-                  title: "Future Ready",
-                  items: ["Strategy alignment", "Guarantee status", "Protection updates"],
+                  title: "Coverage Evolution",
+                  items: ["New protection types", "Enhanced benefits", "Tax law opportunities"],
                 },
               ].map((section, index) => (
                 <Card
@@ -113,102 +114,98 @@ const AboutPage: FC = () => {
                 </Card>
               ))}
             </div>
-            <div className="flex justify-center">
-              <Button
-                size="lg"
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 hover:transform hover:scale-105 shadow-lg"
-                onClick={() => scrollToSection("revolutionizing-reviews")}
-              >
-                Insurance Planner AI Advantage
-              </Button>
+
+            {/* Quiz Section */}
+            <div className="max-w-2xl mx-auto">
+              <PolicyReviewQuiz />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Combined Comparison and CTA Section */}
-      <section id="revolutionizing-reviews" className="bg-gradient-to-b from-gray-100 to-blue-100/50 py-20 md:py-32">
+      {/* The Insurance Planner AI Advantage Section */}
+      <section id="ai-advantage" className="bg-gray-100 py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-5xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-[#4B6FEE] mb-12">
-              Revolutionizing Policy Reviews
+              The Insurance Planner AI Advantage
             </h2>
             <Card className="bg-white p-8 shadow-lg border-blue-100 mb-16 overflow-hidden">
-              <CardContent className="relative">
-                <div className="absolute top-0 left-1/2 w-1 h-full bg-gradient-to-b from-red-400 via-yellow-400 to-green-400 transform -translate-x-1/2"></div>
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-semibold text-[#4B6FEE] mb-4 flex items-center">
-                      <ArrowDownToLine className="w-6 h-6 mr-2 text-red-400" />
-                      Traditional Review
-                    </h3>
-                    {[
-                      {
-                        icon: Clock,
-                        title: "Hours reading complex documents",
-                        description: "Time-consuming manual process",
-                      },
-                      {
-                        icon: AlertTriangle,
-                        title: "Key details often missed",
-                        description: "Human limitations affect thoroughness",
-                      },
-                      { icon: FileText, title: "Basic policy summary", description: "Surface-level understanding" },
-                    ].map((item, index) => (
-                      <Card key={index} className="group transition-all duration-300 hover:shadow-md bg-gray-50">
-                        <CardContent className="flex items-start gap-4 p-4">
-                          <div className="rounded-full bg-blue-50 p-2 group-hover:bg-[#4B6FEE] transition-colors duration-300">
-                            <item.icon className="w-6 h-6 text-[#4B6FEE] group-hover:text-white transition-colors duration-300" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{item.title}</p>
-                            <p className="text-sm text-gray-600">{item.description}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-semibold text-[#4B6FEE] mb-4 flex items-center">
-                      <ArrowUpToLine className="w-6 h-6 mr-2 text-green-400" />
-                      Insurance Planner AI
-                    </h3>
-                    {[
-                      { icon: Zap, title: "5-minute AI-powered analysis", description: "Fast, precise processing" },
-                      { icon: Search, title: "Every feature examined", description: "Comprehensive digital review" },
-                      {
-                        icon: Lightbulb,
-                        title: "Deep insights you can act on",
-                        description: "Personalized actions",
-                      },
-                    ].map((item, index) => (
-                      <Card key={index} className="group transition-all duration-300 hover:shadow-md bg-gray-50">
-                        <CardContent className="flex items-start gap-4 p-4">
-                          <div className="rounded-full bg-blue-50 p-2 group-hover:bg-[#4B6FEE] transition-colors duration-300">
-                            <item.icon className="w-6 h-6 text-[#4B6FEE] group-hover:text-white transition-colors duration-300" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{item.title}</p>
-                            <p className="text-sm text-gray-600">{item.description}</p>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+              <CardContent className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-semibold text-[#4B6FEE] mb-4 flex items-center">
+                    <ArrowDownToLine className="w-6 h-6 mr-2 text-red-400" />
+                    Traditional Review
+                  </h3>
+                  {[
+                    {
+                      icon: Clock,
+                      title: "Time-consuming",
+                      description: "Hours of manual document review",
+                    },
+                    {
+                      icon: AlertTriangle,
+                      title: "Error-prone",
+                      description: "Key details often overlooked",
+                    },
+                    { icon: FileText, title: "Surface-level", description: "Basic policy summary" },
+                  ].map((item, index) => (
+                    <Card key={index} className="group transition-all duration-300 hover:shadow-md bg-gray-50">
+                      <CardContent className="flex items-start gap-4 p-4">
+                        <div className="rounded-full bg-blue-50 p-2 group-hover:bg-[#4B6FEE] transition-colors duration-300">
+                          <item.icon className="w-6 h-6 text-[#4B6FEE] group-hover:text-white transition-colors duration-300" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{item.title}</p>
+                          <p className="text-sm text-gray-600">{item.description}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-semibold text-[#4B6FEE] mb-4 flex items-center">
+                    <ArrowUpToLine className="w-6 h-6 mr-2 text-green-400" />
+                    Insurance Planner AI
+                  </h3>
+                  {[
+                    { icon: Zap, title: "Lightning-fast", description: "5-minute AI-powered analysis" },
+                    { icon: Search, title: "Comprehensive", description: "Every feature examined" },
+                    {
+                      icon: Lightbulb,
+                      title: "Actionable insights",
+                      description: "Clear, personalized recommendations",
+                    },
+                  ].map((item, index) => (
+                    <Card key={index} className="group transition-all duration-300 hover:shadow-md bg-gray-50">
+                      <CardContent className="flex items-start gap-4 p-4">
+                        <div className="rounded-full bg-blue-50 p-2 group-hover:bg-[#4B6FEE] transition-colors duration-300">
+                          <item.icon className="w-6 h-6 text-[#4B6FEE] group-hover:text-white transition-colors duration-300" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{item.title}</p>
+                          <p className="text-sm text-gray-600">{item.description}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Get Your Policy Analysis Now CTA */}
+            {/* Ready to review your policy? CTA */}
             <Card className="border-2 border-blue-100 bg-white transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
               <CardHeader className="text-center bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white p-8">
                 <div className="flex items-center justify-center gap-3 mb-2">
                   <div className="rounded-full bg-white/10 p-2 transition-transform duration-300 group-hover:scale-110">
                     <Zap className="w-8 h-8" />
                   </div>
-                  <h2 className="text-2xl md:text-3xl font-bold">Get Your Policy Analysis Now</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold">Ready to review your policy?</h2>
                 </div>
-                <p className="text-xl text-blue-100">From questions to clarity in minutes</p>
+                <p className="text-xl text-blue-100">
+                  From questions to clarity in minutes. Our AI technology evaluates every aspect of your coverage to
+                  ensure it's working exactly as it should.
+                </p>
               </CardHeader>
               <CardContent className="flex justify-center p-8 bg-gradient-to-b from-white to-blue-50/30">
                 <Button
