@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, type React } from "react"
+import { useState, useEffect } from "react"
 import { X, Maximize2, Minimize2, RefreshCw } from "lucide-react"
 
 // Type definitions
@@ -8,8 +8,8 @@ interface ChatInterfaceProps {
   onClose: () => void
 }
 
-interface IframeErrorEvent extends React.SyntheticEvent<HTMLIFrameElement, Event> {
-  currentTarget: HTMLIFrameElement
+interface IframeErrorEvent extends Event {
+  target: HTMLIFrameElement
 }
 
 // Get the chatbot URL from environment variable or use a default value
@@ -34,7 +34,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
 
   const handleIframeError = (e: IframeErrorEvent) => {
     const errorMessage =
-      e.currentTarget?.contentWindow?.document?.body?.textContent ||
+      (e.target as HTMLIFrameElement).contentWindow?.document?.body?.textContent ||
       "Failed to load chat interface. Please try again later."
 
     console.error("Iframe loading error:", {
@@ -151,7 +151,6 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
                   w-full h-full transition-all duration-500
                   ${iframeLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}
                 `}
-                frameBorder="0"
                 onLoad={() => setIframeLoaded(true)}
                 onError={handleIframeError}
                 allow="microphone *"
