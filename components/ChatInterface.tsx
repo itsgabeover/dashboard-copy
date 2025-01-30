@@ -109,7 +109,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
         <div
           className={`
           relative
-          ${isMinimized ? "hidden" : "flex-grow h-[calc(100%-3rem)] sm:h-[calc(100%-3.5rem)]"}
+          ${isMinimized ? "hidden" : "flex-grow h-[calc(100%-7rem)] sm:h-[calc(100%-8rem)]"}
         `}
         >
           {!iframeLoaded && !loadError && (
@@ -136,7 +136,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
               </div>
             </div>
           ) : (
-            <div className="relative w-full h-full sm:rounded-b-2xl overflow-hidden">
+            <div className="relative w-full h-full overflow-hidden">
               <iframe
                 key={iframeKey}
                 src={CHATBOT_URL}
@@ -150,14 +150,13 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
                 sandbox="allow-scripts allow-same-origin allow-forms"
                 title="Chat Interface"
               />
-              <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white via-white to-transparent pointer-events-none sm:rounded-b-2xl" />
             </div>
           )}
         </div>
 
         {/* Disclosure and links */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 bg-white/80 backdrop-blur-sm text-[10px] sm:text-xs text-gray-600 sm:rounded-b-2xl">
-          <p className="mb-1 sm:mb-2">
+        <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 bg-white/80 backdrop-blur-sm text-[10px] sm:text-xs text-gray-600 text-center border-t">
+          <p className="mb-1">
             This AI-powered chatbot provides automated responses and may be inaccurate or incomplete. It does not offer
             financial, legal, or professional advice.
           </p>
