@@ -51,11 +51,11 @@ const PolicyReviewQuiz = () => {
 
   const getRecommendation = () => {
     if (score <= 2) {
-      return "Your policy appears to be on track, but an AI review can confirm this and uncover potential opportunities."
+      return "Your policy appears to be on track, but our AI review can uncover potential opportunities and confirm everything is working as intended."
     } else if (score <= 5) {
-      return "Your policy story may have hidden chapters. A review would help ensure you're not missing out on valuable benefits."
+      return "Your policy may benefit from a checkup. A review would help ensure you are not missing out on valuable benefits or needed updates."
     } else {
-      return "Your policy needs immediate attention. Let's uncover its full potential and ensure it's working as hard as it should for you."
+      return "Your policy needs attention. Let us make sure it is properly aligned with your current needs and performing at its best."
     }
   }
 
