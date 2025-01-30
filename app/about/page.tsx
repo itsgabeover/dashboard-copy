@@ -214,7 +214,7 @@ const AboutPage: FC = () => {
                   className="bg-green-600 hover:bg-green-700 text-white px-8 py-6 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   <Link href="/upload" className="flex items-center gap-2">
-                    Start My Analysis
+                    Start My AI Analysis
                     <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                 </Button>
