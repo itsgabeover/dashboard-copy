@@ -118,13 +118,13 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
           )}
         </div>
 
-        {/* Persistent disclosure footer positioned to cover powered by text */}
-        <div className="absolute bottom-0 left-0 right-0 p-2 bg-white border-t text-xs text-gray-600 text-center">
-          <p className="mb-1">
+        {/* Compact disclosure footer positioned to just cover powered by text */}
+        <div className="absolute bottom-0 left-0 right-0 py-1 px-2 bg-white border-t text-xs text-gray-600 text-center">
+          <p className="mb-0.5 text-[10px] leading-tight">
             This AI-powered chatbot provides automated responses and may be inaccurate or incomplete. It does not offer
             financial, legal, or professional advice.
           </p>
-          <div className="flex gap-2 text-[#4B6FEE] justify-center">
+          <div className="flex gap-2 text-[#4B6FEE] justify-center text-[10px]">
             <a href="/privacy" target="_blank" rel="noopener noreferrer" className="hover:underline">
               Privacy Policy
             </a>
@@ -133,8 +133,8 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
               Terms of Service
             </a>
           </div>
-          {/* Extra padding to ensure coverage of powered by text */}
-          <div className="h-4"></div>
+          {/* Minimal extra padding */}
+          <div className="h-1"></div>
         </div>
       </div>
     </div>
