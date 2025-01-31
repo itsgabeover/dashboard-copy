@@ -5,9 +5,23 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Home, ArrowRight, ArrowLeft, Zap, Shield, Clock, Copy, Check, ChevronUp, ChevronDown } from "lucide-react"
+import {
+  Home,
+  ArrowRight,
+  ArrowLeft,
+  Zap,
+  Shield,
+  Clock,
+  Copy,
+  Check,
+  ChevronUp,
+  ChevronDown,
+  Eye,
+  FileText,
+  CheckSquare,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
-import type React from "react" // Added import for React
+import type React from "react"
 
 interface Step {
   title: string
@@ -21,6 +35,11 @@ interface IllustrationContent {
   items: string[]
   script: string
   contextBar: string
+  introCards: {
+    preview: string
+    script: string
+    action: string
+  }
 }
 
 interface IllustrationResults {
@@ -94,7 +113,7 @@ export default function IllustrationHelper() {
       title: "See how my policy is performing",
       description: "Get a complete picture of your policy's health and future",
       contextBar:
-        "You selected 'See how my policy is performing.' This illustration will show you a complete picture of your policy's health and future. Follow the steps below to get your analysis.",
+        "You selected 'See how my policy is performing.' This illustration will show you a complete picture of your policy's health and future. Follow the steps below to get your illustration.",
       items: [
         "Your coverage amount and type (Level or Increasing)",
         "Year-by-year projected cash value growth",
@@ -106,12 +125,20 @@ export default function IllustrationHelper() {
       ],
       script:
         "I am requesting a current in-force illustration for my policy. Please include:\n\n• Policy performance based on my current annual premium\n• Both guaranteed and non-guaranteed values\n• Cash value projections\n• Death benefit projections\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 100\n• Impact of any existing policy loans\n\nPlease make sure all values and projections match my current premium payment schedule.",
+      introCards: {
+        preview:
+          "First, preview what you'll receive. Your illustration will show you a complete picture of your policy's performance. Here's what will be included:",
+        script:
+          "Next, get your request script. We've prepared everything you need to say. Just copy this text and share it with your insurance company to get your illustration.",
+        action:
+          "Finally, take these simple steps. Here's exactly what to do to get your illustration. Click each step for more details.",
+      },
     },
     lower_premium: {
       title: "Find ways to lower my payments",
       description: "Discover ways to make your payments more affordable",
       contextBar:
-        "You selected 'Find ways to lower my payments.' This illustration will show you ways to make your payments more affordable. Follow the steps below to get your analysis.",
+        "You selected 'Find ways to lower my payments.' This illustration will show you options to make your payments more affordable. Follow the steps below to get your illustration.",
       items: [
         "Your lowest possible premium to keep coverage",
         "How your payments could change year by year",
@@ -122,12 +149,20 @@ export default function IllustrationHelper() {
       ],
       script:
         "I am requesting a minimum premium in-force illustration for my policy. Please include:\n\n• The lowest premium amount needed to maintain my current death benefit\n• Year-by-year minimum premium requirements\n• Impact on cash value at minimum funding\n• Both guaranteed and non-guaranteed values\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 100\n• Any years requiring premium adjustments\n\nPlease note all assumptions used in these calculations.",
+      introCards: {
+        preview:
+          "First, preview what you'll receive. Your illustration will show payment options and their impacts. Here's what will be included:",
+        script:
+          "Next, get your request script. We've prepared everything you need to say. Just copy this text and share it with your insurance company to get your illustration.",
+        action:
+          "Finally, take these simple steps. Here's exactly what to do to get your illustration. Click each step for more details.",
+      },
     },
     stop_paying: {
       title: "See what happens if I stop paying",
       description: "Learn what happens to your coverage if payments stop",
       contextBar:
-        "You selected 'See what happens if I stop paying.' This illustration will show you what happens to your coverage if payments stop. Follow the steps below to get your analysis.",
+        "You selected 'See what happens if I stop paying.' This illustration will show you how stopping payments affects your coverage. Follow the steps below to get your illustration.",
       items: [
         "How your policy performs without future payments",
         "Year-by-year changes to your policy's cash value",
@@ -138,6 +173,14 @@ export default function IllustrationHelper() {
       ],
       script:
         "I am requesting a zero-premium in-force illustration for my policy. Please show what happens if I stop all premium payments now. Please include:\n\n• How long my current death benefit can continue\n• Year-by-year changes to the cash value\n• When the policy would end without more payments\n• Both guaranteed and non-guaranteed projections\n• Effects on any policy benefits or riders\n• All policy expenses and fees\n• Current interest rate assumptions\n\nPlease run this to age 100 or until the policy ends, whichever comes first.",
+      introCards: {
+        preview:
+          "First, preview what you'll receive. Your illustration will show the effects of stopping payments. Here's what will be included:",
+        script:
+          "Next, get your request script. We've prepared everything you need to say. Just copy this text and share it with your insurance company to get your illustration.",
+        action:
+          "Finally, take these simple steps. Here's exactly what to do to get your illustration. Click each step for more details.",
+      },
     },
   }
 
@@ -202,9 +245,7 @@ export default function IllustrationHelper() {
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-3">What would you like to know about your policy?</h1>
-          <p className="text-xl text-gray-600 mb-4">
-           Get the illustration you need in just a few simple steps
-          </p>
+          <p className="text-xl text-gray-600 mb-4">Get the illustration you need in just a few simple steps</p>
           <p className="text-gray-600">Takes about 2-3 minutes</p>
         </div>
 
@@ -230,7 +271,9 @@ export default function IllustrationHelper() {
 
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-3">Which type of illustration do you need?</h1>
-          <p className="text-xl text-gray-600">Tell us what you want to learn about your policy.  Select an illustration type.</p>
+          <p className="text-xl text-gray-600">
+            Tell us what you want to learn about your policy. Select an illustration type.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -277,25 +320,31 @@ export default function IllustrationHelper() {
           <TabsList className="grid w-full grid-cols-3 mb-6 h-12 items-center bg-gray-100 p-1 rounded-lg">
             <TabsTrigger
               value="what-youll-see"
-              className="rounded-md h-10 data-[state=active]:bg-white data-[state=active]:text-[#4B6FEE] data-[state=active]:shadow-sm"
+              className="rounded-md h-10 data-[state=active]:bg-white data-[state=active]:text-[#4B6FEE] data-[state=active]:shadow-sm flex items-center justify-center gap-2"
             >
-              What You&apos;ll See
+              <Eye className="h-4 w-4" />
+              First, Preview Content
             </TabsTrigger>
             <TabsTrigger
               value="request-script"
-              className="rounded-md h-10 data-[state=active]:bg-white data-[state=active]:text-[#4B6FEE] data-[state=active]:shadow-sm"
+              className="rounded-md h-10 data-[state=active]:bg-white data-[state=active]:text-[#4B6FEE] data-[state=active]:shadow-sm flex items-center justify-center gap-2"
             >
-              Request Script
+              <FileText className="h-4 w-4" />
+              Next, Get Script
             </TabsTrigger>
             <TabsTrigger
               value="next-steps"
-              className="rounded-md h-10 data-[state=active]:bg-white data-[state=active]:text-[#4B6FEE] data-[state=active]:shadow-sm"
+              className="rounded-md h-10 data-[state=active]:bg-white data-[state=active]:text-[#4B6FEE] data-[state=active]:shadow-sm flex items-center justify-center gap-2"
             >
-              Next Steps
+              <CheckSquare className="h-4 w-4" />
+              Finally, Take Action
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="what-youll-see" className="mt-0">
+            <Card className="mb-6 p-4 bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-700 mb-2">{content.introCards.preview}</h3>
+            </Card>
             <ul className="space-y-4" role="list">
               {content.items.map((item, index) => (
                 <li key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
@@ -307,10 +356,10 @@ export default function IllustrationHelper() {
           </TabsContent>
 
           <TabsContent value="request-script" className="mt-0">
+            <Card className="mb-6 p-4 bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-700 mb-2">{content.introCards.script}</h3>
+            </Card>
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-700">
-                Use this script when contacting your insurance company:
-              </h3>
               <div className="bg-gray-50 rounded-lg p-4 text-gray-700">
                 <p className="whitespace-pre-line">{content.script}</p>
               </div>
@@ -332,6 +381,9 @@ export default function IllustrationHelper() {
           </TabsContent>
 
           <TabsContent value="next-steps" className="mt-0">
+            <Card className="mb-6 p-4 bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-700 mb-2">{content.introCards.action}</h3>
+            </Card>
             <div className="space-y-3">
               {steps.map((step, index) => (
                 <div key={index} className="border rounded-lg overflow-hidden">
