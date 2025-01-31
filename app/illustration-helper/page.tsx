@@ -203,7 +203,7 @@ export default function IllustrationHelper() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-3">What Would You Like to Know About Your Policy?</h1>
           <p className="text-xl text-gray-600 mb-4">
-            We'll help you get the information you need in just a few simple steps
+            We will help you get the information you need in just a few simple steps
           </p>
           <p className="text-gray-600">Takes about 2-3 minutes</p>
         </div>
