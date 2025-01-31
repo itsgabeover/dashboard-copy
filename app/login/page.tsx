@@ -81,7 +81,8 @@ export default function LoginPage() {
                 <div>
                   <h3 className="font-medium">Try It Out</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    Upload illustrations and experince how quickly IP-AI streamlines the policy review review process for clients and advisors.
+                    Upload illustrations and experience how quickly IP-AI streamlines the policy review process for clients and advisors.
+                  </p>
                 </div>
               </div>
 
@@ -92,7 +93,8 @@ export default function LoginPage() {
                 <div>
                   <h3 className="font-medium">Explore Opportunities</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                   Consider how IP-AI can empower clients to better understand their policies and engage more meaningfully with their advisors.
+                    Consider how IP-AI can empower clients to better understand their policies and engage more meaningfully with their advisors.
+                  </p>
                 </div>
               </div>
 
@@ -103,7 +105,8 @@ export default function LoginPage() {
                 <div>
                   <h3 className="font-medium">Share Your Insights</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                   Help us lead the way in AI-powered policy reviews. Your feedback will shape how clients and advisors experience automated life insurance policy analysis.
+                    Help us lead the way in AI-powered policy reviews. Your feedback will shape how clients and advisors experience automated life insurance policy analysis.
+                  </p>
                 </div>
               </div>
             </div>
@@ -175,4 +178,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
