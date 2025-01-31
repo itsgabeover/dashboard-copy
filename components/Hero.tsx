@@ -4,7 +4,6 @@ import type { FC } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
-  Upload,
   FileText,
   CheckCircle,
   Zap,
@@ -16,6 +15,9 @@ import {
   LineChart,
   ChevronRight,
   ChevronDown,
+  UploadIcon,
+  Brain,
+  Inbox,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -62,9 +64,9 @@ export const Hero: FC = () => {
               </span>
             </h1>
             <h2 className="text-xl md:text-3xl mb-12 text-gray-600 font-light">
-              AI-Powered Life Insurance Analysis
+              Turn Your Policy Details into Clear Answers
               <br />
-              That Shows Your Policy&apos;s True Picture
+              with Smart AI Technology
             </h2>
             <Card className="w-full bg-white shadow-xl hover:shadow-2xl transition-all duration-300 border-blue-100">
               <CardContent className="p-8">
@@ -82,14 +84,18 @@ export const Hero: FC = () => {
                   <div className="flex flex-col md:flex-row items-center justify-center gap-6 text-gray-700 font-medium">
                     <div className="flex items-center">
                       <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
-                      <span>No questionnaires needed</span>
+                      <span>Reliable AI Analysis</span>
                     </div>
                     <div className="flex items-center">
                       <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
-                      <span>No back-and-forth delays</span>
+                      <span>Quick, Clear Results</span>
+                    </div>
+                    <div className="flex items-center">
+                      <CheckCircle className="w-6 h-6 text-green-500 mr-2" aria-hidden="true" />
+                      <span>Expert-Level Review</span>
                     </div>
                   </div>
-                  <div className="mt-4 flex flex-col items-center space-y-2">
+                  <div className="mt-4 flex flex-col items-center">
                     <Button
                       onClick={() => scrollToSection("how-it-works")}
                       className="bg-[#4B6FEE] hover:bg-blue-700 text-white px-8 py-6 rounded-full text-lg font-semibold transition-all duration-300 hover:transform hover:scale-105 group"
@@ -99,7 +105,6 @@ export const Hero: FC = () => {
                         <ChevronDown className="w-5 h-5 transition-transform group-hover:translate-y-1" />
                       </span>
                     </Button>
-                    <p className="text-sm text-gray-600">↓ See the process</p>
                   </div>
                 </div>
               </CardContent>
@@ -113,48 +118,52 @@ export const Hero: FC = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">How It Works</h2>
-              <p className="text-gray-600 text-lg">Three simple steps to understand your policy</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">Instant Policy Analysis</h2>
+              <p className="text-gray-600 text-lg">From complex document to clear insights in moments</p>
             </div>
 
             <div className="relative">
               <div className="grid md:grid-cols-3 gap-8 relative z-10">
                 {[
                   {
-                    step: 1,
-                    title: "Upload & Email",
-                    description: "Upload your policy illustration and provide your email address.",
-                    icon: <FileText className="w-6 h-6" />,
+                    title: "Upload Your Policy",
+                    description:
+                      "Simply upload your policy illustration and provide your email. That&apos;s all we need.",
+                    icon: <UploadIcon className="w-6 h-6" />,
+                    link: {
+                      text: "Need help getting an illustration?",
+                      href: "/illustration-helper",
+                    },
                   },
                   {
-                    step: 2,
                     title: "AI Analysis",
-                    description: "Insurance Planner AI analyzes your illustration details in minutes.",
-                    icon: <Upload className="w-6 h-6" />,
+                    description:
+                      "Our advanced AI reads and analyzes your entire illustration in seconds, identifying key details and coverage areas.",
+                    icon: <Brain className="w-6 h-6" />,
                   },
                   {
-                    step: 3,
-                    title: "Get Your Analysis",
-                    description: "Delivered to your inbox: clear email summary and professional PDF report",
-                    icon: <Zap className="w-6 h-6" />,
+                    title: "Instant Results",
+                    description:
+                      "Receive a clear summary email and detailed PDF report breaking down your coverage and key policy points.",
+                    icon: <Inbox className="w-6 h-6" />,
                   },
                 ].map((item, index) => (
-                  <div key={item.step} className="relative flex">
+                  <div key={item.title} className="relative flex">
                     <Card className="text-center transition-all duration-300 hover:shadow-lg bg-white group hover:-translate-y-1 w-full flex flex-col">
                       <CardContent className="p-6 flex flex-col h-full justify-between">
                         <div>
-                          <div className="bg-blue-50 text-[#4B6FEE] rounded-full p-4 w-16 h-16 mx-auto mb-6 flex items-center justify-center text-xl font-bold group-hover:bg-[#4B6FEE] group-hover:text-white transition-colors duration-300">
-                            {item.step}
+                          <div className="bg-blue-50 text-[#4B6FEE] rounded-full p-4 w-16 h-16 mx-auto mb-6 flex items-center justify-center text-xl font-bold">
+                            {item.icon}
                           </div>
                           <h3 className="text-xl font-semibold mb-4 text-[#4B6FEE]">{item.title}</h3>
                           <p className="text-gray-600">{item.description}</p>
                         </div>
-                        {item.step === 1 && (
+                        {item.link && (
                           <Link
-                            href="/illustration-helper"
+                            href={item.link.href}
                             className="text-blue-500 hover:text-blue-700 underline mt-4 inline-block bg-white"
                           >
-                            Need help getting an illustration?
+                            {item.link.text}
                           </Link>
                         )}
                       </CardContent>
@@ -201,7 +210,7 @@ export const Hero: FC = () => {
                   icon: <Shield className="h-8 w-8" />,
                   title: "Protection Confidence",
                   description:
-                    "Understand exactly how your coverage aligns with your family's needs and get clarity on your policy's true protection power",
+                    "Understand exactly how your coverage aligns with your family&apos;s needs and get clarity on your policy&apos;s true protection power",
                 },
                 {
                   icon: <Sparkles className="h-8 w-8" />,
@@ -213,7 +222,7 @@ export const Hero: FC = () => {
                   icon: <TrendingUp className="h-8 w-8" />,
                   title: "Growth Analysis",
                   description:
-                    "Get clear insights into your policy's accumulation potential and understand your options for accessing benefits",
+                    "Get clear insights into your policy&apos;s accumulation potential and understand your options for accessing benefits",
                 },
                 {
                   icon: <Lock className="h-8 w-8" />,
@@ -227,10 +236,8 @@ export const Hero: FC = () => {
                   className="group transition-all duration-300 hover:shadow-lg bg-white transform hover:scale-102"
                 >
                   <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                    <div className="p-2 rounded-full bg-blue-50 group-hover:bg-[#4B6FEE] transition-colors duration-300">
-                      <div className="text-[#4B6FEE] group-hover:text-white transition-colors duration-300">
-                        {item.icon}
-                      </div>
+                    <div className="p-2 rounded-full bg-blue-50">
+                      <div className="text-[#4B6FEE]">{item.icon}</div>
                     </div>
                     <h3 className="text-xl font-semibold">{item.title}</h3>
                   </CardHeader>
@@ -296,8 +303,8 @@ export const Hero: FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent rounded-lg" />
                     <CardHeader className="relative pb-0">
                       <div className="flex items-center justify-center mb-6">
-                        <div className="rounded-full bg-blue-50 p-3 group-hover:bg-[#4B6FEE] transition-colors duration-300">
-                          <FileText className="h-6 w-6 text-[#4B6FEE] group-hover:text-white transition-colors duration-300" />
+                        <div className="rounded-full bg-blue-50 p-3">
+                          <FileText className="h-6 w-6 text-[#4B6FEE]" />
                         </div>
                       </div>
                       <h3 className="text-2xl font-semibold text-center text-gray-900">{item.title}</h3>
