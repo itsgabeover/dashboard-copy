@@ -68,7 +68,7 @@ export default function LoginPage() {
 
           <div className="text-center space-y-4 mb-8">
             <h1 className="text-2xl font-semibold">Welcome to the Insurance Planner AI Pilot Program</h1>
-            <p className="text-gray-600">Insurance Planner AI (IP-AI) delivers life insurance policy reviews in minutes, not hours. We're excited to have you help transform how policy reviews are done.</p>
+            <p className="text-gray-600">Thank you for joining us in transforming life insurance policy reviews. IP-AI delivers automated analysis in minutes, not hours, and we are excited to have your help shaping this innovation.</p>
           </div>
 
           <div className="space-y-6 mb-8">
