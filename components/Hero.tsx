@@ -138,13 +138,13 @@ export const Hero: FC = () => {
                   {
                     title: "AI Analysis",
                     description:
-                      "Smart AI analyzes your illustration to identify key policy details",
+                      "IP AI analyzes your illustration to identify key policy details",
                     icon: <Brain className="w-6 h-6" />,
                   },
                   {
                     title: "Quick Results",
                     description:
-                      "AI policy analysis email summary and PDF report to your inbox in minutes",
+                      "Receive a clear summary and detailed PDF report to your inbox in minutes",
                     icon: <Inbox className="w-6 h-6" />,
                   },
                 ].map((item, index) => (
