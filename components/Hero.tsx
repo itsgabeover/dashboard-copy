@@ -144,7 +144,7 @@ export const Hero: FC = () => {
                   {
                     title: "Quick Results",
                     description:
-                      "Complete Insurance Planner AI policy analysis - summary email and PDF in minutes",
+                      "AI policy analysis email summary and PDF report to your inbox in minutes",
                     icon: <Inbox className="w-6 h-6" />,
                   },
                 ].map((item, index) => (
