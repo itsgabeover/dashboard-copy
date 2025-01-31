@@ -93,7 +93,7 @@ export default function LoginPage() {
                 <div>
                   <h3 className="font-medium">Share your thoughts</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    Your feedback is super important. Tell us what works, what doesn't, and how we can make IP-AI better. Your real-world experience will help shape this tool into something truly useful
+                    Your feedback is super important. Tell us what works, what does not, and how we can make IP-AI better. Your real-world experience will help shape this tool into something truly useful
                   </p>
                 </div>
               </div>
@@ -103,7 +103,7 @@ export default function LoginPage() {
                   <MessageSquareMore className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Recommend It When You're Ready</h3>
+                  <h3 className="font-medium">Recommend It When You are Ready</h3>
                   <p className="text-gray-600 text-sm mt-1">
                    As you get comfortable with IP-AI, you might find it helpful to offer it during your regular policy reviews. No pressure - use it when it makes sense for you and your clients.
                   </p>
