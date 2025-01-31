@@ -118,7 +118,7 @@ export const Hero: FC = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-16 space-y-4">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">Instant Policy Analysis</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-[#4B6FEE]">Rapid Policy Analysis</h2>
               <p className="text-gray-600 text-lg">From complex document to clear insights in moments</p>
             </div>
 
@@ -138,13 +138,13 @@ export const Hero: FC = () => {
                   {
                     title: "AI Analysis",
                     description:
-                      "Our advanced AI reads and analyzes your entire illustration in seconds, identifying key details and coverage areas.",
+                      "Smart AI analyzes your illustration to identify key policy details",
                     icon: <Brain className="w-6 h-6" />,
                   },
                   {
-                    title: "Instant Results",
+                    title: "Quick Results",
                     description:
-                      "Receive a clear summary email and detailed PDF report breaking down your coverage and key policy points.",
+                      "Complete Insurance Planner AI policy analysis - summary email and PDF in minutes",
                     icon: <Inbox className="w-6 h-6" />,
                   },
                 ].map((item, index) => (
@@ -210,7 +210,7 @@ export const Hero: FC = () => {
                   icon: <Shield className="h-8 w-8" />,
                   title: "Protection Confidence",
                   description:
-                    "Understand exactly how your coverage aligns with your family&apos;s needs and get clarity on your policy&apos;s true protection power",
+                    "Understand exactly how your coverage aligns with your family's needs and get clarity on your policy&apos;s true protection power",
                 },
                 {
                   icon: <Sparkles className="h-8 w-8" />,
