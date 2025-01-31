@@ -128,7 +128,7 @@ export const Hero: FC = () => {
                   {
                     title: "Upload Your Policy",
                     description:
-                      "Simply upload your policy illustration and provide your email. That&apos;s all we need.",
+                      "Simply upload your policy illustration and provide your email. That is all we need.",
                     icon: <UploadIcon className="w-6 h-6" />,
                     link: {
                       text: "Need help getting an illustration?",
@@ -286,7 +286,7 @@ export const Hero: FC = () => {
                     sample: "sample_reports/SAMPLE_CLIENT_SUMMARY.pdf",
                   },
                   {
-                    title: "Professional PDF Report",
+                    title: "Expert PDF Report",
                     features: [
                       "Comprehensive Policy Analysis",
                       "Detailed Feature Assessment",
