@@ -5,20 +5,9 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Home,
-  ArrowRight,
-  ArrowLeft,
-  Zap,
-  Shield,
-  Clock,
-  CheckCircle,
-  Copy,
-  Check,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react"
+import { Home, ArrowRight, ArrowLeft, Zap, Shield, Clock, Copy, Check, ChevronUp, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import type React from "react" // Added import for React
 
 interface Step {
   title: string
@@ -31,6 +20,7 @@ interface IllustrationContent {
   description: string
   items: string[]
   script: string
+  contextBar: string
 }
 
 interface IllustrationResults {
@@ -52,24 +42,6 @@ function ProgressSteps({ currentStep }: { currentStep: number }) {
           {index < 2 && <div className={`h-0.5 w-16 ${step < currentStep ? "bg-[#4B6FEE]" : "bg-gray-200"}`} />}
         </div>
       ))}
-    </div>
-  )
-}
-
-interface FeatureCardProps {
-  icon: React.ReactNode
-  title: string
-  description: string
-}
-
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
-  return (
-    <div className="flex flex-col items-start p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#4B6FEE]/10 text-[#4B6FEE] mb-4">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold mb-2 text-gray-900">{title}</h3>
-      <p className="text-gray-600 leading-relaxed">{description}</p>
     </div>
   )
 }
@@ -119,8 +91,10 @@ export default function IllustrationHelper() {
 
   const results: IllustrationResults = {
     current_review: {
-      title: "Current Policy Illustration",
-      description: "See exactly where your policy stands today and in years ahead",
+      title: "See how my policy is performing",
+      description: "Get a complete picture of your policy's health and future",
+      contextBar:
+        "You selected 'See how my policy is performing.' This illustration will show you a complete picture of your policy's health and future. Follow the steps below to get your analysis.",
       items: [
         "Your coverage amount and type (Level or Increasing)",
         "Year-by-year projected cash value growth",
@@ -134,8 +108,10 @@ export default function IllustrationHelper() {
         "I am requesting a current in-force illustration for my policy. Please include:\n\n• Policy performance based on my current annual premium\n• Both guaranteed and non-guaranteed values\n• Cash value projections\n• Death benefit projections\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 100\n• Impact of any existing policy loans\n\nPlease make sure all values and projections match my current premium payment schedule.",
     },
     lower_premium: {
-      title: "Lower Premium Illustration",
-      description: "See how reducing your premium affects your policy",
+      title: "Find ways to lower my payments",
+      description: "Discover ways to make your payments more affordable",
+      contextBar:
+        "You selected 'Find ways to lower my payments.' This illustration will show you ways to make your payments more affordable. Follow the steps below to get your analysis.",
       items: [
         "Your lowest possible premium to keep coverage",
         "How your payments could change year by year",
@@ -148,8 +124,10 @@ export default function IllustrationHelper() {
         "I am requesting a minimum premium in-force illustration for my policy. Please include:\n\n• The lowest premium amount needed to maintain my current death benefit\n• Year-by-year minimum premium requirements\n• Impact on cash value at minimum funding\n• Both guaranteed and non-guaranteed values\n• All policy expenses and fees\n• Current interest rate assumptions\n• Projections to age 100\n• Any years requiring premium adjustments\n\nPlease note all assumptions used in these calculations.",
     },
     stop_paying: {
-      title: "Zero Premium Illustration",
-      description: "See exactly how long your policy can last without more payments",
+      title: "See what happens if I stop paying",
+      description: "Learn what happens to your coverage if payments stop",
+      contextBar:
+        "You selected 'See what happens if I stop paying.' This illustration will show you what happens to your coverage if payments stop. Follow the steps below to get your analysis.",
       items: [
         "How your policy performs without future payments",
         "Year-by-year changes to your policy's cash value",
@@ -162,24 +140,6 @@ export default function IllustrationHelper() {
         "I am requesting a zero-premium in-force illustration for my policy. Please show what happens if I stop all premium payments now. Please include:\n\n• How long my current death benefit can continue\n• Year-by-year changes to the cash value\n• When the policy would end without more payments\n• Both guaranteed and non-guaranteed projections\n• Effects on any policy benefits or riders\n• All policy expenses and fees\n• Current interest rate assumptions\n\nPlease run this to age 100 or until the policy ends, whichever comes first.",
     },
   }
-
-  const features: FeatureCardProps[] = [
-    {
-      icon: <CheckCircle className="h-6 w-6" />,
-      title: "First: Tell Us What You Need",
-      description: "We'll help you get the right illustration from three simple options",
-    },
-    {
-      icon: <Shield className="h-6 w-6" />,
-      title: "Then: Get Your Request Script",
-      description: "We'll give you the exact words to use with your insurance company",
-    },
-    {
-      icon: <Clock className="h-6 w-6" />,
-      title: "Finally: Follow Our Guide",
-      description: "We'll walk you through submitting your request using your policy number",
-    },
-  ]
 
   const options = [
     {
@@ -241,24 +201,19 @@ export default function IllustrationHelper() {
         <ProgressSteps currentStep={1} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">How to Get Your Policy Illustration</h1>
+          <h1 className="text-4xl font-bold mb-3">What Would You Like to Know About Your Policy?</h1>
           <p className="text-xl text-gray-600 mb-4">
-            We&apos;ll help you get the illustration needed for your AI analysis
+            We'll help you get the information you need in just a few simple steps
           </p>
-          <p className="text-gray-600 max-w-3xl mx-auto">
-            Tell us what matters to you, and we&apos;ll help you get the right illustration.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
-          ))}
+          <p className="text-gray-600">Takes about 2-3 minutes</p>
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <Button onClick={() => setStep(2)} className="bg-[#4B6FEE] hover:bg-[#4B6FEE]/90 text-white">
-            Start Now <ArrowRight className="ml-2 h-4 w-4" />
+          <Button
+            onClick={() => setStep(2)}
+            className="bg-[#4B6FEE] hover:bg-[#4B6FEE]/90 text-white px-6 py-3 text-lg"
+          >
+            Get Started <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
           <Button variant="outline" className="gap-2" onClick={() => router.push("/")}>
             <Home className="h-4 w-4" /> Return to Home
@@ -312,6 +267,9 @@ export default function IllustrationHelper() {
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-3">{content.title}</h1>
         <p className="text-xl text-gray-600">{content.description}</p>
+      </div>
+      <div className="bg-gray-100 p-4 rounded-lg mb-8">
+        <p className="text-gray-700">{content.contextBar}</p>
       </div>
 
       <Card className="p-6">
