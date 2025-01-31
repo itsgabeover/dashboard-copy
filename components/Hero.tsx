@@ -138,7 +138,7 @@ export const Hero: FC = () => {
                   {
                     title: "AI Analysis",
                     description:
-                      "IP AI analyzes your illustration to identify key policy details",
+                      "Insurance Planner AI analyzes your illustration to identify key policy details",
                     icon: <Brain className="w-6 h-6" />,
                   },
                   {
@@ -210,7 +210,7 @@ export const Hero: FC = () => {
                   icon: <Shield className="h-8 w-8" />,
                   title: "Protection Confidence",
                   description:
-                    "Understand exactly how your coverage aligns with your family's needs and get clarity on your policy&apos;s true protection power",
+                    "Understand exactly how your coverage aligns with your family's needs and get clarity on your policy's true protection power",
                 },
                 {
                   icon: <Sparkles className="h-8 w-8" />,
