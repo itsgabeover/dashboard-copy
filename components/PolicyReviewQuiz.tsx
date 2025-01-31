@@ -73,7 +73,7 @@ const PolicyReviewQuiz = () => {
           <CardTitle className="text-2xl font-bold text-[#4B6FEE]">Not sure if you need a review?</CardTitle>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="mb-6 text-gray-600">Take our 60-second assessment to find out if your policy needs attention</p>
+          <p className="mb-6 text-gray-600">Take our 30-second assessment to find out if your policy needs attention</p>
           <Button
             onClick={() => setStarted(true)}
             className="bg-[#4B6FEE] hover:bg-blue-700 text-white px-6 py-2 rounded-full"
