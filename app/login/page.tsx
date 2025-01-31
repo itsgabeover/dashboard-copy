@@ -68,28 +68,20 @@ export default function LoginPage() {
 
           <div className="text-center space-y-4 mb-8">
             <h1 className="text-2xl font-semibold">Welcome to the IP-AI Pilot Program</h1>
-            <p className="text-gray-600">Thank you for being part of this innovation in policy review.</p>
-          </div>
-
-          <div className="bg-blue-50 p-4 rounded-lg mb-8">
-            <p className="text-center text-blue-700">
-              Together, we can help more clients understand their coverage through AI-powered analysis that delivers
-              clear insights in minutes.
-            </p>
+            <p className="text-gray-600">Thanks for helping us test out a better way to review insurance policies. We believe this tool can help make policy reviews clearer and simpler for everyone.</p>
           </div>
 
           <div className="space-y-6 mb-8">
-            <h2 className="text-lg font-medium">As a pilot member, our hope is that you&apos;ll:</h2>
+            <h2 className="text-lg font-medium">What hope you&apos;ll do is:</h2>
             <div className="space-y-6">
               <div className="flex gap-4">
                 <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <Glasses className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Discover IP-AI through a client&apos;s lens</h3>
+                  <h3 className="font-medium">Take a look through a client&apos;s</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    Take a moment to experience how IP-AI reviews policies from your client&apos;s perspective, seeing
-                    firsthand how it delivers insights in a clear, digestible way
+                    Try IP-AI yourself to see exactly what your clients would see. We want you to experience firsthand how it breaks down complex policies into simple, clear language
                   </p>
                 </div>
               </div>
@@ -99,10 +91,9 @@ export default function LoginPage() {
                   <Share2 className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Feel comfortable suggesting IP-AI</h3>
+                  <h3 className="font-medium">Share your thoughts</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    As you become familiar with the platform, you may want to introduce your clients to this simple way
-                    of understanding their policies as part of your regular policy review process
+                    Your feedback is super important. Tell us what works, what doesn't, and how we can make IP-AI better. Your real-world experience will help shape this tool into something truly useful
                   </p>
                 </div>
               </div>
@@ -112,10 +103,9 @@ export default function LoginPage() {
                   <MessageSquareMore className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Share your unique insights</h3>
+                  <h3 className="font-medium">Recommend It When You're Ready</h3>
                   <p className="text-gray-600 text-sm mt-1">
-                    Your experience both using and recommending IP-AI will help shape it into a tool that truly serves
-                    your clients&apos; life insurance planning needs
+                   As you get comfortable with IP-AI, you might find it helpful to offer it during your regular policy reviews. No pressure - use it when it makes sense for you and your clients.
                   </p>
                 </div>
               </div>
