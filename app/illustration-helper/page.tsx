@@ -244,8 +244,8 @@ export default function IllustrationHelper() {
         <ProgressSteps currentStep={1} />
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-3">What would you like to know about your policy?</h1>
-          <p className="text-xl text-gray-600 mb-4">Get the illustration you need in just a few simple steps</p>
+          <h1 className="text-4xl font-bold mb-3">Need help getting your in-force illustration?</h1>
+          <p className="text-xl text-gray-600 mb-4">Get the in-force illustration you need in just a few simple steps</p>
           <p className="text-gray-600">Takes about 2-3 minutes</p>
         </div>
 
