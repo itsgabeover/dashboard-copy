@@ -9,7 +9,11 @@ const steps = [
   "Generating insights",
 ]
 
-export default function AnalysisProgress() {
+interface AnalysisProgressProps {
+  email: string
+}
+
+export default function AnalysisProgress({ email }: AnalysisProgressProps) {
   const [currentStep, setCurrentStep] = useState(0)
 
   useEffect(() => {
@@ -44,6 +48,7 @@ export default function AnalysisProgress() {
           <p className="text-center mt-6 text-gray-600">
             This process usually takes about a minute. We'll redirect you to your dashboard when it's ready.
           </p>
+          <p className="text-center mt-2 text-sm text-gray-500">Results will be sent to: {email}</p>
         </CardContent>
       </Card>
     </div>
