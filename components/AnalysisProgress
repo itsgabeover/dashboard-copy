@@ -9,11 +9,7 @@ const steps = [
   "Generating insights",
 ]
 
-interface AnalysisProgressProps {
-  email: string
-}
-
-export default function AnalysisProgress({ email }: AnalysisProgressProps) {
+const AnalysisProgress = ({ email }) => {
   const [currentStep, setCurrentStep] = useState(0)
 
   useEffect(() => {
@@ -54,4 +50,6 @@ export default function AnalysisProgress({ email }: AnalysisProgressProps) {
     </div>
   )
 }
+
+export default AnalysisProgress
 
