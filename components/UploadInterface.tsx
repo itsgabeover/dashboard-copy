@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Upload } from "lucide-react"
-import UploadSuccess from "./upload-success"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
 interface UploadInterfaceProps {
@@ -18,11 +18,11 @@ interface UploadResponse {
 }
 
 export function UploadInterface({ token }: UploadInterfaceProps) {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
-  const [uploadSuccess, setUploadSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -80,7 +80,6 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
 
     setIsUploading(true)
     setError(null)
-    setUploadSuccess(false)
 
     try {
       console.log("Starting upload with token:", token)
@@ -118,22 +117,19 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(data.error || data.message || "Upload failed")
       }
 
-      setUploadSuccess(true)
       setFile(null)
-      setEmail("")
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
+
+      // Redirect to success page with email parameter
+      router.push(`/upload/success?email=${encodeURIComponent(email)}`)
     } catch (error) {
       console.error("Upload failed:", error)
       setError(error instanceof Error ? error.message : "An error occurred during upload. Please try again.")
     } finally {
       setIsUploading(false)
     }
-  }
-
-  if (uploadSuccess) {
-    return <UploadSuccess />
   }
 
   return (
