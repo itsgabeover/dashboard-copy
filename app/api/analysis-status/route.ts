@@ -1,17 +1,23 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const email = searchParams.get("email")
+  const uploadId = request.nextUrl.searchParams.get("uploadId")
 
-  if (!email) {
-    return NextResponse.json({ error: "Email is required" }, { status: 400 })
+  if (!uploadId) {
+    return NextResponse.json({ error: "Missing uploadId" }, { status: 400 })
   }
 
-  // In a real application, you would check the status of the analysis in your database or external service
+  // Here, you would typically check the status of the analysis in your database or with n8n
   // For this example, we'll simulate a random completion time
-  const isComplete = Math.random() < 0.2 // 20% chance of being complete each time we check
+  const isCompleted = Math.random() < 0.3 // 30% chance of completion each check
 
-  return NextResponse.json({ status: isComplete ? "complete" : "inProgress" })
+  if (isCompleted) {
+    // In a real scenario, you'd fetch the actual policyId from your database
+    const policyId = `policy_${Date.now()}`
+    return NextResponse.json({ status: "completed", policyId })
+  } else {
+    return NextResponse.json({ status: "processing" })
+  }
 }
 
