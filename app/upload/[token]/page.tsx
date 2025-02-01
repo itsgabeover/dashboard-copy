@@ -37,7 +37,7 @@ export default function UploadPage() {
   const [step, setStep] = useState(1)
   const [isDragging, setIsDragging] = useState(false)
   const [analysisStatus, setAnalysisStatus] = useState<"idle" | "inProgress" | "complete">("idle")
-  const [policyId, setPolicyId] = useState<string | null>(null)
+  //const [policyId, setPolicyId] = useState<string | null>(null) //Removed as policyId is no longer needed
 
   useEffect(() => {
     const pathToken = window.location.pathname.split("/").pop()
@@ -49,15 +49,15 @@ export default function UploadPage() {
   }, [router])
 
   useEffect(() => {
-    if (analysisStatus === "inProgress" && policyId) {
+    if (analysisStatus === "inProgress") {
       const checkAnalysisStatus = async () => {
         try {
-          const response = await fetch(`/api/analysis-status/${policyId}`)
+          const response = await fetch(`/api/analysis-status?email=${encodeURIComponent(email)}`)
           if (response.ok) {
             const { status } = await response.json()
             if (status === "complete") {
               setAnalysisStatus("complete")
-              router.push(`/dashboard/${policyId}`)
+              router.push(`/dashboard?email=${encodeURIComponent(email)}`)
             } else {
               setTimeout(checkAnalysisStatus, 5000) // Check again after 5 seconds
             }
@@ -71,7 +71,7 @@ export default function UploadPage() {
 
       checkAnalysisStatus()
     }
-  }, [analysisStatus, policyId, router])
+  }, [analysisStatus, email, router])
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -146,9 +146,7 @@ export default function UploadPage() {
         throw new Error(`Upload failed: ${response.statusText}`)
       }
 
-      const { policyId } = await response.json()
       setUploadStatus({ state: "success" })
-      setPolicyId(policyId)
       setAnalysisStatus("inProgress")
     } catch (error: unknown) {
       console.error("Upload error:", error)
