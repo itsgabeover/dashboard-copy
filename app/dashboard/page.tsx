@@ -1,54 +1,54 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import PolicyOverview from "@/components/PolicyOverview";
-import SectionAnalysis from "@/components/SectionAnalysis";
-import InsightFramework from "@/components/InsightFramework";
-import KeyTakeaways from "@/components/KeyTakeaways";
-import { Button } from "@/components/ui/button";
-import { MessageCircle } from 'lucide-react';
-import { fetchPolicyData } from "@/lib/api";
-import type { ParsedPolicyData } from "@/types/policy";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+import Link from "next/link"
+import PolicyOverview from "@/components/PolicyOverview"
+import SectionAnalysis from "@/components/SectionAnalysis"
+import InsightFramework from "@/components/InsightFramework"
+import KeyTakeaways from "@/components/KeyTakeaways"
+import { Button } from "@/components/ui/button"
+import { MessageCircle } from "lucide-react"
+import { fetchPolicyData } from "@/lib/api"
+import type { ParsedPolicyData } from "@/types/policy"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function Dashboard() {
-  const params = useParams();
-  const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null);
-  const [selectedSectionIndex, setSelectedSectionIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const params = useParams()
+  const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
+  const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadPolicyData() {
-      if (!params.policyId) return;
+      if (!params.policyId) return
 
       try {
-        setIsLoading(true);
-        setError(null);
-        const data = await fetchPolicyData(params.policyId as string);
-        setPolicyData(data);
+        setIsLoading(true)
+        setError(null)
+        const data = await fetchPolicyData(params.policyId as string)
+        setPolicyData(data)
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load policy data");
-        console.error(err);
+        setError(err instanceof Error ? err.message : "Failed to load policy data")
+        console.error(err)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
 
-    loadPolicyData();
-  }, [params.policyId]);
+    loadPolicyData()
+  }, [params.policyId])
 
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner />
   }
 
   if (error || !policyData) {
-    return <div className="text-center text-red-600 p-6">{error || "No policy data available"}</div>;
+    return <div className="text-center text-red-600 p-6">{error || "No policy data available"}</div>
   }
 
-  const selectedSection = policyData.data.sections[selectedSectionIndex];
+  const selectedSection = policyData.data.sections[selectedSectionIndex]
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
@@ -80,7 +80,7 @@ export default function Dashboard() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Policy Analysis Dashboard</h1>
           <div className="text-sm text-gray-500">
-            Policy ID: {policyData.policyId}
+            Policy ID: {params.policyId}
             <br />
             Last updated: {new Date(policyData.timestamp).toLocaleDateString()}
           </div>
@@ -111,5 +111,6 @@ export default function Dashboard() {
         )}
       </main>
     </div>
-  );
+  )
 }
+
