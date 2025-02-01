@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { UploadSuccess } from "@/components/upload-success"
+import UploadSuccess from "@/components/upload-success"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function UploadSuccessPage() {
@@ -41,7 +41,7 @@ export default function UploadSuccessPage() {
       <div className="min-h-screen flex flex-col items-center justify-center">
         <LoadingSpinner />
         <p className="mt-4 text-lg text-gray-600">Analyzing your policy...</p>
-        <p className="mt-2 text-sm text-gray-500">This may take a few minutes. Please don't close this page.</p>
+        <p className="mt-2 text-sm text-gray-500">This may take a few minutes. Please don&apos;t close this page.</p>
       </div>
     )
   }
