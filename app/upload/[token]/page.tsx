@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
-import AnalysisProgress from "@/components/AnalysisProgress"
 
 interface UploadStatus {
   state: "idle" | "uploading" | "success" | "error"
@@ -34,10 +33,7 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null)
   const [email, setEmail] = useState("")
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>({ state: "idle" })
-  const [step, setStep] = useState(1)
   const [isDragging, setIsDragging] = useState(false)
-  const [analysisStatus, setAnalysisStatus] = useState<"idle" | "inProgress" | "complete">("idle")
-  //const [policyId, setPolicyId] = useState<string | null>(null) //Removed as policyId is no longer needed
 
   useEffect(() => {
     const pathToken = window.location.pathname.split("/").pop()
@@ -47,31 +43,6 @@ export default function UploadPage() {
       router.push("/")
     }
   }, [router])
-
-  useEffect(() => {
-    if (analysisStatus === "inProgress") {
-      const checkAnalysisStatus = async () => {
-        try {
-          const response = await fetch(`/api/analysis-status?email=${encodeURIComponent(email)}`)
-          if (response.ok) {
-            const { status } = await response.json()
-            if (status === "complete") {
-              setAnalysisStatus("complete")
-              router.push(`/dashboard?email=${encodeURIComponent(email)}`)
-            } else {
-              setTimeout(checkAnalysisStatus, 5000) // Check again after 5 seconds
-            }
-          } else {
-            console.error("Failed to fetch analysis status")
-          }
-        } catch (error) {
-          console.error("Error checking analysis status:", error)
-        }
-      }
-
-      checkAnalysisStatus()
-    }
-  }, [analysisStatus, email, router])
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -147,7 +118,8 @@ export default function UploadPage() {
       }
 
       setUploadStatus({ state: "success" })
-      setAnalysisStatus("inProgress")
+      // Redirect to dashboard immediately after successful upload
+      router.push(`/dashboard?email=${encodeURIComponent(email)}`)
     } catch (error: unknown) {
       console.error("Upload error:", error)
       if (error instanceof Error) {
@@ -162,21 +134,12 @@ export default function UploadPage() {
     }
   }
 
-  const handleChangeFile = () => {
-    setFile(null)
-    setStep(1)
-  }
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4B6FEE]" aria-label="Loading" />
       </div>
     )
-  }
-
-  if (analysisStatus === "inProgress") {
-    return <AnalysisProgress />
   }
 
   return (
@@ -232,7 +195,9 @@ export default function UploadPage() {
               </Button>
             </form>
             {uploadStatus.state === "error" && <p className="mt-4 text-red-500">{uploadStatus.message}</p>}
-            {uploadStatus.state === "success" && <p className="mt-4 text-green-500">Upload successful!</p>}
+            {uploadStatus.state === "success" && (
+              <p className="mt-4 text-green-500">Upload successful! Redirecting to dashboard...</p>
+            )}
           </CardContent>
         </Card>
       </main>
