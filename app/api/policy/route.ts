@@ -1,60 +1,46 @@
 import { type NextRequest, NextResponse } from "next/server"
-import type { ParsedPolicyData } from "@/types/policy"
+import type { ParsedPolicyData, APIResponse } from "@/types/policy"
 
-// POST endpoint for receiving data from n8n
+// Store data in server memory (temporary, resets on deploy)
+let latestPolicyData: ParsedPolicyData | null = null
+
 export async function POST(request: NextRequest) {
   try {
     const policyData: ParsedPolicyData = await request.json()
     
-    // Validate the data structure
-    if (!policyData.data || !policyData.timestamp) {
-      return NextResponse.json(
-        { error: "Invalid policy data structure" }, 
-        { status: 400 }
-      )
-    }
+    // Store in server memory
+    latestPolicyData = policyData
     
-    // Log for debugging
-    console.log("Received policy data in API:", JSON.stringify(policyData, null, 2))
+    console.log("Stored policy data:", JSON.stringify(policyData, null, 2))
 
-    // Return success response with the data
-    // The frontend will handle storing this in localStorage
-    return NextResponse.json({
+    const response: APIResponse = {
       success: true,
-      data: policyData,
-      message: "Policy data received successfully"
-    })
+      data: policyData
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error("Error processing policy data:", error)
     return NextResponse.json({ 
+      success: false, 
       error: "Failed to process policy data",
       details: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
   }
 }
 
-// GET endpoint for retrieving policy data
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const policyId = searchParams.get('policyId')
-
-  if (!policyId) {
-    return NextResponse.json({ error: "Policy ID is required" }, { status: 400 })
-  }
-
-  try {
-    // Currently just acknowledges the request
-    // In future could be expanded to fetch from a database
-    return NextResponse.json({
-      success: true,
-      message: "GET endpoint ready for future database integration",
-      policyId: policyId
-    })
-  } catch (error) {
-    console.error("Error retrieving policy data:", error)
+export async function GET() {
+  if (!latestPolicyData) {
     return NextResponse.json({ 
-      error: "Failed to retrieve policy data",
-      details: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 })
+      success: false,
+      message: "No policy data available" 
+    }, { status: 404 })
   }
+
+  const response: APIResponse = {
+    success: true,
+    data: latestPolicyData
+  }
+
+  return NextResponse.json(response)
 }
