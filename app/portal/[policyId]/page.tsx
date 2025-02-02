@@ -1,177 +1,96 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { FileText, Clock, CheckCircle, AlertCircle } from "lucide-react"
-import { 
-  Card, 
-  CardHeader, 
-  CardContent, 
-  CardTitle 
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import PolicyOverview from "@/components/PolicyOverview"
+import SectionAnalysis from "@/components/SectionAnalysis"
+import InsightFramework from "@/components/InsightFramework"
+import KeyTakeaways from "@/components/KeyTakeaways"
+import { fetchPolicyData } from "@/lib/api"
+import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { supabase } from '@/lib/supabase'
 
-interface PolicyCard {
-  id: string
-  productName: string
-  uploadDate: string
-  status: 'processing' | 'complete' | 'error'
-  analysis_data: any
+interface PolicyPageProps {
+  params: {
+    policyId: string
+  }
 }
 
-export default function PortalPage() {
-  const router = useRouter()
-  const [policies, setPolicies] = useState<PolicyCard[]>([])
+export default function PolicyPage({ params }: PolicyPageProps) {
+  const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
+  const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function fetchPolicies() {
+    async function loadPolicyData() {
+      if (!params.policyId) return
+
       try {
-        const { data, error } = await supabase
-          .from('policies')
-          .select('*')
-          .order('uploadDate', { ascending: false })
-
-        if (error) throw error
-
-        if (data) {
-          setPolicies(data.map(policy => ({
-            id: policy.id,
-            productName: policy.analysis_data?.data?.policyOverview?.productName || 'Untitled Policy',
-            uploadDate: new Date(policy.uploadDate).toLocaleDateString(),
-            status: policy.status,
-            analysis_data: policy.analysis_data
-          })))
+        setIsLoading(true)
+        setError(null)
+        const response = await fetchPolicyData(params.policyId)
+        
+        if (response?.success && response.data) {
+          setPolicyData(response.data)
+        } else {
+          setError("No policy data available")
         }
       } catch (err) {
-        console.error('Error fetching policies:', err)
-        setError('Failed to load policies')
+        setError(err instanceof Error ? err.message : "Failed to load policy data")
+        console.error("Error loading policy:", err)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchPolicies()
-  }, [])
+    loadPolicyData()
+  }, [params.policyId])
 
-  const getStatusIcon = (status: string) => {
-    switch(status) {
-      case 'complete':
-        return <CheckCircle className="h-5 w-5 text-green-500" />
-      case 'processing':
-        return <Clock className="h-5 w-5 text-[#4B6FEE] animate-pulse" />
-      case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-500" />
-      default:
-        return null
-    }
+  if (isLoading) {
+    return <LoadingSpinner />
   }
 
-  const handleViewPolicy = (policyId: string) => {
-    router.push(`/portal/${policyId}`)
-  }
-
-  if (isLoading) return <LoadingSpinner />
-
-  if (error) {
+  if (error || !policyData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">{error}</p>
-          <Button 
-            onClick={() => window.location.reload()} 
-            className="mt-4"
-            variant="outline"
-          >
-            Try Again
-          </Button>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-50">
+        <div className="text-center text-red-600 p-6">
+          {error || "No policy data available"}
         </div>
       </div>
     )
   }
 
-  const latestPolicy = policies[0]
+  const selectedSection = policyData.data.sections[selectedSectionIndex]
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#4B6FEE] to-[#3B4FDE]">
-            Your Policy Analyses
-          </h1>
-          <p className="text-lg text-gray-600">
-            View and manage your insurance policy analyses
-          </p>
+      <main className="container mx-auto px-4 py-4 space-y-6">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Policy Analysis Dashboard</h1>
+          <div className="text-sm text-gray-500">
+            Last updated: {new Date(policyData.timestamp).toLocaleDateString()}
+          </div>
         </div>
-
-        {/* Latest Upload */}
-        {latestPolicy && (
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">Latest Analysis</CardTitle>
-                {getStatusIcon(latestPolicy.status)}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-start gap-4">
-                <div className="p-4 bg-blue-50 rounded-lg">
-                  <FileText className="h-8 w-8 text-[#4B6FEE]" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{latestPolicy.productName}</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Uploaded {latestPolicy.uploadDate}
-                  </p>
-                </div>
-                <Button
-                  onClick={() => handleViewPolicy(latestPolicy.id)}
-                  className="bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white shadow-lg shadow-blue-200"
-                >
-                  View Analysis
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <PolicyOverview {...policyData.data.policyOverview} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <SectionAnalysis
+              sections={policyData.data.sections}
+              selectedSectionIndex={selectedSectionIndex}
+              onSectionChange={setSelectedSectionIndex}
+            />
+          </div>
+          <div>
+            <InsightFramework section={selectedSection} />
+          </div>
+        </div>
+        <KeyTakeaways section={selectedSection} />
+        {policyData.data.finalThoughts && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Final Thoughts</h2>
+            <p className="text-gray-700">{policyData.data.finalThoughts}</p>
+          </div>
         )}
-
-        {/* Previous Analyses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {policies.slice(1).map(policy => (
-            <Card 
-              key={policy.id}
-              className="border bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start gap-3">
-                  <div className="p-3 bg-gray-50 rounded-lg">
-                    <FileText className="h-6 w-6 text-[#4B6FEE]" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium">{policy.productName}</h3>
-                      {getStatusIcon(policy.status)}
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {policy.uploadDate}
-                    </p>
-                    <Button
-                      onClick={() => handleViewPolicy(policy.id)}
-                      variant="ghost"
-                      className="mt-3 text-[#4B6FEE] hover:text-[#3B4FDE] hover:bg-blue-50/50"
-                    >
-                      View Analysis →
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
       </main>
     </div>
   )
