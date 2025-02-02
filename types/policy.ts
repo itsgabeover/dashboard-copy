@@ -1,34 +1,41 @@
+export interface PolicyValue {
+  timePoint: string
+  values: {
+    deathBenefitAmount: number
+    cashValue: number
+    netSurrenderValue: number
+  }
+}
+
+export interface PolicySection {
+  title: string
+  quotes: string[]
+  hiddengem: string | null
+  blindspot: string | null
+  redflag: string | null
+  clientImplications: string | null
+}
+
+export interface PolicyOverview {
+  productName: string
+  issuer: string
+  productType: string
+  deathBenefit: number
+  annualPremium: number
+  riders: string[]
+}
+
 export interface ParsedPolicyData {
   timestamp: string
   data: {
     policyOverview: PolicyOverview
     sections: PolicySection[]
-    finalThoughts?: string
+    values: PolicyValue[]
+    finalThoughts: string
   }
 }
 
-export interface PolicyOverview {
-  policyName: string
-  insuranceCompany: string
-  policyType: string
-  faceAmount: string
-  premiumAmount: string
-  cashValue: string
+export interface APIResponse {
+  success: boolean
+  data: ParsedPolicyData
 }
-
-export interface PolicySection {
-  title: string
-  content: string
-  insights: string[]
-}
-
-export interface Policy {
-  id: string
-  created_at: string
-  status: string
-  productName: string
-  analysis_data: {
-    policyName: string
-  }
-}
-
