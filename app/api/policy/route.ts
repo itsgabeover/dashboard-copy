@@ -17,10 +17,12 @@ export async function POST(request: NextRequest) {
     // Log for debugging
     console.log("Received policy data in API:", JSON.stringify(policyData, null, 2))
 
+    // Return success response with the data
+    // The frontend will handle storing this in localStorage
     return NextResponse.json({
       success: true,
       data: policyData,
-      message: "Policy data received and stored successfully"
+      message: "Policy data received successfully"
     })
   } catch (error) {
     console.error("Error processing policy data:", error)
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET endpoint for retrieving data (in case you need it)
+// GET endpoint for retrieving policy data
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const policyId = searchParams.get('policyId')
@@ -41,12 +43,18 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Currently just acknowledges the request
+    // In future could be expanded to fetch from a database
     return NextResponse.json({
       success: true,
-      message: "This endpoint is ready to be integrated with storage"
+      message: "GET endpoint ready for future database integration",
+      policyId: policyId
     })
   } catch (error) {
     console.error("Error retrieving policy data:", error)
-    return NextResponse.json({ error: "Failed to retrieve policy data" }, { status: 500 })
+    return NextResponse.json({ 
+      error: "Failed to retrieve policy data",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
   }
 }
