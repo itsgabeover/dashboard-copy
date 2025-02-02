@@ -1,56 +1,28 @@
 "use client"
 
-import { Suspense } from "react"
-import { useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
-function SuccessContent() {
-  const searchParams = useSearchParams()
-  const email = searchParams.get("email")
+export default function SuccessPage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    // Short delay before redirecting to processing
+    const timeout = setTimeout(() => {
+      router.push('/processing')
+    }, 1500)
+
+    return () => clearTimeout(timeout)
+  }, [router])
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardContent className="pt-6 text-center space-y-4">
-        <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-        <h2 className="text-2xl font-semibold text-[#4361EE]">Upload Successful!</h2>
-        <div className="space-y-2 text-gray-600">
-          <p>
-            Thank you for uploading your policy document. Your reports will be sent shortly to{" "}
-            {email ? <span className="font-medium">{email}</span> : "the email address you provided"}.
-          </p>
-          <p>
-            Need help? Contact our support team at{" "}
-            <a href="mailto:support@financialplanner-ai.com" className="text-[#4361EE] hover:underline">
-              support@financialplanner-ai.com
-            </a>
-          </p>
-        </div>
-      </CardContent>
-      <CardFooter className="justify-center pb-6">
-        <Link href="/">
-          <Button variant="outline" className="border-[#4361EE] text-[#4361EE] hover:bg-[#4361EE] hover:text-white">
-            Return to Home
-          </Button>
-        </Link>
-      </CardFooter>
-    </Card>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-50">
+      <LoadingSpinner />
+      <h2 className="mt-8 text-2xl font-semibold text-gray-800">Upload Successful!</h2>
+      <p className="mt-4 text-gray-600">
+        Redirecting to process your policy...
+      </p>
+    </div>
   )
 }
-
-export default function UploadSuccess() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4361EE]"></div>
-        </div>
-      }
-    >
-      <SuccessContent />
-    </Suspense>
-  )
-}
-
