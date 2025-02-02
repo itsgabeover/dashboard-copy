@@ -58,6 +58,7 @@ export default async function PolicyPage({ params }: { params: { policyId: strin
   try {
     policyData = await getPolicyData(params.policyId)
   } catch (error) {
+    console.error("Error fetching policy data:", error)
     notFound()
   }
 
