@@ -22,7 +22,11 @@ async function getPolicyData(policyId: string): Promise<ParsedPolicyData | null>
   return data as ParsedPolicyData
 }
 
-export default async function PolicyPage({ params }: { params: { policyId: string } }) {
+interface PolicyPageProps {
+  params: { policyId: string }
+}
+
+export default async function PolicyPage({ params }: PolicyPageProps) {
   const policyData = await getPolicyData(params.policyId)
 
   if (!policyData) {
@@ -32,8 +36,8 @@ export default async function PolicyPage({ params }: { params: { policyId: strin
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <main className="container mx-auto px-4 py-8">
-        <Button onClick={() => window.history.back()} className="mb-6 bg-[#4B6FEE] text-white hover:bg-[#3B4FDE]">
-          Back to Portal
+        <Button asChild className="mb-6 bg-[#4B6FEE] text-white hover:bg-[#3B4FDE]">
+          <a href="/portal">Back to Portal</a>
         </Button>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
