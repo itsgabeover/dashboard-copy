@@ -2,110 +2,61 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { fetchPolicyData } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
+const stages = ["Analyzing Policy", "Extracting Insights", "Generating Report", "Finalizing"]
+
 export default function ProcessingPage() {
-  const router = useRouter()
+  const [currentStage, setCurrentStage] = useState(0)
   const [attempts, setAttempts] = useState(0)
-  const [lastAttemptTime, setLastAttemptTime] = useState<Date | null>(null)
-  const [processingStage, setProcessingStage] = useState(1)
-  const maxAttempts = 30
-
-  const stages = [
-    { id: 1, text: "Uploading document..." },
-    { id: 2, text: "Converting to text..." },
-    { id: 3, text: "AI analyzing policy..." },
-    { id: 4, text: "Preparing your analysis..." }
-  ]
-
-  const stagesLength = stages.length
+  const router = useRouter()
 
   useEffect(() => {
     const stageInterval = setInterval(() => {
-      setProcessingStage(prev => prev < stagesLength ? prev + 1 : prev)
+      setCurrentStage((prevStage) => (prevStage + 1) % stages.length)
     }, 12000)
 
-    return () => clearInterval(stageInterval)
-  }, [stagesLength])
-
-  useEffect(() => {
-    const checkProcessingStatus = async () => {
+    const checkPolicy = async () => {
       try {
-        setLastAttemptTime(new Date())
-        
-        const data = await fetchPolicyData()
-        if (data) {
-          console.log("Policy data found, redirecting to portal")
-          router.push('/portal')
-          return
-        }
-
-        if (attempts < maxAttempts) {
-          setAttempts(prev => prev + 1)
-          setTimeout(checkProcessingStatus, 10000)
-        } else {
-          setAttempts(0)
-          setTimeout(checkProcessingStatus, 10000)
+        const response = await fetch("/api/policy")
+        if (response.ok) {
+          const data = await response.json()
+          if (data.status === "complete") {
+            clearInterval(stageInterval)
+            router.push("/portal")
+          }
         }
       } catch (error) {
-        console.error('Error checking status:', error)
-        if (attempts < maxAttempts) {
-          setAttempts(prev => prev + 1)
-          setTimeout(checkProcessingStatus, 10000)
-        }
+        console.error("Error checking policy status:", error)
       }
+
+      setAttempts((prevAttempts) => prevAttempts + 1)
     }
 
-    checkProcessingStatus()
+    const pollingInterval = setInterval(() => {
+      if (attempts < 30) {
+        checkPolicy()
+      } else {
+        clearInterval(pollingInterval)
+        clearInterval(stageInterval)
+        router.push("/error")
+      }
+    }, 10000)
 
-    return () => clearTimeout(setTimeout(checkProcessingStatus, 10000))
-  }, [attempts, maxAttempts, router])
+    return () => {
+      clearInterval(stageInterval)
+      clearInterval(pollingInterval)
+    }
+  }, [router, attempts])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-50">
-      <div className="max-w-md w-full mx-auto p-8">
-        <LoadingSpinner />
-        
-        <div className="mt-8 space-y-6">
-          {stages.map((stage) => (
-            <div 
-              key={stage.id} 
-              className={`flex items-center space-x-4 transition-all duration-500 ${
-                stage.id <= processingStage ? 'opacity-100' : 'opacity-30'
-              }`}
-            >
-              <div className={`w-4 h-4 rounded-full ${
-                stage.id < processingStage ? 'bg-green-500' : 
-                stage.id === processingStage ? 'bg-[#4B6FEE] animate-pulse' : 
-                'bg-gray-300'
-              }`} />
-              <span className={`text-lg ${
-                stage.id === processingStage ? 'text-[#4B6FEE] font-semibold' : 
-                stage.id < processingStage ? 'text-green-600' : 
-                'text-gray-400'
-              }`}>
-                {stage.text}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            This process typically takes 45-60 seconds.
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            We&apos;ll automatically redirect you when ready.
-          </p>
-        </div>
-
-        {lastAttemptTime && (
-          <div className="mt-4 text-xs text-gray-400 text-center">
-            Last check: {lastAttemptTime.toLocaleTimeString()}
-          </div>
-        )}
+      <div className="text-center">
+        <LoadingSpinner size={48} className="mb-8 text-[#4B6FEE]" />
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">{stages[currentStage]}</h1>
+        <p className="text-lg text-gray-600">Please wait while we process your policy...</p>
       </div>
     </div>
   )
 }
+
