@@ -9,13 +9,12 @@ import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
-interface PolicyPageProps {
-  params: {
-    policyId: string
-  }
-}
-
-export default function PolicyPage({ params }: PolicyPageProps) {
+// Using the correct Next.js page props type
+export default function PolicyPage({
+  params,
+}: {
+  params: { policyId: string }
+}) {
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
