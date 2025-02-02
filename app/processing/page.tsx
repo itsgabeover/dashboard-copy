@@ -106,7 +106,7 @@ export default function ProcessingPage() {
 
         <div className="mt-8 text-center">
           <p className="text-gray-600">This process typically takes 60-90 seconds.</p>
-          <p className="text-sm text-gray-500 mt-2">We'll automatically redirect you when ready.</p>
+          <p className="text-sm text-gray-500 mt-2">We&apos;ll automatically redirect you when ready.</p>
         </div>
 
         <div className="mt-4 text-xs text-gray-400 text-center">Processing time: {processingTime} seconds</div>
