@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { notFound } from "next/navigation"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -7,31 +8,20 @@ import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
-async function PolicyPageContent({ policyId }: { policyId: string }) {
-  let policyData: ParsedPolicyData | null = null
-  let error: string | null = null
-
+async function getPolicyData(policyId: string): Promise<ParsedPolicyData> {
   try {
     const response = await fetchPolicyData(policyId)
-
     if (response?.success && response.data) {
-      policyData = response.data
-    } else {
-      error = "No policy data available"
+      return response.data
     }
-  } catch (err) {
-    error = err instanceof Error ? err.message : "Failed to load policy data"
-    console.error("Error loading policy:", err)
+    throw new Error("No policy data available")
+  } catch (error) {
+    console.error("Error fetching policy data:", error)
+    throw error
   }
+}
 
-  if (error || !policyData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-50">
-        <div className="text-center text-red-600 p-6">{error || "No policy data available"}</div>
-      </div>
-    )
-  }
-
+function PolicyContent({ policyData }: { policyData: ParsedPolicyData }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <main className="container mx-auto px-4 py-4 space-y-6">
@@ -62,10 +52,18 @@ async function PolicyPageContent({ policyId }: { policyId: string }) {
   )
 }
 
-export default function PolicyPage({ params }: { params: { policyId: string } }) {
+export default async function PolicyPage({ params }: { params: { policyId: string } }) {
+  let policyData: ParsedPolicyData
+
+  try {
+    policyData = await getPolicyData(params.policyId)
+  } catch (error) {
+    notFound()
+  }
+
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <PolicyPageContent policyId={params.policyId} />
+      <PolicyContent policyData={policyData} />
     </Suspense>
   )
 }
