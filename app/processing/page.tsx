@@ -12,6 +12,8 @@ export default function ProcessingPage() {
   const maxAttempts = 30 // 5 minutes with 10-second intervals
 
   useEffect(() => {
+    console.log("Processing page mounted")
+
     const checkProcessingStatus = async () => {
       try {
         // Update last attempt time
@@ -44,6 +46,11 @@ export default function ProcessingPage() {
     }
 
     checkProcessingStatus()
+
+    // Cleanup timeout on unmount
+    return () => {
+      clearTimeout(setTimeout(checkProcessingStatus, 10000))
+    }
   }, [attempts, router])
 
   return (
