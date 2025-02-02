@@ -1,7 +1,6 @@
 "use client"
 
-import { Suspense } from "react"
-import { notFound } from "next/navigation"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 import PolicyOverview from "@/components/PolicyOverview"
@@ -11,6 +10,7 @@ import KeyTakeaways from "@/components/KeyTakeaways"
 import { supabase } from '@/lib/supabase'
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
+
 
 // Define props type for NextJS page component
 type PageProps = {
