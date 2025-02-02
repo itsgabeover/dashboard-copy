@@ -5,8 +5,7 @@ import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
 import KeyTakeaways from "@/components/KeyTakeaways"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { supabase } from "@/lib/supabase"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
@@ -18,8 +17,6 @@ type PageProps = {
 }
 
 async function PolicyContent({ policyId }: { policyId: string }) {
-  const supabase = createServerComponentClient({ cookies })
-
   const { data: policy, error } = await supabase.from("policies").select("*").eq("id", policyId).single()
 
   if (error) throw error
