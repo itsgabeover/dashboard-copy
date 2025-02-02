@@ -8,14 +8,6 @@ import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
-// Define proper page props type for Next.js App Router
-type Props = {
-  params: {
-    policyId: string
-  }
-  searchParams: Record<string, string | string[] | undefined>
-}
-
 async function getPolicyData(policyId: string): Promise<ParsedPolicyData> {
   try {
     const response = await fetchPolicyData(policyId)
@@ -60,8 +52,9 @@ function PolicyContent({ policyData }: { policyData: ParsedPolicyData }) {
   )
 }
 
-export default async function PolicyPage({ params, searchParams }: Props) {
+export default async function PolicyPage({ params }: { params: { policyId: string } }) {
   let policyData: ParsedPolicyData
+
   try {
     policyData = await getPolicyData(params.policyId)
   } catch (error) {
