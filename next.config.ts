@@ -1,12 +1,16 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next"
+import type { Configuration as WebpackConfig } from "webpack"
+
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  webpack: (config) => {
-    config.resolve.alias.canvas = false
+  webpack: (config: WebpackConfig) => {
+    if (config.resolve && config.resolve.alias) {
+      config.resolve.alias.canvas = false
+    }
     return config
   },
 }
 
-module.exports = nextConfig
+export default nextConfig
 
