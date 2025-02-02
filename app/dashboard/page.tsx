@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -10,6 +11,7 @@ import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function Dashboard() {
+  const router = useRouter()
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -24,7 +26,9 @@ export default function Dashboard() {
         if (data) {
           setPolicyData(data)
         } else {
-          setError("No policy data available")
+          // If no data is available, redirect to the processing page
+          router.push("/processing")
+          return
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load policy data")
@@ -35,7 +39,7 @@ export default function Dashboard() {
     }
 
     loadPolicyData()
-  }, [])
+  }, [router])
 
   if (isLoading) {
     return <LoadingSpinner />
@@ -84,3 +88,4 @@ export default function Dashboard() {
     </div>
   )
 }
+
