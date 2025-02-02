@@ -17,33 +17,33 @@ export default function ProcessingPage() {
     { id: 1, text: "Uploading document..." },
     { id: 2, text: "Converting to text..." },
     { id: 3, text: "AI analyzing policy..." },
-    { id: 4, text: "Preparing your analysis..." }  // Updated text
+    { id: 4, text: "Preparing your analysis..." },
   ]
 
   useEffect(() => {
     console.log("Processing page mounted")
-    
+
     // Advance through stages every 12 seconds
     const stageInterval = setInterval(() => {
-      setProcessingStage(prev => prev < stages.length ? prev + 1 : prev)
+      setProcessingStage((prev) => (prev < stages.length ? prev + 1 : prev))
     }, 12000)
 
     const checkProcessingStatus = async () => {
       try {
         setLastAttemptTime(new Date())
-        
+
         const data = await fetchPolicyData()
         if (data) {
           console.log("Policy data found, redirecting to portal")
           // Add a small delay before redirect to ensure user sees completion
           setTimeout(() => {
-            router.push('/portal')
+            router.push("/portal")
           }, 1000)
           return
         }
 
         if (attempts < maxAttempts) {
-          setAttempts(prev => prev + 1)
+          setAttempts((prev) => prev + 1)
           setTimeout(checkProcessingStatus, 10000)
         } else {
           console.log("Max attempts reached")
@@ -52,9 +52,9 @@ export default function ProcessingPage() {
           setTimeout(checkProcessingStatus, 10000)
         }
       } catch (error) {
-        console.error('Error checking status:', error)
+        console.error("Error checking status:", error)
         if (attempts < maxAttempts) {
-          setAttempts(prev => prev + 1)
+          setAttempts((prev) => prev + 1)
           setTimeout(checkProcessingStatus, 10000)
         }
       }
@@ -72,25 +72,33 @@ export default function ProcessingPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <div className="max-w-md w-full mx-auto p-8">
         <LoadingSpinner />
-        
+
         <div className="mt-8 space-y-6">
           {stages.map((stage) => (
-            <div 
-              key={stage.id} 
+            <div
+              key={stage.id}
               className={`flex items-center space-x-4 transition-all duration-500 ${
-                stage.id <= processingStage ? 'opacity-100' : 'opacity-30'
+                stage.id <= processingStage ? "opacity-100" : "opacity-30"
               }`}
             >
-              <div className={`w-4 h-4 rounded-full ${
-                stage.id < processingStage ? 'bg-green-500' : 
-                stage.id === processingStage ? 'bg-[#4B6FEE] animate-pulse' : 
-                'bg-gray-300'
-              }`} />
-              <span className={`text-lg ${
-                stage.id === processingStage ? 'text-[#4B6FEE] font-semibold' : 
-                stage.id < processingStage ? 'text-green-600' : 
-                'text-gray-400'
-              }`}>
+              <div
+                className={`w-4 h-4 rounded-full ${
+                  stage.id < processingStage
+                    ? "bg-green-500"
+                    : stage.id === processingStage
+                      ? "bg-[#4B6FEE] animate-pulse"
+                      : "bg-gray-300"
+                }`}
+              />
+              <span
+                className={`text-lg ${
+                  stage.id === processingStage
+                    ? "text-[#4B6FEE] font-semibold"
+                    : stage.id < processingStage
+                      ? "text-green-600"
+                      : "text-gray-400"
+                }`}
+              >
                 {stage.text}
               </span>
             </div>
@@ -98,12 +106,8 @@ export default function ProcessingPage() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            This process typically takes 45-60 seconds.
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            We&apos;ll automatically redirect you when ready.
-          </p>
+          <p className="text-gray-600">This process typically takes 45-60 seconds.</p>
+          <p className="text-sm text-gray-500 mt-2">We&apos;ll automatically redirect you when ready.</p>
         </div>
 
         {lastAttemptTime && (
@@ -115,3 +119,4 @@ export default function ProcessingPage() {
     </div>
   )
 }
+
