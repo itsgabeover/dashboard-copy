@@ -1,33 +1,79 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { type NextRequest, NextResponse } from "next/server"
+import type { ParsedPolicyData } from "@/types/policy"
+import { supabase } from '@/lib/supabase'
 
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
+// Store data in server memory (temporary, resets on deploy)
+let latestPolicyData: ParsedPolicyData | null = null
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { status, analysis_data } = await request.json()
+    const policyData: ParsedPolicyData = await request.json()
+    
+    // Store in server memory
+    latestPolicyData = policyData
+    
+    // Store in Supabase
+    const { data, error } = await supabase
+      .from('policies')
+      .insert([
+        { 
+          policy_name: policyData.data.policyOverview.productName,
+          analysis_data: policyData,
+          status: 'completed'
+        }
+      ])
+      .select()
 
-    const { data, error } = await supabase.from("policies").insert({ status, analysis_data }).select()
+    if (error) {
+      console.error("Supabase error:", error)
+      throw error
+    }
 
-    if (error) throw error
+    console.log("Stored policy data:", JSON.stringify(policyData, null, 2))
 
-    return NextResponse.json(data[0], { status: 201 })
+    return NextResponse.json({
+      success: true,
+      data: policyData,
+      timestamp: new Date().toISOString()
+    })
   } catch (error) {
-    console.error("Error in POST /api/policy:", error)
-    return NextResponse.json({ error: "Failed to create policy" }, { status: 500 })
+    console.error("Error processing policy data:", error)
+    return NextResponse.json({ 
+      error: "Failed to process policy data",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
   }
 }
 
 export async function GET() {
   try {
-    const { data, error } = await supabase.from("policies").select("*").order("created_at", { ascending: false })
+    // Get latest policies from Supabase
+    const { data: policies, error } = await supabase
+      .from('policies')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
 
     if (error) throw error
 
-    return NextResponse.json(data)
+    const latestPolicy = policies[0]
+
+    if (!latestPolicy) {
+      return NextResponse.json({ 
+        success: false,
+        message: "No policy data available" 
+      }, { status: 404 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: latestPolicy.analysis_data
+    })
   } catch (error) {
-    console.error("Error in GET /api/policy:", error)
-    return NextResponse.json({ error: "Failed to fetch policies" }, { status: 500 })
+    console.error("Error retrieving policy data:", error)
+    return NextResponse.json({ 
+      error: "Failed to retrieve policy data",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
   }
 }
-
