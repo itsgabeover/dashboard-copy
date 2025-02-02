@@ -1,11 +1,11 @@
 "use client"
 
-import React, { Suspense } from "react"
+import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 
 const PDFViewer = () => {
   const searchParams = useSearchParams()
-  const pdfUrl = searchParams.get("pdfUrl")
+  const pdfUrl = searchParams?.get("pdfUrl") || null
 
   return (
     <div className="pdf-container h-screen">
