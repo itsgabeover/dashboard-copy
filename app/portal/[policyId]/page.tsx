@@ -23,11 +23,11 @@ async function getPolicyData(policyId: string): Promise<ParsedPolicyData | null>
   return data as ParsedPolicyData
 }
 
-interface PolicyPageProps {
+export default async function PolicyPage({
+  params,
+}: {
   params: { policyId: string }
-}
-
-export default async function PolicyPage({ params }: PolicyPageProps) {
+}) {
   const policyData = await getPolicyData(params.policyId)
 
   if (!policyData) {
