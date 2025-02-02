@@ -27,11 +27,27 @@ export default function Dashboard() {
       try {
         setIsLoading(true)
         setError(null)
+
+        // Try to get data from localStorage first
+        const storedData = localStorage.getItem(`policy_${params.policyId}`)
+        if (storedData) {
+          console.log("Loading data from localStorage")
+          const parsedData = JSON.parse(storedData)
+          setPolicyData(parsedData)
+          setIsLoading(false)
+          return
+        }
+
+        // If not in localStorage, fetch from API
+        console.log("Fetching data from API")
         const data = await fetchPolicyData(params.policyId as string)
         setPolicyData(data)
+
+        // Store the fetched data in localStorage
+        localStorage.setItem(`policy_${params.policyId}`, JSON.stringify(data))
       } catch (err) {
+        console.error("Error loading policy data:", err)
         setError(err instanceof Error ? err.message : "Failed to load policy data")
-        console.error(err)
       } finally {
         setIsLoading(false)
       }
@@ -39,6 +55,20 @@ export default function Dashboard() {
 
     loadPolicyData()
   }, [params.policyId])
+
+  // Handler for updating policy data
+  const updatePolicyData = async (newData: ParsedPolicyData) => {
+    try {
+      setPolicyData(newData)
+      // Update localStorage when data changes
+      if (params.policyId) {
+        localStorage.setItem(`policy_${params.policyId}`, JSON.stringify(newData))
+      }
+    } catch (err) {
+      console.error("Error updating policy data:", err)
+      setError(err instanceof Error ? err.message : "Failed to update policy data")
+    }
+  }
 
   if (isLoading) {
     return <LoadingSpinner />
@@ -113,4 +143,3 @@ export default function Dashboard() {
     </div>
   )
 }
-
