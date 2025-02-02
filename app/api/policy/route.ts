@@ -1,80 +1,33 @@
-// app/api/policy/route.ts
 import { NextResponse } from "next/server"
-import { supabase } from '@/lib/supabase'
-import type { ParsedPolicyData } from "@/types/policy"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
 
 export async function POST(request: Request) {
   try {
-    const policyData: ParsedPolicyData = await request.json()
-    
-    // Store in Supabase
-    const { data, error } = await supabase
-      .from('policies')
-      .insert([
-        { 
-          analysis_data: policyData,
-          status: 'complete',
-          productName: policyData.data.policyOverview.productName
-        }
-      ])
-      .select()
+    const { status, analysis_data } = await request.json()
 
-    if (error) {
-      console.error("Supabase error:", error)
-      throw error
-    }
+    const { data, error } = await supabase.from("policies").insert({ status, analysis_data }).select()
 
-    return NextResponse.json({
-      success: true,
-      data: data[0],
-      timestamp: new Date().toISOString()
-    })
+    if (error) throw error
+
+    return NextResponse.json(data[0], { status: 201 })
   } catch (error) {
-    console.error("Error processing policy data:", error)
-    return NextResponse.json({ 
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 })
+    console.error("Error in POST /api/policy:", error)
+    return NextResponse.json({ error: "Failed to create policy" }, { status: 500 })
   }
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const policyId = searchParams.get('policyId')
-
+export async function GET() {
   try {
-    let query = supabase
-      .from('policies')
-      .select('*')
+    const { data, error } = await supabase.from("policies").select("*").order("created_at", { ascending: false })
 
-    if (policyId) {
-      query = query.eq('id', policyId)
-    } else {
-      query = query.order('created_at', { ascending: false })
-    }
+    if (error) throw error
 
-    const { data: policies, error } = await query.limit(1)
-
-    if (error) {
-      throw error
-    }
-
-    if (!policies || policies.length === 0) {
-      return NextResponse.json({ 
-        success: false,
-        message: "No policy data available" 
-      }, { status: 404 })
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: policies[0],
-      timestamp: new Date().toISOString()
-    })
+    return NextResponse.json(data)
   } catch (error) {
-    console.error("Error retrieving policy data:", error)
-    return NextResponse.json({ 
-      error: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 })
+    console.error("Error in GET /api/policy:", error)
+    return NextResponse.json({ error: "Failed to fetch policies" }, { status: 500 })
   }
 }
+
