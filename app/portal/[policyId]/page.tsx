@@ -62,7 +62,7 @@ async function PolicyPageContent({ policyId }: { policyId: string }) {
   )
 }
 
-export default function PolicyPage({ params }: { params: { policyId: string } }) {
+export default async function PolicyPage({ params }: { params: { policyId: string } }) {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <PolicyPageContent policyId={params.policyId} />
