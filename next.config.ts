@@ -1,15 +1,12 @@
-import type { NextConfig } from 'next'
-
-const nextConfig: NextConfig = {
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb'  // Or whatever limit you need
-    }
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  webpack: (config) => {
+    config.resolve.alias.canvas = false
+    return config
   },
-  webpack: (config: any) => {
-    config.externals = [...config.externals, 'chrome-aws-lambda'];
-    return config;
-  }
-};
+}
 
-export default nextConfig;
+module.exports = nextConfig
+
