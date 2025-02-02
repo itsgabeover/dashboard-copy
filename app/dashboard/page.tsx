@@ -1,13 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
 import KeyTakeaways from "@/components/KeyTakeaways"
-import { Button } from "@/components/ui/button"
-import { MessageCircle } from "lucide-react"
 import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -53,26 +50,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="container mx-auto px-4 h-16 flex items-center">
           <div className="flex items-center gap-2">
             <span className="text-[#4B6FEE] font-bold text-xl">IP-AI</span>
             <span className="text-gray-700">Insurance Planner AI</span>
           </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/" className="text-gray-600 hover:text-gray-900">
-              Home
-            </Link>
-            <Link href="/why-review" className="text-gray-600 hover:text-gray-900">
-              Why Review?
-            </Link>
-            <Link href="/help" className="text-gray-600 hover:text-gray-900">
-              Help Center
-            </Link>
-            <Button className="bg-[#4B6FEE] hover:bg-[#3B4FDE] text-white rounded-full px-6">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Ask Our AI Helper
-            </Button>
-          </nav>
         </div>
       </header>
 
@@ -111,3 +93,4 @@ export default function Dashboard() {
     </div>
   )
 }
+
