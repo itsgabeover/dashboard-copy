@@ -27,7 +27,7 @@ export default function Dashboard() {
           setError("No policy data available")
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load illustration data")
+        setError(err instanceof Error ? err.message : "Failed to load policy data")
         console.error(err)
       } finally {
         setIsLoading(false)
@@ -84,4 +84,3 @@ export default function Dashboard() {
     </div>
   )
 }
-
