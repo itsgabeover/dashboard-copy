@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
 import Link from "next/link"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
@@ -14,7 +13,6 @@ import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function Dashboard() {
-  const params = useParams()
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
@@ -22,39 +20,25 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function loadPolicyData() {
-      if (!params.policyId) return
-
       try {
         setIsLoading(true)
         setError(null)
-
-        // Try to get data from localStorage first
-        const storedData = localStorage.getItem(`policy_${params.policyId}`)
-        if (storedData) {
-          console.log("Loading data from localStorage")
-          const parsedData = JSON.parse(storedData)
-          setPolicyData(parsedData)
-          setIsLoading(false)
-          return
+        const data = await fetchPolicyData()
+        if (data) {
+          setPolicyData(data)
+        } else {
+          setError("No policy data available")
         }
-
-        // If not in localStorage, fetch from API
-        console.log("Fetching data from API")
-        const data = await fetchPolicyData(params.policyId as string)
-        setPolicyData(data)
-
-        // Store the fetched data in localStorage
-        localStorage.setItem(`policy_${params.policyId}`, JSON.stringify(data))
       } catch (err) {
-        console.error("Error loading policy data:", err)
         setError(err instanceof Error ? err.message : "Failed to load policy data")
+        console.error(err)
       } finally {
         setIsLoading(false)
       }
     }
 
     loadPolicyData()
-  }, [params.policyId])
+  }, [])
 
   if (isLoading) {
     return <LoadingSpinner />
@@ -96,8 +80,6 @@ export default function Dashboard() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Policy Analysis Dashboard</h1>
           <div className="text-sm text-gray-500">
-            Policy ID: {params.policyId}
-            <br />
             Last updated: {new Date(policyData.timestamp).toLocaleDateString()}
           </div>
         </div>
