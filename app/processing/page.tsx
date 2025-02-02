@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { fetchPolicyData } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import type { ParsedPolicyData } from "@/types/policy"
 
 export default function ProcessingPage() {
   const router = useRouter()
@@ -52,7 +51,7 @@ export default function ProcessingPage() {
       <LoadingSpinner />
       <h2 className="mt-8 text-2xl font-semibold text-gray-800">Processing Your Policy</h2>
       <p className="mt-4 text-gray-600">
-        This typically takes 2-3 minutes. We'll redirect you automatically when ready.
+        This typically takes 2-3 minutes. We&apos;ll redirect you automatically when ready.
       </p>
       <div className="mt-4 text-sm text-gray-500">
         <p>Attempt {attempts + 1} of {maxAttempts}</p>
