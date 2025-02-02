@@ -56,20 +56,6 @@ export default function Dashboard() {
     loadPolicyData()
   }, [params.policyId])
 
-  // Handler for updating policy data
-  const updatePolicyData = async (newData: ParsedPolicyData) => {
-    try {
-      setPolicyData(newData)
-      // Update localStorage when data changes
-      if (params.policyId) {
-        localStorage.setItem(`policy_${params.policyId}`, JSON.stringify(newData))
-      }
-    } catch (err) {
-      console.error("Error updating policy data:", err)
-      setError(err instanceof Error ? err.message : "Failed to update policy data")
-    }
-  }
-
   if (isLoading) {
     return <LoadingSpinner />
   }
