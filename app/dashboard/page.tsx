@@ -49,16 +49,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 h-16 flex items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-[#4B6FEE] font-bold text-xl">IP-AI</span>
-            <span className="text-gray-700">Insurance Planner AI</span>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-6 space-y-6">
+      <main className="container mx-auto px-4 py-4 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Policy Analysis Dashboard</h1>
           <div className="text-sm text-gray-500">
