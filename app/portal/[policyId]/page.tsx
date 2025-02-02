@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect, useState } from "react"
+import { Suspense } from "react"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -9,57 +7,30 @@ import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
-// Using the correct Next.js page props type
-export default function PolicyPage({
-  params,
-}: {
-  params: { policyId: string }
-}) {
-  const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
-  const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+async function PolicyPageContent({ policyId }: { policyId: string }) {
+  let policyData: ParsedPolicyData | null = null
+  let error: string | null = null
 
-  useEffect(() => {
-    async function loadPolicyData() {
-      if (!params.policyId) return
+  try {
+    const response = await fetchPolicyData(policyId)
 
-      try {
-        setIsLoading(true)
-        setError(null)
-        const response = await fetchPolicyData(params.policyId)
-        
-        if (response?.success && response.data) {
-          setPolicyData(response.data)
-        } else {
-          setError("No policy data available")
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load policy data")
-        console.error("Error loading policy:", err)
-      } finally {
-        setIsLoading(false)
-      }
+    if (response?.success && response.data) {
+      policyData = response.data
+    } else {
+      error = "No policy data available"
     }
-
-    loadPolicyData()
-  }, [params.policyId])
-
-  if (isLoading) {
-    return <LoadingSpinner />
+  } catch (err) {
+    error = err instanceof Error ? err.message : "Failed to load policy data"
+    console.error("Error loading policy:", err)
   }
 
   if (error || !policyData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-50">
-        <div className="text-center text-red-600 p-6">
-          {error || "No policy data available"}
-        </div>
+        <div className="text-center text-red-600 p-6">{error || "No policy data available"}</div>
       </div>
     )
   }
-
-  const selectedSection = policyData.data.sections[selectedSectionIndex]
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
@@ -73,17 +44,13 @@ export default function PolicyPage({
         <PolicyOverview {...policyData.data.policyOverview} />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <SectionAnalysis
-              sections={policyData.data.sections}
-              selectedSectionIndex={selectedSectionIndex}
-              onSectionChange={setSelectedSectionIndex}
-            />
+            <SectionAnalysis sections={policyData.data.sections} selectedSectionIndex={0} onSectionChange={() => {}} />
           </div>
           <div>
-            <InsightFramework section={selectedSection} />
+            <InsightFramework section={policyData.data.sections[0]} />
           </div>
         </div>
-        <KeyTakeaways section={selectedSection} />
+        <KeyTakeaways section={policyData.data.sections[0]} />
         {policyData.data.finalThoughts && (
           <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Final Thoughts</h2>
@@ -94,3 +61,12 @@ export default function PolicyPage({
     </div>
   )
 }
+
+export default function PolicyPage({ params }: { params: { policyId: string } }) {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <PolicyPageContent policyId={params.policyId} />
+    </Suspense>
+  )
+}
+
