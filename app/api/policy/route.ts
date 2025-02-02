@@ -1,28 +1,38 @@
 import { type NextRequest, NextResponse } from "next/server"
-import type { ParsedPolicyData, APIResponse } from "@/types/policy"
-
-// Store data in server memory (temporary, resets on deploy)
-let latestPolicyData: ParsedPolicyData | null = null
+import type { ParsedPolicyData } from "@/types/policy"
+import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
     const policyData: ParsedPolicyData = await request.json()
     
-    // Store in server memory
-    latestPolicyData = policyData
-    
-    console.log("Stored policy data:", JSON.stringify(policyData, null, 2))
+    // Store in Supabase
+    const { data, error } = await supabase
+      .from('policies')
+      .insert([
+        { 
+          policy_name: policyData.data.policyOverview.productName,
+          analysis_data: policyData,
+          status: 'completed'
+        }
+      ])
+      .select()
 
-    const response: APIResponse = {
-      success: true,
-      data: policyData
+    if (error) {
+      console.error("Supabase error:", error)
+      throw error
     }
 
-    return NextResponse.json(response)
+    console.log("Stored policy data in Supabase:", JSON.stringify(data, null, 2))
+
+    return NextResponse.json({
+      success: true,
+      data: policyData,
+      timestamp: new Date().toISOString()
+    })
   } catch (error) {
     console.error("Error processing policy data:", error)
     return NextResponse.json({ 
-      success: false, 
       error: "Failed to process policy data",
       details: error instanceof Error ? error.message : "Unknown error"
     }, { status: 500 })
@@ -30,17 +40,34 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  if (!latestPolicyData) {
+  try {
+    // Get latest policies from Supabase
+    const { data: policies, error } = await supabase
+      .from('policies')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+
+    if (error) throw error
+
+    const latestPolicy = policies[0]
+
+    if (!latestPolicy) {
+      return NextResponse.json({ 
+        success: false,
+        message: "No policy data available" 
+      }, { status: 404 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: latestPolicy.analysis_data
+    })
+  } catch (error) {
+    console.error("Error retrieving policy data:", error)
     return NextResponse.json({ 
-      success: false,
-      message: "No policy data available" 
-    }, { status: 404 })
+      error: "Failed to retrieve policy data",
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
   }
-
-  const response: APIResponse = {
-    success: true,
-    data: latestPolicyData
-  }
-
-  return NextResponse.json(response)
 }
