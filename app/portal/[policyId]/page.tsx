@@ -1,4 +1,5 @@
-// app/portal/[policyId]/page.tsx
+"use client"
+
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import Link from "next/link"
@@ -11,30 +12,51 @@ import { supabase } from '@/lib/supabase'
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
-async function getPolicyData(policyId: string): Promise<ParsedPolicyData | null> {
-  const { data: policy, error } = await supabase
-    .from('policies')
-    .select('*')
-    .eq('id', policyId)
-    .single()
-
-  if (error) {
-    console.error("Error fetching policy:", error)
-    return null
+// Define props type for NextJS page component
+type PageProps = {
+  params: {
+    policyId: string
   }
-
-  if (!policy?.analysis_data) {
-    return null
-  }
-
-  return policy.analysis_data
 }
 
-function PolicyContent({ policyData }: { policyData: ParsedPolicyData }) {
+export default function Page(props: PageProps) {
+  const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function loadPolicyData() {
+      try {
+        setIsLoading(true)
+        const { data: policy, error } = await supabase
+          .from('policies')
+          .select('*')
+          .eq('id', props.params.policyId)
+          .single()
+
+        if (error) throw error
+        if (!policy?.analysis_data) {
+          setError("Policy not found")
+          return
+        }
+
+        setPolicyData(policy.analysis_data)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load policy")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadPolicyData()
+  }, [props.params.policyId])
+
+  if (isLoading) return <LoadingSpinner />
+  if (error || !policyData) return <div className="text-red-500">{error || "Policy not found"}</div>
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <main className="container mx-auto px-4 py-4 space-y-6">
-        {/* Back Button */}
         <Link 
           href="/portal" 
           className="inline-flex items-center text-[#4B6FEE] hover:text-[#3B4FDE]"
@@ -75,19 +97,5 @@ function PolicyContent({ policyData }: { policyData: ParsedPolicyData }) {
         )}
       </main>
     </div>
-  )
-}
-
-export default async function Page({ params }: { params: { policyId: string } }) {
-  const policyData = await getPolicyData(params.policyId)
-
-  if (!policyData) {
-    notFound()
-  }
-
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <PolicyContent policyData={policyData} />
-    </Suspense>
   )
 }
