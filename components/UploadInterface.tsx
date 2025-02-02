@@ -122,8 +122,8 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         fileInputRef.current.value = ""
       }
 
-      // Redirect to success page with email parameter
-      router.push(`/upload/success?email=${encodeURIComponent(email)}`)
+      // Redirect to processing page instead of success page
+      router.push("/processing")
     } catch (error) {
       console.error("Upload failed:", error)
       setError(error instanceof Error ? error.message : "An error occurred during upload. Please try again.")
