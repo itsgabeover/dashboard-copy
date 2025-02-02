@@ -17,12 +17,12 @@ export default function ProcessingPage() {
     { id: 1, text: "Uploading document..." },
     { id: 2, text: "Converting to text..." },
     { id: 3, text: "AI analyzing policy..." },
-    { id: 4, text: "Preparing your dashboard..." }
+    { id: 4, text: "Preparing your analysis..." }  // Updated text
   ]
 
   useEffect(() => {
     console.log("Processing page mounted")
-
+    
     // Advance through stages every 12 seconds
     const stageInterval = setInterval(() => {
       setProcessingStage(prev => prev < stages.length ? prev + 1 : prev)
@@ -34,8 +34,11 @@ export default function ProcessingPage() {
         
         const data = await fetchPolicyData()
         if (data) {
-          console.log("Policy data found, redirecting to dashboard")
-          router.push('/dashboard')
+          console.log("Policy data found, redirecting to portal")
+          // Add a small delay before redirect to ensure user sees completion
+          setTimeout(() => {
+            router.push('/portal')
+          }, 1000)
           return
         }
 
@@ -43,9 +46,10 @@ export default function ProcessingPage() {
           setAttempts(prev => prev + 1)
           setTimeout(checkProcessingStatus, 10000)
         } else {
-          console.log("Max attempts reached, staying on processing page")
-          // Instead of redirecting, we'll stay here and keep trying
-          setAttempts(0) // Reset attempts
+          console.log("Max attempts reached")
+          // Reset attempts and keep trying instead of failing
+          setAttempts(0)
+          setTimeout(checkProcessingStatus, 10000)
         }
       } catch (error) {
         console.error('Error checking status:', error)
@@ -79,11 +83,11 @@ export default function ProcessingPage() {
             >
               <div className={`w-4 h-4 rounded-full ${
                 stage.id < processingStage ? 'bg-green-500' : 
-                stage.id === processingStage ? 'bg-blue-500 animate-pulse' : 
+                stage.id === processingStage ? 'bg-[#4B6FEE] animate-pulse' : 
                 'bg-gray-300'
               }`} />
               <span className={`text-lg ${
-                stage.id === processingStage ? 'text-blue-600 font-semibold' : 
+                stage.id === processingStage ? 'text-[#4B6FEE] font-semibold' : 
                 stage.id < processingStage ? 'text-green-600' : 
                 'text-gray-400'
               }`}>
