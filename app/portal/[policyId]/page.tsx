@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import { notFound } from "next/navigation"
+import Link from "next/link"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -37,7 +38,7 @@ export default async function PolicyPage({ params }: PolicyPageProps) {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <main className="container mx-auto px-4 py-8">
         <Button asChild className="mb-6 bg-[#4B6FEE] text-white hover:bg-[#3B4FDE]">
-          <a href="/portal">Back to Portal</a>
+          <Link href="/portal">Back to Portal</Link>
         </Button>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-8">
