@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { fetchPolicyData } from "@/lib/api"
 import { motion } from "framer-motion"
 import { CheckCircle, Clock, ArrowRight } from "lucide-react"
 
@@ -46,30 +45,18 @@ export default function ProcessingPage() {
       setCurrentStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev))
     }, totalDuration / steps.length)
 
-    const checkProcessingStatus = async () => {
-      try {
-        const data = await fetchPolicyData()
-        if (data) {
-          console.log("Policy data found, redirecting to dashboard")
-          router.push("/dashboard")
-          return
-        }
-        setTimeout(checkProcessingStatus, 5000) // Check every 5 seconds
-      } catch (error) {
-        console.error("Error checking status:", error)
-        setTimeout(checkProcessingStatus, 5000)
-      }
-    }
-
-    // Start checking after 60 seconds
-    const initialCheckTimeout = setTimeout(checkProcessingStatus, 60000)
-
     return () => {
       clearInterval(progressInterval)
       clearInterval(stepInterval)
-      clearTimeout(initialCheckTimeout)
     }
-  }, [router, steps.length])
+  }, [steps.length])
+
+  useEffect(() => {
+    if (progress === 100) {
+      // Redirect to portal page when processing is complete
+      router.push("/portal")
+    }
+  }, [progress, router])
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-100 p-4">
