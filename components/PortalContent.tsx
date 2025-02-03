@@ -1,6 +1,6 @@
 "use client"
 import { useRouter } from "next/navigation"
-import useSWR from "swr"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar, ArrowRight } from "lucide-react"
@@ -15,14 +15,34 @@ interface PolicyAnalysis {
   uploaded_at: string
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
-
 export default function PortalContent() {
   const router = useRouter()
-  const { data, error, isLoading } = useSWR<PolicyAnalysis[]>("/api/policy-analyses", fetcher)
+  const [data, setData] = useState<PolicyAnalysis[] | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function fetchPolicyAnalyses() {
+      try {
+        const response = await fetch("/api/policy-analyses")
+        if (!response.ok) {
+          throw new Error("Failed to fetch policy analyses")
+        }
+        const result = await response.json()
+        setData(result)
+      } catch (err) {
+        setError("Failed to load policy analyses")
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchPolicyAnalyses()
+  }, [])
 
   if (isLoading) return <LoadingSpinner />
-  if (error) return <div className="text-red-500">Failed to load policy analyses</div>
+  if (error) return <div className="text-red-500">{error}</div>
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
