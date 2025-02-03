@@ -9,16 +9,11 @@ export const dynamic = "force-dynamic"
 // Set revalidation to 0 to ensure fresh data on every request
 export const revalidate = 0
 
-// Add headers configuration
-export const metadata: Metadata = {
-  title: "Policy Analysis Portal",
-  description: "View your policy analyses",
-}
-
-// Use generateMetadata for dynamic header setting
+// Use generateMetadata for both metadata and header setting
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    ...metadata,
+    title: "Policy Analysis Portal",
+    description: "View your policy analyses",
     other: {
       "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
       Pragma: "no-cache",
