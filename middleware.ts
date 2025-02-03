@@ -21,7 +21,6 @@ export function middleware(request: NextRequest) {
   // Handle login page
   if (pathname === '/login') {
     if (isAuthenticated) {
-      // If already logged in, redirect to portal
       return NextResponse.redirect(new URL('/portal', request.url));
     }
     return NextResponse.next();
@@ -34,23 +33,23 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Special handling for upload paths with mock tokens
+  // Handle upload flow
   if (pathname.startsWith('/upload')) {
-    // Allow processing page access
-    if (pathname === '/processing') {
+    // Allow access to success and processing pages
+    if (pathname === '/upload/success' || pathname === '/processing') {
       return NextResponse.next();
     }
     
-    // Base upload path handling
+    // Base upload path
     if (pathname === '/upload') {
       const mockToken = `pi_${Date.now()}_mock`;
       return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url));
     }
     
-    // Token path handling
+    // Token paths
     if (pathname.startsWith('/upload/')) {
       const token = pathname.split('/').pop();
-      if (token && (token.startsWith('pi_') && token.includes('_'))) {
+      if (token && token.startsWith('pi_') && token.includes('_')) {
         return NextResponse.next();
       }
       
@@ -59,12 +58,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Allow processing and portal access for authenticated users
-  if (pathname === '/processing' || pathname === '/portal') {
-    return NextResponse.next();
-  }
-
-  // Allow authenticated users to access all other routes
+  // Allow access to processing and portal for authenticated users
   return NextResponse.next();
 }
 
