@@ -1,3 +1,5 @@
+"use client"
+
 import { Suspense } from "react"
 import PortalContent from "@/components/PortalContent"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
