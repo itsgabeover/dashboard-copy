@@ -1,13 +1,8 @@
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
-
+// app/portal/loading.tsx
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
-      <div className="text-center space-y-4">
-        <LoadingSpinner />
-        <h2 className="text-xl font-semibold text-blue-800">Loading Portal...</h2>
-        <p className="text-sm text-gray-600">Please wait while we fetch your policy analyses</p>
-      </div>
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="text-lg">Loading...</div>
     </div>
   )
 }
