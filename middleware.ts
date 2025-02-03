@@ -36,11 +36,18 @@ export function middleware(request: NextRequest) {
 
   // Special handling for upload paths with mock tokens
   if (pathname.startsWith('/upload')) {
+    // Allow processing page access
+    if (pathname === '/processing') {
+      return NextResponse.next();
+    }
+    
+    // Base upload path handling
     if (pathname === '/upload') {
       const mockToken = `pi_${Date.now()}_mock`;
       return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url));
     }
     
+    // Token path handling
     if (pathname.startsWith('/upload/')) {
       const token = pathname.split('/').pop();
       if (token && (token.startsWith('pi_') && token.includes('_'))) {
@@ -52,16 +59,21 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // Allow processing and portal access for authenticated users
+  if (pathname === '/processing' || pathname === '/portal') {
+    return NextResponse.next();
+  }
+
   // Allow authenticated users to access all other routes
   return NextResponse.next();
 }
 
-// Configure matcher to protect all routes except specific ones
 export const config = {
   matcher: [
-    // Match all paths except static files, api routes, etc.
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
     '/upload',
-    '/upload/:path*'
+    '/upload/:path*',
+    '/processing',
+    '/portal'
   ]
 };
