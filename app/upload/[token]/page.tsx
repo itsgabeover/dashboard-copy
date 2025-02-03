@@ -157,7 +157,7 @@ export default function UploadPage() {
               Ready to Analyze Your Policy?
             </h1>
             <p className="text-lg text-gray-600 font-medium">
-              Just 2 quick steps to get your Insurance Planner AI analysis package
+              Just 2 quick steps to get your Insurance Planner AI analysis
             </p>
           </div>
 
@@ -173,7 +173,7 @@ export default function UploadPage() {
                 {step > 1 ? "✓" : "1"}
               </div>
               <div className="ml-3 space-y-1">
-                <span className="block font-semibold text-[#4B6FEE]">Upload PDF</span>
+                <span className="block font-semibold text-[#4B6FEE]">First, upload PDF</span>
                 <span className="block text-sm text-gray-500">In-force illustration</span>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function UploadPage() {
               </div>
               <div className="ml-3 space-y-1">
                 <span className={cn("block font-semibold", step === 2 ? "text-[#4B6FEE]" : "text-gray-400")}>
-                  Email Address
+                  Next, enter email
                 </span>
                 <span className="block text-sm text-gray-500">Get your analysis</span>
               </div>
@@ -294,7 +294,7 @@ export default function UploadPage() {
                     )}
                     <div className="space-y-3">
                       <label htmlFor="email-input" className="block text-lg font-medium text-gray-700">
-                        Enter your email address
+                        Where should we send your analysis?
                       </label>
                       <Input
                         id="email-input"
@@ -335,7 +335,7 @@ export default function UploadPage() {
                             Processing...
                           </span>
                         ) : (
-                          "Get My Analysis"
+                          "Get My AI Analysis"
                         )}
                       </Button>
                     </div>
