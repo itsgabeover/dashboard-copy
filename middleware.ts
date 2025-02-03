@@ -4,7 +4,7 @@ import { verifyToken } from "@/lib/auth/config"
 
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
-  
+
   // Log the current domain and path for debugging
   console.log(`Processing request for ${request.nextUrl.hostname}${pathname}`)
 
@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
   const authToken = request.cookies.get("auth-token")
   const isAuthenticated = authToken && verifyToken(authToken.value)
 
-  console.log(`Auth status: ${isAuthenticated ? 'authenticated' : 'not authenticated'}`)
+  console.log(`Auth status: ${isAuthenticated ? "authenticated" : "not authenticated"}`)
 
   // Handle login page
   if (pathname === "/login") {
@@ -78,11 +78,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-    "/upload",
-    "/upload/:path*",
-    "/processing",
-    "/portal"
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)", "/upload", "/upload/:path*", "/processing", "/portal"],
 }
+
