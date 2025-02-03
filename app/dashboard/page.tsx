@@ -9,6 +9,7 @@ import KeyTakeaways from "@/components/KeyTakeaways"
 import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { MyPortalButton } from "@/components/MyPortalButton"
 
 export default function Dashboard() {
   const router = useRouter()
@@ -53,15 +54,25 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
+      <header className="container mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-900">Policy Analysis Dashboard</h1>
+        <MyPortalButton />
+      </header>
       <main className="container mx-auto px-4 py-4 space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Policy Analysis Dashboard</h1>
           <div className="text-sm text-gray-500">
             Last updated: {new Date(policyData.timestamp).toLocaleDateString()}
           </div>
         </div>
 
-        <PolicyOverview {...policyData.data.policyOverview} />
+        <PolicyOverview
+          policyName={policyData.data.policyOverview.policyName}
+          insurer={policyData.data.policyOverview.insurer}
+          policyType={policyData.data.policyOverview.policyType}
+          deathBenefit={policyData.data.policyOverview.deathBenefit}
+          premiumAmount={policyData.data.policyOverview.premiumAmount}
+          policyStatus={policyData.data.policyOverview.policyStatus}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
