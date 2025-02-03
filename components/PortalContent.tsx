@@ -25,7 +25,12 @@ export default function PortalContent() {
   useEffect(() => {
     async function fetchPolicyAnalyses() {
       try {
-        const response = await fetch("/api/policy-analyses")
+        const response = await fetch("/api/policy-analyses", {
+          cache: "no-store",
+          headers: {
+            Pragma: "no-cache",
+          },
+        })
         if (!response.ok) {
           throw new Error("Failed to fetch policy analyses")
         }
@@ -81,3 +86,4 @@ export default function PortalContent() {
     </div>
   )
 }
+
