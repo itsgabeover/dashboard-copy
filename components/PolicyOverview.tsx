@@ -1,63 +1,56 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { CheckCircle } from "lucide-react"
-import { formatCurrency } from "@/lib/utils"
-import type { PolicyOverview as PolicyOverviewType } from "@/types/policy"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+interface PolicyOverviewProps {
+  policyName: string
+  insurer: string
+  policyType: string
+  deathBenefit: number
+  premiumAmount: number
+  policyStatus: string
+}
 
 export default function PolicyOverview({
-  productName,
-  issuer,
-  productType,
+  policyName,
+  insurer,
+  policyType,
   deathBenefit,
-  annualPremium,
-  riders,
-}: PolicyOverviewType) {
+  premiumAmount,
+  policyStatus,
+}: PolicyOverviewProps) {
   return (
-    <Card className="bg-white shadow-lg border-0 overflow-hidden">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-blue-50 rounded-lg p-2">
-            <CheckCircle className="w-6 h-6 text-[#4B6FEE]" />
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Policy Overview</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm font-medium text-gray-500">Policy Name</p>
+            <p className="text-lg font-semibold">{policyName}</p>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900">Policy Overview</h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
-          <div className="space-y-1">
-            <h3 className="font-semibold text-gray-600">Product Name</h3>
-            <p className="text-gray-900">{productName}</p>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Insurer</p>
+            <p className="text-lg font-semibold">{insurer}</p>
           </div>
-          <div className="space-y-1">
-            <h3 className="font-semibold text-gray-600">Issuer</h3>
-            <p className="text-gray-900">{issuer}</p>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Policy Type</p>
+            <p className="text-lg font-semibold">{policyType}</p>
           </div>
-          <div className="space-y-1">
-            <h3 className="font-semibold text-gray-600">Product Type</h3>
-            <p className="text-gray-900">{productType}</p>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Death Benefit</p>
+            <p className="text-lg font-semibold">${deathBenefit.toLocaleString()}</p>
           </div>
-          <div className="space-y-1">
-            <h3 className="font-semibold text-gray-600">Death Benefit</h3>
-            <p className="text-gray-900">{formatCurrency(deathBenefit)}</p>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Premium Amount</p>
+            <p className="text-lg font-semibold">${premiumAmount.toLocaleString()}</p>
           </div>
-          <div className="space-y-1">
-            <h3 className="font-semibold text-gray-600">Annual Premium</h3>
-            <p className="text-gray-900">{formatCurrency(annualPremium)}</p>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Policy Status</p>
+            <p className="text-lg font-semibold">{policyStatus}</p>
           </div>
-          {riders && riders.length > 0 && (
-            <div className="space-y-1">
-              <h3 className="font-semibold text-gray-600">Riders</h3>
-              <ul className="text-gray-900 list-disc list-inside">
-                {riders.map((rider, index) => (
-                  <li key={index} className="text-sm">
-                    {rider}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
   )
 }
-
 
