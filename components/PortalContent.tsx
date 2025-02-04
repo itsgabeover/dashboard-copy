@@ -118,7 +118,7 @@ export default function PortalContent() {
                 </p>
               )}
             </div>
-            <Button className="mt-4 w-full" onClick={() => router.push(`/dashboard/${policy.id}`)}>
+            <Button className="mt-4 w-full" onClick={() => router.push(`/dashboard2/${policy.id}`)}>
               View Full Analysis
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
