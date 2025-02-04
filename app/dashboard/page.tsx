@@ -6,6 +6,7 @@ import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
 import KeyTakeaways from "@/components/KeyTakeaways"
+import { EmptyDashboard } from "@/components/EmptyDashboard"
 import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
@@ -27,8 +28,6 @@ export default function Dashboard() {
           setPolicyData(data)
         } else {
           setError("No policy data available")
-          // Redirect to upload page if no reviews are available
-          router.push("/upload")
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load policy data")
@@ -39,14 +38,15 @@ export default function Dashboard() {
     }
 
     loadPolicyData()
-  }, [router])
+  }, [])
 
   if (isLoading) {
     return <LoadingSpinner />
   }
 
+  // Show the empty state instead of redirecting
   if (error || !policyData) {
-    return <div className="text-center text-red-600 p-6">{error || "No policy data available"}</div>
+    return <EmptyDashboard />
   }
 
   const selectedSection = policyData.data.sections[selectedSectionIndex]
