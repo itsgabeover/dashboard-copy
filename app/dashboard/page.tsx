@@ -57,7 +57,14 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <PolicyOverview {...policyData.data.policyOverview} />
+        <PolicyOverview
+          productName={policyData.data.productName}
+          issuer={policyData.data.issuer}
+          productType={policyData.data.productType}
+          deathBenefit={policyData.data.deathBenefit}
+          annualPremium={policyData.data.annualPremium}
+          riders={policyData.data.riders}
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
@@ -84,3 +91,4 @@ export default function Dashboard() {
     </div>
   )
 }
+
