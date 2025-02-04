@@ -10,11 +10,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
   const id = params.id
 
   try {
-    const { data, error } = await supabase.from("policies").select("*").eq("id", id).single()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    const { data } = await supabase.from("policies").select("*").eq("id", id).single()
 
     if (!data) {
       return NextResponse.json({ error: "Policy not found" }, { status: 404 })
