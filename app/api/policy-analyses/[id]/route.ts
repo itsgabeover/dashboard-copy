@@ -1,3 +1,4 @@
+import { type NextApiRequest } from "next"
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
@@ -6,10 +7,11 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function GET(
-  req: Request,
-  context: { params: { id: string } }
+  request: NextApiRequest
 ) {
-  const id = context.params.id
+  // Get the ID from the URL
+  const { pathname } = new URL(request.url!)
+  const id = pathname.split('/').pop()
 
   try {
     const { data, error } = await supabase
