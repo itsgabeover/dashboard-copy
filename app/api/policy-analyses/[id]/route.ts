@@ -1,21 +1,11 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Define the props type for the route handler
-type Props = {
-  params: {
-    id: string
-  }
-}
-
-export async function GET(
-  _req: Request,
-  { params }: Props
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { data, error } = await supabase
       .from("policies")
@@ -41,7 +31,7 @@ export async function GET(
       uploaded_at: data.created_at,
       status: data.status,
       timestamp: data.created_at,
-      data: data.analysis_data?.data || null
+      data: data.analysis_data?.data || null,
     }
 
     return NextResponse.json(transformedData)
@@ -50,3 +40,4 @@ export async function GET(
     return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
   }
 }
+
