@@ -15,15 +15,16 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     if (error) {
       console.error("Error fetching policy:", error)
-      return NextResponse.json({ error: "Failed to fetch policy", details: error }, { status: 500 })
+      return NextResponse.json({ error: "Failed to fetch policy data" }, { status: 500 })
     }
 
-    // Transform the data to include the required fields
-    const policyData = data?.analysis_data?.data || null
+    if (!data) {
+      return NextResponse.json({ error: "Policy not found" }, { status: 404 })
+    }
 
     return NextResponse.json({
       timestamp: data.created_at,
-      data: policyData
+      data: data.analysis_data?.data || null
     })
   } catch (error) {
     console.error("Unexpected error:", error)
