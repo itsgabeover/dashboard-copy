@@ -9,16 +9,35 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 export async function GET() {
   try {
     const { data, error } = await supabase
-      .from("policy_analyses")
+      .from("policies") // Use the correct table name
       .select("*")
-      .order("uploaded_at", { ascending: false })
+      .eq("status", "completed")
+      .order("created_at", { ascending: false })
 
-    if (error) throw error
+    if (error) {
+      console.error("Error fetching policies:", error)
+      return NextResponse.json({ error: "Failed to fetch policies", details: error }, { status: 500 })
+    }
 
-    return NextResponse.json(data)
+    // Transform the data to include the required fields from analysis_data
+    const transformedData =
+      data?.map((policy) => {
+        const policyOverview = policy.analysis_data?.data?.policyOverview || {}
+        return {
+          id: policy.id,
+          policy_name: policy.policy_name || policyOverview.productName,
+          insurer: policyOverview.issuer,
+          policy_type: policyOverview.productType,
+          death_benefit: policyOverview.deathBenefit,
+          uploaded_at: policy.created_at,
+          status: policy.status,
+        }
+      }) || []
+
+    return NextResponse.json(transformedData)
   } catch (error) {
-    console.error("Error fetching policy analyses:", error)
-    return NextResponse.json({ error: "Failed to fetch policy analyses" }, { status: 500 })
+    console.error("Unexpected error fetching policies:", error)
+    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
   }
 }
 
