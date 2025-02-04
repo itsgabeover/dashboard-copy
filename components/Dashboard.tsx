@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -15,7 +15,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ policyData }: DashboardProps) {
-  const router = useRouter()
+  // const router = useRouter()
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
 
   const selectedSection = policyData.data.sections[selectedSectionIndex]
