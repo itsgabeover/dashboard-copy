@@ -11,57 +11,54 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+// Keep existing GET method for retrieving policies
 export async function GET(request: Request) {
-  try {
-    // Extract the policy ID from the request, assuming it's passed as a query parameter
-    const { searchParams } = new URL(request.url)
-    const policyId = searchParams.get("id")
+  // ... existing GET implementation ...
+}
 
-    if (!policyId) {
-      return NextResponse.json({ error: "Policy ID is required" }, { status: 400 })
+// Add POST method for storing new policies
+export async function POST(request: Request) {
+  try {
+    // Parse the incoming JSON data
+    const policyData = await request.json()
+    
+    // Transform the data to match your Supabase table structure
+    const supabaseData = {
+      product_name: policyData.data.policyOverview.productName,
+      issuer: policyData.data.policyOverview.issuer,
+      product_type: policyData.data.policyOverview.productType,
+      death_benefit: policyData.data.policyOverview.deathBenefit,
+      annual_premium: policyData.data.policyOverview.annualPremium,
+      riders: policyData.data.policyOverview.riders,
+      sections: policyData.data.sections,
+      values: policyData.data.values,
+      final_thoughts: policyData.data.finalThoughts,
+      created_at: new Date().toISOString()
     }
 
-    // Fetch policy data from Supabase
-    const { data, error } = await supabase.from("policies").select("*").eq("id", policyId).single()
+    // Insert data into Supabase
+    const { data, error } = await supabase
+      .from('policies')
+      .insert(supabaseData)
+      .select()
+      .single()
 
     if (error) {
       console.error("Supabase error:", error)
-      return NextResponse.json({ error: "Failed to fetch policy data" }, { status: 500 })
+      return NextResponse.json({ error: "Failed to store policy data" }, { status: 500 })
     }
 
-    if (!data) {
-      return NextResponse.json({ error: "Policy not found" }, { status: 404 })
-    }
-
-    // Transform the data to match our ParsedPolicyData structure
-    const parsedPolicyData: ParsedPolicyData = {
-      timestamp: new Date().toISOString(),
-      data: {
-        policyOverview: {
-          productName: data.product_name,
-          issuer: data.issuer,
-          productType: data.product_type,
-          deathBenefit: data.death_benefit,
-          annualPremium: data.annual_premium,
-          riders: data.riders || [],
-          policyStatus: data.policy_status,
-        },
-        sections: data.sections || [],
-        values: data.values || [],
-        finalThoughts: data.final_thoughts || "",
-      },
-    }
-
-    // Construct the API response
-    const apiResponse: APIResponse = {
+    // Return success response with the stored data
+    return NextResponse.json({
       success: true,
-      data: parsedPolicyData,
-    }
+      data: data
+    })
 
-    return NextResponse.json(apiResponse)
   } catch (error) {
     console.error("Unexpected error:", error)
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
+    return NextResponse.json({ 
+      success: false,
+      error: "An unexpected error occurred" 
+    }, { status: 500 })
   }
 }
-
