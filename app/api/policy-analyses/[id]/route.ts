@@ -5,21 +5,17 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-interface RouteContext {
-  params: {
-    id: string
-  }
-}
-
 export async function GET(
-  _request: Request,
-  context: RouteContext
+  req: Request,
+  context: { params: { id: string } }
 ) {
+  const id = context.params.id
+
   try {
     const { data, error } = await supabase
       .from("policies")
       .select("*")
-      .eq("id", context.params.id)
+      .eq("id", id)
       .eq("status", "completed")
       .order("created_at", { ascending: false })
       .single()
