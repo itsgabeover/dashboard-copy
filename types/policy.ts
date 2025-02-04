@@ -14,8 +14,8 @@ export interface PolicySection {
   blindspot: string | null
   redflag: string | null
   clientImplications: string | null
-  content?: string // Added for compatibility with some components
-  insights?: string[] // Added for compatibility with some components
+  content?: string
+  insights?: string[]
 }
 
 export interface PolicyOverview {
@@ -25,7 +25,7 @@ export interface PolicyOverview {
   deathBenefit: number
   annualPremium: number
   riders: string[]
-  policyStatus?: string // Added this field as it was in the other type definition
+  policyStatus?: string
 }
 
 export interface ParsedPolicyData {
