@@ -10,11 +10,34 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { MyPortalButton } from "@/components/MyPortalButton"
 import Link from "next/link"
 
+interface Section {
+  title: string
+  content: string
+  analysis: string
+  insights: {
+    key: string
+    explanation: string
+  }[]
+}
+
+interface PolicyData {
+  timestamp: string
+  data: {
+    policyOverview: {
+      title: string
+      summary: string
+      keyPoints: string[]
+    }
+    sections: Section[]
+    finalThoughts?: string
+  }
+}
+
 export default function Dashboard2() {
   const params = useParams()
   const router = useRouter()
   const policyId = params.id as string
-  const [policyData, setPolicyData] = useState<any>(null)
+  const [policyData, setPolicyData] = useState<PolicyData | null>(null)
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -98,7 +121,7 @@ export default function Dashboard2() {
   )
 }
 
-async function fetchPolicyData(id: string) {
+async function fetchPolicyData(id: string): Promise<PolicyData> {
   const response = await fetch(`/api/policy-analyses/${id}`)
   if (!response.ok) {
     throw new Error("Failed to fetch policy data")
