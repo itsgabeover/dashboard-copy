@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -14,6 +15,7 @@ export default function Dashboard() {
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     async function loadPolicyData() {
@@ -25,6 +27,8 @@ export default function Dashboard() {
           setPolicyData(data)
         } else {
           setError("No policy data available")
+          // Redirect to upload page if no reviews are available
+          router.push("/upload")
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load policy data")
@@ -35,7 +39,7 @@ export default function Dashboard() {
     }
 
     loadPolicyData()
-  }, [])
+  }, [router])
 
   if (isLoading) {
     return <LoadingSpinner />
