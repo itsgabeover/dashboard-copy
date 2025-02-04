@@ -19,6 +19,7 @@ export default function Navigation() {
     { href: "/", label: "Home" },
     { href: "/about", label: "Why Review?" },
     { href: "/resources", label: "Help Center" },
+    { href: "/dashboard", label: "My Reviews" }, // Added My Reviews link
   ]
 
   const isActivePath = (path: string) => pathname === path
@@ -143,3 +144,4 @@ export default function Navigation() {
     </>
   )
 }
+
