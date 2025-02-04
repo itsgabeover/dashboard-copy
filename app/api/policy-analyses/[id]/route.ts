@@ -19,7 +19,7 @@ export async function GET(
     if (error) {
       console.error("Error fetching policy:", error)
       return NextResponse.json(
-        { error: "Failed to fetch policy", details: error },
+        { error: "Failed to fetch policy" },
         { status: 500 }
       )
     }
@@ -31,13 +31,12 @@ export async function GET(
       )
     }
 
-    // Return the full analysis data
     return NextResponse.json({
       timestamp: data.created_at,
       data: data.analysis_data?.data || null
     })
   } catch (error) {
-    console.error("Unexpected error fetching policy:", error)
+    console.error("Unexpected error:", error)
     return NextResponse.json(
       { error: "An unexpected error occurred" },
       { status: 500 }
