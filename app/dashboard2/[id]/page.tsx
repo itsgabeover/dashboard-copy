@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -10,47 +10,26 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { MyPortalButton } from "@/components/MyPortalButton"
 import Link from "next/link"
 
-interface Section {
-  title: string
-  content: string
-  analysis: string
-  insights: {
-    key: string
-    explanation: string
-  }[]
-}
-
-interface PolicyData {
-  timestamp: string
-  data: {
-    policyOverview: {
-      title: string
-      summary: string
-      keyPoints: string[]
-    }
-    sections: Section[]
-    finalThoughts?: string
-  }
-}
-
 export default function Dashboard2() {
-  const params = useParams()
   const router = useRouter()
+  const params = useParams()
   const policyId = params.id as string
-  const [policyData, setPolicyData] = useState<PolicyData | null>(null)
+  const [policyData, setPolicyData] = useState(null)
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     async function loadPolicyData() {
       try {
         setIsLoading(true)
         setError(null)
-        const data = await fetchPolicyData(policyId)
+        const response = await fetch(`/api/policy-analyses/${policyId}`)
+        const data = await response.json()
         if (data) {
           setPolicyData(data)
         } else {
+          // If no data is available, redirect to the processing page
           router.push("/processing")
           return
         }
@@ -119,12 +98,4 @@ export default function Dashboard2() {
       </main>
     </div>
   )
-}
-
-async function fetchPolicyData(id: string): Promise<PolicyData> {
-  const response = await fetch(`/api/policy-analyses/${id}`)
-  if (!response.ok) {
-    throw new Error("Failed to fetch policy data")
-  }
-  return response.json()
 }
