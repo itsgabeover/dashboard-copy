@@ -17,7 +17,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 
     return NextResponse.json(data)
-  } catch (error) {
+  } catch (err) {
+    console.error("An unexpected error occurred:", err)
     return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
   }
 }
