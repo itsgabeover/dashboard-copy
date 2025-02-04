@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
@@ -16,7 +15,6 @@ export default function Dashboard() {
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   useEffect(() => {
     async function loadPolicyData() {
