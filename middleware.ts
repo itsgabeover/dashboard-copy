@@ -31,8 +31,8 @@ export function middleware(request: NextRequest) {
     redirectUrl.searchParams.set("callbackUrl", pathname)
     return NextResponse.redirect(redirectUrl)
   }
-  // Explicitly handle /portal2 and /processing routes
-  if (pathname === "/portal2" || pathname === "/processing") {
+  // Explicitly handle /portal2, /dashboard2, and /processing routes
+  if (pathname === "/portal2" || pathname === "/dashboard2" || pathname === "/processing") {
     console.log(`Allowing access to ${pathname}`)
     return NextResponse.next()
   }
@@ -59,11 +59,25 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(`/upload/${mockToken}`, request.url))
     }
   }
+  // Handle dashboard2 routes
+  if (pathname.startsWith("/dashboard2")) {
+    console.log(`Allowing access to ${pathname}`)
+    return NextResponse.next()
+  }
   // Allow access to all other routes for authenticated users
   console.log(`Allowing access to ${pathname} for authenticated user`)
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)", "/upload", "/upload/:path*", "/processing", "/portal2"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/upload",
+    "/upload/:path*",
+    "/processing",
+    "/portal2",
+    "/dashboard2",
+    "/dashboard2/:path*",
+  ],
 }
+
