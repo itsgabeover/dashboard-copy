@@ -54,7 +54,7 @@ export default function ProcessingPage() {
   useEffect(() => {
     if (progress === 100) {
       // Redirect to portal page when processing is complete
-      router.push("/portal2")
+      router.push("/dashboard")
     }
   }, [progress, router])
 
