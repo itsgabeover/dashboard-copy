@@ -1,54 +1,59 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
+import { CheckCircle } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
 import type { PolicyOverview as PolicyOverviewType } from "@/types/policy"
 
-interface PolicyOverviewProps {
-  policyOverview: PolicyOverviewType
-}
-
-export default function PolicyOverview({ policyOverview }: PolicyOverviewProps) {
+export default function PolicyOverview({
+  productName,
+  issuer,
+  productType,
+  deathBenefit,
+  annualPremium,
+  riders,
+}: PolicyOverviewType) {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Policy Overview</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Product Name</p>
-            <p className="text-lg font-semibold">{policyOverview.productName}</p>
+    <Card className="bg-white shadow-lg border-0 overflow-hidden">
+      <CardContent className="p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="bg-blue-50 rounded-lg p-2">
+            <CheckCircle className="w-6 h-6 text-[#4B6FEE]" />
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Issuer</p>
-            <p className="text-lg font-semibold">{policyOverview.issuer}</p>
+          <h2 className="text-2xl font-bold text-gray-900">Policy Overview</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
+          <div className="space-y-1">
+            <h3 className="font-semibold text-gray-600">Product Name</h3>
+            <p className="text-gray-900">{productName}</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Product Type</p>
-            <p className="text-lg font-semibold">{policyOverview.productType}</p>
+          <div className="space-y-1">
+            <h3 className="font-semibold text-gray-600">Issuer</h3>
+            <p className="text-gray-900">{issuer}</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Death Benefit</p>
-            <p className="text-lg font-semibold">${policyOverview.deathBenefit.toLocaleString()}</p>
+          <div className="space-y-1">
+            <h3 className="font-semibold text-gray-600">Product Type</h3>
+            <p className="text-gray-900">{productType}</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Annual Premium</p>
-            <p className="text-lg font-semibold">${policyOverview.annualPremium.toLocaleString()}</p>
+          <div className="space-y-1">
+            <h3 className="font-semibold text-gray-600">Death Benefit</h3>
+            <p className="text-gray-900">{formatCurrency(deathBenefit)}</p>
           </div>
-          {policyOverview.policyStatus && (
-            <div>
-              <p className="text-sm font-medium text-gray-500">Policy Status</p>
-              <p className="text-lg font-semibold">{policyOverview.policyStatus}</p>
+          <div className="space-y-1">
+            <h3 className="font-semibold text-gray-600">Annual Premium</h3>
+            <p className="text-gray-900">{formatCurrency(annualPremium)}</p>
+          </div>
+          {riders && riders.length > 0 && (
+            <div className="space-y-1">
+              <h3 className="font-semibold text-gray-600">Riders</h3>
+              <ul className="text-gray-900 list-disc list-inside">
+                {riders.map((rider, index) => (
+                  <li key={index} className="text-sm">
+                    {rider}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
-        </div>
-        <div className="mt-4">
-          <p className="text-sm font-medium text-gray-500">Riders</p>
-          <ul className="list-disc list-inside">
-            {policyOverview.riders.map((rider, index) => (
-              <li key={index} className="text-sm">
-                {rider}
-              </li>
-            ))}
-          </ul>
         </div>
       </CardContent>
     </Card>
