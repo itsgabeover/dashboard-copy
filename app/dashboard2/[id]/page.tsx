@@ -10,14 +10,15 @@ export async function GET(request: Request, { params }: { params: { id: string }
   const id = params.id
 
   try {
-    const { data } = await supabase.from("policies").select("*").eq("id", id).single()
+    const { data } = await supabase.from("users").select("*").eq("id", id).single()
 
     if (!data) {
-      return NextResponse.json({ error: "Policy not found" }, { status: 404 })
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
     return NextResponse.json(data)
-  } catch (error) {
+  } catch (err) {
+    console.error("An unexpected error occurred:", err)
     return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
   }
 }
