@@ -10,9 +10,9 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 interface Policy {
   id: string
   policy_name: string
-  insurer: string
-  policy_type: string
-  death_benefit: number
+  insurer?: string
+  policy_type?: string
+  death_benefit?: number
   uploaded_at: string
   status: string
 }
