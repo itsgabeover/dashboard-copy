@@ -1,59 +1,22 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import PolicyOverview from "@/components/PolicyOverview"
 import SectionAnalysis from "@/components/SectionAnalysis"
 import InsightFramework from "@/components/InsightFramework"
 import KeyTakeaways from "@/components/KeyTakeaways"
-import { fetchPolicyData } from "@/lib/api"
 import type { ParsedPolicyData } from "@/types/policy"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { MyPortalButton } from "@/components/MyPortalButton"
 import Link from "next/link"
 
 interface DashboardProps {
-  policyId: string
+  policyData: ParsedPolicyData
 }
 
-export default function Dashboard({ policyId }: DashboardProps) {
+export default function Dashboard({ policyData }: DashboardProps) {
   const router = useRouter()
-  const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
   const [selectedSectionIndex, setSelectedSectionIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function loadPolicyData() {
-      try {
-        setIsLoading(true)
-        setError(null)
-        const data = await fetchPolicyData(policyId)
-        if (data) {
-          setPolicyData(data)
-        } else {
-          // If no data is available, redirect to the processing page
-          router.push("/processing")
-          return
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load policy data")
-        console.error(err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    loadPolicyData()
-  }, [policyId, router])
-
-  if (isLoading) {
-    return <LoadingSpinner />
-  }
-
-  if (error || !policyData) {
-    return <div className="text-center text-red-600 p-6">{error || "No policy data available"}</div>
-  }
 
   const selectedSection = policyData.data.sections[selectedSectionIndex]
 
