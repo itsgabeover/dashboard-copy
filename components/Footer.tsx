@@ -1,5 +1,5 @@
-'use client'
-import Link from 'next/link'
+"use client"
+import Link from "next/link"
 
 export function Footer() {
   return (
@@ -8,72 +8,53 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
           {/* Company Info */}
           <div className="text-center md:text-left">
-            <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">
-              Insurance Planner AI
-            </h3>
+            <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">Insurance Planner AI</h3>
             <p className="text-text-light text-sm md:text-base">
               AI-driven insurance analysis by Financial Planner AI, LLC.
             </p>
           </div>
           {/* Quick Links */}
           <div className="text-center md:text-left">
-            <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">
-              Quick Links
-            </h3>
+            <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link 
-                  href="/" 
-                  className="text-text-light hover:text-text block py-2 md:py-0"
-                >
+                <Link href="/" className="text-text-light hover:text-text block py-2 md:py-0">
                   Home
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="/about" 
-                  className="text-text-light hover:text-text block py-2 md:py-0"
-                >
+                <Link href="/about" className="text-text-light hover:text-text block py-2 md:py-0">
                   Why Review?
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="/resources" 
-                  className="text-text-light hover:text-text block py-2 md:py-0"
-                >
+                <Link href="/resources" className="text-text-light hover:text-text block py-2 md:py-0">
                   Resources
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard" className="text-text-light hover:text-text block py-2 md:py-0">
+                  My Reviews
                 </Link>
               </li>
             </ul>
           </div>
           {/* Company Links */}
           <div className="text-center md:text-left">
-            <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">
-              Company
-            </h3>
+            <h3 className="text-lg font-semibold text-[#4B6FEE] mb-3 md:mb-4">Company</h3>
             <ul className="space-y-2">
               <li>
-                <Link 
-                  href="/privacy" 
-                  className="text-text-light hover:text-text block py-2 md:py-0"
-                >
+                <Link href="/privacy" className="text-text-light hover:text-text block py-2 md:py-0">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="/terms" 
-                  className="text-text-light hover:text-text block py-2 md:py-0"
-                >
+                <Link href="/terms" className="text-text-light hover:text-text block py-2 md:py-0">
                   Terms of Use
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="/cookie-policy" 
-                  className="text-text-light hover:text-text block py-2 md:py-0"
-                >
+                <Link href="/cookie-policy" className="text-text-light hover:text-text block py-2 md:py-0">
                   Cookie Policy
                 </Link>
               </li>
@@ -89,3 +70,4 @@ export function Footer() {
     </footer>
   )
 }
+
