@@ -5,7 +5,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-export async function GET(request: Request, { params }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     const { data, error } = await supabase
       .from("policies")
