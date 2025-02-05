@@ -11,6 +11,13 @@ import { fetchPolicyData } from "@/lib/api"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 
+const getHealthDescription = (score: number): string => {
+  if (score >= 90) return "Excellent"
+  if (score >= 80) return "Strong"
+  if (score >= 70) return "Good"
+  return "Fair"
+}
+
 export default function Dashboard() {
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
   const [selectedSection, setSelectedSection] = useState<PolicySection | null>(null)
@@ -47,6 +54,9 @@ export default function Dashboard() {
     return <div className="text-center text-red-600 p-6">{error || "Failed to load policy data"}</div>
   }
 
+  const healthScore = 85 // This should be dynamically calculated based on your logic
+  const healthDescription = getHealthDescription(healthScore)
+
   return (
     <div className="container mx-auto p-4 space-y-8 max-w-7xl">
       <header className="text-center mb-8">
@@ -72,7 +82,7 @@ export default function Dashboard() {
             value="analysis"
             className="data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white rounded-md transition-colors"
           >
-            Analysis
+            AI Analysis
           </TabsTrigger>
           <TabsTrigger
             value="projections"
@@ -110,15 +120,21 @@ export default function Dashboard() {
                 <CardTitle className="text-lg font-semibold text-gray-900">Policy Health</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
-                <div className="text-5xl font-bold mb-4 text-[rgb(82,102,255)]">85%</div>
-                <Progress value={85} className="w-full h-2 bg-gray-100" />
+                <div className="text-5xl font-bold mb-2 text-[rgb(82,102,255)]">{healthScore}%</div>
+                <div className="text-xl font-semibold mb-4 text-gray-700">{healthDescription}</div>
+                <Progress value={healthScore} className="w-full h-2 bg-gray-100" />
+                <p className="mt-4 text-sm text-gray-600 text-center">
+                  This health score evaluates your policy's performance across premium structure, guarantees, cash
+                  accumulation, available riders, and flexibility options. Higher scores indicate robust features and
+                  stronger long-term value.
+                </p>
               </CardContent>
             </Card>
           </div>
 
           <Card className="bg-white rounded-xl shadow-sm border border-gray-100">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg font-semibold text-gray-900">Final Thoughts</CardTitle>
+              <CardTitle className="text-lg font-semibold text-gray-900">Policy Assessment</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">{policyData.data.finalThoughts}</p>
@@ -238,7 +254,7 @@ export default function Dashboard() {
                         </div>
 
                         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                          <h4 className="font-semibold mb-2">Client Implications</h4>
+                          <h4 className="font-semibold mb-2">Key Takeaways</h4>
                           <p className="text-gray-700">{selectedSection.clientImplications}</p>
                         </div>
                       </div>
@@ -304,4 +320,5 @@ export default function Dashboard() {
     </div>
   )
 }
+
 
