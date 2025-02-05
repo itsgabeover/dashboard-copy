@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import type { ParsedPolicyData } from "@/types/policy"
+import type { ParsedPolicyData, APIResponse } from "@/types/policy"
 import { supabase } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
@@ -13,7 +13,8 @@ export async function POST(request: NextRequest) {
         { 
           policy_name: policyData.data.policyOverview.productName,
           analysis_data: policyData,
-          status: 'completed'
+          status: 'completed',
+          updated_at: new Date().toISOString()
         }
       ])
       .select()
@@ -23,25 +24,23 @@ export async function POST(request: NextRequest) {
       throw error
     }
 
-    console.log("Stored policy data in Supabase:", JSON.stringify(data, null, 2))
-
     return NextResponse.json({
       success: true,
-      data: policyData,
-      timestamp: new Date().toISOString()
-    })
+      data: policyData
+    } as APIResponse)
+
   } catch (error) {
     console.error("Error processing policy data:", error)
     return NextResponse.json({ 
+      success: false,
       error: "Failed to process policy data",
       details: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 })
+    } as APIResponse, { status: 500 })
   }
 }
 
 export async function GET() {
   try {
-    // Get latest policies from Supabase
     const { data: policies, error } = await supabase
       .from('policies')
       .select('*')
@@ -49,25 +48,27 @@ export async function GET() {
       .limit(1)
 
     if (error) throw error
-
+    
     const latestPolicy = policies[0]
-
     if (!latestPolicy) {
       return NextResponse.json({ 
         success: false,
-        message: "No policy data available" 
-      }, { status: 404 })
+        error: "No policy data available" 
+      } as APIResponse, { status: 404 })
     }
 
+    // Ensure the returned data matches our ParsedPolicyData type
     return NextResponse.json({
       success: true,
-      data: latestPolicy.analysis_data
-    })
+      data: latestPolicy.analysis_data as ParsedPolicyData
+    } as APIResponse)
+
   } catch (error) {
     console.error("Error retrieving policy data:", error)
     return NextResponse.json({ 
+      success: false,
       error: "Failed to retrieve policy data",
       details: error instanceof Error ? error.message : "Unknown error"
-    }, { status: 500 })
+    } as APIResponse, { status: 500 })
   }
 }
