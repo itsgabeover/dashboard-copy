@@ -9,9 +9,8 @@ export async function fetchPolicyData(): Promise<ParsedPolicyData | null> {
     const result: APIResponse = await response.json()
     if (result.success && result.data) {
       return result.data
-    } else {
-      return null
     }
+    return null
   } catch (error) {
     console.error("Error fetching policy data:", error)
     throw error
