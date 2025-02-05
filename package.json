@@ -18,6 +18,8 @@
     "@radix-ui/react-tabs": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@radix-ui/react-scroll-area": "^1.0.5",
+    "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-slider": "^1.1.2",
     "@sparticuz/chromium": "^131.0.1",
     "@supabase/supabase-js": "^2.39.3",
     "@types/puppeteer": "^5.4.7",
@@ -37,6 +39,7 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.3.5",
     "react-pdf": "^9.2.1",
+    "recharts": "^2.10.3",
     "redis": "^4.7.0",
     "stripe": "^17.5.0",
     "tailwind-merge": "^2.5.5",
@@ -47,6 +50,7 @@
     "@types/node": "^20.9.0",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.16",
     "eslint": "^9",
     "eslint-config-next": "15.1.2",
     "postcss": "^8",
@@ -54,4 +58,3 @@
     "typescript": "^5.2.2"
   }
 }
-
