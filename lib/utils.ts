@@ -57,7 +57,7 @@ export const calculatePercentage = (value: number, total: number): number => {
 /**
  * Debounce function
  */
-export const debounce = <F extends (...args: any[]) => any>(func: F, waitFor: number) => {
+export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, waitFor: number) => {
   let timeout: ReturnType<typeof setTimeout> | null = null
 
   return (...args: Parameters<F>): Promise<ReturnType<F>> => {
@@ -93,7 +93,7 @@ export const generateRandomString = (length: number): string => {
 /**
  * Parse JSON safely
  */
-export const safeJSONParse = (str: string): any => {
+export const safeJSONParse = (str: string): unknown => {
   try {
     return JSON.parse(str)
   } catch (e) {
@@ -162,7 +162,7 @@ export const camelToSnake = (str: string): string =>
 export const flattenArray = <T>(arr: T[]): T[] =>
   arr.reduce((flat, next) => flat.concat(Array.isArray(next) ? flattenArray(next) : next), [] as T[])
 
-export default {
+export const utils = {
   cn,
   formatCurrency,
   formatDate,
