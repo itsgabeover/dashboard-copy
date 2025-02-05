@@ -1,10 +1,10 @@
 // Define the structure for policy overview
 export interface PolicyOverview {
   productName: string
-  issuer: string
-  productType: string
+  carrierName: string // Changed from 'issuer' to 'carrierName'
+  policyDesign: string
   deathBenefit: number
-  annualPremium: number
+  premiumAmount: number
   riders?: string[]
 }
 
