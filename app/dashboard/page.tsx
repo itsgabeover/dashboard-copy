@@ -9,6 +9,7 @@ import { AlertTriangle, Lightbulb, Flag } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { ParsedPolicyData, Category } from "@/types/policy"
 import { fetchPolicyData } from "@/lib/api"
+import { formatCurrency } from "@/lib/utils"
 
 export default function Dashboard() {
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
@@ -74,11 +75,11 @@ export default function Dashboard() {
                 <dl className="space-y-2">
                   <div>
                     <dt className="font-semibold">Death Benefit</dt>
-                    <dd>${policyOverview.deathBenefit.toLocaleString()}</dd>
+                    <dd>{formatCurrency(policyOverview.deathBenefit)}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold">Annual Premium</dt>
-                    <dd>${policyOverview.premiumAmount.toLocaleString()}</dd>
+                    <dd>{formatCurrency(policyOverview.premiumAmount)}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold">Policy Type</dt>
@@ -155,11 +156,11 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <dt className="font-semibold">Death Benefit</dt>
-                  <dd>${policyOverview.deathBenefit.toLocaleString()}</dd>
+                  <dd>{formatCurrency(policyOverview.deathBenefit)}</dd>
                 </div>
                 <div>
                   <dt className="font-semibold">Annual Premium</dt>
-                  <dd>${policyOverview.premiumAmount.toLocaleString()}</dd>
+                  <dd>{formatCurrency(policyOverview.premiumAmount)}</dd>
                 </div>
               </dl>
             </CardContent>
@@ -237,15 +238,15 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold">Year {selectedYear}</h4>
-                  <p>Cash Value: ${timePoints.find((tp) => tp.year === selectedYear)?.cashValue.toLocaleString()}</p>
+                  <p>Cash Value: {formatCurrency(timePoints.find((tp) => tp.year === selectedYear)?.cashValue || 0)}</p>
                   <p>
-                    Net Surrender Value: $
-                    {timePoints.find((tp) => tp.year === selectedYear)?.netSurrenderValue.toLocaleString()}
+                    Net Surrender Value:{" "}
+                    {formatCurrency(timePoints.find((tp) => tp.year === selectedYear)?.netSurrenderValue || 0)}
                   </p>
                 </div>
                 <div>
                   <h4 className="font-semibold">Death Benefit</h4>
-                  <p>${policyOverview.deathBenefit.toLocaleString()}</p>
+                  <p>{formatCurrency(policyOverview.deathBenefit)}</p>
                 </div>
               </div>
             </CardContent>
