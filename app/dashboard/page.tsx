@@ -2,19 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Slider } from "@/components/ui/slider"
 import { AlertTriangle, Lightbulb, Flag } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import type { ParsedPolicyData, PolicySection, PolicyValue } from "@/types/policy"
+import type { ParsedPolicyData, PolicySection } from "@/types/policy"
 import { fetchPolicyData } from "@/lib/api"
 import { formatCurrency } from "@/lib/utils"
 
 export default function Dashboard() {
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
   const [selectedSection, setSelectedSection] = useState<PolicySection | null>(null)
-  const [selectedTimePoint, setSelectedTimePoint] = useState<PolicyValue | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,9 +24,6 @@ export default function Dashboard() {
           setPolicyData(data)
           if (data.data.sections && data.data.sections.length > 0) {
             setSelectedSection(data.data.sections[0])
-          }
-          if (data.data.values && data.data.values.length > 0) {
-            setSelectedTimePoint(data.data.values[0])
           }
         } else {
           setError("No policy data available")
@@ -50,9 +45,6 @@ export default function Dashboard() {
   if (error || !policyData) {
     return <div className="text-center text-red-600 p-6">{error || "Failed to load policy data"}</div>
   }
-
-  // Calculate policy health score based on sections (simplified example)
-  const healthScore = 85 // Placeholder - could be calculated based on analysis
 
   return (
     <div className="container mx-auto p-4 space-y-8">
@@ -94,11 +86,11 @@ export default function Dashboard() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Policy Health Score</CardTitle>
+                <CardTitle>Policy Health</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
-                <div className="text-5xl font-bold mb-4">{healthScore}%</div>
-                <Progress value={healthScore} className="w-full" />
+                <div className="text-5xl font-bold mb-4">85%</div>
+                <Progress value={85} className="w-full" />
               </CardContent>
             </Card>
           </div>
