@@ -24,6 +24,7 @@ export interface PolicySection {
   blindspot: string
   redflag: string
   clientImplications: string
+  quotes: string[] // Add this line
 }
 
 // Define the structure for a time point
