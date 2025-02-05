@@ -86,9 +86,9 @@ export enum PolicyStatus {
 
 export const MAX_POLICY_TERM = 100 // Maximum policy term in years
 
-// Export any utility types that might be useful
-export type PolicyId = string
-export type CarrierId = string
+// Define utility types
+type PolicyId = string
+type CarrierId = string
 
 export interface CarrierInfo {
   id: CarrierId
@@ -102,8 +102,8 @@ export interface PolicyComparison {
   policyB: ParsedPolicyData
   differences: {
     [key: string]: {
-      policyA: any
-      policyB: any
+      policyA: unknown
+      policyB: unknown
     }
   }
 }
@@ -160,6 +160,4 @@ export interface PolicySearchResult {
 
 // Export types that haven't been exported inline
 export type { PolicyId, CarrierId }
-
-// No need to re-export types that have already been exported inline
 
