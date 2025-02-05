@@ -1,7 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
-import type { PolicyOverview as PolicyOverviewType } from "@/types/policy"
 
 interface PolicyOverviewProps {
   productName: string
