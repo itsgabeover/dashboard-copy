@@ -1,10 +1,11 @@
 // Define the structure for policy overview
 export interface PolicyOverview {
   productName: string
-  carrierName: string
-  policyDesign: string
+  issuer: string
+  productType: string
   deathBenefit: number
-  premiumAmount: number
+  annualPremium: number
+  riders?: string[]
 }
 
 // Define the structure for a category
