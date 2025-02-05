@@ -3,14 +3,23 @@ import { CheckCircle } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 import type { PolicyOverview as PolicyOverviewType } from "@/types/policy"
 
+interface PolicyOverviewProps {
+  productName: string
+  issuer: string
+  productType: string
+  deathBenefit: number
+  annualPremium: number
+  riders?: string[]
+}
+
 export default function PolicyOverview({
   productName,
-  carrierName,
-  policyDesign,
+  issuer,
+  productType,
   deathBenefit,
-  premiumAmount,
+  annualPremium,
   riders,
-}: PolicyOverviewType) {
+}: PolicyOverviewProps) {
   return (
     <Card className="bg-white shadow-lg border-0 overflow-hidden">
       <CardContent className="p-6">
@@ -20,7 +29,6 @@ export default function PolicyOverview({
           </div>
           <h2 className="text-2xl font-bold text-gray-900">Policy Overview</h2>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-6">
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Product Name</h3>
@@ -28,11 +36,11 @@ export default function PolicyOverview({
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Issuer</h3>
-            <p className="text-gray-900">{carrierName}</p>
+            <p className="text-gray-900">{issuer}</p>
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Product Type</h3>
-            <p className="text-gray-900">{policyDesign}</p>
+            <p className="text-gray-900">{productType}</p>
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Death Benefit</h3>
@@ -40,7 +48,7 @@ export default function PolicyOverview({
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Annual Premium</h3>
-            <p className="text-gray-900">{formatCurrency(premiumAmount)}</p>
+            <p className="text-gray-900">{formatCurrency(annualPremium)}</p>
           </div>
           {riders && riders.length > 0 && (
             <div className="space-y-1">
@@ -59,4 +67,3 @@ export default function PolicyOverview({
     </Card>
   )
 }
-
