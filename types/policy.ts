@@ -160,7 +160,6 @@ export interface PolicySearchResult {
 
 // Export all types and interfaces
 export type {
-  Currency,
   PolicyOverview,
   Category,
   PolicySection,
