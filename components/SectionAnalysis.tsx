@@ -47,12 +47,13 @@ export default function SectionAnalysis({ sections, selectedSectionIndex, onSect
               <h3 className="text-xl font-semibold mb-4 text-gray-900">{selectedSection.title}</h3>
 
               <div className="space-y-4">
-                {selectedSection.quotes.map((quote, index) => (
-                  <div key={index} className="flex gap-3 items-start">
-                    <Quote className="w-5 h-5 text-[#4B6FEE] flex-shrink-0 mt-1" />
-                    <p className="text-gray-700">{quote}</p>
-                  </div>
-                ))}
+                {selectedSection.quotes &&
+                  selectedSection.quotes.map((quote, index) => (
+                    <div key={index} className="flex gap-3 items-start">
+                      <Quote className="w-5 h-5 text-[#4B6FEE] flex-shrink-0 mt-1" />
+                      <p className="text-gray-700">{quote}</p>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -61,5 +62,4 @@ export default function SectionAnalysis({ sections, selectedSectionIndex, onSect
     </Card>
   )
 }
-
 
