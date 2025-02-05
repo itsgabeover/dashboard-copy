@@ -57,7 +57,7 @@ export const calculatePercentage = (value: number, total: number): number => {
 /**
  * Debounce function
  */
-export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(func: F, waitFor: number) => {
+export const debounce = <F extends (...args: any[]) => any>(func: F, waitFor: number) => {
   let timeout: ReturnType<typeof setTimeout> | null = null
 
   return (...args: Parameters<F>): Promise<ReturnType<F>> => {
@@ -74,7 +74,7 @@ export const debounce = <F extends (...args: Parameters<F>) => ReturnType<F>>(fu
 /**
  * Check if an object is empty
  */
-export const isEmptyObject = (obj: object): boolean => {
+export const isEmptyObject = (obj: Record<string, unknown>): boolean => {
   return Object.keys(obj).length === 0
 }
 
@@ -105,9 +105,9 @@ export const safeJSONParse = (str: string): unknown => {
 /**
  * Get query params from URL
  */
-export const getQueryParams = (url: string): { [key: string]: string } => {
+export const getQueryParams = (url: string): Record<string, string> => {
   const params = new URLSearchParams(new URL(url).search)
-  const result: { [key: string]: string } = {}
+  const result: Record<string, string> = {}
   for (const [key, value] of params) {
     result[key] = value
   }
@@ -135,7 +135,7 @@ export const isServer = typeof window === 'undefined'
  * Validate email address
  */
 export const isValidEmail = (email: string): boolean => {
-  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return re.test(String(email).toLowerCase())
 }
 
@@ -182,4 +182,6 @@ export const utils = {
   camelToSnake,
   flattenArray
 }
+
+export default utils
 
