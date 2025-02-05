@@ -24,6 +24,7 @@ export default function Dashboard() {
         const data = await fetchPolicyData()
         if (data) {
           setPolicyData(data)
+          // Only set selected category if categories exist and have items
           if (data.data.categories && data.data.categories.length > 0) {
             setSelectedCategory(data.data.categories[0])
           }
@@ -48,13 +49,19 @@ export default function Dashboard() {
     return <div className="text-center text-red-600 p-6">{error || "Failed to load policy data"}</div>
   }
 
-  const { policyOverview, riders, categories, timePoints } = policyData.data
+  // Calculate average score with null check
+  const averageScore =
+    policyData.data.categories && policyData.data.categories.length > 0
+      ? Math.round(
+          policyData.data.categories.reduce((acc, cat) => acc + cat.score, 0) / policyData.data.categories.length,
+        )
+      : 0
 
   return (
     <div className="container mx-auto p-4 space-y-8">
       <header className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">{policyOverview.productName}</h1>
-        <p className="text-xl text-gray-600">{policyOverview.carrierName}</p>
+        <h1 className="text-3xl font-bold mb-2">{policyData.data.policyOverview.productName}</h1>
+        <p className="text-xl text-gray-600">{policyData.data.policyOverview.carrierName}</p>
       </header>
 
       <Tabs defaultValue="overview" className="w-full">
@@ -75,15 +82,15 @@ export default function Dashboard() {
                 <dl className="space-y-2">
                   <div>
                     <dt className="font-semibold">Death Benefit</dt>
-                    <dd>{formatCurrency(policyOverview.deathBenefit)}</dd>
+                    <dd>{formatCurrency(policyData.data.policyOverview.deathBenefit)}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold">Annual Premium</dt>
-                    <dd>{formatCurrency(policyOverview.premiumAmount)}</dd>
+                    <dd>{formatCurrency(policyData.data.policyOverview.premiumAmount)}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold">Policy Type</dt>
-                    <dd>{policyOverview.policyDesign}</dd>
+                    <dd>{policyData.data.policyOverview.policyDesign}</dd>
                   </div>
                 </dl>
               </CardContent>
@@ -93,33 +100,30 @@ export default function Dashboard() {
                 <CardTitle>Policy Health Score</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
-                <div className="text-5xl font-bold mb-4">
-                  {Math.round(categories.reduce((acc, cat) => acc + cat.score, 0) / categories.length)}%
-                </div>
-                <Progress
-                  value={Math.round(categories.reduce((acc, cat) => acc + cat.score, 0) / categories.length)}
-                  className="w-full"
-                />
+                <div className="text-5xl font-bold mb-4">{averageScore}%</div>
+                <Progress value={averageScore} className="w-full" />
               </CardContent>
             </Card>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Key Categories Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={categories}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="score" stroke="#8884d8" fill="#8884d8" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          {policyData.data.categories && policyData.data.categories.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Key Categories Overview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={policyData.data.categories}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="score" stroke="#8884d8" fill="#8884d8" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="details" className="space-y-4">
@@ -129,7 +133,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5 space-y-2">
-                {riders.map((rider, index) => (
+                {policyData.data.riders.map((rider, index) => (
                   <li key={index}>{rider}</li>
                 ))}
               </ul>
@@ -144,23 +148,23 @@ export default function Dashboard() {
               <dl className="space-y-2">
                 <div>
                   <dt className="font-semibold">Product Name</dt>
-                  <dd>{policyOverview.productName}</dd>
+                  <dd>{policyData.data.policyOverview.productName}</dd>
                 </div>
                 <div>
                   <dt className="font-semibold">Carrier Name</dt>
-                  <dd>{policyOverview.carrierName}</dd>
+                  <dd>{policyData.data.policyOverview.carrierName}</dd>
                 </div>
                 <div>
                   <dt className="font-semibold">Policy Design</dt>
-                  <dd>{policyOverview.policyDesign}</dd>
+                  <dd>{policyData.data.policyOverview.policyDesign}</dd>
                 </div>
                 <div>
                   <dt className="font-semibold">Death Benefit</dt>
-                  <dd>{formatCurrency(policyOverview.deathBenefit)}</dd>
+                  <dd>{formatCurrency(policyData.data.policyOverview.deathBenefit)}</dd>
                 </div>
                 <div>
                   <dt className="font-semibold">Annual Premium</dt>
-                  <dd>{formatCurrency(policyOverview.premiumAmount)}</dd>
+                  <dd>{formatCurrency(policyData.data.policyOverview.premiumAmount)}</dd>
                 </div>
               </dl>
             </CardContent>
@@ -205,7 +209,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {categories.map((category, index) => (
+                  {policyData.data.categories.map((category, index) => (
                     <li
                       key={index}
                       className="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-2 rounded"
@@ -230,7 +234,7 @@ export default function Dashboard() {
             <CardContent>
               <Slider
                 defaultValue={[30]}
-                max={Math.max(...timePoints.map((tp) => tp.year))}
+                max={Math.max(...policyData.data.timePoints.map((tp) => tp.year))}
                 step={10}
                 onValueChange={(value) => setSelectedYear(value[0])}
                 className="mb-6"
@@ -238,15 +242,20 @@ export default function Dashboard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="font-semibold">Year {selectedYear}</h4>
-                  <p>Cash Value: {formatCurrency(timePoints.find((tp) => tp.year === selectedYear)?.cashValue || 0)}</p>
+                  <p>
+                    Cash Value:{" "}
+                    {formatCurrency(policyData.data.timePoints.find((tp) => tp.year === selectedYear)?.cashValue || 0)}
+                  </p>
                   <p>
                     Net Surrender Value:{" "}
-                    {formatCurrency(timePoints.find((tp) => tp.year === selectedYear)?.netSurrenderValue || 0)}
+                    {formatCurrency(
+                      policyData.data.timePoints.find((tp) => tp.year === selectedYear)?.netSurrenderValue || 0,
+                    )}
                   </p>
                 </div>
                 <div>
                   <h4 className="font-semibold">Death Benefit</h4>
-                  <p>{formatCurrency(policyOverview.deathBenefit)}</p>
+                  <p>{formatCurrency(policyData.data.policyOverview.deathBenefit)}</p>
                 </div>
               </div>
             </CardContent>
@@ -258,7 +267,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={timePoints}>
+                <AreaChart data={policyData.data.timePoints}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="year" />
                   <YAxis />
