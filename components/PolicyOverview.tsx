@@ -5,10 +5,10 @@ import type { PolicyOverview as PolicyOverviewType } from "@/types/policy"
 
 export default function PolicyOverview({
   productName,
-  issuer,
-  productType,
+  carrierName,
+  policyDesign,
   deathBenefit,
-  annualPremium,
+  premiumAmount,
   riders,
 }: PolicyOverviewType) {
   return (
@@ -28,11 +28,11 @@ export default function PolicyOverview({
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Issuer</h3>
-            <p className="text-gray-900">{issuer}</p>
+            <p className="text-gray-900">{carrierName}</p>
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Product Type</h3>
-            <p className="text-gray-900">{productType}</p>
+            <p className="text-gray-900">{policyDesign}</p>
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Death Benefit</h3>
@@ -40,7 +40,7 @@ export default function PolicyOverview({
           </div>
           <div className="space-y-1">
             <h3 className="font-semibold text-gray-600">Annual Premium</h3>
-            <p className="text-gray-900">{formatCurrency(annualPremium)}</p>
+            <p className="text-gray-900">{formatCurrency(premiumAmount)}</p>
           </div>
           {riders && riders.length > 0 && (
             <div className="space-y-1">
