@@ -1,7 +1,10 @@
+// Define the Currency type
+export type Currency = "USD" | "EUR" | "GBP" | "JPY"
+
 // Define the structure for monetary values
 export interface MonetaryValue {
   amount: number
-  currency: "USD" | "EUR" | "GBP" | "JPY"
+  currency: Currency
 }
 
 // Define the structure for policy overview
@@ -157,6 +160,7 @@ export interface PolicySearchResult {
 
 // Export all types and interfaces
 export type {
+  Currency,
   PolicyOverview,
   Category,
   PolicySection,
