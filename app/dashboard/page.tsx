@@ -55,7 +55,6 @@ export default function Dashboard() {
   }
 
   const healthScore = 85 // This should be dynamically calculated based on your logic
-  const healthDescription = getHealthDescription(healthScore)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -120,6 +119,9 @@ export default function Dashboard() {
                       <dd className="text-2xl text-[rgb(82,102,255)]">{policyData.data.policyOverview.productType}</dd>
                     </div>
                   </dl>
+                  <div className="mt-6 pl-4 border-l-4 border-[rgb(82,102,255)] bg-blue-50 p-4 rounded-lg">
+                    <p className="text-sm text-gray-600">{policyData.data.policyOverview.description}</p>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -130,12 +132,14 @@ export default function Dashboard() {
                 <CardContent className="flex flex-col items-center p-6">
                   <div className="text-6xl font-bold mb-2 text-[rgb(82,102,255)]">{healthScore}%</div>
                   <div className="text-2xl font-semibold mb-4 text-gray-700">{getHealthDescription(healthScore)}</div>
-                  <div className="w-full h-px bg-gray-200 mb-4" />
+                  <div className="w-full h-1 bg-gray-200 mb-4 rounded-full overflow-hidden">
+                    <div className="h-full bg-[rgb(82,102,255)]" style={{ width: `${healthScore}%` }} />
+                  </div>
                   <Progress value={healthScore} className="w-full h-3 bg-gray-100 rounded-full" />
                   <p className="mt-6 text-sm text-gray-600 text-center bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    This health score evaluates your policy's performance across premium structure, guarantees, cash
-                    accumulation, available riders, and flexibility options. Higher scores indicate robust features and
-                    stronger long-term value.
+                    This health score evaluates your policy&apos;s performance across premium structure, guarantees,
+                    cash accumulation, available riders, and flexibility options. Higher scores indicate robust features
+                    and stronger long-term value.
                   </p>
                 </CardContent>
               </Card>
@@ -163,7 +167,10 @@ export default function Dashboard() {
                   {policyData.data.policyOverview.riders.map((rider, index) => (
                     <li key={index} className="bg-gray-50 p-4 rounded-lg flex items-start">
                       <span className="inline-block w-2 h-2 rounded-full bg-[rgb(82,102,255)] mt-2 mr-3" />
-                      <span>{rider}</span>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">{rider.name}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{rider.description}</p>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -179,18 +186,14 @@ export default function Dashboard() {
                   {policyData.data.values.map((timePoint, index) => (
                     <div key={index} className="bg-gray-50 p-6 rounded-lg">
                       <h4 className="text-lg font-semibold text-[rgb(82,102,255)] mb-4">{timePoint.timePoint}</h4>
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-3">
-                          <div className="bg-white p-4 rounded-lg shadow-sm">
-                            <p className="text-sm text-gray-600 mb-1">Cash Value</p>
-                            <p className="text-lg font-semibold">{formatCurrency(timePoint.values.cashValue)}</p>
-                          </div>
-                          <div className="bg-white p-4 rounded-lg shadow-sm">
-                            <p className="text-sm text-gray-600 mb-1">Net Surrender Value</p>
-                            <p className="text-lg font-semibold">
-                              {formatCurrency(timePoint.values.netSurrenderValue)}
-                            </p>
-                          </div>
+                      <div className="grid md:grid-cols-3 gap-4">
+                        <div className="bg-white p-4 rounded-lg shadow-sm">
+                          <p className="text-sm text-gray-600 mb-1">Cash Value</p>
+                          <p className="text-lg font-semibold">{formatCurrency(timePoint.values.cashValue)}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm">
+                          <p className="text-sm text-gray-600 mb-1">Net Surrender Value</p>
+                          <p className="text-lg font-semibold">{formatCurrency(timePoint.values.netSurrenderValue)}</p>
                         </div>
                         <div className="bg-white p-4 rounded-lg shadow-sm">
                           <p className="text-sm text-gray-600 mb-1">Death Benefit</p>
