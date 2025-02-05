@@ -1,7 +1,13 @@
+// Define the structure for monetary values
+export interface MonetaryValue {
+  amount: number
+  currency: "USD" | "EUR" | "GBP" | "JPY"
+}
+
 // Define the structure for policy overview
 export interface PolicyOverview {
   productName: string
-  carrierName: string // Changed from 'issuer' to 'carrierName'
+  carrierName: string
   policyDesign: string
   deathBenefit: number
   premiumAmount: number
@@ -24,7 +30,7 @@ export interface PolicySection {
   blindspot: string
   redflag: string
   clientImplications: string
-  quotes: string[] // Add this line
+  quotes: string[]
 }
 
 // Define the structure for a time point
@@ -108,22 +114,19 @@ export interface HistoricalPolicyData {
   }>
 }
 
-// Export any additional utility types or interfaces that might be needed for the application
-export type Currency = "USD" | "EUR" | "GBP" | "JPY"
-
-export interface MonetaryValue {
-  amount: number
-  currency: Currency
-}
-
 export interface RiderDetails {
   name: string
   description: string
   cost: MonetaryValue
 }
 
-// Extend the PolicyOverview to include more detailed financial information
-export interface DetailedPolicyOverview extends PolicyOverview {
+// Define a separate interface for DetailedPolicyOverview
+export interface DetailedPolicyOverview {
+  productName: string
+  carrierName: string
+  policyDesign: string
+  deathBenefit: number
+  premiumAmount: number
   cashValue: MonetaryValue
   surrenderValue: MonetaryValue
   riders: RiderDetails[]
