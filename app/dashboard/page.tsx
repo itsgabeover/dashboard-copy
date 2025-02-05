@@ -7,14 +7,14 @@ import { Progress } from "@/components/ui/progress"
 import { Slider } from "@/components/ui/slider"
 import { AlertTriangle, Lightbulb, Flag } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import type { ParsedPolicyData, Category } from "@/types/policy"
+import type { ParsedPolicyData, PolicySection, PolicyValue } from "@/types/policy"
 import { fetchPolicyData } from "@/lib/api"
 import { formatCurrency } from "@/lib/utils"
 
 export default function Dashboard() {
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
-  const [selectedYear, setSelectedYear] = useState(30)
+  const [selectedSection, setSelectedSection] = useState<PolicySection | null>(null)
+  const [selectedTimePoint, setSelectedTimePoint] = useState<PolicyValue | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -24,9 +24,11 @@ export default function Dashboard() {
         const data = await fetchPolicyData()
         if (data) {
           setPolicyData(data)
-          // Only set selected category if categories exist and have items
-          if (data.data.categories && data.data.categories.length > 0) {
-            setSelectedCategory(data.data.categories[0])
+          if (data.data.sections && data.data.sections.length > 0) {
+            setSelectedSection(data.data.sections[0])
+          }
+          if (data.data.values && data.data.values.length > 0) {
+            setSelectedTimePoint(data.data.values[0])
           }
         } else {
           setError("No policy data available")
@@ -49,19 +51,14 @@ export default function Dashboard() {
     return <div className="text-center text-red-600 p-6">{error || "Failed to load policy data"}</div>
   }
 
-  // Calculate average score with null check
-  const averageScore =
-    policyData.data.categories && policyData.data.categories.length > 0
-      ? Math.round(
-          policyData.data.categories.reduce((acc, cat) => acc + cat.score, 0) / policyData.data.categories.length,
-        )
-      : 0
+  // Calculate policy health score based on sections (simplified example)
+  const healthScore = 85 // Placeholder - could be calculated based on analysis
 
   return (
     <div className="container mx-auto p-4 space-y-8">
       <header className="text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">{policyData.data.policyOverview.productName}</h1>
-        <p className="text-xl text-gray-600">{policyData.data.policyOverview.carrierName}</p>
+        <p className="text-xl text-gray-600">{policyData.data.policyOverview.issuer}</p>
       </header>
 
       <Tabs defaultValue="overview" className="w-full">
@@ -86,11 +83,11 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <dt className="font-semibold">Annual Premium</dt>
-                    <dd>{formatCurrency(policyData.data.policyOverview.premiumAmount)}</dd>
+                    <dd>{formatCurrency(policyData.data.policyOverview.annualPremium)}</dd>
                   </div>
                   <div>
                     <dt className="font-semibold">Policy Type</dt>
-                    <dd>{policyData.data.policyOverview.policyDesign}</dd>
+                    <dd>{policyData.data.policyOverview.productType}</dd>
                   </div>
                 </dl>
               </CardContent>
@@ -100,30 +97,20 @@ export default function Dashboard() {
                 <CardTitle>Policy Health Score</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
-                <div className="text-5xl font-bold mb-4">{averageScore}%</div>
-                <Progress value={averageScore} className="w-full" />
+                <div className="text-5xl font-bold mb-4">{healthScore}%</div>
+                <Progress value={healthScore} className="w-full" />
               </CardContent>
             </Card>
           </div>
 
-          {policyData.data.categories && policyData.data.categories.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Categories Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={policyData.data.categories}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="score" stroke="#8884d8" fill="#8884d8" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>Final Thoughts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700">{policyData.data.finalThoughts}</p>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="details" className="space-y-4">
@@ -133,7 +120,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <ul className="list-disc pl-5 space-y-2">
-                {policyData.data.riders.map((rider, index) => (
+                {policyData.data.policyOverview.riders.map((rider, index) => (
                   <li key={index}>{rider}</li>
                 ))}
               </ul>
@@ -142,31 +129,25 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Policy Details</CardTitle>
+              <CardTitle>Value Projections</CardTitle>
             </CardHeader>
             <CardContent>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="font-semibold">Product Name</dt>
-                  <dd>{policyData.data.policyOverview.productName}</dd>
-                </div>
-                <div>
-                  <dt className="font-semibold">Carrier Name</dt>
-                  <dd>{policyData.data.policyOverview.carrierName}</dd>
-                </div>
-                <div>
-                  <dt className="font-semibold">Policy Design</dt>
-                  <dd>{policyData.data.policyOverview.policyDesign}</dd>
-                </div>
-                <div>
-                  <dt className="font-semibold">Death Benefit</dt>
-                  <dd>{formatCurrency(policyData.data.policyOverview.deathBenefit)}</dd>
-                </div>
-                <div>
-                  <dt className="font-semibold">Annual Premium</dt>
-                  <dd>{formatCurrency(policyData.data.policyOverview.premiumAmount)}</dd>
-                </div>
-              </dl>
+              <div className="space-y-4">
+                {policyData.data.values.map((timePoint, index) => (
+                  <div key={index} className="border-b pb-4 last:border-0">
+                    <h4 className="font-semibold">{timePoint.timePoint}</h4>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <div>
+                        <p>Cash Value: {formatCurrency(timePoint.values.cashValue)}</p>
+                        <p>Net Surrender Value: {formatCurrency(timePoint.values.netSurrenderValue)}</p>
+                      </div>
+                      <div>
+                        <p>Death Benefit: {formatCurrency(timePoint.values.deathBenefitAmount)}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -175,7 +156,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>{selectedCategory?.name}</CardTitle>
+                <CardTitle>{selectedSection?.title}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -184,39 +165,42 @@ export default function Dashboard() {
                       <Lightbulb className="w-5 h-5 text-yellow-500" />
                       Hidden Gem
                     </h4>
-                    <p>{selectedCategory?.hiddenGem}</p>
+                    <p>{selectedSection?.hiddengem}</p>
                   </div>
                   <div>
                     <h4 className="font-semibold flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-orange-500" />
                       Blind Spot
                     </h4>
-                    <p>{selectedCategory?.blindSpot}</p>
+                    <p>{selectedSection?.blindspot}</p>
                   </div>
                   <div>
                     <h4 className="font-semibold flex items-center gap-2">
                       <Flag className="w-5 h-5 text-red-500" />
                       Red Flag
                     </h4>
-                    <p>{selectedCategory?.redFlag}</p>
+                    <p>{selectedSection?.redflag}</p>
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="font-semibold">Client Implications</h4>
+                    <p>{selectedSection?.clientImplications}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Category Scores</CardTitle>
+                <CardTitle>Policy Sections</CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2">
-                  {policyData.data.categories.map((category, index) => (
+                  {policyData.data.sections.map((section, index) => (
                     <li
                       key={index}
                       className="flex justify-between items-center cursor-pointer hover:bg-gray-100 p-2 rounded"
-                      onClick={() => setSelectedCategory(category)}
+                      onClick={() => setSelectedSection(section)}
                     >
-                      <span>{category.name}</span>
-                      <span className="font-semibold">{category.score}%</span>
+                      <span>{section.title}</span>
                     </li>
                   ))}
                 </ul>
@@ -228,53 +212,46 @@ export default function Dashboard() {
         <TabsContent value="projections" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Policy Projections</CardTitle>
-              <CardDescription>Adjust the slider to see projections for different years</CardDescription>
+              <CardTitle>Policy Values Chart</CardTitle>
             </CardHeader>
             <CardContent>
-              <Slider
-                defaultValue={[30]}
-                max={Math.max(...policyData.data.timePoints.map((tp) => tp.year))}
-                step={10}
-                onValueChange={(value) => setSelectedYear(value[0])}
-                className="mb-6"
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-semibold">Year {selectedYear}</h4>
-                  <p>
-                    Cash Value:{" "}
-                    {formatCurrency(policyData.data.timePoints.find((tp) => tp.year === selectedYear)?.cashValue || 0)}
-                  </p>
-                  <p>
-                    Net Surrender Value:{" "}
-                    {formatCurrency(
-                      policyData.data.timePoints.find((tp) => tp.year === selectedYear)?.netSurrenderValue || 0,
-                    )}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Death Benefit</h4>
-                  <p>{formatCurrency(policyData.data.policyOverview.deathBenefit)}</p>
-                </div>
-              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={policyData.data.values}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="timePoint" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area 
+                    type="monotone" 
+                    dataKey="values.cashValue" 
+                    name="Cash Value"
+                    stroke="#82ca9d" 
+                    fill="#82ca9d" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="values.netSurrenderValue" 
+                    name="Net Surrender Value"
+                    stroke="#8884d8" 
+                    fill="#8884d8" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Cash Value Growth</CardTitle>
+              <CardTitle>Key Quotes</CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={policyData.data.timePoints}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="year" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="cashValue" stroke="#82ca9d" fill="#82ca9d" />
-                </AreaChart>
-              </ResponsiveContainer>
+              <ul className="space-y-2">
+                {selectedSection?.quotes.map((quote, index) => (
+                  <li key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                    {quote}
+                  </li>
+                ))}
+              </ul>
             </CardContent>
           </Card>
         </TabsContent>
@@ -282,4 +259,3 @@ export default function Dashboard() {
     </div>
   )
 }
-
