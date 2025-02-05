@@ -18,9 +18,11 @@ export interface Category {
 
 // Define the structure for a policy section
 export interface PolicySection {
+  title: string
   hiddengem: string
   blindspot: string
   redflag: string
+  clientImplications: string
 }
 
 // Define the structure for a time point
