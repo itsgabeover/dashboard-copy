@@ -158,24 +158,8 @@ export interface PolicySearchResult {
   pagination: PaginationParams
 }
 
-// Export all types and interfaces
-export type {
-  PolicyOverview,
-  Category,
-  PolicySection,
-  TimePoint,
-  ParsedPolicyData,
-  APIResponse,
-  PolicyAnalysis,
-  UserProfile,
-  CarrierInfo,
-  PolicyComparison,
-  HistoricalPolicyData,
-  MonetaryValue,
-  RiderDetails,
-  DetailedPolicyOverview,
-  PolicySearchParams,
-  PaginationParams,
-  PolicySearchResult,
-}
+// Export types that haven't been exported inline
+export type { PolicyId, CarrierId }
+
+// No need to re-export types that have already been exported inline
 
