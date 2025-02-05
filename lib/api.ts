@@ -1,15 +1,20 @@
-import type { ParsedPolicyData, APIResponse } from "@/types/policy"
+import type { APIResponse } from "@/types/policy"
 
-export async function fetchPolicyData(): Promise<ParsedPolicyData | null> {
+async function fetchPolicyDataFromAPI(): Promise<APIResponse> {
+  const res = await fetch("/api/policy-data")
+  if (!res.ok) {
+    throw new Error(`Error! status: ${res.status}`)
+  }
+  return res.json()
+}
+
+export const fetchPolicyData = async (): Promise<APIResponse["data"] | null> => {
   try {
-    const response = await fetch('/api/policy')
-    if (!response.ok) {
-      throw new Error('Failed to fetch policy data')
-    }
-    const result: APIResponse = await response.json()
-    return result.success ? result.data : null
+    const data = await fetchPolicyDataFromAPI()
+    return data.success ? data.data : null
   } catch (error) {
-    console.error('Error fetching policy data:', error)
-    throw error
+    console.error("Error fetching policy data:", error)
+    return null
   }
 }
+
