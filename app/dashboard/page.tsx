@@ -111,7 +111,7 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="flex flex-col items-center">
                 <div className="text-5xl font-bold mb-4 text-[rgb(82,102,255)]">85%</div>
-                <Progress value={85} className="w-full bg-gray-100 h-2" indicatorClassName="bg-[rgb(82,102,255)]" />
+                <Progress value={85} className="w-full" indicatorClassName="bg-[rgb(82,102,255)]" />
               </CardContent>
             </Card>
           </div>
