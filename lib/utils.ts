@@ -57,16 +57,19 @@ export const calculatePercentage = (value: number, total: number): number => {
 /**
  * Debounce function
  */
-export const debounce = <F extends (...args: any[]) => any>(func: F, waitFor: number) => {
+export const debounce = <T extends (...args: unknown[]) => unknown>(
+  func: T,
+  waitFor: number,
+): ((...args: Parameters<T>) => Promise<ReturnType<T>>) => {
   let timeout: ReturnType<typeof setTimeout> | null = null
 
-  return (...args: Parameters<F>): Promise<ReturnType<F>> => {
+  return (...args: Parameters<T>): Promise<ReturnType<T>> => {
     if (timeout) {
       clearTimeout(timeout)
     }
 
     return new Promise((resolve) => {
-      timeout = setTimeout(() => resolve(func(...args)), waitFor)
+      timeout = setTimeout(() => resolve(func(...args) as ReturnType<T>), waitFor)
     })
   }
 }
