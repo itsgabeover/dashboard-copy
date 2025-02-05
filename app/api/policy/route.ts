@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     const policyData: ParsedPolicyData = await request.json()
     
     // Store in Supabase
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('policies')
       .insert([
         { 
@@ -57,7 +57,6 @@ export async function GET() {
       } as APIResponse, { status: 404 })
     }
 
-    // Ensure the returned data matches our ParsedPolicyData type
     return NextResponse.json({
       success: true,
       data: latestPolicy.analysis_data as ParsedPolicyData
