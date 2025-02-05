@@ -120,7 +120,10 @@ export default function Dashboard() {
                     </div>
                   </dl>
                   <div className="mt-6 pl-4 border-l-4 border-[rgb(82,102,255)] bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600">{policyData.data.policyOverview.description}</p>
+                    <p className="text-sm text-gray-600">
+                      This policy provides comprehensive coverage tailored to your specific needs. Review the details
+                      carefully to understand your benefits and obligations.
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -167,10 +170,7 @@ export default function Dashboard() {
                   {policyData.data.policyOverview.riders.map((rider, index) => (
                     <li key={index} className="bg-gray-50 p-4 rounded-lg flex items-start">
                       <span className="inline-block w-2 h-2 rounded-full bg-[rgb(82,102,255)] mt-2 mr-3" />
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{rider.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">{rider.description}</p>
-                      </div>
+                      <span>{rider}</span>
                     </li>
                   ))}
                 </ul>
