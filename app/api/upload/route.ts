@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       }),
     )
 
-    const file = formData.get("data0") as File | null
+    const file = formData.get("data") as File | null
     const email = formData.get("email") as string | null
     const sessionId = formData.get("sessionId") as string | null
 
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
 
     // Prepare data for n8n
     const n8nFormData = new FormData()
-    n8nFormData.append("data0", file)
+    n8nFormData.append("data", file)
     n8nFormData.append("email", email)
     n8nFormData.append("filename", file.name)
     n8nFormData.append("timestamp", new Date().toISOString())
