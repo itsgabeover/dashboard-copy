@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,6 @@ import { Progress } from "@/components/ui/progress"
 import { AlertTriangle, Lightbulb, Flag, ChevronRight, Info } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { ParsedPolicyData, PolicySection } from "@/types/policy"
-import { fetchPolicyData } from "@/lib/api"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
@@ -29,7 +28,6 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
       .select("*")
       .eq("email", email.toLowerCase().trim())
       .order("created_at", { ascending: false })
-      .limit(1)
 
     if (supabaseError || !data?.length) {
       setError("No policy analysis found for this email")
@@ -66,6 +64,40 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
   )
 }
 
+const PolicySelection = ({
+  policies,
+  onSelect,
+}: {
+  policies: Array<{
+    policy_name: string
+    created_at: string
+    analysis_data: ParsedPolicyData
+  }>
+  onSelect: (policy: any) => void
+}) => {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <Card className="w-full max-w-md mx-4">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold text-[#4361EE]">Select a Policy to View</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {policies.map((policy, index) => (
+            <button
+              key={index}
+              onClick={() => onSelect(policy)}
+              className="w-full p-4 text-left border rounded-lg hover:border-[#4361EE] transition-colors"
+            >
+              <div className="font-medium text-[#4361EE]">{policy.policy_name}</div>
+              <div className="text-sm text-gray-500">Uploaded: {new Date(policy.created_at).toLocaleDateString()}</div>
+            </button>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
 const getHealthDescription = (score: number): string => {
   if (score >= 90) return "Excellent"
   if (score >= 80) return "Very Good"
@@ -80,55 +112,50 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isVerified, setIsVerified] = useState(false)
+  const [policies, setPolicies] = useState<any[]>([])
+  const [showPolicySelection, setShowPolicySelection] = useState(false)
 
-  const loadPolicyData = async (email?: string) => {
+  const loadPolicies = useCallback(async (email: string) => {
     try {
-      if (email) {
-        const { data, error: supabaseError } = await supabase
-          .from("policies")
-          .select("*")
-          .eq("email", email.toLowerCase())
-          .order("created_at", { ascending: false })
-          .limit(1)
+      const { data, error: supabaseError } = await supabase
+        .from("policies")
+        .select("*")
+        .eq("email", email.toLowerCase())
+        .order("created_at", { ascending: false })
 
-        if (supabaseError) throw supabaseError
-        if (!data?.length) throw new Error("No policy data found")
+      if (supabaseError) throw supabaseError
+      if (!data?.length) throw new Error("No policy data found")
 
-        setPolicyData(data[0].analysis_data as ParsedPolicyData)
-        if (data[0].analysis_data.data.sections?.length > 0) {
-          setSelectedSection(data[0].analysis_data.data.sections[0])
-        }
-      } else {
-        const data = await fetchPolicyData()
-        if (data) {
-          setPolicyData(data)
-          if (data.data.sections && data.data.sections.length > 0) {
-            setSelectedSection(data.data.sections[0])
-          }
-        } else {
-          setError("No policy data available")
-        }
-      }
+      setPolicies(data)
+      setShowPolicySelection(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred while fetching policy data")
+      setError(err instanceof Error ? err.message : "An error occurred while fetching policies")
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("userEmail")
     if (storedEmail) {
       setIsVerified(true)
-      loadPolicyData(storedEmail)
+      loadPolicies(storedEmail)
     } else {
       setIsLoading(false)
     }
-  }, [loadPolicyData]) // Added loadPolicyData to dependencies
+  }, [loadPolicies])
 
   const handleEmailVerified = (email: string) => {
     setIsVerified(true)
-    loadPolicyData(email)
+    loadPolicies(email)
+  }
+
+  const handlePolicySelect = (policy: any) => {
+    setPolicyData(policy.analysis_data)
+    setShowPolicySelection(false)
+    if (policy.analysis_data.data.sections?.length > 0) {
+      setSelectedSection(policy.analysis_data.data.sections[0])
+    }
   }
 
   if (isLoading) {
@@ -137,6 +164,10 @@ export default function Dashboard() {
 
   if (!isVerified) {
     return <EmailVerification onVerify={handleEmailVerified} />
+  }
+
+  if (showPolicySelection) {
+    return <PolicySelection policies={policies} onSelect={handlePolicySelect} />
   }
 
   if (error || !policyData) {
@@ -150,6 +181,7 @@ export default function Dashboard() {
                 onClick={() => {
                   localStorage.removeItem("userEmail")
                   setIsVerified(false)
+                  setShowPolicySelection(false)
                 }}
                 className="bg-[#4361EE] text-white hover:bg-[#3651DE]"
               >
