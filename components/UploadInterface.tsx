@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { v4 as uuidv4 } from "uuid"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
+type Database = any // Replace 'any' with your actual database type
+
 interface UploadInterfaceProps {
   token: string
 }
