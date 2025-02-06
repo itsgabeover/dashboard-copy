@@ -103,14 +103,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Update Supabase status
-    const { error: supabaseError } = await supabase
-      .from("policies")
-      .update({ status: "processing" })
-      .match({ session_id: sessionId })
+const { error: supabaseError } = await supabase
+  .from("policies")
+  .update({ 
+    status: "processing",
+    updated_at: new Date().toISOString()
+  })
+  .match({ session_id: sessionId })
 
-    if (supabaseError) {
-      console.error("Supabase update error:", supabaseError)
-    }
+if (supabaseError) {
+  console.error("Supabase update error:", supabaseError)
+  // Don't throw here, just log the error as it's not critical
+}
 
     // Prepare data for n8n
     const n8nFormData = new FormData()
