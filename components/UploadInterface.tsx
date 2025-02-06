@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Upload } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { v4 as uuidv4 } from 'uuid'
-import { supabase } from '@/lib/supabase'
+import { v4 as uuidv4 } from "uuid"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 interface UploadInterfaceProps {
   token: string
@@ -27,6 +27,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [sessionId, setSessionId] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
     console.log("UploadInterface mounted with token:", token)
@@ -85,19 +86,17 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     setIsUploading(true)
     setError(null)
 
-try {
+    try {
       // First, create a record in Supabase
-      const { error: supabaseError } = await supabase
-        .from('policies')
-        .insert([
-          {
-            session_id: sessionId,
-            email: email.trim(),
-            policy_name: file.name,
-            status: 'uploading',
-            analysis_data: {} // Empty object initially
-          }
-        ])
+      const { error: supabaseError } = await supabase.from("policies").insert([
+        {
+          session_id: sessionId,
+          email: email.trim(),
+          policy_name: file.name,
+          status: "uploading",
+          analysis_data: {}, // Empty object initially
+        },
+      ])
 
       if (supabaseError) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
@@ -106,20 +105,11 @@ try {
       console.log("Starting upload with token:", token)
       const formData = new FormData()
       formData.append("data0", file)
-      formData.append('email', email.trim())
-      formData.append('filename', file.name)
-      formData.append('timestamp', new Date().toISOString())
-      formData.append('token', token)
-      formData.append('sessionId', sessionId)
-
-      console.log("Sending request to /api/upload")
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      })
+      formData.append("email", email.trim())
+      formData.append("filename", file.name)
+      formData.append("timestamp", new Date().toISOString())
+      formData.append("token", token)
+      formData.append("sessionId", sessionId)
 
       console.log("Sending request to /api/upload")
       const response = await fetch("/api/upload", {
@@ -146,8 +136,8 @@ try {
       }
 
       // Store session info in localStorage for dashboard access
-      localStorage.setItem('currentSessionId', sessionId)
-      localStorage.setItem('userEmail', email.trim())
+      localStorage.setItem("currentSessionId", sessionId)
+      localStorage.setItem("userEmail", email.trim())
 
       setFile(null)
       if (fileInputRef.current) {
@@ -159,12 +149,9 @@ try {
     } catch (error) {
       console.error("Upload failed:", error)
       setError(error instanceof Error ? error.message : "An error occurred during upload. Please try again.")
-      
+
       // Clean up failed upload from Supabase
-      await supabase
-        .from('policies')
-        .delete()
-        .match({ session_id: sessionId })
+      await supabase.from("policies").delete().match({ session_id: sessionId })
     } finally {
       setIsUploading(false)
     }
@@ -235,3 +222,4 @@ try {
     </section>
   )
 }
+
