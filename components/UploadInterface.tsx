@@ -116,7 +116,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       })
 
       // Append file and other data directly (no metadata object)
-      formData.append("data0", file)
+      formData.append("data", file)
       formData.append("email", email.trim())
       formData.append("filename", file.name)
       formData.append("timestamp", new Date().toISOString())
