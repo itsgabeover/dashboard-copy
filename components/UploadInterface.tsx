@@ -88,39 +88,49 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     setError(null)
 
     try {
-      // Generate sessionId using token
-      const sessionId = token.includes('_mock') ? 'mock_session' : token
+ // Generate sessionId using token
+const sessionId = token.includes('_mock') ? 'mock_session' : token
 
-      // Create Supabase record first
-      const { error: supabaseError } = await supabase
-        .from("policies")
-        .insert([
-          {
-            session_id: sessionId,
-            email: email.trim(),
-            policy_name: file.name,
-            status: "uploading",
-            analysis_data: {},
-          },
-        ])
+// Log the data we're about to insert
+console.log('Attempting Supabase insert with:', {
+  policy_name: file.name,
+  email: email.trim(),
+  session_id: sessionId,
+  status: 'uploading',
+  analysis_data: {},
+  updated_at: new Date().toISOString()
+})
 
-      if (supabaseError) {
-        throw new Error(`Supabase error: ${supabaseError.message}`)
-      }
+// Create Supabase record first
+const { error: supabaseError } = await supabase
+  .from('policies')
+  .insert({
+    policy_name: file.name,
+    email: email.trim(),
+    session_id: sessionId,
+    status: 'uploading',
+    analysis_data: {},
+    updated_at: new Date().toISOString()
+  })
 
-      // Create FormData
-      const formData = new FormData()
-      formData.append("file", file)
-      formData.append("email", email.trim())
+if (supabaseError) {
+  console.error('Supabase error:', supabaseError)
+  throw new Error(`Supabase error: ${supabaseError.message}`)
+}
 
-      // Log the request details
-      console.log("Uploading file:", {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        email: email.trim(),
-        sessionId
-      })
+// Create FormData
+const formData = new FormData()
+formData.append("file", file)
+formData.append("email", email.trim())
+
+// Log the request details
+console.log("Uploading file:", {
+  name: file.name,
+  size: file.size,
+  type: file.type,
+  email: email.trim(),
+  sessionId
+})
 
       // Make the upload request
       const response = await fetch("/api/upload", {
