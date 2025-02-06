@@ -26,14 +26,17 @@ export interface PolicyOverview {
 }
 
 export interface ParsedPolicyData {
+  sessionId: string  // Added sessionId at root level
   data: {
     values: PolicyValue[]
     sections: PolicySection[]
     finalThoughts: string
     policyOverview: PolicyOverview
+    email: string    // Added email inside data object
   }
   status: "completed" | string
   updated_at: string
+  timestamp?: string // Added optional timestamp
 }
 
 export interface APIResponse {
@@ -43,11 +46,10 @@ export interface APIResponse {
 }
 
 // New types to support the updated dashboard code
-
 export interface Policy {
   policy_name: string
   created_at: string
   analysis_data: ParsedPolicyData
   email: string
+  session_id: string  // Added to match Supabase schema
 }
-
