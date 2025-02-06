@@ -85,7 +85,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     setIsUploading(true)
     setError(null)
 
-    try {
+try {
       // First, create a record in Supabase
       const { error: supabaseError } = await supabase
         .from('policies')
@@ -103,15 +103,23 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
       }
 
+      console.log("Starting upload with token:", token)
       const formData = new FormData()
-      formData.append("data0", file, file.name)  // Keep data0 since n8n expects it
+      formData.append("data0", file)
       formData.append('email', email.trim())
       formData.append('filename', file.name)
       formData.append('timestamp', new Date().toISOString())
       formData.append('token', token)
       formData.append('sessionId', sessionId)
-        }),
-      )
+
+      console.log("Sending request to /api/upload")
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
 
       console.log("Sending request to /api/upload")
       const response = await fetch("/api/upload", {
