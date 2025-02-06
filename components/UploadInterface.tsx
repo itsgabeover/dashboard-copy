@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input"
 import { Upload } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { v4 as uuidv4 } from 'uuid'
+import { supabase } from '@/lib/supabase'
 
 interface UploadInterfaceProps {
   token: string
@@ -23,11 +25,13 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const [sessionId, setSessionId] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     console.log("UploadInterface mounted with token:", token)
     console.log("Is mock token:", token.includes("_mock"))
+    setSessionId(uuidv4())
   }, [token])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,6 +86,23 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     setError(null)
 
     try {
+      // First, create a record in Supabase
+      const { error: supabaseError } = await supabase
+        .from('policies')
+        .insert([
+          {
+            session_id: sessionId,
+            email: email.trim(),
+            policy_name: file.name,
+            status: 'uploading',
+            analysis_data: {} // Empty object initially
+          }
+        ])
+
+      if (supabaseError) {
+        throw new Error(`Supabase error: ${supabaseError.message}`)
+      }
+
       console.log("Starting upload with token:", token)
       const formData = new FormData()
       formData.append("data0", file)
@@ -90,6 +111,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         JSON.stringify({
           email: email.trim(),
           token: token,
+          sessionId: sessionId
         }),
       )
 
@@ -117,16 +139,26 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(data.error || data.message || "Upload failed")
       }
 
+      // Store session info in localStorage for dashboard access
+      localStorage.setItem('currentSessionId', sessionId)
+      localStorage.setItem('userEmail', email.trim())
+
       setFile(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
 
-      // Redirect to processing page instead of success page
+      // Redirect to processing page
       router.push("/processing")
     } catch (error) {
       console.error("Upload failed:", error)
       setError(error instanceof Error ? error.message : "An error occurred during upload. Please try again.")
+      
+      // Clean up failed upload from Supabase
+      await supabase
+        .from('policies')
+        .delete()
+        .match({ session_id: sessionId })
     } finally {
       setIsUploading(false)
     }
@@ -197,4 +229,3 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     </section>
   )
 }
-
