@@ -143,7 +143,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       let data: UploadResponse
       try {
         data = JSON.parse(responseText)
-      } catch (e) {
+      } catch {
         console.error("Failed to parse response:", responseText)
         throw new Error("Invalid response from server")
       }
