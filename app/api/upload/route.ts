@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { createClient } from 'redis'
+import { supabase } from '@/lib/supabase'
 
 type TokenData = {
   token: string
@@ -58,9 +59,9 @@ export async function POST(req: NextRequest) {
 
     // Get form data
     const formData = await req.formData()
-    const file = formData.get('file') as File | null
-    const email = formData.get('email') as string | null
-
+    const file = formData.get('data0') as File | null
+    const metadataStr = formData.get('metadata') as string | null
+    
     // Validate file
     if (!file) {
       return NextResponse.json(
@@ -69,16 +70,42 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Parse metadata
+    let metadata: { email: string; token: string; sessionId: string } | null = null
+    try {
+      metadata = metadataStr ? JSON.parse(metadataStr) : null
+    } catch (e) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid metadata format' },
+        { status: 400 }
+      )
+    }
+
+    if (!metadata?.sessionId) {
+      return NextResponse.json(
+        { success: false, error: 'Session ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Update Supabase status
+    const { error: supabaseError } = await supabase
+      .from('policies')
+      .update({ status: 'processing' })
+      .match({ session_id: metadata.sessionId })
+
+    if (supabaseError) {
+      console.error('Supabase update error:', supabaseError)
+    }
+
     // Prepare data for n8n
     const n8nFormData = new FormData()
     n8nFormData.append('data0', file, file.name)
-    if (email) {
-      n8nFormData.append('email', email)
-    }
+    n8nFormData.append('email', metadata.email || '')
     n8nFormData.append('filename', file.name)
     n8nFormData.append('timestamp', new Date().toISOString())
     n8nFormData.append('token', token)
-    n8nFormData.append('sessionId', isMockToken ? 'mock_session' : token)
+    n8nFormData.append('sessionId', metadata.sessionId)
 
     // Send to n8n webhook
     const response = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT!, {
@@ -97,7 +124,7 @@ export async function POST(req: NextRequest) {
         used: "true",
         created: new Date().toISOString(),
         expires: new Date(Date.now() + 1800000).toISOString(),
-        sessionId: token
+        sessionId: metadata.sessionId
       }
       
       const redisPromises = [
@@ -117,7 +144,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'File uploaded successfully'
+      message: 'File uploaded successfully',
+      sessionId: metadata.sessionId
     })
   } catch (error) {
     console.error('Upload processing error:', error)
