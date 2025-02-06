@@ -103,15 +103,13 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
       }
 
-      console.log("Starting upload with token:", token)
       const formData = new FormData()
-      formData.append("data0", file)
-      formData.append(
-        "metadata",
-        JSON.stringify({
-          email: email.trim(),
-          token: token,
-          sessionId: sessionId
+      formData.append("data0", file, file.name)  // Keep data0 since n8n expects it
+      formData.append('email', email.trim())
+      formData.append('filename', file.name)
+      formData.append('timestamp', new Date().toISOString())
+      formData.append('token', token)
+      formData.append('sessionId', sessionId)
         }),
       )
 
