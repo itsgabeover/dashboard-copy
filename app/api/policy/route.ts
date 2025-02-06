@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     console.log("Received policy data:", policyData)
     
     // Get sessionId from the policy data
-    const sessionId = policyData.sessionId || policyData.data?.sessionId
+    const sessionId = policyData.sessionId
     if (!sessionId) {
       console.error("No sessionId provided in policy data")
       return NextResponse.json({ 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           status: 'completed',
           updated_at: new Date().toISOString(),
           session_id: sessionId,
-          email: policyData.data?.email
+          email: policyData.data.email
         })
 
       if (insertError) {
@@ -123,16 +123,4 @@ export async function GET(request: NextRequest) {
       details: error instanceof Error ? error.message : "Unknown error"
     } as APIResponse, { status: 500 })
   }
-}
-
-// Add OPTIONS handler for CORS if needed
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    },
-  })
 }
