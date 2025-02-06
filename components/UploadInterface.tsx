@@ -9,8 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { v4 as uuidv4 } from "uuid"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
-type Database = any // Replace 'any' with your actual database type
-
 interface UploadInterfaceProps {
   token: string
 }
@@ -78,7 +76,10 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
   }
 
   const handleUpload = async () => {
-    if (!file || !email) return
+    if (!file || !email) {
+      setError("Please provide both file and email")
+      return
+    }
 
     if (!validateEmail(email)) {
       setError("Please enter a valid email address.")
@@ -96,7 +97,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
           email: email.trim(),
           policy_name: file.name,
           status: "uploading",
-          analysis_data: {}, // Empty object initially
+          analysis_data: {},
         },
       ])
 
@@ -104,7 +105,15 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
       }
 
-      console.log("Starting upload with token:", token)
+      // Prepare form data with explicit logging
+      console.log("Preparing upload with:", {
+        fileSize: file.size,
+        fileName: file.name,
+        email: email.trim(),
+        sessionId,
+        token: token.substring(0, 10) + "...", // Log partial token for debugging
+      })
+
       const formData = new FormData()
       formData.append("data0", file)
       formData.append("email", email.trim())
@@ -113,7 +122,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       formData.append("token", token)
       formData.append("sessionId", sessionId)
 
-      console.log("Sending request to /api/upload")
+      // Make the upload request
       const response = await fetch("/api/upload", {
         method: "POST",
         headers: {
@@ -128,16 +137,16 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       let data: UploadResponse
       try {
         data = JSON.parse(responseText)
-      } catch {
-        console.log("Response is not JSON:", responseText)
-        data = { success: response.ok, message: responseText }
+      } catch (e) {
+        console.error("Failed to parse response:", responseText)
+        throw new Error("Invalid response from server")
       }
 
       if (!response.ok) {
         throw new Error(data.error || data.message || "Upload failed")
       }
 
-      // Store session info in localStorage for dashboard access
+      // Success path
       localStorage.setItem("currentSessionId", sessionId)
       localStorage.setItem("userEmail", email.trim())
 
@@ -146,7 +155,6 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         fileInputRef.current.value = ""
       }
 
-      // Redirect to processing page
       router.push("/processing")
     } catch (error) {
       console.error("Upload failed:", error)
