@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input"
 import { Upload } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { v4 as uuidv4 } from "uuid"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 interface UploadInterfaceProps {
@@ -17,6 +16,7 @@ interface UploadResponse {
   success: boolean
   message?: string
   error?: string
+  sessionId?: string
 }
 
 export function UploadInterface({ token }: UploadInterfaceProps) {
@@ -25,14 +25,12 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
   const [file, setFile] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
-  const [sessionId, setSessionId] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClientComponentClient()
 
   useEffect(() => {
     console.log("UploadInterface mounted with token:", token)
     console.log("Is mock token:", token.includes("_mock"))
-    setSessionId(uuidv4())
   }, [token])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,47 +88,39 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     setError(null)
 
     try {
-      // First, create a record in Supabase
-      const { error: supabaseError } = await supabase.from("policies").insert([
-        {
-          session_id: sessionId,
-          email: email.trim(),
-          policy_name: file.name,
-          status: "uploading",
-          analysis_data: {},
-        },
-      ])
+      // Generate sessionId using token
+      const sessionId = token.includes('_mock') ? 'mock_session' : token
+
+      // Create Supabase record first
+      const { error: supabaseError } = await supabase
+        .from("policies")
+        .insert([
+          {
+            session_id: sessionId,
+            email: email.trim(),
+            policy_name: file.name,
+            status: "uploading",
+            analysis_data: {},
+          },
+        ])
 
       if (supabaseError) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
       }
 
-       // Create FormData
+      // Create FormData
       const formData = new FormData()
-
-      // Log file details before upload
-      console.log("File details:", {
-        name: file.name,
-        type: file.type,
-        size: file.size,
-      })
-
-      // Append file and other data directly (no metadata object)
-      formData.append("data0", file)
+      formData.append("file", file)
       formData.append("email", email.trim())
-      formData.append("filename", file.name)
-      formData.append("timestamp", new Date().toISOString())
-      formData.append("token", token)
-      formData.append("sessionId", sessionId)
 
-      // Enhanced logging before sending
-      console.log("About to send FormData with entries:")
-      for (const [key, value] of formData.entries()) {
-        console.log(`Key: ${key}, Value type: ${value instanceof File ? 'File' : typeof value}`)
-        if (value instanceof File) {
-          console.log(`File details: name=${value.name}, type=${value.type}, size=${value.size}`)
-        }
-      }
+      // Log the request details
+      console.log("Uploading file:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        email: email.trim(),
+        sessionId
+      })
 
       // Make the upload request
       const response = await fetch("/api/upload", {
@@ -142,7 +132,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       })
 
       const responseText = await response.text()
-      console.log("API response:", responseText)
+      console.log("Upload response:", responseText)
 
       let data: UploadResponse
       try {
@@ -156,22 +146,28 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(data.error || data.message || "Upload failed")
       }
 
-      // Success path
+      // Store session info
       localStorage.setItem("currentSessionId", sessionId)
       localStorage.setItem("userEmail", email.trim())
 
+      // Clear form
       setFile(null)
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
 
+      // Redirect to processing page
       router.push("/processing")
     } catch (error) {
       console.error("Upload failed:", error)
       setError(error instanceof Error ? error.message : "An error occurred during upload. Please try again.")
 
-      // Clean up failed upload from Supabase
-      await supabase.from("policies").delete().match({ session_id: sessionId })
+      // Clean up failed Supabase record
+      const sessionId = token.includes('_mock') ? 'mock_session' : token
+      await supabase
+        .from("policies")
+        .delete()
+        .match({ session_id: sessionId })
     } finally {
       setIsUploading(false)
     }
@@ -248,4 +244,3 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     </section>
   )
 }
-
