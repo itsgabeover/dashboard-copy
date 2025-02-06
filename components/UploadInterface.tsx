@@ -105,7 +105,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
       }
 
-      // Create FormData
+       // Create FormData
       const formData = new FormData()
 
       // Log file details before upload
@@ -123,9 +123,13 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       formData.append("token", token)
       formData.append("sessionId", sessionId)
 
-      // Log FormData entries for debugging
+      // Enhanced logging before sending
+      console.log("About to send FormData with entries:")
       for (const [key, value] of formData.entries()) {
-        console.log(`FormData entry - ${key}:`, value instanceof File ? value.name : value)
+        console.log(`Key: ${key}, Value type: ${value instanceof File ? 'File' : typeof value}`)
+        if (value instanceof File) {
+          console.log(`File details: name=${value.name}, type=${value.type}, size=${value.size}`)
+        }
       }
 
       // Make the upload request
