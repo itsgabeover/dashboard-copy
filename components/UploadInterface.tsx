@@ -105,7 +105,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
       }
 
-      // Create FormData and append file
+      // Create FormData
       const formData = new FormData()
 
       // Log file details before upload
@@ -115,32 +115,24 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         size: file.size,
       })
 
-      // Append file with specific content type
-      formData.append("data0", file, file.name)
-
-      // Create metadata object
-      const metadata = {
-        email: email.trim(),
-        filename: file.name,
-        timestamp: new Date().toISOString(),
-        token,
-        sessionId,
-      }
-
-      // Append metadata as JSON string
-      formData.append("metadata", JSON.stringify(metadata))
+      // Append file and other data directly (no metadata object)
+      formData.append("data0", file)
+      formData.append("email", email.trim())
+      formData.append("filename", file.name)
+      formData.append("timestamp", new Date().toISOString())
+      formData.append("token", token)
+      formData.append("sessionId", sessionId)
 
       // Log FormData entries for debugging
       for (const [key, value] of formData.entries()) {
         console.log(`FormData entry - ${key}:`, value instanceof File ? value.name : value)
       }
 
-      // Make the upload request with proper headers
+      // Make the upload request
       const response = await fetch("/api/upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          // Do not set Content-Type header, let browser set it with boundary
         },
         body: formData,
       })
@@ -151,7 +143,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       let data: UploadResponse
       try {
         data = JSON.parse(responseText)
-      } catch {
+      } catch (e) {
         console.error("Failed to parse response:", responseText)
         throw new Error("Invalid response from server")
       }
