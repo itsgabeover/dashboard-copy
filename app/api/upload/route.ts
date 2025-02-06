@@ -105,33 +105,26 @@ export async function POST(req: NextRequest) {
       console.error("Supabase update error:", supabaseError)
     }
 
-    // Validate upload endpoint
-    if (!process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT) {
-      throw new Error("Upload endpoint not configured")
-    }
-
-    // Prepare data for n8n
+      // Prepare data for n8n
     const n8nFormData = new FormData()
-    n8nFormData.append("data", file)
-    n8nFormData.append("email", email)
-    n8nFormData.append("filename", file.name)
-    n8nFormData.append("timestamp", new Date().toISOString())
-    n8nFormData.append("token", token)
-    n8nFormData.append("sessionId", sessionId)
+    n8nFormData.append('data0', file, file.name)
+    if (email) {
+      n8nFormData.append('email', email)
+    }
+    n8nFormData.append('filename', file.name)
+    n8nFormData.append('timestamp', new Date().toISOString())
+    n8nFormData.append('token', token)
+    n8nFormData.append('sessionId', isMockToken ? 'mock_session' : token)
 
-    // Send to n8n webhook with debug logging
-    console.log("Sending to n8n:", process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT)
-    const response = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT, {
-      method: "POST",
-      body: n8nFormData,
+    // Send to n8n webhook
+    const response = await fetch(process.env.NEXT_PUBLIC_UPLOAD_ENDPOINT!, {
+      method: 'POST',
+      body: n8nFormData
     })
 
     if (!response.ok) {
-      const responseText = await response.text()
-      console.error("n8n processing error:", responseText)
-      throw new Error("Failed to process file with n8n")
+      throw new Error('Failed to process file with n8n')
     }
-
     // Only update Redis if it's not a mock token
     if (!isMockToken && client) {
       const tokenData = {
