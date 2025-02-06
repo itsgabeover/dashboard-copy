@@ -105,28 +105,42 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
         throw new Error(`Supabase error: ${supabaseError.message}`)
       }
 
-      // Prepare form data with explicit logging
-      console.log("Preparing upload with:", {
-        fileSize: file.size,
-        fileName: file.name,
-        email: email.trim(),
-        sessionId,
-        token: token.substring(0, 10) + "...", // Log partial token for debugging
+      // Create FormData and append file
+      const formData = new FormData()
+
+      // Log file details before upload
+      console.log("File details:", {
+        name: file.name,
+        type: file.type,
+        size: file.size,
       })
 
-      const formData = new FormData()
-      formData.append("data0", file)
-      formData.append("email", email.trim())
-      formData.append("filename", file.name)
-      formData.append("timestamp", new Date().toISOString())
-      formData.append("token", token)
-      formData.append("sessionId", sessionId)
+      // Append file with specific content type
+      formData.append("data0", file, file.name)
 
-      // Make the upload request
+      // Create metadata object
+      const metadata = {
+        email: email.trim(),
+        filename: file.name,
+        timestamp: new Date().toISOString(),
+        token,
+        sessionId,
+      }
+
+      // Append metadata as JSON string
+      formData.append("metadata", JSON.stringify(metadata))
+
+      // Log FormData entries for debugging
+      for (const [key, value] of formData.entries()) {
+        console.log(`FormData entry - ${key}:`, value instanceof File ? value.name : value)
+      }
+
+      // Make the upload request with proper headers
       const response = await fetch("/api/upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          // Do not set Content-Type header, let browser set it with boundary
         },
         body: formData,
       })
@@ -137,7 +151,7 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
       let data: UploadResponse
       try {
         data = JSON.parse(responseText)
-      } catch {
+      } catch (e) {
         console.error("Failed to parse response:", responseText)
         throw new Error("Invalid response from server")
       }
@@ -197,7 +211,13 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
               <Upload className="mx-auto mb-3 text-[#4361EE]" size={32} />
               <p className="mb-1 text-gray-600">Drag and drop your file here or click to browse</p>
               <p className="text-sm text-gray-500">Supported format: PDF (Max 2 MB)</p>
-              <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".pdf" className="hidden" />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept=".pdf,application/pdf"
+                className="hidden"
+              />
             </div>
 
             {file && <p className="text-sm text-green-600">Selected file: {file.name}</p>}
