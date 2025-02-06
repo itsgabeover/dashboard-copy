@@ -32,7 +32,7 @@ export interface ParsedPolicyData {
     finalThoughts: string
     policyOverview: PolicyOverview
   }
-  status: 'completed' | string
+  status: "completed" | string
   updated_at: string
 }
 
@@ -41,3 +41,13 @@ export interface APIResponse {
   data?: ParsedPolicyData
   error?: string
 }
+
+// New types to support the updated dashboard code
+
+export interface Policy {
+  policy_name: string
+  created_at: string
+  analysis_data: ParsedPolicyData
+  email: string
+}
+
