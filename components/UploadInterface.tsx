@@ -28,6 +28,17 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const supabase = createClientComponentClient()
 
+  const generateSessionId = (token: string) => {
+    if (token.includes('_mock')) {
+      const timestamp = Date.now()
+      const randomString = Math.random().toString(36).substring(2, 8)
+      const uniqueId = `mock_${timestamp}_${randomString}`
+      console.log('Generated unique session ID:', uniqueId)
+      return uniqueId
+    }
+    return token
+  }
+
   useEffect(() => {
     console.log("UploadInterface mounted with token:", token)
     console.log("Is mock token:", token.includes("_mock"))
@@ -88,49 +99,44 @@ export function UploadInterface({ token }: UploadInterfaceProps) {
     setError(null)
 
     try {
- // Generate sessionId using token
-const sessionId = token.includes('_mock') ? 'mock_session' : token
+      // Generate unique sessionId
+      const sessionId = generateSessionId(token)
+      console.log('Using sessionId for upload:', sessionId)
 
-// Log the data we're about to insert
-console.log('Attempting Supabase insert with:', {
-  policy_name: file.name,
-  email: email.trim(),
-  session_id: sessionId,
-  status: 'uploading',
-  analysis_data: {},
-  updated_at: new Date().toISOString()
-})
+      // Create Supabase record first
+      const { error: supabaseError } = await supabase
+        .from('policies')
+        .insert({
+          policy_name: file.name,
+          email: email.trim(),
+          session_id: sessionId,
+          status: 'uploading',
+          analysis_data: {},
+          updated_at: new Date().toISOString()
+        })
 
-// Create Supabase record first
-const { error: supabaseError } = await supabase
-  .from('policies')
-  .insert({
-    policy_name: file.name,
-    email: email.trim(),
-    session_id: sessionId,
-    status: 'uploading',
-    analysis_data: {},
-    updated_at: new Date().toISOString()
-  })
+      if (supabaseError) {
+        console.error('Supabase error:', supabaseError)
+        throw new Error(`Supabase error: ${supabaseError.message}`)
+      }
 
-if (supabaseError) {
-  console.error('Supabase error:', supabaseError)
-  throw new Error(`Supabase error: ${supabaseError.message}`)
-}
+      // Create FormData
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("email", email.trim())
+      formData.append("filename", file.name)
+      formData.append("timestamp", new Date().toISOString())
+      formData.append("token", token)
+      formData.append("sessionId", sessionId)
 
-// Create FormData
-const formData = new FormData()
-formData.append("file", file)
-formData.append("email", email.trim())
-
-// Log the request details
-console.log("Uploading file:", {
-  name: file.name,
-  size: file.size,
-  type: file.type,
-  email: email.trim(),
-  sessionId
-})
+      // Log the request details
+      console.log("Uploading file:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        email: email.trim(),
+        sessionId
+      })
 
       // Make the upload request
       const response = await fetch("/api/upload", {
@@ -172,17 +178,21 @@ console.log("Uploading file:", {
       console.error("Upload failed:", error)
       setError(error instanceof Error ? error.message : "An error occurred during upload. Please try again.")
 
-      // Clean up failed Supabase record
-      const sessionId = token.includes('_mock') ? 'mock_session' : token
-      await supabase
-        .from("policies")
-        .delete()
-        .match({ session_id: sessionId })
+      // Clean up failed Supabase record if we have a sessionId
+      try {
+        await supabase
+          .from("policies")
+          .delete()
+          .match({ session_id: generateSessionId(token) })
+      } catch (cleanupError) {
+        console.error("Failed to clean up Supabase record:", cleanupError)
+      }
     } finally {
       setIsUploading(false)
     }
   }
 
+  // JSX remains the same...
   return (
     <section className="bg-white py-16">
       <div className="container mx-auto px-4 max-w-2xl">
