@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { AlertTriangle, Lightbulb, Flag, ChevronRight, Info } from "lucide-react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import type { ParsedPolicyData, PolicySection } from "@/types/policy"
+import type { ParsedPolicyData, PolicySection, Policy } from "@/types/policy"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
@@ -68,12 +68,8 @@ const PolicySelection = ({
   policies,
   onSelect,
 }: {
-  policies: Array<{
-    policy_name: string
-    created_at: string
-    analysis_data: ParsedPolicyData
-  }>
-  onSelect: (policy: any) => void
+  policies: Policy[]
+  onSelect: (policy: Policy) => void
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -112,7 +108,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isVerified, setIsVerified] = useState(false)
-  const [policies, setPolicies] = useState<any[]>([])
+  const [policies, setPolicies] = useState<Policy[]>([])
   const [showPolicySelection, setShowPolicySelection] = useState(false)
 
   const loadPolicies = useCallback(async (email: string) => {
@@ -126,7 +122,7 @@ export default function Dashboard() {
       if (supabaseError) throw supabaseError
       if (!data?.length) throw new Error("No policy data found")
 
-      setPolicies(data)
+      setPolicies(data as Policy[])
       setShowPolicySelection(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred while fetching policies")
@@ -150,7 +146,7 @@ export default function Dashboard() {
     loadPolicies(email)
   }
 
-  const handlePolicySelect = (policy: any) => {
+  const handlePolicySelect = (policy: Policy) => {
     setPolicyData(policy.analysis_data)
     setShowPolicySelection(false)
     if (policy.analysis_data.data.sections?.length > 0) {
