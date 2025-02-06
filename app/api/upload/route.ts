@@ -56,8 +56,13 @@ export async function POST(req: NextRequest) {
     // Log the content type
     console.log("Content-Type:", req.headers.get("content-type"))
 
-    // Get form data with debug logging
+     // Get form data with enhanced debug logging
     const formData = await req.formData()
+    console.log("Raw FormData keys:", Array.from(formData.keys()))
+    console.log("Attempting to get 'data':", formData.get("data"))
+    console.log("Attempting to get 'file':", formData.get("file"))
+
+    // Keep your existing logging
     console.log(
       "FormData entries:",
       Array.from(formData.entries()).map(([key, value]) => {
