@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     let metadata: { email: string; token: string; sessionId: string } | null = null
     try {
       metadata = metadataStr ? JSON.parse(metadataStr) : null
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { success: false, error: 'Invalid metadata format' },
         { status: 400 }
