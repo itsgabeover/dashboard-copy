@@ -12,7 +12,7 @@ import type { ParsedPolicyData, PolicySection } from "@/types/policy"
 import { fetchPolicyData } from "@/lib/api"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
-import { supabase } from '@/lib/supabase'
+import { supabase } from "@/lib/supabase"
 
 const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) => {
   const [email, setEmail] = useState("")
@@ -25,10 +25,10 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
     }
 
     const { data, error: supabaseError } = await supabase
-      .from('policies')
-      .select('*')
-      .eq('email', email.toLowerCase().trim())
-      .order('created_at', { ascending: false })
+      .from("policies")
+      .select("*")
+      .eq("email", email.toLowerCase().trim())
+      .order("created_at", { ascending: false })
       .limit(1)
 
     if (supabaseError || !data?.length) {
@@ -36,7 +36,7 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
       return
     }
 
-    localStorage.setItem('userEmail', email.toLowerCase().trim())
+    localStorage.setItem("userEmail", email.toLowerCase().trim())
     onVerify(email)
   }
 
@@ -44,9 +44,7 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <Card className="w-full max-w-md mx-4">
         <CardHeader>
-          <CardTitle className="text-2xl font-semibold text-[#4361EE]">
-            View Your Policy Analysis
-          </CardTitle>
+          <CardTitle className="text-2xl font-semibold text-[#4361EE]">View Your Policy Analysis</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -59,16 +57,21 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
             />
             {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
           </div>
-          <Button
-            onClick={handleSubmit}
-            className="w-full bg-[#4361EE] text-white hover:bg-[#3651DE]"
-          >
+          <Button onClick={handleSubmit} className="w-full bg-[#4361EE] text-white hover:bg-[#3651DE]">
             View My Policy Review(s)
           </Button>
         </CardContent>
       </Card>
     </div>
   )
+}
+
+const getHealthDescription = (score: number): string => {
+  if (score >= 90) return "Excellent"
+  if (score >= 80) return "Very Good"
+  if (score >= 70) return "Good"
+  if (score >= 60) return "Fair"
+  return "Needs Improvement"
 }
 
 export default function Dashboard() {
@@ -82,10 +85,10 @@ export default function Dashboard() {
     try {
       if (email) {
         const { data, error: supabaseError } = await supabase
-          .from('policies')
-          .select('*')
-          .eq('email', email.toLowerCase())
-          .order('created_at', { ascending: false })
+          .from("policies")
+          .select("*")
+          .eq("email", email.toLowerCase())
+          .order("created_at", { ascending: false })
           .limit(1)
 
         if (supabaseError) throw supabaseError
@@ -114,14 +117,14 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem('userEmail')
+    const storedEmail = localStorage.getItem("userEmail")
     if (storedEmail) {
       setIsVerified(true)
       loadPolicyData(storedEmail)
     } else {
       setIsLoading(false)
     }
-  }, [])
+  }, [loadPolicyData]) // Added loadPolicyData to dependencies
 
   const handleEmailVerified = (email: string) => {
     setIsVerified(true)
@@ -145,7 +148,7 @@ export default function Dashboard() {
               <p className="text-red-600 mb-4">{error || "Failed to load policy data"}</p>
               <Button
                 onClick={() => {
-                  localStorage.removeItem('userEmail')
+                  localStorage.removeItem("userEmail")
                   setIsVerified(false)
                 }}
                 className="bg-[#4361EE] text-white hover:bg-[#3651DE]"
@@ -157,6 +160,7 @@ export default function Dashboard() {
         </Card>
       </div>
     )
+  }
 
   const healthScore = 85 // This should be dynamically calculated based on your logic
 
