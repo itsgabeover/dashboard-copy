@@ -16,15 +16,26 @@ import {
   FileCheck,
   Inbox,
   Activity,
+  type LucideIcon,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { ReactNode } from "react"
 
-type SlideContent =
-  | string[]
-  | { text: string; description: string; icon: any; color: string }[]
-  | { email: string[]; pdf: string[] }
-type Slide = {
+type SlideContent = string[] | IconContent[] | EmailPdfContent
+
+interface IconContent {
+  text: string
+  description: string
+  icon: LucideIcon
+  color: string
+}
+
+interface EmailPdfContent {
+  email: string[]
+  pdf: string[]
+}
+
+interface Slide {
   id: number
   title: string
   subtext: string
@@ -155,26 +166,45 @@ const itemFade: Variants = {
 
 const isStringArray = (content: SlideContent): content is string[] =>
   Array.isArray(content) && typeof content[0] === "string"
-const isIconArray = (
-  content: SlideContent,
-): content is { text: string; description: string; icon: any; color: string }[] =>
-  Array.isArray(content) && typeof content[0] === "object" && "text" in content[0]
-const isEmailPdfContent = (content: SlideContent): content is { email: string[]; pdf: string[] } =>
-  typeof content === "object" && "email" in content && "pdf" in content
+
+const isIconArray = (content: SlideContent): content is IconContent[] =>
+  Array.isArray(content) && typeof content[0] === "object" && "icon" in content[0]
+
+const isEmailPdfContent = (content: SlideContent): content is EmailPdfContent =>
+  !Array.isArray(content) && "email" in content && "pdf" in content
 
 export default function ProcessingPage() {
   const router = useRouter()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [progress, setProgress] = useState(0)
 
+  // Progress update effect
   useEffect(() => {
     const interval = setInterval(() => {
-      setProgress((prevProgress) => Math.min(prevProgress + 1, 100))
-    }, 20)
+      setProgress((prevProgress) => {
+        const newProgress = Math.min(prevProgress + 1, 100)
+        return newProgress
+      })
+    }, 1000) // Update every second
 
     return () => clearInterval(interval)
   }, [])
 
+  // Slide change effect
+  useEffect(() => {
+    const slideInterval = setInterval(() => {
+      setCurrentSlide((prev) => {
+        if (prev < slides.length - 1) {
+          return prev + 1
+        }
+        return prev
+      })
+    }, 20000) // Change slide every 20 seconds
+
+    return () => clearInterval(slideInterval)
+  }, [])
+
+  // Redirect effect
   useEffect(() => {
     if (progress === 100) {
       setTimeout(() => {
