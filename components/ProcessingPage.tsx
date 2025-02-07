@@ -4,8 +4,21 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
 import { CheckCircle, Star, Eye, AlertTriangle, FileText, BarChart, PieChart, TrendingUp } from "lucide-react"
+import type React from "react" // Import React
 
-const slides = [
+type SlideContent =
+  | string[]
+  | { text: string; description: string; icon: React.ElementType; color: string }[]
+  | { email: string[]; pdf: string[] }
+
+interface Slide {
+  id: number
+  title: string
+  subtext: string
+  content: SlideContent
+}
+
+const slides: Slide[] = [
   {
     id: 1,
     title: "Analyzing Your Policy",
@@ -55,10 +68,10 @@ const slides = [
     title: "Your Interactive Experience",
     subtext: "Explore your policy insights through our intuitive dashboard.",
     content: [
-      { text: "Overview", description: "Your policy at a glance.", icon: PieChart },
-      { text: "Policy Details", description: "Deep dive into your coverage.", icon: FileText },
-      { text: "AI Analysis", description: "Insights and recommendations.", icon: BarChart },
-      { text: "Projections", description: "Future value and growth.", icon: TrendingUp },
+      { text: "Overview", description: "Your policy at a glance.", icon: PieChart, color: "text-blue-500" },
+      { text: "Policy Details", description: "Deep dive into your coverage.", icon: FileText, color: "text-blue-500" },
+      { text: "AI Analysis", description: "Insights and recommendations.", icon: BarChart, color: "text-blue-500" },
+      { text: "Projections", description: "Future value and growth.", icon: TrendingUp, color: "text-blue-500" },
     ],
   },
   {
@@ -120,6 +133,68 @@ export default function ProcessingPage() {
 
   const currentSlideData = slides[currentSlide]
 
+  const renderContent = (content: SlideContent) => {
+    if (Array.isArray(content)) {
+      if (typeof content[0] === "string") {
+        return (
+          <ul className="space-y-4">
+            {content.map((item, index) => (
+              <motion.li
+                key={index}
+                className="flex items-center space-x-2"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.5 }}
+              >
+                <CheckCircle className="text-green-500" />
+                <span>{item}</span>
+              </motion.li>
+            ))}
+          </ul>
+        )
+      } else {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {content.map((item, index) => (
+              <motion.div
+                key={index}
+                className="flex flex-col items-center text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.5 }}
+              >
+                <item.icon className={`w-12 h-12 ${item.color} mb-2`} />
+                <h3 className={`font-semibold ${item.color} mb-1`}>{item.text}</h3>
+                <p className="text-sm text-gray-600">{item.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        )
+      }
+    } else {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <motion.div className="space-y-4" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+            <h3 className="font-semibold text-blue-600">Clear Email Summary</h3>
+            <ul className="list-disc list-inside">
+              {content.email.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </motion.div>
+          <motion.div className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+            <h3 className="font-semibold text-blue-600">Expert PDF Report</h3>
+            <ul className="list-disc list-inside">
+              {content.pdf.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+      )
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-100 p-4">
       <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg p-8">
@@ -169,97 +244,7 @@ export default function ProcessingPage() {
             variants={fadeInUp}
             transition={transition}
           >
-            {currentSlide === 0 && (
-              <ul className="space-y-4">
-                {currentSlideData.content.map((item, index) => (
-                  <motion.li
-                    key={index}
-                    className="flex items-center space-x-2"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.5 }}
-                  >
-                    <CheckCircle className="text-green-500" />
-                    <span>{item}</span>
-                  </motion.li>
-                ))}
-              </ul>
-            )}
-
-            {currentSlide === 1 && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {currentSlideData.content.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className="flex flex-col items-center text-center"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.5 }}
-                  >
-                    <item.icon className={`w-12 h-12 ${item.color} mb-2`} />
-                    <h3 className={`font-semibold ${item.color} mb-1`}>{item.text}</h3>
-                    <p className="text-sm text-gray-600">{item.description}</p>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-
-            {currentSlide === 2 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <motion.div className="space-y-4" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h3 className="font-semibold text-blue-600">Clear Email Summary</h3>
-                  <ul className="list-disc list-inside">
-                    {currentSlideData.content.email.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </motion.div>
-                <motion.div className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h3 className="font-semibold text-blue-600">Expert PDF Report</h3>
-                  <ul className="list-disc list-inside">
-                    {currentSlideData.content.pdf.map((item, index) => (
-                      <li key={index}>{item}</li>
-                    ))}
-                  </ul>
-                </motion.div>
-              </div>
-            )}
-
-            {currentSlide === 3 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {currentSlideData.content.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className="flex items-center space-x-4"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.3 }}
-                  >
-                    <item.icon className="w-8 h-8 text-blue-500" />
-                    <div>
-                      <h3 className="font-semibold text-blue-600">{item.text}</h3>
-                      <p className="text-sm text-gray-600">{item.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            )}
-
-            {currentSlide === 4 && (
-              <ul className="space-y-4">
-                {currentSlideData.content.map((item, index) => (
-                  <motion.li
-                    key={index}
-                    className="text-center"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.5 }}
-                  >
-                    <p className="text-lg font-semibold text-blue-600">{item.text}</p>
-                  </motion.li>
-                ))}
-              </ul>
-            )}
+            {renderContent(currentSlideData.content)}
           </motion.div>
         </AnimatePresence>
 
