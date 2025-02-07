@@ -18,12 +18,35 @@ import {
   Activity,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type React from "react" // Added import for React
+import type { ReactNode } from "react"
 
-type SlideContent =
-  | string[]
-  | { text: string; description: string; icon: React.ElementType; color: string }[]
-  | { email: string[]; pdf: string[] }
+// Define more specific types for content
+type StringContent = string[]
+type IconContent = Array<{
+  text: string
+  description: string
+  icon: React.ElementType
+  color: string
+}>
+type EmailPdfContent = {
+  email: string[]
+  pdf: string[]
+}
+
+type SlideContent = StringContent | IconContent | EmailPdfContent
+
+// Type guard functions
+function isStringArray(content: SlideContent): content is StringContent {
+  return Array.isArray(content) && typeof content[0] === "string"
+}
+
+function isIconArray(content: SlideContent): content is IconContent {
+  return Array.isArray(content) && typeof content[0] === "object" && "icon" in content[0]
+}
+
+function isEmailPdfContent(content: SlideContent): content is EmailPdfContent {
+  return !Array.isArray(content) && "email" in content && "pdf" in content
+}
 
 interface Slide {
   id: number
@@ -182,46 +205,48 @@ export default function ProcessingPage() {
 
   const currentSlideData = slides[currentSlide]
 
-  const renderContent = (content: SlideContent) => {
-    if (Array.isArray(content)) {
-      if (typeof content[0] === "string") {
-        return (
-          <motion.ul className="space-y-6" variants={staggerItems} initial="initial" animate="animate">
-            {content.map((item, index) => (
-              <motion.li key={index} className="flex items-center space-x-3" variants={itemFade}>
-                <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
-                <span className="text-gray-700">{item}</span>
-              </motion.li>
-            ))}
-          </motion.ul>
-        )
-      } else {
-        return (
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-            variants={staggerItems}
-            initial="initial"
-            animate="animate"
-          >
-            {content.map((item, index) => (
-              <motion.div key={index} className="relative group" variants={itemFade}>
-                <Card className="h-full transition-all duration-300 hover:shadow-lg">
-                  <CardHeader className="space-y-4 text-center">
-                    <div className="mx-auto rounded-full bg-blue-50 p-3 transition-colors duration-300 group-hover:bg-blue-100">
-                      <item.icon className={`w-8 h-8 ${item.color}`} />
-                    </div>
-                    <CardTitle className={`text-lg font-semibold ${item.color}`}>{item.text}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 text-center">{item.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        )
-      }
-    } else {
+  const renderContent = (content: SlideContent): ReactNode => {
+    if (isStringArray(content)) {
+      return (
+        <motion.ul className="space-y-6" variants={staggerItems} initial="initial" animate="animate">
+          {content.map((item, index) => (
+            <motion.li key={index} className="flex items-center space-x-3" variants={itemFade}>
+              <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
+              <span className="text-gray-700">{item}</span>
+            </motion.li>
+          ))}
+        </motion.ul>
+      )
+    }
+
+    if (isIconArray(content)) {
+      return (
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={staggerItems}
+          initial="initial"
+          animate="animate"
+        >
+          {content.map((item, index) => (
+            <motion.div key={index} className="relative group" variants={itemFade}>
+              <Card className="h-full transition-all duration-300 hover:shadow-lg">
+                <CardHeader className="space-y-4 text-center">
+                  <div className="mx-auto rounded-full bg-blue-50 p-3 transition-colors duration-300 group-hover:bg-blue-100">
+                    <item.icon className={`w-8 h-8 ${item.color}`} />
+                  </div>
+                  <CardTitle className={`text-lg font-semibold ${item.color}`}>{item.text}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 text-center">{item.description}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+      )
+    }
+
+    if (isEmailPdfContent(content)) {
       return (
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 gap-8"
@@ -272,6 +297,8 @@ export default function ProcessingPage() {
         </motion.div>
       )
     }
+
+    return null
   }
 
   return (
