@@ -4,8 +4,9 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { CheckCircle, Clock, ArrowRight, Mail, FileText, Star, Eye, Flag } from "lucide-react"
-import type { Step, InsightNode, MindMapNode } from "./types/processing"
-import { fadeInUp, pulseAnimation, drawLine } from "./utils/animations"
+// Update import paths to use absolute imports with @/ prefix
+import type { Step, InsightNode, MindMapNode } from "@/types/processing"
+import { fadeInUp, pulseAnimation, drawLine } from "@/utils/animations"
 
 const steps: Step[] = [
   { id: 1, text: "Initial Analysis Launch", icon: CheckCircle },
