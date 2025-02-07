@@ -22,7 +22,13 @@
       "@/*": ["./*"]
     },
     "baseUrl": ".",
-    "types": ["node"] // Add this line to support framer-motion types
+    "types": ["node", "react", "react-dom", "framer-motion"],
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
