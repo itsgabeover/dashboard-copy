@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, type Variants } from "framer-motion"
 import { CheckCircle, Star, Eye, AlertTriangle, FileText, BarChart, PieChart, TrendingUp } from "lucide-react"
 
 const slides = [
@@ -73,12 +73,13 @@ const slides = [
   },
 ]
 
-const fadeInUp = {
+const fadeInUp: Variants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -20 },
-  transition: { duration: 0.5 },
 }
+
+const transition = { duration: 0.5 }
 
 export default function ProcessingPage() {
   const router = useRouter()
@@ -125,11 +126,23 @@ export default function ProcessingPage() {
         <motion.h1
           key={`title-${currentSlide}`}
           className="text-4xl font-bold text-center text-blue-600 mb-2"
-          {...fadeInUp}
+          variants={fadeInUp}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={transition}
         >
           {currentSlideData.title}
         </motion.h1>
-        <motion.p key={`subtext-${currentSlide}`} className="text-xl text-center text-blue-400 mb-6" {...fadeInUp}>
+        <motion.p
+          key={`subtext-${currentSlide}`}
+          className="text-xl text-center text-blue-400 mb-6"
+          variants={fadeInUp}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={transition}
+        >
           {currentSlideData.subtext}
         </motion.p>
 
@@ -154,6 +167,7 @@ export default function ProcessingPage() {
             animate="animate"
             exit="exit"
             variants={fadeInUp}
+            transition={transition}
           >
             {currentSlide === 0 && (
               <ul className="space-y-4">
