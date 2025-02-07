@@ -17,7 +17,7 @@ function PaymentProcessor(): ReactElement {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  useEffect(() => {
+  useEffect((): (() => void) | undefined => {
     console.log("PaymentProcessor useEffect started")
 
     const verifyPayment = async (): Promise<void> => {
