@@ -74,7 +74,7 @@ function PaymentProcessor(): ReactElement {
       const intervalId = setInterval(verifyPayment, 2000)
 
       // Run initial verification
-      verifyPayment()
+      void verifyPayment()
 
       const timeoutId = setTimeout(() => {
         console.log("Verification timed out")
