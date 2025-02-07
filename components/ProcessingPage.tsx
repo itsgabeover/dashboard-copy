@@ -16,26 +16,15 @@ import {
   FileCheck,
   Inbox,
   Activity,
-  type LucideIcon,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { ReactNode } from "react"
 
-type SlideContent = string[] | IconContent[] | EmailPdfContent
-
-interface IconContent {
-  text: string
-  description: string
-  icon: LucideIcon
-  color: string
-}
-
-interface EmailPdfContent {
-  email: string[]
-  pdf: string[]
-}
-
-interface Slide {
+type SlideContent =
+  | string[]
+  | { text: string; description: string; icon: any; color: string }[]
+  | { email: string[]; pdf: string[] }
+type Slide = {
   id: number
   title: string
   subtext: string
@@ -43,6 +32,15 @@ interface Slide {
   postamble?: string
   content: SlideContent
 }
+
+const isStringArray = (content: SlideContent): content is string[] =>
+  Array.isArray(content) && typeof content[0] === "string"
+const isIconArray = (
+  content: SlideContent,
+): content is { text: string; description: string; icon: any; color: string }[] =>
+  Array.isArray(content) && typeof content[0] === "object" && "text" in content[0]
+const isEmailPdfContent = (content: SlideContent): content is { email: string[]; pdf: string[] } =>
+  typeof content === "object" && "email" in content && "pdf" in content
 
 const slides: Slide[] = [
   {
@@ -146,82 +144,58 @@ const slides: Slide[] = [
 
 const fadeInUp: Variants = {
   initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.4, ease: "easeIn" } },
 }
 
 const staggerItems: Variants = {
   animate: {
     transition: {
-      staggerChildren: 2, // 2 second delay between items
-      delayChildren: 5, // 5 second initial delay
+      staggerChildren: 2,
+      delayChildren: 5,
     },
   },
 }
 
 const itemFade: Variants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
 }
 
-const isStringArray = (content: SlideContent): content is string[] =>
-  Array.isArray(content) && typeof content[0] === "string"
-
-const isIconArray = (content: SlideContent): content is IconContent[] =>
-  Array.isArray(content) && typeof content[0] === "object" && "icon" in content[0]
-
-const isEmailPdfContent = (content: SlideContent): content is EmailPdfContent =>
-  !Array.isArray(content) && "email" in content && "pdf" in content
+const cardHover: Variants = {
+  initial: { scale: 1 },
+  hover: { scale: 1.02, transition: { duration: 0.2 } },
+}
 
 export default function ProcessingPage() {
   const router = useRouter()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [progress, setProgress] = useState(0)
 
-  // Progress update effect
+  const currentSlideData = slides[currentSlide]
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setProgress((prevProgress) => {
-        const newProgress = Math.min(prevProgress + 1, 100)
-        return newProgress
-      })
-    }, 1000) // Update every second
+      setProgress((prevProgress) => Math.min(prevProgress + 20, 100))
+    }, 1000)
 
-    return () => clearInterval(interval)
-  }, [])
-
-  // Slide change effect
-  useEffect(() => {
-    const slideInterval = setInterval(() => {
-      setCurrentSlide((prev) => {
-        if (prev < slides.length - 1) {
-          return prev + 1
-        }
-        return prev
-      })
-    }, 20000) // Change slide every 20 seconds
-
-    return () => clearInterval(slideInterval)
-  }, [])
-
-  // Redirect effect
-  useEffect(() => {
     if (progress === 100) {
+      clearInterval(interval)
       setTimeout(() => {
         router.push("/dashboard")
-      }, 2000)
+      }, 1000)
     }
-  }, [progress, router])
 
-  const currentSlideData = slides[currentSlide]
+    return () => clearInterval(interval)
+  }, [progress, router])
 
   const renderContent = (content: SlideContent, slide: Slide): ReactNode => {
     if (isStringArray(content)) {
       return (
-        <>
+        <div className="max-w-3xl mx-auto w-full px-4">
           {slide.preamble && (
             <motion.p
-              className="text-left text-gray-600 mb-6 max-w-3xl mx-auto"
+              className="text-left text-gray-600 mb-8 text-lg leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
@@ -231,22 +205,26 @@ export default function ProcessingPage() {
           )}
           <motion.ul className="space-y-6" variants={staggerItems} initial="initial" animate="animate">
             {content.map((item, index) => (
-              <motion.li key={index} className="flex items-center space-x-3" variants={itemFade}>
+              <motion.li
+                key={index}
+                className="flex items-center space-x-4 bg-white/50 p-4 rounded-lg shadow-sm"
+                variants={itemFade}
+              >
                 <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
-                <span className="text-gray-700">{item}</span>
+                <span className="text-gray-700 text-lg">{item}</span>
               </motion.li>
             ))}
           </motion.ul>
-        </>
+        </div>
       )
     }
 
     if (isIconArray(content)) {
       return (
-        <>
+        <div className="max-w-5xl mx-auto w-full px-4">
           {slide.preamble && (
             <motion.p
-              className="text-center text-gray-600 mb-8 max-w-3xl mx-auto"
+              className="text-center text-gray-600 mb-12 text-lg leading-relaxed max-w-3xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
@@ -255,30 +233,48 @@ export default function ProcessingPage() {
             </motion.p>
           )}
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center"
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center"
             variants={staggerItems}
             initial="initial"
             animate="animate"
           >
             {content.map((item, index) => (
-              <motion.div key={index} className="relative group w-full max-w-sm" variants={itemFade}>
-                <Card className="h-full transition-all duration-300 hover:shadow-lg">
-                  <CardHeader className="space-y-4 text-center">
-                    <div className="mx-auto rounded-full bg-blue-50 p-3 transition-colors duration-300 group-hover:bg-blue-100">
-                      <item.icon className={`w-8 h-8 ${item.color}`} />
-                    </div>
-                    <CardTitle className={`text-lg font-semibold ${item.color}`}>{item.text}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600 text-center">{item.description}</p>
-                  </CardContent>
-                </Card>
+              <motion.div
+                key={index}
+                className="w-full max-w-sm"
+                variants={itemFade}
+                whileHover="hover"
+                initial="initial"
+              >
+                <motion.div variants={cardHover}>
+                  <Card
+                    className="h-full transition-all duration-300 hover:shadow-lg border-t-4"
+                    style={{
+                      borderTopColor:
+                        item.color === "text-blue-500"
+                          ? "#3b82f6"
+                          : item.color === "text-yellow-500"
+                            ? "#eab308"
+                            : "#ef4444",
+                    }}
+                  >
+                    <CardHeader className="space-y-4 text-center p-6">
+                      <div className="mx-auto rounded-full bg-gray-50 p-4 transition-colors duration-300 group-hover:bg-gray-100">
+                        <item.icon className={`w-8 h-8 ${item.color}`} />
+                      </div>
+                      <CardTitle className={`text-xl font-semibold ${item.color}`}>{item.text}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 text-center leading-relaxed">{item.description}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </motion.div>
             ))}
           </motion.div>
           {slide.postamble && (
             <motion.p
-              className="text-right text-gray-600 mt-8 italic"
+              className="text-right text-gray-600 mt-12 italic text-lg"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: content.length * 2 + 1 }}
@@ -286,16 +282,16 @@ export default function ProcessingPage() {
               {slide.postamble}
             </motion.p>
           )}
-        </>
+        </div>
       )
     }
 
     if (isEmailPdfContent(content)) {
       return (
-        <>
+        <div className="max-w-5xl mx-auto w-full px-4">
           {slide.preamble && (
             <motion.p
-              className="text-center text-gray-600 mb-8 max-w-3xl mx-auto"
+              className="text-center text-gray-600 mb-12 text-lg leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
@@ -309,48 +305,52 @@ export default function ProcessingPage() {
             initial="initial"
             animate="animate"
           >
-            <motion.div variants={itemFade}>
-              <Card className="h-full transition-all duration-300 hover:shadow-lg">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <Mail className="h-5 w-5 text-blue-500" />
-                    <CardTitle className="text-lg font-semibold text-blue-500">Clear Email Summary</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {content.email.map((item, index) => (
-                      <li key={index} className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm text-gray-600">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+            <motion.div variants={itemFade} whileHover="hover" initial="initial">
+              <motion.div variants={cardHover}>
+                <Card className="h-full transition-all duration-300 hover:shadow-lg border-t-4 border-t-blue-500">
+                  <CardHeader className="border-b bg-gray-50/50">
+                    <div className="flex items-center space-x-3">
+                      <Mail className="h-6 w-6 text-blue-500" />
+                      <CardTitle className="text-xl font-semibold text-blue-500">Clear Email Summary</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <ul className="space-y-3">
+                      {content.email.map((item, index) => (
+                        <li key={index} className="flex items-center space-x-3">
+                          <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                          <span className="text-gray-600">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </motion.div>
-            <motion.div variants={itemFade}>
-              <Card className="h-full transition-all duration-300 hover:shadow-lg">
-                <CardHeader>
-                  <div className="flex items-center space-x-2">
-                    <FileCheck className="h-5 w-5 text-blue-500" />
-                    <CardTitle className="text-lg font-semibold text-blue-500">Expert PDF Report</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {content.pdf.map((item, index) => (
-                      <li key={index} className="flex items-center space-x-2">
-                        <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm text-gray-600">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+            <motion.div variants={itemFade} whileHover="hover" initial="initial">
+              <motion.div variants={cardHover}>
+                <Card className="h-full transition-all duration-300 hover:shadow-lg border-t-4 border-t-blue-500">
+                  <CardHeader className="border-b bg-gray-50/50">
+                    <div className="flex items-center space-x-3">
+                      <FileCheck className="h-6 w-6 text-blue-500" />
+                      <CardTitle className="text-xl font-semibold text-blue-500">Expert PDF Report</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <ul className="space-y-3">
+                      {content.pdf.map((item, index) => (
+                        <li key={index} className="flex items-center space-x-3">
+                          <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                          <span className="text-gray-600">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </motion.div>
           </motion.div>
-        </>
+        </div>
       )
     }
 
@@ -359,10 +359,10 @@ export default function ProcessingPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-100 p-4">
-      <div className="max-w-5xl w-full bg-white rounded-xl shadow-lg p-8">
+      <div className="max-w-6xl w-full bg-white rounded-xl shadow-lg p-8 md:p-12">
         <motion.h1
           key={`title-${currentSlide}`}
-          className="text-4xl font-bold text-center text-blue-600 mb-2"
+          className="text-4xl md:text-5xl font-bold text-center text-blue-600 mb-3"
           variants={fadeInUp}
           initial="initial"
           animate="animate"
@@ -372,7 +372,7 @@ export default function ProcessingPage() {
         </motion.h1>
         <motion.p
           key={`subtext-${currentSlide}`}
-          className="text-xl text-center text-blue-400 mb-6"
+          className="text-xl md:text-2xl text-center text-blue-400 mb-8"
           variants={fadeInUp}
           initial="initial"
           animate="animate"
@@ -381,7 +381,7 @@ export default function ProcessingPage() {
           {currentSlideData.subtext}
         </motion.p>
 
-        <div className="mb-8">
+        <div className="mb-12">
           <div className="h-2 w-full bg-gradient-to-r from-blue-100 to-blue-200 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
@@ -390,8 +390,8 @@ export default function ProcessingPage() {
               transition={{ duration: 0.5 }}
             />
           </div>
-          <div className="mt-4 text-center space-y-2">
-            <p className="text-lg font-semibold text-gray-700">
+          <div className="mt-4 text-center">
+            <p className="text-lg font-medium text-gray-700">
               Estimated time: {Math.max(0, Math.ceil(100 - (progress / 100) * 100))} seconds remaining
             </p>
           </div>
@@ -404,7 +404,7 @@ export default function ProcessingPage() {
             animate="animate"
             exit="exit"
             variants={fadeInUp}
-            className="min-h-[300px] flex items-center justify-center"
+            className="min-h-[400px] flex items-center justify-center"
           >
             {renderContent(currentSlideData.content, currentSlideData)}
           </motion.div>
@@ -412,21 +412,28 @@ export default function ProcessingPage() {
 
         {currentSlideData.postamble && currentSlide === 4 && (
           <motion.div
-            className="mt-8 text-center space-y-2"
+            className="mt-12 text-center space-y-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 8 }} // After all boxes have appeared
+            transition={{ delay: 8 }}
           >
-            <p className="text-gray-600">{currentSlideData.postamble.split("\n")[0]}</p>
-            <p className="text-sm text-gray-500 tracking-wider">{currentSlideData.postamble.split("\n")[1]}</p>
+            <p className="text-gray-700 text-lg">{currentSlideData.postamble.split("\n")[0]}</p>
+            <p className="text-gray-500 text-sm tracking-wider font-medium">
+              {currentSlideData.postamble.split("\n")[1]}
+            </p>
           </motion.div>
         )}
 
-        <div className="mt-8 text-center">
+        <motion.div
+          className="mt-12 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           <p className="text-lg font-semibold text-blue-700">
             Step {currentSlide + 1} of {slides.length}
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   )
