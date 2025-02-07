@@ -109,7 +109,7 @@ const slides: Slide[] = [
     title: "Your Interactive Experience",
     subtext: "Explore your policy insights through our intuitive dashboard.",
     preamble: "Your personalized dashboard puts powerful insights at your fingertips",
-    postamble: "Available 24/7 | Always Up-to-Date | Advisor-Ready Insights",
+    postamble: "Your insights are available 24/7, always up-to-date, and ready for advisor review.",
     content: [
       { text: "Overview", description: "Your policy at a glance.", icon: PieChart, color: "text-blue-500" },
       { text: "Policy Details", description: "Deep dive into your coverage.", icon: FileText, color: "text-blue-500" },
@@ -123,7 +123,7 @@ const slides: Slide[] = [
     subtext: "Your AI-powered analysis journey is just beginning",
     preamble: "Your comprehensive analysis is ready and being delivered in three formats:",
     postamble:
-      "Watch your inbox for your analysis package while we redirect you to your interactive dashboard\nAvailable 24/7 | Secure Access | Always Up-to-Date",
+      "Watch for your analysis package in your inbox as we prepare your interactive dashboard.\nSecure 24/7 access with always up-to-date insights.",
     content: [
       {
         text: "In Your Inbox",
@@ -163,7 +163,7 @@ const staggerItems: Variants = {
   animate: {
     transition: {
       staggerChildren: 2,
-      delayChildren: 5,
+      delayChildren: 0.5,
     },
   },
 }
@@ -240,6 +240,8 @@ export default function ProcessingPage() {
                 key={index}
                 className="flex items-center space-x-4 bg-white/50 p-4 rounded-lg shadow-sm"
                 variants={itemFade}
+                custom={index}
+                transition={{ delay: index * 2 }}
               >
                 <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
                 <span className="text-gray-700 text-lg">{item}</span>
@@ -274,6 +276,8 @@ export default function ProcessingPage() {
                 key={index}
                 className="w-full max-w-sm"
                 variants={itemFade}
+                custom={index}
+                transition={{ delay: index * 2 }}
                 whileHover="hover"
                 initial="initial"
               >
@@ -336,7 +340,7 @@ export default function ProcessingPage() {
             initial="initial"
             animate="animate"
           >
-            <motion.div variants={itemFade} whileHover="hover" initial="initial">
+            <motion.div variants={itemFade} transition={{ delay: 0 }} whileHover="hover" initial="initial">
               <motion.div variants={cardHover}>
                 <Card className="h-full transition-all duration-300 hover:shadow-lg border-t-4 border-t-blue-500">
                   <CardHeader className="border-b bg-gray-50/50">
@@ -358,7 +362,7 @@ export default function ProcessingPage() {
                 </Card>
               </motion.div>
             </motion.div>
-            <motion.div variants={itemFade} whileHover="hover" initial="initial">
+            <motion.div variants={itemFade} transition={{ delay: 2 }} whileHover="hover" initial="initial">
               <motion.div variants={cardHover}>
                 <Card className="h-full transition-all duration-300 hover:shadow-lg border-t-4 border-t-blue-500">
                   <CardHeader className="border-b bg-gray-50/50">
@@ -441,17 +445,21 @@ export default function ProcessingPage() {
           </motion.div>
         </AnimatePresence>
 
-        {currentSlideData.postamble && currentSlide === 4 && (
+        {currentSlideData.postamble && (
           <motion.div
             className="mt-12 text-center space-y-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 8 }}
+            transition={{ delay: currentSlideData.content.length * 2 + 1 }}
           >
-            <p className="text-gray-700 text-lg">{currentSlideData.postamble.split("\n")[0]}</p>
-            <p className="text-gray-500 text-sm tracking-wider font-medium">
-              {currentSlideData.postamble.split("\n")[1]}
-            </p>
+            {currentSlideData.postamble.split("\n").map((line, index) => (
+              <p
+                key={index}
+                className={index === 0 ? "text-gray-700 text-lg" : "text-gray-500 text-sm tracking-wider font-medium"}
+              >
+                {line}
+              </p>
+            ))}
           </motion.div>
         )}
 
