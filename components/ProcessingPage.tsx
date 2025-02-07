@@ -53,6 +53,19 @@ const isIconArray = (content: SlideContent): content is IconContent[] =>
 const isEmailPdfContent = (content: SlideContent): content is EmailPdfContent =>
   !Array.isArray(content) && "email" in content && "pdf" in content
 
+const getContentLength = (content: SlideContent): number => {
+  if (isStringArray(content)) {
+    return content.length
+  }
+  if (isIconArray(content)) {
+    return content.length
+  }
+  if (isEmailPdfContent(content)) {
+    return Math.max(content.email.length, content.pdf.length)
+  }
+  return 0
+}
+
 const slides: Slide[] = [
   {
     id: 1,
@@ -312,7 +325,7 @@ export default function ProcessingPage() {
               className="text-right text-gray-600 mt-12 italic text-lg"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: content.length * 2 + 1 }}
+              transition={{ delay: getContentLength(currentSlideData.content) * 2 + 1 }}
             >
               {slide.postamble}
             </motion.p>
@@ -450,7 +463,7 @@ export default function ProcessingPage() {
             className="mt-12 text-center space-y-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: currentSlideData.content.length * 2 + 1 }}
+            transition={{ delay: getContentLength(currentSlideData.content) * 2 + 1 }}
           >
             {currentSlideData.postamble.split("\n").map((line, index) => (
               <p
