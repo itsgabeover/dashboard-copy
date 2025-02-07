@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle, Star, Eye, AlertTriangle, Shield, DollarSign, TrendingUp, Gift } from "lucide-react"
-import type { Step } from "@/types/processing"
+import { Star, Eye, AlertTriangle, Shield, DollarSign, TrendingUp, Gift } from "lucide-react"
 
-const steps: Step[] = [
-  { id: 1, text: "Initial Launch Phase", icon: CheckCircle, duration: 10 },
-  { id: 2, text: "Framework Expansion", icon: Star, duration: 15 },
-  { id: 3, text: "Deep Analysis Phase", icon: Eye, duration: 20 },
-  { id: 4, text: "Final Phase", icon: AlertTriangle, duration: 30 },
-]
+// const steps: Step[] = [
+//   { id: 1, text: "Initial Launch Phase", icon: CheckCircle, duration: 10 },
+//   { id: 2, text: "Framework Expansion", icon: Star, duration: 15 },
+//   { id: 3, text: "Deep Analysis Phase", icon: Eye, duration: 20 },
+//   { id: 4, text: "Final Phase", icon: AlertTriangle, duration: 30 },
+// ]
 
 const categories = [
   { id: "protection", text: "Protection Structure", icon: Shield },
@@ -227,6 +226,9 @@ export default function ProcessingPage() {
             into your policy.&rdquo;
           </p>
         </motion.div>
+        <div className="mt-4 text-center">
+          <p className="text-lg font-semibold text-blue-700">Current Step: {currentStep + 1} / 4</p>
+        </div>
       </div>
     </div>
   )
