@@ -1,22 +1,36 @@
 "use client"
 
-import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
-import { CheckCircle, Star, Eye, AlertTriangle, FileText, BarChart, PieChart, TrendingUp } from "lucide-react"
+import {
+  CheckCircle,
+  Star,
+  Eye,
+  AlertTriangle,
+  FileText,
+  BarChart,
+  PieChart,
+  TrendingUp,
+  Mail,
+  FileCheck,
+  Inbox,
+  Activity,
+} from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import type React from "react" // Added import for React
 
-type StringContent = string[]
-type IconContent = { text: string; description: string; icon: React.ElementType; color: string }[]
-type EmailPdfContent = { email: string[]; pdf: string[] }
-
-type SlideContent = StringContent | IconContent | EmailPdfContent
+type SlideContent =
+  | string[]
+  | { text: string; description: string; icon: React.ElementType; color: string }[]
+  | { email: string[]; pdf: string[] }
 
 interface Slide {
   id: number
   title: string
   subtext: string
   content: SlideContent
+  preamble?: string
 }
 
 const slides: Slide[] = [
@@ -24,6 +38,8 @@ const slides: Slide[] = [
     id: 1,
     title: "Analyzing Your Policy",
     subtext: "We're unlocking the value in your insurance policy.",
+    preamble:
+      "The analysis you're about to receive would typically take an experienced insurance professional several hours to compile. Our AI completes this in minutes, providing you with rapid, comprehensive insights into your policy.",
     content: [
       "Insurance Planner AI is analyzing your unique policy structure.",
       "Converting complex details into clear, actionable insights.",
@@ -77,12 +93,33 @@ const slides: Slide[] = [
   },
   {
     id: 5,
-    title: "Analysis Complete",
-    subtext: "Your personalized policy insights are ready.",
+    title: "Discover Your Policy's Potential",
+    subtext: "Your AI-powered analysis journey is just beginning",
     content: [
-      "Your Insurance Planner AI Analysis is Complete.",
-      "Check your inbox for your comprehensive analysis package.",
-      "Preparing your personalized dashboard experience...",
+      {
+        text: "In Your Inbox",
+        description: "Access your comprehensive analysis package.",
+        icon: Inbox,
+        color: "text-blue-500",
+      },
+      {
+        text: "Email Summary",
+        description: "Quick insights and key findings.",
+        icon: Mail,
+        color: "text-blue-500",
+      },
+      {
+        text: "PDF Report",
+        description: "Detailed analysis and recommendations.",
+        icon: FileCheck,
+        color: "text-blue-500",
+      },
+      {
+        text: "Interactive Dashboard",
+        description: "Real-time tracking and insights.",
+        icon: Activity,
+        color: "text-blue-500",
+      },
     ],
   },
 ]
@@ -93,7 +130,18 @@ const fadeInUp: Variants = {
   exit: { opacity: 0, y: -20 },
 }
 
-const transition = { duration: 0.5 }
+const staggerItems: Variants = {
+  animate: {
+    transition: {
+      staggerChildren: 0.8,
+    },
+  },
+}
+
+const itemFade: Variants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+}
 
 export default function ProcessingPage() {
   const router = useRouter()
@@ -101,7 +149,7 @@ export default function ProcessingPage() {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    const totalDuration = 75000 // 75 seconds
+    const totalDuration = 100000 // 100 seconds
     const interval = 100 // Update every 100ms for smoother animations
     const incrementPerInterval = 100 / (totalDuration / interval)
 
@@ -121,7 +169,7 @@ export default function ProcessingPage() {
   useEffect(() => {
     const slideInterval = setInterval(() => {
       setCurrentSlide((prev) => (prev < slides.length - 1 ? prev + 1 : prev))
-    }, 15000) // Change slide every 15 seconds
+    }, 20000) // Change slide every 20 seconds
 
     return () => clearInterval(slideInterval)
   }, [])
@@ -138,68 +186,97 @@ export default function ProcessingPage() {
     if (Array.isArray(content)) {
       if (typeof content[0] === "string") {
         return (
-          <ul className="space-y-4">
-            {(content as StringContent).map((item, index) => (
-              <motion.li
-                key={index}
-                className="flex items-center space-x-2"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.5 }}
-              >
-                <CheckCircle className="text-green-500" />
-                <span>{item}</span>
+          <motion.ul className="space-y-6" variants={staggerItems} initial="initial" animate="animate">
+            {content.map((item, index) => (
+              <motion.li key={index} className="flex items-center space-x-3" variants={itemFade}>
+                <CheckCircle className="h-6 w-6 text-green-500 flex-shrink-0" />
+                <span className="text-gray-700">{item}</span>
               </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         )
       } else {
         return (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(content as IconContent).map((item, index) => (
-              <motion.div
-                key={index}
-                className="flex flex-col items-center text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.5 }}
-              >
-                <item.icon className={`w-12 h-12 ${item.color} mb-2`} />
-                <h3 className={`font-semibold ${item.color} mb-1`}>{item.text}</h3>
-                <p className="text-sm text-gray-600">{item.description}</p>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+            variants={staggerItems}
+            initial="initial"
+            animate="animate"
+          >
+            {content.map((item, index) => (
+              <motion.div key={index} className="relative group" variants={itemFade}>
+                <Card className="h-full transition-all duration-300 hover:shadow-lg">
+                  <CardHeader className="space-y-4 text-center">
+                    <div className="mx-auto rounded-full bg-blue-50 p-3 transition-colors duration-300 group-hover:bg-blue-100">
+                      <item.icon className={`w-8 h-8 ${item.color}`} />
+                    </div>
+                    <CardTitle className={`text-lg font-semibold ${item.color}`}>{item.text}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 text-center">{item.description}</p>
+                  </CardContent>
+                </Card>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         )
       }
     } else {
-      const emailPdfContent = content as EmailPdfContent
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <motion.div className="space-y-4" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <h3 className="font-semibold text-blue-600">Clear Email Summary</h3>
-            <ul className="list-disc list-inside">
-              {emailPdfContent.email.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-8"
+          variants={staggerItems}
+          initial="initial"
+          animate="animate"
+        >
+          <motion.div variants={itemFade}>
+            <Card className="h-full transition-all duration-300 hover:shadow-lg">
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <Mail className="h-5 w-5 text-blue-500" />
+                  <CardTitle className="text-lg font-semibold text-blue-500">Clear Email Summary</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {content.email.map((item, index) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span className="text-sm text-gray-600">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           </motion.div>
-          <motion.div className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <h3 className="font-semibold text-blue-600">Expert PDF Report</h3>
-            <ul className="list-disc list-inside">
-              {emailPdfContent.pdf.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
+          <motion.div variants={itemFade}>
+            <Card className="h-full transition-all duration-300 hover:shadow-lg">
+              <CardHeader>
+                <div className="flex items-center space-x-2">
+                  <FileCheck className="h-5 w-5 text-blue-500" />
+                  <CardTitle className="text-lg font-semibold text-blue-500">Expert PDF Report</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2">
+                  {content.pdf.map((item, index) => (
+                    <li key={index} className="flex items-center space-x-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span className="text-sm text-gray-600">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           </motion.div>
-        </div>
+        </motion.div>
       )
     }
   }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-50 via-white to-blue-100 p-4">
-      <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg p-8">
+      <div className="max-w-5xl w-full bg-white rounded-xl shadow-lg p-8">
         <motion.h1
           key={`title-${currentSlide}`}
           className="text-4xl font-bold text-center text-blue-600 mb-2"
@@ -207,7 +284,6 @@ export default function ProcessingPage() {
           initial="initial"
           animate="animate"
           exit="exit"
-          transition={transition}
         >
           {currentSlideData.title}
         </motion.h1>
@@ -218,23 +294,27 @@ export default function ProcessingPage() {
           initial="initial"
           animate="animate"
           exit="exit"
-          transition={transition}
         >
           {currentSlideData.subtext}
         </motion.p>
 
         <div className="mb-8">
-          <div className="h-2 w-full bg-gradient-to-r from-blue-200 to-blue-400 rounded-full">
+          <div className="h-2 w-full bg-gradient-to-r from-blue-100 to-blue-200 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-blue-500 to-blue-700 rounded-full"
+              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5 }}
             />
           </div>
-          <p className="text-center text-lg font-semibold text-gray-700 mt-2">
-            Estimated time: {Math.max(0, Math.ceil(75 - (progress / 100) * 75))} seconds remaining
-          </p>
+          <div className="mt-4 text-center space-y-2">
+            <p className="text-lg font-semibold text-gray-700">
+              Estimated time: {Math.max(0, Math.ceil(100 - (progress / 100) * 100))} seconds remaining
+            </p>
+            {currentSlideData.preamble && (
+              <p className="text-sm text-gray-600 max-w-2xl mx-auto">{currentSlideData.preamble}</p>
+            )}
+          </div>
         </div>
 
         <AnimatePresence mode="wait">
@@ -244,25 +324,13 @@ export default function ProcessingPage() {
             animate="animate"
             exit="exit"
             variants={fadeInUp}
-            transition={transition}
+            className="min-h-[300px] flex items-center justify-center"
           >
             {renderContent(currentSlideData.content)}
           </motion.div>
         </AnimatePresence>
 
-        <motion.div
-          className="mt-8 p-6 bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg text-white"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1 }}
-        >
-          <p className="text-lg font-semibold">
-            &ldquo;The analysis you&apos;re about to receive would typically take an experienced insurance professional
-            several hours to compile. Our AI completes this in minutes, providing you with rapid, comprehensive insights
-            into your policy.&rdquo;
-          </p>
-        </motion.div>
-        <div className="mt-4 text-center">
+        <div className="mt-8 text-center">
           <p className="text-lg font-semibold text-blue-700">
             Step {currentSlide + 1} of {slides.length}
           </p>
