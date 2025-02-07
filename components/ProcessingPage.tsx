@@ -18,7 +18,6 @@ import {
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { ReactNode } from "react"
-import type React from "react" // Added import for React
 
 interface IconContent {
   text: string
@@ -94,7 +93,7 @@ const slides: Slide[] = [
   },
   {
     id: 3,
-    title: "Your AI Analysis Package is Being Prepared",
+    title: "Preparing Your AI Analysis Package",
     subtext: "Two detailed reports tailored to your policy's unique features.",
     preamble: "Comprehensive insights for you and your advisor.",
     content: {
@@ -145,22 +144,22 @@ const slides: Slide[] = [
 
 const fadeInUp: Variants = {
   initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-  exit: { opacity: 0, y: -20, transition: { duration: 0.4, ease: "easeIn" } },
+  animate: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeInOut" } },
+  exit: { opacity: 0, y: -20, transition: { duration: 0.8, ease: "easeInOut" } },
 }
 
 const staggerItems: Variants = {
   animate: {
     transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.3,
+      staggerChildren: 0.2,
+      delayChildren: 0.4,
     },
   },
 }
 
 const itemFade: Variants = {
   initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  animate: { opacity: 1, y: 0, transition: { duration: 1, ease: "easeInOut" } },
 }
 
 export default function ProcessingPage() {
@@ -211,7 +210,7 @@ export default function ProcessingPage() {
               className="text-center text-gray-600 mb-8 text-lg leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 1 }}
             >
               {slide.preamble}
             </motion.p>
@@ -220,12 +219,12 @@ export default function ProcessingPage() {
             {content.map((item, index) => (
               <motion.li
                 key={index}
-                className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow-sm"
+                className="flex items-center space-x-4 bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
                 variants={itemFade}
                 custom={index}
               >
-                <div className="flex-shrink-0 rounded-full bg-blue-50 p-2">
-                  <CheckCircle className="h-5 w-5 text-[#4B6FEE]" />
+                <div className="flex-shrink-0 rounded-full bg-blue-50 p-3">
+                  <CheckCircle className="h-6 w-6 text-[#4B6FEE]" />
                 </div>
                 <span className="text-gray-700 text-lg">{item}</span>
               </motion.li>
@@ -243,7 +242,7 @@ export default function ProcessingPage() {
               className="text-center text-gray-600 mb-12 text-lg leading-relaxed max-w-3xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 1 }}
             >
               {slide.preamble}
             </motion.p>
@@ -257,15 +256,15 @@ export default function ProcessingPage() {
             {content.map((item, index) => (
               <motion.div
                 key={index}
-                className="w-full max-w-sm"
+                className="w-full"
                 variants={itemFade}
                 custom={index}
                 initial="initial"
                 animate="animate"
               >
-                <Card className="h-full transition-all duration-300 hover:shadow-lg bg-white group hover:-translate-y-1 border-2 border-blue-100">
+                <Card className="h-full transition-all duration-300 hover:shadow-md bg-white rounded-xl border-0">
                   <CardHeader className="space-y-4 text-center p-6">
-                    <div className="mx-auto rounded-full bg-blue-50 p-4">
+                    <div className="mx-auto rounded-full bg-blue-50 p-4 w-16 h-16 flex items-center justify-center">
                       <item.icon className="w-8 h-8 text-[#4B6FEE]" />
                     </div>
                     <CardTitle className="text-xl font-semibold text-[#4B6FEE]">{item.text}</CardTitle>
@@ -289,7 +288,7 @@ export default function ProcessingPage() {
               className="text-center text-gray-600 mb-12 text-lg leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 1 }}
             >
               {slide.preamble}
             </motion.p>
@@ -301,18 +300,18 @@ export default function ProcessingPage() {
             animate="animate"
           >
             <motion.div variants={itemFade} initial="initial" animate="animate" transition={{ delay: 0.5 }}>
-              <Card className="h-full transition-all duration-300 hover:shadow-lg bg-white group hover:-translate-y-1 border-2 border-blue-100">
-                <CardHeader className="border-b bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white">
-                  <div className="flex items-center justify-center">
-                    <Mail className="w-8 h-8" />
+              <Card className="h-full transition-all duration-300 hover:shadow-md bg-white rounded-xl border-0">
+                <CardHeader className="space-y-4 text-center p-6">
+                  <div className="mx-auto rounded-full bg-blue-50 p-4 w-16 h-16 flex items-center justify-center">
+                    <Mail className="w-8 h-8 text-[#4B6FEE]" />
                   </div>
-                  <CardTitle className="text-xl font-semibold">Email Summary</CardTitle>
+                  <CardTitle className="text-xl font-semibold text-[#4B6FEE]">Email Summary</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6">
+                <CardContent className="pt-2">
                   <ul className="space-y-3">
                     {content.email.map((item, index) => (
                       <li key={index} className="flex items-center space-x-3">
-                        <div className="flex-shrink-0 rounded-full bg-blue-50 p-1">
+                        <div className="flex-shrink-0 rounded-full bg-blue-50 p-1.5">
                           <CheckCircle className="h-4 w-4 text-[#4B6FEE]" />
                         </div>
                         <span className="text-gray-600">{item}</span>
@@ -322,19 +321,19 @@ export default function ProcessingPage() {
                 </CardContent>
               </Card>
             </motion.div>
-            <motion.div variants={itemFade} initial="initial" animate="animate" transition={{ delay: 1 }}>
-              <Card className="h-full transition-all duration-300 hover:shadow-lg bg-white group hover:-translate-y-1 border-2 border-blue-100">
-                <CardHeader className="border-b bg-gradient-to-r from-[#4B6FEE] to-blue-500 text-white">
-                  <div className="flex items-center justify-center">
-                    <FileCheck className="w-8 h-8" />
+            <motion.div variants={itemFade} initial="initial" animate="animate" transition={{ delay: 0.7 }}>
+              <Card className="h-full transition-all duration-300 hover:shadow-md bg-white rounded-xl border-0">
+                <CardHeader className="space-y-4 text-center p-6">
+                  <div className="mx-auto rounded-full bg-blue-50 p-4 w-16 h-16 flex items-center justify-center">
+                    <FileCheck className="w-8 h-8 text-[#4B6FEE]" />
                   </div>
-                  <CardTitle className="text-xl font-semibold">PDF Report</CardTitle>
+                  <CardTitle className="text-xl font-semibold text-[#4B6FEE]">PDF Report</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-6">
+                <CardContent className="pt-2">
                   <ul className="space-y-3">
                     {content.pdf.map((item, index) => (
                       <li key={index} className="flex items-center space-x-3">
-                        <div className="flex-shrink-0 rounded-full bg-blue-50 p-1">
+                        <div className="flex-shrink-0 rounded-full bg-blue-50 p-1.5">
                           <CheckCircle className="h-4 w-4 text-[#4B6FEE]" />
                         </div>
                         <span className="text-gray-600">{item}</span>
@@ -368,14 +367,14 @@ export default function ProcessingPage() {
                 className="h-full bg-[#4B6FEE]"
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
               />
             </div>
           </div>
           <p className="text-sm text-gray-600">Progress: {progress}%</p>
         </div>
         <motion.div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-[#4B6FEE] mb-2">{currentSlideData.title}</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-[#4B6FEE] mb-4">{currentSlideData.title}</h1>
           <p className="text-lg text-gray-600">{currentSlideData.subtext}</p>
         </motion.div>
         {renderContent(currentSlideData.content, currentSlideData)}
@@ -384,7 +383,7 @@ export default function ProcessingPage() {
             className="text-center text-gray-600 mt-12 text-lg leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 1 }}
           >
             {currentSlideData.postamble}
           </motion.p>
