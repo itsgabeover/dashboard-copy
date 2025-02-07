@@ -1,4 +1,5 @@
 "use client"
+
 import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import type { ReactElement } from "react"
@@ -12,7 +13,7 @@ type VerifyResponse = {
 
 function PaymentProcessor(): ReactElement {
   console.log("PaymentProcessor mounted")
-  const [error, setError] = useState<string>()
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -21,12 +22,7 @@ function PaymentProcessor(): ReactElement {
 
     const verifyPayment = async (): Promise<void> => {
       try {
-        if (!searchParams) {
-          console.log("SearchParams is null, skipping verification")
-          return
-        }
-
-        const sessionId = searchParams.get("session_id")
+        const sessionId = searchParams?.get("session_id")
         console.log("Attempting verification with session ID:", sessionId)
 
         if (!sessionId) {
