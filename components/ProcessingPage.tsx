@@ -16,15 +16,26 @@ import {
   FileCheck,
   Inbox,
   Activity,
+  type LucideIcon,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { ReactNode } from "react"
 
-type SlideContent =
-  | string[]
-  | { text: string; description: string; icon: any; color: string }[]
-  | { email: string[]; pdf: string[] }
-type Slide = {
+interface IconContent {
+  text: string
+  description: string
+  icon: LucideIcon
+  color: string
+}
+
+interface EmailPdfContent {
+  email: string[]
+  pdf: string[]
+}
+
+type SlideContent = string[] | IconContent[] | EmailPdfContent
+
+interface Slide {
   id: number
   title: string
   subtext: string
@@ -35,12 +46,12 @@ type Slide = {
 
 const isStringArray = (content: SlideContent): content is string[] =>
   Array.isArray(content) && typeof content[0] === "string"
-const isIconArray = (
-  content: SlideContent,
-): content is { text: string; description: string; icon: any; color: string }[] =>
-  Array.isArray(content) && typeof content[0] === "object" && "text" in content[0]
-const isEmailPdfContent = (content: SlideContent): content is { email: string[]; pdf: string[] } =>
-  typeof content === "object" && "email" in content && "pdf" in content
+
+const isIconArray = (content: SlideContent): content is IconContent[] =>
+  Array.isArray(content) && typeof content[0] === "object" && "icon" in content[0]
+
+const isEmailPdfContent = (content: SlideContent): content is EmailPdfContent =>
+  !Array.isArray(content) && "email" in content && "pdf" in content
 
 const slides: Slide[] = [
   {
@@ -172,22 +183,42 @@ export default function ProcessingPage() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [progress, setProgress] = useState(0)
 
-  const currentSlideData = slides[currentSlide]
-
+  // Progress update effect
   useEffect(() => {
     const interval = setInterval(() => {
-      setProgress((prevProgress) => Math.min(prevProgress + 20, 100))
+      setProgress((prevProgress) => {
+        const newProgress = Math.min(prevProgress + 1, 100)
+        return newProgress
+      })
     }, 1000)
 
-    if (progress === 100) {
-      clearInterval(interval)
-      setTimeout(() => {
-        router.push("/dashboard")
-      }, 1000)
-    }
-
     return () => clearInterval(interval)
+  }, [])
+
+  // Slide change effect
+  useEffect(() => {
+    const slideInterval = setInterval(() => {
+      setCurrentSlide((prev) => {
+        if (prev < slides.length - 1) {
+          return prev + 1
+        }
+        return prev
+      })
+    }, 20000) // Change slide every 20 seconds
+
+    return () => clearInterval(slideInterval)
+  }, [])
+
+  // Redirect effect
+  useEffect(() => {
+    if (progress === 100) {
+      setTimeout(() => {
+        void router.push("/dashboard")
+      }, 2000)
+    }
   }, [progress, router])
+
+  const currentSlideData = slides[currentSlide]
 
   const renderContent = (content: SlideContent, slide: Slide): ReactNode => {
     if (isStringArray(content)) {
