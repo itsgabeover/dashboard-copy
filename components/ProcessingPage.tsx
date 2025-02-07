@@ -1,15 +1,16 @@
 "use client"
 
+import type React from "react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence, type Variants } from "framer-motion"
 import { CheckCircle, Star, Eye, AlertTriangle, FileText, BarChart, PieChart, TrendingUp } from "lucide-react"
-import type React from "react" // Import React
 
-type SlideContent =
-  | string[]
-  | { text: string; description: string; icon: React.ElementType; color: string }[]
-  | { email: string[]; pdf: string[] }
+type StringContent = string[]
+type IconContent = { text: string; description: string; icon: React.ElementType; color: string }[]
+type EmailPdfContent = { email: string[]; pdf: string[] }
+
+type SlideContent = StringContent | IconContent | EmailPdfContent
 
 interface Slide {
   id: number
@@ -138,7 +139,7 @@ export default function ProcessingPage() {
       if (typeof content[0] === "string") {
         return (
           <ul className="space-y-4">
-            {content.map((item, index) => (
+            {(content as StringContent).map((item, index) => (
               <motion.li
                 key={index}
                 className="flex items-center space-x-2"
@@ -155,7 +156,7 @@ export default function ProcessingPage() {
       } else {
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {content.map((item, index) => (
+            {(content as IconContent).map((item, index) => (
               <motion.div
                 key={index}
                 className="flex flex-col items-center text-center"
@@ -172,12 +173,13 @@ export default function ProcessingPage() {
         )
       }
     } else {
+      const emailPdfContent = content as EmailPdfContent
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <motion.div className="space-y-4" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <h3 className="font-semibold text-blue-600">Clear Email Summary</h3>
             <ul className="list-disc list-inside">
-              {content.email.map((item, index) => (
+              {emailPdfContent.email.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
@@ -185,7 +187,7 @@ export default function ProcessingPage() {
           <motion.div className="space-y-4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <h3 className="font-semibold text-blue-600">Expert PDF Report</h3>
             <ul className="list-disc list-inside">
-              {content.pdf.map((item, index) => (
+              {emailPdfContent.pdf.map((item, index) => (
                 <li key={index}>{item}</li>
               ))}
             </ul>
