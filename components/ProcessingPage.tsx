@@ -169,7 +169,7 @@ export default function ProcessingPage() {
                           </motion.li>
                         ))}
                       </ul>
-                    ))}
+                    )}
                   </div>
                 </motion.div>
               ))}
@@ -236,9 +236,9 @@ export default function ProcessingPage() {
           transition={{ delay: 2 }}
         >
           <p className="text-sm text-blue-700 italic">
-            &ldquo;The analysis you&apos;re about to receive would typically take an experienced insurance professional several
-            hours to compile. Our AI completes this in minutes, providing you with rapid, comprehensive insights into
-            your policy.&rdquo;
+            &ldquo;The analysis you&apos;re about to receive would typically take an experienced insurance professional
+            several hours to compile. Our AI completes this in minutes, providing you with rapid, comprehensive insights
+            into your policy.&rdquo;
           </p>
         </motion.div>
 
