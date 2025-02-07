@@ -17,8 +17,10 @@ function PaymentProcessor(): ReactElement {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  useEffect((): (() => void) | undefined => {
+  useEffect(() => {
     console.log("PaymentProcessor useEffect started")
+    let intervalId: NodeJS.Timeout | undefined
+    let timeoutId: NodeJS.Timeout | undefined
 
     const verifyPayment = async (): Promise<void> => {
       try {
@@ -71,22 +73,23 @@ function PaymentProcessor(): ReactElement {
 
     if (searchParams) {
       console.log("Setting up interval for payment verification")
-      const intervalId = setInterval(verifyPayment, 2000)
+      intervalId = setInterval(verifyPayment, 2000)
 
       // Run initial verification
       void verifyPayment()
 
-      const timeoutId = setTimeout(() => {
+      timeoutId = setTimeout(() => {
         console.log("Verification timed out")
-        clearInterval(intervalId)
+        if (intervalId) clearInterval(intervalId)
         setError("Payment verification timed out")
       }, 30000)
+    }
 
-      return () => {
-        console.log("PaymentProcessor cleanup running")
-        clearInterval(intervalId)
-        clearTimeout(timeoutId)
-      }
+    // Cleanup function that will always be returned
+    return () => {
+      console.log("PaymentProcessor cleanup running")
+      if (intervalId) clearInterval(intervalId)
+      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [router, searchParams])
 
@@ -137,4 +140,3 @@ export default function PaymentSuccessPage(): ReactElement {
     </Suspense>
   )
 }
-
