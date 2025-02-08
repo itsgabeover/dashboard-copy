@@ -1,4 +1,4 @@
-"use client"
+/*"use client"
 
 import { useState, useEffect, useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
@@ -176,5 +176,6 @@ export function SageChat() {
       </div>
     </TooltipProvider>
   )
+  */
 }
 
