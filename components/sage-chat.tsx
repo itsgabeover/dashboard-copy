@@ -25,7 +25,7 @@ export function SageChat() {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
     }
-  }, [messages, isLoading]) //Fixed unnecessary dependency
+  }, [messages]) //Fixed unnecessary dependency
 
   const quickActions: QuickAction[] = [
     { label: "Policy Overview", query: "Show me my policy overview" },
