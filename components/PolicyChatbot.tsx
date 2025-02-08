@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
-import { supabase } from "@/lib/supabase"
+import { createClient } from '@supabase/supabase-js'
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 interface PolicyChatbotProps {
   policyData: ParsedPolicyData
@@ -25,94 +31,125 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
     },
     body: {
       chat_id: chat?.id,
-      session_id: policyData.sessionId,
-      email: policyData.data.email
+      session_id: policyData.sessionId
     },
   })
 
   useEffect(() => {
     const fetchOrCreateChat = async () => {
-      const { data: existingChat, error: fetchError } = await supabase
-        .from("chats")
-        .select("*")
-        .eq("user_email", userEmail)
-        .eq("session_id", policyData.sessionId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single()
-
-      if (fetchError || !existingChat) {
-        const { data: newChat, error: insertError } = await supabase
+      try {
+        // First try to fetch existing chat
+        const { data: existingChat, error: fetchError } = await supabase
           .from("chats")
-          .insert({ 
-            user_email: userEmail, 
-            session_id: policyData.sessionId,
-            is_active: true 
-          })
-          .select()
+          .select("*")
+          .eq("user_email", userEmail)
+          .eq("session_id", policyData.sessionId)
+          .order("created_at", { ascending: false })
+          .limit(1)
           .single()
 
-        if (insertError) {
-          console.error("Error creating new chat:", insertError)
-          return
-        }
+        if (!fetchError && existingChat) {
+          console.log("Found existing chat:", existingChat.id)
+          setChat(existingChat)
+        } else {
+          console.log("Creating new chat for session:", policyData.sessionId)
+          const { data: newChat, error: insertError } = await supabase
+            .from("chats")
+            .insert({ 
+              user_email: userEmail, 
+              session_id: policyData.sessionId,
+              is_active: true 
+            })
+            .select()
+            .single()
 
-        setChat(newChat)
-      } else {
-        setChat(existingChat)
+          if (insertError) {
+            console.error("Error creating new chat:", insertError)
+            return
+          }
+
+          setChat(newChat)
+        }
+      } catch (err) {
+        console.error("Error in fetchOrCreateChat:", err)
       }
     }
 
-    fetchOrCreateChat()
-  }, [userEmail, policyData])
+    if (userEmail && policyData.sessionId) {
+      fetchOrCreateChat()
+    }
+  }, [userEmail, policyData.sessionId])
 
   useEffect(() => {
-    if (chat) {
+    if (chat?.id) {
       const fetchMessages = async () => {
-        const { data: fetchedMessages, error } = await supabase
-          .from("chat_messages")
-          .select("*")
-          .eq("chat_id", chat.id)
-          .order("created_at", { ascending: true })
+        try {
+          const { data: fetchedMessages, error } = await supabase
+            .from("chat_messages")
+            .select("*")
+            .eq("chat_id", chat.id)
+            .order("created_at", { ascending: true })
 
-        if (error) {
-          console.error("Error fetching messages:", error)
-          return
+          if (error) {
+            console.error("Error fetching messages:", error)
+            return
+          }
+
+          if (fetchedMessages) {
+            setMessages(
+              fetchedMessages.map((msg) => ({
+                id: msg.id,
+                role: msg.role as "user" | "assistant" | "system",
+                content: msg.content,
+              }))
+            )
+          }
+        } catch (err) {
+          console.error("Error in fetchMessages:", err)
         }
-
-        setMessages(
-          fetchedMessages.map((msg) => ({
-            id: msg.id,
-            role: msg.role as "user" | "assistant" | "system",
-            content: msg.content,
-          })),
-        )
       }
 
       fetchMessages()
     }
-  }, [chat, setMessages])
+  }, [chat?.id, setMessages])
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!chat) return
+    if (!chat?.id || !input.trim()) return
 
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      chat_id: chat.id,
-      role: "user",
-      content: input,
-      created_at: new Date().toISOString(),
-      is_complete: true,
+    try {
+      const userMessage: ChatMessage = {
+        id: Date.now().toString(),
+        chat_id: chat.id,
+        role: "user",
+        content: input.trim(),
+        created_at: new Date().toISOString(),
+        is_complete: true,
+      }
+
+      const { error: saveError } = await supabase
+        .from("chat_messages")
+        .insert(userMessage)
+
+      if (saveError) {
+        console.error("Error saving user message:", saveError)
+        return
+      }
+
+      await handleSubmit(e)
+    } catch (err) {
+      console.error("Error in handleFormSubmit:", err)
     }
+  }
 
-    const { error } = await supabase.from("chat_messages").insert(userMessage)
-
-    if (error) {
-      console.error("Error saving user message:", error)
-    }
-
-    handleSubmit(e)
+  if (!policyData || !policyData.sessionId) {
+    return (
+      <Card className="w-full p-4">
+        <CardContent>
+          <p className="text-red-500">Error: Missing required policy data</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -149,9 +186,19 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
       </CardContent>
       <CardFooter>
         <form onSubmit={handleFormSubmit} className="flex w-full space-x-2">
-          <Input value={input} onChange={handleInputChange} placeholder="Type your message..." className="flex-grow" />
-          <Button type="submit" disabled={isLoading}>
-            Send
+          <Input 
+            value={input} 
+            onChange={handleInputChange} 
+            placeholder="Type your message..." 
+            className="flex-grow"
+            disabled={isLoading || !chat?.id}
+          />
+          <Button 
+            type="submit" 
+            disabled={isLoading || !input.trim() || !chat?.id}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            {isLoading ? 'Sending...' : 'Send'}
           </Button>
         </form>
       </CardFooter>
