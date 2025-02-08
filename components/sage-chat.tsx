@@ -10,6 +10,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
+interface QuickAction {
+  label: string
+  query: string
+}
+
 export function SageChat() {
   const [isOpen, setIsOpen] = useState(false)
   const [isMinimized, setIsMinimized] = useState(false)
@@ -20,13 +25,18 @@ export function SageChat() {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
     }
-  }, [chatContainerRef]) //Corrected dependency
+  }, [messages, isLoading]) //Fixed unnecessary dependency
 
-  const quickActions = [
+  const quickActions: QuickAction[] = [
     { label: "Policy Overview", query: "Show me my policy overview" },
     { label: "Health Score Details", query: "Explain my health score" },
     { label: "Investment Options", query: "What are my investment options?" },
   ]
+
+  // Create a type-safe handler for quick action clicks
+  const handleQuickActionClick = (query: string) => {
+    handleInputChange({ target: { value: query } } as React.ChangeEvent<HTMLInputElement>)
+  }
 
   return (
     <TooltipProvider>
@@ -63,8 +73,8 @@ export function SageChat() {
                     {messages.length === 0 ? (
                       <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                          Hi! I'm Sage, your AI assistant. I can help you understand your policy details and answer any
-                          questions you have.
+                          Hi! I&apos;m Sage, your AI assistant. I can help you understand your policy details and answer
+                          any questions you have.
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {quickActions.map((action, index) => (
@@ -72,7 +82,7 @@ export function SageChat() {
                               key={index}
                               variant="outline"
                               size="sm"
-                              onClick={() => handleInputChange({ target: { value: action.query } } as any)}
+                              onClick={() => handleQuickActionClick(action.query)}
                               className="text-sm"
                             >
                               {action.label}
