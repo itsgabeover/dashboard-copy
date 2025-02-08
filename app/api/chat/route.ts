@@ -1,6 +1,6 @@
 import { streamText } from "ai"
 import { OpenAI } from "ai/openai"
-import { supabase } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabaseclient"
 import type { NextRequest } from "next/server"
 import type { ParsedPolicyData } from "@/types/policy"
 
