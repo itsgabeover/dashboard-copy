@@ -73,7 +73,7 @@ export function SageChat() {
                     {messages.length === 0 ? (
                       <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                          Hi! I&apos;m Sage, your AI assistant. I can help you understand your policy details and answer
+                          Hi! I&apos;m Sage, your AI assistant. I can help you understand your AI policy analysis and answer
                           any questions you have.
                         </p>
                         <div className="flex flex-wrap gap-2">
