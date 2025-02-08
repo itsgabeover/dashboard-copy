@@ -67,7 +67,7 @@ Remember: Each report tells a unique story about someone's policy. Your role is 
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, chat_id, policy_id } = await req.json()
+    const { messages, chat_id, session_id, email } = await req.json()
     const userEmail = req.headers.get("X-User-Email")
 
     if (!userEmail) {
@@ -88,29 +88,46 @@ export async function POST(req: NextRequest) {
       }
 
       chat = existingChat
-    } else if (policy_id) {
-      const { data: newChat, error: insertError } = await supabase
+    } else if (session_id) {
+      // First try to find an existing chat with this session_id
+      const { data: existingChat, error: fetchError } = await supabase
         .from("chats")
-        .insert({ user_email: userEmail, policy_id })
-        .select()
+        .select("*")
+        .eq("session_id", session_id)
+        .eq("user_email", userEmail)
         .single()
 
-      if (insertError) {
-        throw new Error("Error creating new chat")
-      }
+      if (!fetchError && existingChat) {
+        chat = existingChat
+      } else {
+        // Create new chat if none exists
+        const { data: newChat, error: insertError } = await supabase
+          .from("chats")
+          .insert({ 
+            user_email: userEmail, 
+            session_id: session_id,
+            is_active: true 
+          })
+          .select()
+          .single()
 
-      chat = newChat
+        if (insertError) {
+          throw new Error("Error creating new chat")
+        }
+
+        chat = newChat
+      }
     }
 
     if (!chat) {
-      return new Response(JSON.stringify({ error: "Invalid chat or policy ID" }), { status: 400 })
+      return new Response(JSON.stringify({ error: "Invalid chat or session ID" }), { status: 400 })
     }
 
     let policyData: ParsedPolicyData | null = null
     const { data: policyDataResult, error: policyError } = await supabase
       .from("policies")
       .select("analysis_data")
-      .eq("id", chat.policy_id)
+      .eq("session_id", session_id)
       .single()
 
     if (policyError) {
@@ -183,4 +200,3 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: "An unexpected error occurred" }), { status: 500 })
   }
 }
-
