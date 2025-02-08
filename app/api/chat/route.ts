@@ -1,4 +1,4 @@
-import { streamText } from "ai"
+import { StreamingTextResponse, OpenAIStream } from "ai"
 import OpenAI from "openai"
 import { supabase } from "@/lib/supabase"
 import type { NextRequest } from "next/server"
@@ -45,14 +45,17 @@ export async function POST(req: NextRequest) {
        Provide general advice about insurance policies and recommend that the user check their policy documents or contact their insurance provider for specific details.`
 
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.OPENAI_API_KEY!,
   })
 
-  const result = streamText({
-    model: openai.chat.completions.create,
-    messages: [{ role: "system", content: systemMessage }, ...messages],
-  })
+  const stream = OpenAIStream(
+    openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [{ role: "system", content: systemMessage }, ...messages],
+      stream: true,
+    }),
+  )
 
-  return result.toDataStreamResponse()
+  return new StreamingTextResponse(stream)
 }
 
