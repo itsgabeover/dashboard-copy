@@ -8,7 +8,6 @@ export interface RateLimitContext {
 }
 
 interface Options {
-  uniqueTokenPerInterval?: number;
   interval?: number;
 }
 
@@ -16,12 +15,10 @@ type TokenBucket = number[];
 
 export default class RateLimit {
   private tokenCache: Map<string, TokenBucket>;
-  private uniqueTokenPerInterval: number;
   private interval: number;
 
   constructor(options?: Options) {
     this.tokenCache = new Map<string, TokenBucket>();
-    this.uniqueTokenPerInterval = options?.uniqueTokenPerInterval || 500;
     this.interval = options?.interval || 60000; // default: 60 seconds
   }
 
@@ -58,7 +55,6 @@ export default class RateLimit {
 
 const rateLimit = new RateLimit({
   interval: 60 * 1000, // 60 seconds
-  uniqueTokenPerInterval: 500, // Max 500 users per interval
 });
 
 export async function withRateLimit(
