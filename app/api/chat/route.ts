@@ -6,6 +6,10 @@ import type { ParsedPolicyData } from "@/types/policy"
 
 export const runtime = "edge"
 
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+})
+
 export async function POST(req: NextRequest) {
   const { messages } = await req.json()
   const userEmail = messages[0]?.content?.match(/User email: (.*)/)?.[1]
@@ -44,18 +48,13 @@ export async function POST(req: NextRequest) {
        However, I don't have specific policy information for this user. 
        Provide general advice about insurance policies and recommend that the user check their policy documents or contact their insurance provider for specific details.`
 
-  const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY!,
+  const response = await openai.chat.completions.create({
+    model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
+    messages: [{ role: "system", content: systemMessage }, ...messages],
+    stream: true,
   })
 
-  const stream = OpenAIStream(
-    openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [{ role: "system", content: systemMessage }, ...messages],
-      stream: true,
-    }),
-  )
-
+  const stream = OpenAIStream(response)
   return new StreamingTextResponse(stream)
 }
 
