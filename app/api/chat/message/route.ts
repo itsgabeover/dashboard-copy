@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { withRateLimit } from '@/lib/rate-limit'
 import { createChatCompletion } from '@/lib/openai'
 import type { SendMessageParams, ChatAPIResponse, OpenAIMessage } from '@/types/chat'
+import type { ChatCompletion } from 'openai/resources/chat'
 
 export async function POST(req: NextRequest) {
   // Check rate limit
@@ -68,8 +69,9 @@ export async function POST(req: NextRequest) {
     // Get AI response
     const completion = await createChatCompletion({
       messages: formattedMessages,
-      policyData: chat.policies.analysis_data
-    })
+      policyData: chat.policies.analysis_data,
+      stream: false
+    }) as ChatCompletion
 
     const aiResponse = completion.choices[0]?.message?.content || ''
 
