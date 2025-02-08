@@ -10,8 +10,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "npm install --legacy-peer-deps"
+    "lint": "next lint"
   },
   "dependencies": {
     "@puppeteer/browsers": "^1.4.5",
@@ -71,3 +70,4 @@
     "react-dom": "18.2.0"
   }
 }
+
