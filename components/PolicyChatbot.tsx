@@ -25,7 +25,8 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
     },
     body: {
       chat_id: chat?.id,
-      policy_id: policyData.sessionId, // Changed from policyData.data.policyOverview.id to policyData.sessionId
+      session_id: policyData.sessionId,
+      email: policyData.data.email
     },
   })
 
@@ -35,7 +36,7 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
         .from("chats")
         .select("*")
         .eq("user_email", userEmail)
-        .eq("policy_id", policyData.sessionId) // Changed here as well
+        .eq("session_id", policyData.sessionId)
         .order("created_at", { ascending: false })
         .limit(1)
         .single()
@@ -43,7 +44,11 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
       if (fetchError || !existingChat) {
         const { data: newChat, error: insertError } = await supabase
           .from("chats")
-          .insert({ user_email: userEmail, policy_id: policyData.sessionId }) // And here
+          .insert({ 
+            user_email: userEmail, 
+            session_id: policyData.sessionId,
+            is_active: true 
+          })
           .select()
           .single()
 
