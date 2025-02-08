@@ -2,7 +2,7 @@ import { StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { supabase } from "@/lib/supabase"
 import type { NextRequest } from "next/server"
-import type { Chat } from "@/types/chat"
+import type { Chat, ParsedPolicyData } from "@/types/chat"
 
 export const runtime = "edge"
 
@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     return new Response(JSON.stringify({ error: "Invalid chat or policy ID" }), { status: 400 })
   }
 
-  let policyData: any | null = null
+  let policyData: ParsedPolicyData | null = null
   const { data: policyDataResult, error: policyError } = await supabase
     .from("policies")
     .select("analysis_data")
@@ -114,8 +114,8 @@ export async function POST(req: NextRequest) {
 
   if (policyError) {
     console.error("Error fetching policy data:", policyError)
-  } else {
-    policyData = policyDataResult.analysis_data as any
+  } else if (policyDataResult && policyDataResult.analysis_data) {
+    policyData = policyDataResult.analysis_data as ParsedPolicyData
   }
 
   const systemMessage = policyData
