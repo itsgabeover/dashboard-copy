@@ -1,3 +1,4 @@
+/*
 import OpenAI from "openai"
 import type { ParsedPolicyData } from "@/types/policy"
 
@@ -56,4 +57,4 @@ export async function* createChatCompletionStream({ messages, policyData }: Chat
     yield chunk.choices[0]?.delta?.content || ""
   }
 }
-
+*/
