@@ -7,13 +7,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js"
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 interface PolicyChatbotProps {
   policyData: ParsedPolicyData
@@ -22,6 +19,8 @@ interface PolicyChatbotProps {
 
 export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
   const [chat, setChat] = useState<Chat | null>(null)
+  const [isInitializing, setIsInitializing] = useState(true)
+  const [initError, setInitError] = useState<string | null>(null)
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error } = useChat({
     api: "/api/chat",
@@ -31,14 +30,20 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
     },
     body: {
       chat_id: chat?.id,
-      session_id: policyData.sessionId
+      session_id: policyData.sessionId,
     },
   })
 
   useEffect(() => {
     const fetchOrCreateChat = async () => {
       try {
-        // First try to fetch existing chat
+        setIsInitializing(true)
+        setInitError(null)
+
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+          throw new Error("Missing Supabase configuration")
+        }
+
         const { data: existingChat, error: fetchError } = await supabase
           .from("chats")
           .select("*")
@@ -51,27 +56,30 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
         if (!fetchError && existingChat) {
           console.log("Found existing chat:", existingChat.id)
           setChat(existingChat)
-        } else {
-          console.log("Creating new chat for session:", policyData.sessionId)
-          const { data: newChat, error: insertError } = await supabase
-            .from("chats")
-            .insert({ 
-              user_email: userEmail, 
-              session_id: policyData.sessionId,
-              is_active: true 
-            })
-            .select()
-            .single()
-
-          if (insertError) {
-            console.error("Error creating new chat:", insertError)
-            return
-          }
-
-          setChat(newChat)
+          return
         }
+
+        console.log("Creating new chat for session:", policyData.sessionId)
+        const { data: newChat, error: insertError } = await supabase
+          .from("chats")
+          .insert({
+            user_email: userEmail,
+            session_id: policyData.sessionId,
+            is_active: true,
+          })
+          .select()
+          .single()
+
+        if (insertError) {
+          throw new Error(`Error creating chat: ${insertError.message}`)
+        }
+
+        setChat(newChat)
       } catch (err) {
         console.error("Error in fetchOrCreateChat:", err)
+        setInitError(err instanceof Error ? err.message : "Failed to initialize chat")
+      } finally {
+        setIsInitializing(false)
       }
     }
 
@@ -101,7 +109,7 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
                 id: msg.id,
                 role: msg.role as "user" | "assistant" | "system",
                 content: msg.content,
-              }))
+              })),
             )
           }
         } catch (err) {
@@ -127,19 +135,46 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
         is_complete: true,
       }
 
-      const { error: saveError } = await supabase
-        .from("chat_messages")
-        .insert(userMessage)
+      const { error: saveError } = await supabase.from("chat_messages").insert(userMessage)
 
       if (saveError) {
-        console.error("Error saving user message:", saveError)
-        return
+        throw new Error(`Failed to save message: ${saveError.message}`)
       }
 
       await handleSubmit(e)
     } catch (err) {
       console.error("Error in handleFormSubmit:", err)
+      // Show error to user
+      const errorMessage = err instanceof Error ? err.message : "Failed to send message"
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          role: "system",
+          content: `Error: ${errorMessage}`,
+        },
+      ])
     }
+  }
+
+  if (isInitializing) {
+    return (
+      <Card className="w-full p-4">
+        <CardContent>
+          <p className="text-gray-500">Initializing chat...</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (initError) {
+    return (
+      <Card className="w-full p-4">
+        <CardContent>
+          <p className="text-red-500">Error: {initError}</p>
+        </CardContent>
+      </Card>
+    )
   }
 
   if (!policyData || !policyData.sessionId) {
@@ -186,22 +221,23 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
       </CardContent>
       <CardFooter>
         <form onSubmit={handleFormSubmit} className="flex w-full space-x-2">
-          <Input 
-            value={input} 
-            onChange={handleInputChange} 
-            placeholder="Type your message..." 
+          <Input
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Type your message..."
             className="flex-grow"
             disabled={isLoading || !chat?.id}
           />
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isLoading || !input.trim() || !chat?.id}
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
-            {isLoading ? 'Sending...' : 'Send'}
+            {isLoading ? "Sending..." : "Send"}
           </Button>
         </form>
       </CardFooter>
     </Card>
   )
 }
+
