@@ -11,7 +11,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { ParsedPolicyData, PolicySection, Policy } from "@/types/policy"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
-import { supabase } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabase"
 import { PolicyChatbot } from "@/components/PolicyChatbot"
 
 const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) => {
