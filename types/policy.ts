@@ -45,11 +45,14 @@ export interface APIResponse {
   error?: string
 }
 
-// New types to support the updated dashboard code
+// Updated Policy interface with new fields from Supabase
 export interface Policy {
+  id: string               // Added from Supabase
   policy_name: string
   created_at: string
   analysis_data: ParsedPolicyData
+  status: string          // Added from Supabase
+  updated_at: string      // Added from Supabase
   email: string
-  session_id: string  // Added to match Supabase schema
+  session_id: string
 }
