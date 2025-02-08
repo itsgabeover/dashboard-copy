@@ -111,6 +111,7 @@ export default function Dashboard() {
   const [isVerified, setIsVerified] = useState(false)
   const [policies, setPolicies] = useState<Policy[]>([])
   const [showPolicySelection, setShowPolicySelection] = useState(false)
+  const [userEmail, setUserEmail] = useState<string>("")
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
@@ -136,6 +137,7 @@ export default function Dashboard() {
     const storedEmail = localStorage.getItem("userEmail")
     if (storedEmail) {
       setIsVerified(true)
+      setUserEmail(storedEmail)
       loadPolicies(storedEmail)
       localStorage.setItem("chatbotInitialMessage", `User email: ${storedEmail}`)
     } else {
@@ -145,6 +147,7 @@ export default function Dashboard() {
 
   const handleEmailVerified = (email: string) => {
     setIsVerified(true)
+    setUserEmail(email)
     loadPolicies(email)
   }
 
@@ -501,7 +504,7 @@ export default function Dashboard() {
             </Card>
           </TabsContent>
           <TabsContent value="chatbot" className="space-y-4">
-            <PolicyChatbot policyData={policyData} />
+            <PolicyChatbot policyData={policyData} userEmail={userEmail} />
           </TabsContent>
         </Tabs>
       </div>
