@@ -1,3 +1,6 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
 export interface RateLimitContext {
   remaining: number;
   reset: number;
@@ -48,5 +51,35 @@ export default class RateLimit {
       reset: Math.ceil((now + this.interval - Date.now()) / 1000),
       limit,
     };
+  }
+}
+
+// Create singleton instance
+const rateLimit = new RateLimit({
+  interval: 60 * 1000, // 60 seconds
+  uniqueTokenPerInterval: 500, // Max 500 users per interval
+});
+
+export async function withRateLimit(
+  req: NextRequest,
+  limit: number = 20
+) {
+  const ip = req.headers.get('x-forwarded-for') || 'anonymous';
+  try {
+    const { remaining } = await rateLimit.check(limit, ip);
+    
+    if (remaining === 0) {
+      return NextResponse.json(
+        { error: 'Too many requests, please try again later.' },
+        { status: 429 }
+      );
+    }
+    
+    return null; // Continue with the request
+  } catch {
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }
