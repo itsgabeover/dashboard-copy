@@ -11,7 +11,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import type { ParsedPolicyData, PolicySection, Policy } from "@/types/policy"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
-import { supabase } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase-client"
+import { PolicyChatbot } from "@/components/PolicyChatbot"
 
 const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) => {
   const [email, setEmail] = useState("")
@@ -136,6 +137,7 @@ export default function Dashboard() {
     if (storedEmail) {
       setIsVerified(true)
       loadPolicies(storedEmail)
+      localStorage.setItem("chatbotInitialMessage", `User email: ${storedEmail}`)
     } else {
       setIsLoading(false)
     }
@@ -203,7 +205,7 @@ export default function Dashboard() {
         </header>
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white border rounded-xl p-1 shadow-sm mb-6">
+          <TabsList className="grid w-full grid-cols-5 bg-white border rounded-xl p-1 shadow-sm mb-6">
             <TabsTrigger
               value="overview"
               className="data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white rounded-lg transition-all"
@@ -227,6 +229,12 @@ export default function Dashboard() {
               className="data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white rounded-lg transition-all"
             >
               Projections
+            </TabsTrigger>
+            <TabsTrigger
+              value="chatbot"
+              className="data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white rounded-lg transition-all"
+            >
+              AI Assistant
             </TabsTrigger>
           </TabsList>
 
@@ -491,6 +499,9 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+          <TabsContent value="chatbot" className="space-y-4">
+            <PolicyChatbot policyData={policyData} />
           </TabsContent>
         </Tabs>
       </div>
