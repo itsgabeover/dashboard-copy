@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = (await req.json()) as SendMessageParams
-    const { chat_id, content, context } = body
+    const { chat_id, content } = body
 
     // Get chat and policy data
     const { data: chat, error: chatError } = await supabase
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Save user message
-    const { data: userMessage, error: userMessageError } = await supabase
+    const { error: userMessageError } = await supabase
       .from('chat_messages')
       .insert({
         chat_id,
@@ -42,8 +42,6 @@ export async function POST(req: NextRequest) {
         content,
         is_complete: true
       })
-      .select()
-      .single()
 
     if (userMessageError) {
       throw userMessageError
