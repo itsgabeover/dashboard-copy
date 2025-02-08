@@ -66,116 +66,121 @@ Remember: Each report tells a unique story about someone's policy. Your role is 
 `
 
 export async function POST(req: NextRequest) {
-  const { messages, chat_id, policy_id } = await req.json()
-  const userEmail = req.headers.get("X-User-Email")
+  try {
+    const { messages, chat_id, policy_id } = await req.json()
+    const userEmail = req.headers.get("X-User-Email")
 
-  if (!userEmail) {
-    return new Response(JSON.stringify({ error: "User email is required" }), { status: 400 })
-  }
-
-  let chat: Chat | null = null
-  if (chat_id) {
-    const { data: existingChat, error: chatError } = await supabase
-      .from("chats")
-      .select("*")
-      .eq("id", chat_id)
-      .eq("user_email", userEmail)
-      .single()
-
-    if (chatError) {
-      return new Response(JSON.stringify({ error: "Error fetching chat" }), { status: 500 })
+    if (!userEmail) {
+      return new Response(JSON.stringify({ error: "User email is required" }), { status: 400 })
     }
 
-    chat = existingChat
-  } else if (policy_id) {
-    const { data: newChat, error: insertError } = await supabase
-      .from("chats")
-      .insert({ user_email: userEmail, policy_id })
-      .select()
-      .single()
+    let chat: Chat | null = null
+    if (chat_id) {
+      const { data: existingChat, error: chatError } = await supabase
+        .from("chats")
+        .select("*")
+        .eq("id", chat_id)
+        .eq("user_email", userEmail)
+        .single()
 
-    if (insertError) {
-      return new Response(JSON.stringify({ error: "Error creating new chat" }), { status: 500 })
-    }
-
-    chat = newChat
-  }
-
-  if (!chat) {
-    return new Response(JSON.stringify({ error: "Invalid chat or policy ID" }), { status: 400 })
-  }
-
-  let policyData: ParsedPolicyData | null = null
-  const { data: policyDataResult, error: policyError } = await supabase
-    .from("policies")
-    .select("analysis_data")
-    .eq("id", chat.policy_id)
-    .single()
-
-  if (policyError) {
-    console.error("Error fetching policy data:", policyError)
-  } else if (policyDataResult && policyDataResult.analysis_data) {
-    policyData = policyDataResult.analysis_data as ParsedPolicyData
-  }
-
-  const systemMessage = policyData
-    ? `${baseSystemPrompt}
-
-       You have access to the following policy data:
-       
-       Policy Name: ${policyData.data.policyOverview.productName}
-       Issuer: ${policyData.data.policyOverview.issuer}
-       Death Benefit: ${policyData.data.policyOverview.deathBenefit}
-       Annual Premium: ${policyData.data.policyOverview.annualPremium}
-       Policy Type: ${policyData.data.policyOverview.productType}
-       
-       Use this information to provide accurate and helpful responses about the user's policy. 
-       If asked about specific details not provided here, explain that you have limited information and offer to guide them to where they can find more details in their report.`
-    : `${baseSystemPrompt}
-
-       However, I don't have specific policy information for this user. 
-       Provide general advice about insurance policies based on the principles outlined above, and recommend that the user check their policy documents or contact their insurance provider for specific details.`
-
-  const response = await openai.chat.completions.create({
-    model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
-    messages: [{ role: "system", content: systemMessage }, ...messages],
-    stream: true,
-  })
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      let fullResponse = ""
-      for await (const chunk of response) {
-        const content = chunk.choices[0]?.delta?.content || ""
-        fullResponse += content
-        controller.enqueue(new TextEncoder().encode(content))
+      if (chatError) {
+        throw new Error("Error fetching chat")
       }
-      controller.close()
 
-      // Save the message to the database
-      const { error: insertError } = await supabase.from("chat_messages").insert({
-        chat_id: chat.id,
-        role: "assistant",
-        content: fullResponse,
-        is_complete: true,
-      })
+      chat = existingChat
+    } else if (policy_id) {
+      const { data: newChat, error: insertError } = await supabase
+        .from("chats")
+        .insert({ user_email: userEmail, policy_id })
+        .select()
+        .single()
 
       if (insertError) {
-        console.error("Error saving assistant message:", insertError)
+        throw new Error("Error creating new chat")
       }
 
-      // Update the last_message_at timestamp for the chat
-      const { error: updateError } = await supabase
-        .from("chats")
-        .update({ last_message_at: new Date().toISOString() })
-        .eq("id", chat.id)
+      chat = newChat
+    }
 
-      if (updateError) {
-        console.error("Error updating chat timestamp:", updateError)
-      }
-    },
-  })
+    if (!chat) {
+      return new Response(JSON.stringify({ error: "Invalid chat or policy ID" }), { status: 400 })
+    }
 
-  return new StreamingTextResponse(stream)
+    let policyData: ParsedPolicyData | null = null
+    const { data: policyDataResult, error: policyError } = await supabase
+      .from("policies")
+      .select("analysis_data")
+      .eq("id", chat.policy_id)
+      .single()
+
+    if (policyError) {
+      console.error("Error fetching policy data:", policyError)
+    } else if (policyDataResult && policyDataResult.analysis_data) {
+      policyData = policyDataResult.analysis_data as ParsedPolicyData
+    }
+
+    const systemMessage = policyData
+      ? `${baseSystemPrompt}
+
+         You have access to the following policy data:
+         
+         Policy Name: ${policyData.data.policyOverview.productName}
+         Issuer: ${policyData.data.policyOverview.issuer}
+         Death Benefit: ${policyData.data.policyOverview.deathBenefit}
+         Annual Premium: ${policyData.data.policyOverview.annualPremium}
+         Policy Type: ${policyData.data.policyOverview.productType}
+         
+         Use this information to provide accurate and helpful responses about the user's policy. 
+         If asked about specific details not provided here, explain that you have limited information and offer to guide them to where they can find more details in their report.`
+      : `${baseSystemPrompt}
+
+         However, I don't have specific policy information for this user. 
+         Provide general advice about insurance policies based on the principles outlined above, and recommend that the user check their policy documents or contact their insurance provider for specific details.`
+
+    const response = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
+      messages: [{ role: "system", content: systemMessage }, ...messages],
+      stream: true,
+    })
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        let fullResponse = ""
+        for await (const chunk of response) {
+          const content = chunk.choices[0]?.delta?.content || ""
+          fullResponse += content
+          controller.enqueue(new TextEncoder().encode(content))
+        }
+        controller.close()
+
+        // Save the message to the database
+        const { error: insertError } = await supabase.from("chat_messages").insert({
+          chat_id: chat.id,
+          role: "assistant",
+          content: fullResponse,
+          is_complete: true,
+        })
+
+        if (insertError) {
+          console.error("Error saving assistant message:", insertError)
+        }
+
+        // Update the last_message_at timestamp for the chat
+        const { error: updateError } = await supabase
+          .from("chats")
+          .update({ last_message_at: new Date().toISOString() })
+          .eq("id", chat.id)
+
+        if (updateError) {
+          console.error("Error updating chat timestamp:", updateError)
+        }
+      },
+    })
+
+    return new StreamingTextResponse(stream)
+  } catch (error) {
+    console.error("Error in chat API:", error)
+    return new Response(JSON.stringify({ error: "An unexpected error occurred" }), { status: 500 })
+  }
 }
 
