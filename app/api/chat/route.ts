@@ -67,7 +67,7 @@ Remember: Each report tells a unique story about someone's policy. Your role is 
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, chat_id, session_id, email } = await req.json()
+    const { messages, chat_id, session_id } = await req.json()
     const userEmail = req.headers.get("X-User-Email")
 
     if (!userEmail) {
