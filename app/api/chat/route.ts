@@ -1,22 +1,16 @@
-import { StreamingTextResponse } from "ai"
+import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js"
 import type { NextRequest } from "next/server"
 import type { Chat, ParsedPolicyData } from "@/types/chat"
 
-export const runtime = "edge"
-
 // Initialize Supabase client with environment variables
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+})
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -83,7 +77,11 @@ export async function POST(req: NextRequest) {
     const userEmail = req.headers.get("X-User-Email")
 
     if (!userEmail) {
-      return new Response(JSON.stringify({ error: "User email is required" }), { status: 400 })
+      return new Response("User email is required", { status: 401 })
+    }
+
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return new Response("Missing Supabase configuration", { status: 500 })
     }
 
     let chat: Chat | null = null
@@ -114,10 +112,10 @@ export async function POST(req: NextRequest) {
       } else {
         const { data: newChat, error: insertError } = await supabase
           .from("chats")
-          .insert({ 
-            user_email: userEmail, 
+          .insert({
+            user_email: userEmail,
             session_id: session_id,
-            is_active: true 
+            is_active: true,
           })
           .select()
           .single()
@@ -172,21 +170,14 @@ export async function POST(req: NextRequest) {
       stream: true,
     })
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        let fullResponse = ""
-        for await (const chunk of response) {
-          const content = chunk.choices[0]?.delta?.content || ""
-          fullResponse += content
-          controller.enqueue(new TextEncoder().encode(content))
-        }
-        controller.close()
-
+    // Create a stream from the OpenAI response
+    const stream = OpenAIStream(response, {
+      async onCompletion(completion) {
         // Save the message to the database
         const { error: insertError } = await supabase.from("chat_messages").insert({
-          chat_id: chat.id,
+          chat_id: chat?.id,
           role: "assistant",
-          content: fullResponse,
+          content: completion,
           is_complete: true,
         })
 
@@ -198,7 +189,7 @@ export async function POST(req: NextRequest) {
         const { error: updateError } = await supabase
           .from("chats")
           .update({ last_message_at: new Date().toISOString() })
-          .eq("id", chat.id)
+          .eq("id", chat?.id)
 
         if (updateError) {
           console.error("Error updating chat timestamp:", updateError)
@@ -206,9 +197,17 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    // Return the stream response
     return new StreamingTextResponse(stream)
   } catch (error) {
     console.error("Error in chat API:", error)
-    return new Response(JSON.stringify({ error: "An unexpected error occurred" }), { status: 500 })
+    return new Response(
+      JSON.stringify({
+        error: "An unexpected error occurred",
+        details: error instanceof Error ? error.message : String(error),
+      }),
+      { status: 500 },
+    )
   }
 }
+
