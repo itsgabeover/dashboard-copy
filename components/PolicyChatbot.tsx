@@ -16,7 +16,6 @@ interface PolicyChatbotProps {
 
 export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
   const [chat, setChat] = useState<Chat | null>(null)
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error } = useChat({
     api: "/api/chat",
@@ -65,7 +64,7 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
   useEffect(() => {
     if (chat) {
       const fetchMessages = async () => {
-        const { data: messages, error } = await supabase
+        const { data: fetchedMessages, error } = await supabase
           .from("chat_messages")
           .select("*")
           .eq("chat_id", chat.id)
@@ -76,11 +75,10 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
           return
         }
 
-        setChatMessages(messages)
         setMessages(
-          messages.map((msg) => ({
+          fetchedMessages.map((msg) => ({
             id: msg.id,
-            role: msg.role,
+            role: msg.role as "user" | "assistant" | "system",
             content: msg.content,
           })),
         )
@@ -103,8 +101,6 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
       is_complete: true,
     }
 
-    setChatMessages((prev) => [...prev, userMessage])
-
     const { error } = await supabase.from("chat_messages").insert(userMessage)
 
     if (error) {
@@ -122,7 +118,7 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
       <CardContent className="flex-grow overflow-hidden">
         <ScrollArea className="h-full">
           <div className="space-y-4 p-4">
-            {chatMessages.map((message) => (
+            {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`rounded-lg p-2 max-w-[80%] ${
