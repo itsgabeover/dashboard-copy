@@ -1,4 +1,4 @@
-import { StreamingTextResponse, OpenAIStream } from "ai"
+import { StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { supabase } from "@/lib/supabase"
 import type { NextRequest } from "next/server"
@@ -54,7 +54,16 @@ export async function POST(req: NextRequest) {
     stream: true,
   })
 
-  const stream = OpenAIStream(response)
+  const stream = new ReadableStream({
+    async start(controller) {
+      for await (const chunk of response) {
+        const content = chunk.choices[0]?.delta?.content || ""
+        controller.enqueue(new TextEncoder().encode(content))
+      }
+      controller.close()
+    },
+  })
+
   return new StreamingTextResponse(stream)
 }
 
