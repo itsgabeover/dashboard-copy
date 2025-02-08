@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "npm install --legacy-peer-deps"
   },
   "dependencies": {
     "@puppeteer/browsers": "^2.6.1",
@@ -27,7 +28,7 @@
     "@upstash/redis": "^1.34.3",
     "@vercel/analytics": "latest",
     "@vercel/kv": "^3.0.0",
-    "ai": "^2.2.37", 
+    "ai": "^2.2.37",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^10.16.4",
@@ -62,3 +63,4 @@
     "typescript": "^5.2.2"
   }
 }
+
