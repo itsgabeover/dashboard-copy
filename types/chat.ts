@@ -1,4 +1,4 @@
-import type { ParsedPolicyData as PolicyParsedPolicyData } from "./policy"
+import type { ParsedPolicyData } from "./policy"
 
 export type Role = "user" | "assistant" | "system"
 
@@ -67,6 +67,4 @@ export interface StreamingChatResponse {
   done: boolean
 }
 
-// Use the ParsedPolicyData from the policy types
-export type ParsedPolicyData = PolicyParsedPolicyData
-
+export type { ParsedPolicyData }
