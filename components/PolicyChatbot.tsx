@@ -6,9 +6,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import type { ParsedPolicyData } from "@/types/policy"
 
 interface PolicyChatbotProps {
-  policyData: any // Replace 'any' with your actual policy data type
+  policyData: ParsedPolicyData
 }
 
 export function PolicyChatbot({ policyData }: PolicyChatbotProps) {
@@ -19,7 +20,7 @@ export function PolicyChatbot({ policyData }: PolicyChatbotProps) {
       {
         id: "welcome",
         role: "assistant",
-        content: "Hello! I'm your AI assistant. How can I help you with your policy today?",
+        content: `Hello! I'm your AI assistant. I have information about your ${policyData.data.policyOverview.productName} policy from ${policyData.data.policyOverview.issuer}. How can I help you today?`,
       },
     ],
   })
