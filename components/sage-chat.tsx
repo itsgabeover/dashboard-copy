@@ -74,7 +74,7 @@ export function SageChat() {
                       <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">
                           Hi! I&apos;m Sage, your AI assistant. I can help you understand your policy details and answer
-                          any questions you have.
+                          any questions you may have.
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {quickActions.map((action, index) => (
