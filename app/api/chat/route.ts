@@ -1,6 +1,6 @@
 import { streamText } from "ai"
-import { OpenAI } from "ai/openai"
-import { supabase } from "@/lib/supabaseclient"
+import OpenAI from "openai"
+import { supabase } from "@/lib/supabase"
 import type { NextRequest } from "next/server"
 import type { ParsedPolicyData } from "@/types/policy"
 
@@ -44,8 +44,12 @@ export async function POST(req: NextRequest) {
        However, I don't have specific policy information for this user. 
        Provide general advice about insurance policies and recommend that the user check their policy documents or contact their insurance provider for specific details.`
 
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
+
   const result = streamText({
-    model: new OpenAI({ model: "gpt-4-turbo" }),
+    model: openai.chat.completions.create,
     messages: [{ role: "system", content: systemMessage }, ...messages],
   })
 
