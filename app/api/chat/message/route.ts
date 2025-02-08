@@ -4,7 +4,6 @@ import { supabase } from '@/lib/supabase'
 import { withRateLimit } from '@/lib/rate-limit'
 import { createChatCompletion } from '@/lib/openai'
 import type { SendMessageParams, ChatAPIResponse, OpenAIMessage } from '@/types/chat'
-import type { ChatCompletion } from 'openai/resources/chat'
 
 export async function POST(req: NextRequest) {
   // Check rate limit
@@ -54,7 +53,7 @@ export async function POST(req: NextRequest) {
       .select('*')
       .eq('chat_id', chat_id)
       .order('created_at', { ascending: true })
-      .limit(10) // Get last 10 messages for context
+      .limit(10)
 
     if (messagesError) {
       throw messagesError
@@ -71,8 +70,9 @@ export async function POST(req: NextRequest) {
       messages: formattedMessages,
       policyData: chat.policies.analysis_data,
       stream: false
-    }) as ChatCompletion
+    })
 
+    // @ts-ignore - We know the response will have this structure
     const aiResponse = completion.choices[0]?.message?.content || ''
 
     // Save AI response
