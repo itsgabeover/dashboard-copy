@@ -1,4 +1,5 @@
-import { OpenAIStream, StreamingTextResponse } from "ai"
+import { StreamingTextResponse, type Message } from "ai"
+import { OpenAIStream } from "ai/streams"
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import type { NextRequest } from "next/server"
@@ -166,7 +167,13 @@ export async function POST(req: NextRequest) {
 
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
-      messages: [{ role: "system", content: systemMessage }, ...messages],
+      messages: [
+        { role: "system", content: systemMessage },
+        ...messages.map((message: Message) => ({
+          role: message.role,
+          content: message.content,
+        })),
+      ],
       stream: true,
     })
 
