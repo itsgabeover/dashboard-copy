@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { MessageCircle, X, Send, Mic, Paperclip, MinimizeIcon } from "lucide-react"
+import { MessageSquare, X, Send, Mic, Paperclip, MinimizeIcon } from "lucide-react"
 import { useChat } from "ai/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -25,7 +25,7 @@ export function SageChat() {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
     }
-  }, [messages]) //Fixed unnecessary dependency
+  }, [messages, chatContainerRef]) //Fixed unnecessary dependency
 
   const quickActions: QuickAction[] = [
     { label: "Policy Overview", query: "Show me my policy overview" },
@@ -73,7 +73,7 @@ export function SageChat() {
                     {messages.length === 0 ? (
                       <div className="space-y-4">
                         <p className="text-sm text-muted-foreground">
-                          Hi! I&apos;m Sage, your AI assistant. I can help you understand your AI policy analysis and answer
+                          Hi! I&apos;m Sage, your AI assistant. I can help you understand your policy details and answer
                           any questions you have.
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -167,7 +167,7 @@ export function SageChat() {
                 isOpen ? "bg-primary/90 hover:bg-primary/100" : "bg-primary hover:bg-primary/90"
               }`}
             >
-              <MessageCircle className="h-6 w-6" />
+              <MessageSquare className="h-6 w-6" />
               <span className="sr-only">Open chat with Sage</span>
             </Button>
           </TooltipTrigger>
