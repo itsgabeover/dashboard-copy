@@ -1,10 +1,22 @@
 import { StreamingTextResponse } from "ai"
 import OpenAI from "openai"
-import { supabase } from "@/lib/supabase"
+import { createClient } from '@supabase/supabase-js'
 import type { NextRequest } from "next/server"
 import type { Chat, ParsedPolicyData } from "@/types/chat"
 
 export const runtime = "edge"
+
+// Initialize Supabase client with environment variables
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -84,12 +96,12 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (chatError) {
+        console.error("Chat fetch error:", chatError)
         throw new Error("Error fetching chat")
       }
 
       chat = existingChat
     } else if (session_id) {
-      // First try to find an existing chat with this session_id
       const { data: existingChat, error: fetchError } = await supabase
         .from("chats")
         .select("*")
@@ -100,7 +112,6 @@ export async function POST(req: NextRequest) {
       if (!fetchError && existingChat) {
         chat = existingChat
       } else {
-        // Create new chat if none exists
         const { data: newChat, error: insertError } = await supabase
           .from("chats")
           .insert({ 
@@ -112,6 +123,7 @@ export async function POST(req: NextRequest) {
           .single()
 
         if (insertError) {
+          console.error("Chat creation error:", insertError)
           throw new Error("Error creating new chat")
         }
 
