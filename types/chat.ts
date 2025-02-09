@@ -1,7 +1,9 @@
+import type { Message } from 'ai'
 import type { ParsedPolicyData } from "./policy"
 
 export type Role = "user" | "assistant" | "system"
 
+// Matches Supabase chat_messages table
 export interface ChatMessage {
   id: string
   chat_id: string
@@ -11,22 +13,20 @@ export interface ChatMessage {
   is_complete: boolean
 }
 
+// Matches Supabase chats table with RLS
 export interface Chat {
   id: string
   user_email: string
-  policy_id: string
+  session_id: string
   created_at: string
   last_message_at: string
   is_active: boolean
 }
 
-export interface CreateChatParams {
-  user_email: string
-  policy_id: string
-}
-
+// API Request Types
 export interface SendMessageParams {
   chat_id: string
+  session_id: string
   content: string
   context?: {
     current_tab: string
@@ -47,24 +47,16 @@ export interface ChatAPIResponse {
   }
 }
 
-export interface OpenAIMessage {
-  role: Role
-  content: string
+// Re-export types used by AI components
+export type { Message, ParsedPolicyData }
+
+// Database query helper types
+export interface ChatQueryResponse {
+  data: Chat[] | null
+  error: Error | null
 }
 
-export interface ChatState {
-  messages: ChatMessage[]
-  isLoading: boolean
-  error: string | null
-  activeChat: Chat | null
+export interface MessageQueryResponse {
+  data: ChatMessage[] | null
+  error: Error | null
 }
-
-export interface StreamingChatResponse {
-  id: string
-  role: Role
-  content: string
-  created_at: string
-  done: boolean
-}
-
-export type { ParsedPolicyData }
