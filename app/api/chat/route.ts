@@ -1,8 +1,9 @@
-import { StreamingTextResponse, type Message, OpenAIStream } from "ai"
-import OpenAI from "openai"
-import { createClient } from "@supabase/supabase-js"
-import type { NextRequest } from "next/server"
-import type { Chat, ParsedPolicyData } from "@/types/chat"
+import { StreamingTextResponse, Message } from 'ai'
+import { experimental_StreamData } from 'ai'
+import OpenAI from 'openai'
+import { createClient } from '@supabase/supabase-js'
+import type { NextRequest } from 'next/server'
+import type { Chat, ParsedPolicyData } from '@/types/chat'
 
 // Initialize Supabase client with environment variables
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
@@ -68,8 +69,7 @@ Report Navigation:
 - Explain how different findings relate
 - Highlight key points for their situation
 
-Remember: Each report tells a unique story about someone's policy. Your role is to help them understand their specific analysis, using the report's structure and findings to provide clear, relevant insights while encouraging professional guidance for specific decisions.
-`
+Remember: Each report tells a unique story about someone's policy. Your role is to help them understand their specific analysis, using the report's structure and findings to provide clear, relevant insights while encouraging professional guidance for specific decisions.`
 
 export async function POST(req: NextRequest) {
   try {
@@ -78,10 +78,6 @@ export async function POST(req: NextRequest) {
 
     if (!userEmail) {
       return new Response("User email is required", { status: 401 })
-    }
-
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return new Response("Missing Supabase configuration", { status: 500 })
     }
 
     let chat: Chat | null = null
@@ -164,34 +160,43 @@ export async function POST(req: NextRequest) {
          However, I don't have specific policy information for this user. 
          Provide general advice about insurance policies based on the principles outlined above, and recommend that the user check their policy documents or contact their insurance provider for specific details.`
 
+    // Create data stream
+    const data = new experimental_StreamData()
+
+    // Convert messages to the format OpenAI expects
+    const messagesToSend = [
+      { role: 'system', content: systemMessage },
+      ...messages.map((m: Message) => ({
+        role: m.role,
+        content: m.content,
+      }))
+    ]
+
+    // Create OpenAI completion
     const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: systemMessage },
-        ...messages.map((message: Message) => ({
-          role: message.role,
-          content: message.content,
-        })),
-      ],
+      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+      messages: messagesToSend,
       stream: true,
     })
 
-    // Create a stream from the OpenAI response
+    // Convert the response to a friendly stream
     const stream = OpenAIStream(response, {
       async onCompletion(completion) {
         // Save the message to the database
-        const { error: insertError } = await supabase.from("chat_messages").insert({
-          chat_id: chat?.id,
-          role: "assistant",
-          content: completion,
-          is_complete: true,
-        })
+        const { error: insertError } = await supabase
+          .from("chat_messages")
+          .insert({
+            chat_id: chat?.id,
+            role: "assistant",
+            content: completion,
+            is_complete: true,
+          })
 
         if (insertError) {
-          console.error("Error saving assistant message:", insertError)
+          console.error("Error saving message:", insertError)
         }
 
-        // Update the last_message_at timestamp for the chat
+        // Update chat timestamp
         const { error: updateError } = await supabase
           .from("chats")
           .update({ last_message_at: new Date().toISOString() })
@@ -201,10 +206,13 @@ export async function POST(req: NextRequest) {
           console.error("Error updating chat timestamp:", updateError)
         }
       },
+      onFinal() {
+        data.close()
+      },
     })
 
-    // Return the stream response
-    return new StreamingTextResponse(stream)
+    // Return the stream
+    return new StreamingTextResponse(stream, { headers: {} }, data)
   } catch (error) {
     console.error("Error in chat API:", error)
     return new Response(
@@ -212,7 +220,7 @@ export async function POST(req: NextRequest) {
         error: "An unexpected error occurred",
         details: error instanceof Error ? error.message : String(error),
       }),
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
