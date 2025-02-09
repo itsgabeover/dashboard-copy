@@ -290,285 +290,285 @@ export default function Dashboard() {
 
   const healthScore = 85 // This would typically be calculated based on policy metrics
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto p-4 space-y-8 max-w-7xl">
-        <header className="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-sm">
-          <div>
-            <h1 className="text-4xl font-bold text-[#4361EE]">{policyData.data.policyOverview.productName}</h1>
-            <p className="text-xl text-gray-600">{policyData.data.policyOverview.issuer}</p>
+return (
+  <div className="min-h-screen bg-gray-50">
+    <div className="container mx-auto p-4 space-y-8 max-w-7xl">
+      <header className="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-sm">
+        <div>
+          <h1 className="text-4xl font-bold text-[#4361EE]">{policyData.data.policyOverview.productName}</h1>
+          <p className="text-xl text-gray-600">{policyData.data.policyOverview.issuer}</p>
+        </div>
+        <Button onClick={handleSignOut} variant="outline">
+          Sign Out
+        </Button>
+      </header>
+
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 bg-white border rounded-xl p-1 shadow-sm mb-6">
+          <TabsTrigger
+            value="overview"
+            className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="details"
+            className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
+          >
+            Policy Details
+          </TabsTrigger>
+          <TabsTrigger
+            value="analysis"
+            className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
+          >
+            AI Analysis
+          </TabsTrigger>
+          <TabsTrigger
+            value="projections"
+            className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
+          >
+            Projections
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="bg-white rounded-xl shadow-sm">
+              <CardHeader>
+                <CardTitle>Policy Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <dt className="font-semibold text-gray-700">Death Benefit</dt>
+                    <dd className="text-2xl text-[#4361EE]">
+                      {formatCurrency(policyData.data.policyOverview.deathBenefit)}
+                    </dd>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <dt className="font-semibold text-gray-700">Annual Premium</dt>
+                    <dd className="text-2xl text-[#4361EE]">
+                      {formatCurrency(policyData.data.policyOverview.annualPremium)}
+                    </dd>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <dt className="font-semibold text-gray-700">Policy Type</dt>
+                    <dd className="text-2xl text-[#4361EE]">{policyData.data.policyOverview.productType}</dd>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white rounded-xl shadow-sm">
+              <CardHeader>
+                <CardTitle>Policy Health</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center space-y-4">
+                  <div className="text-6xl font-bold text-[#4361EE]">{healthScore}%</div>
+                  <Progress value={healthScore} className="h-2" />
+                  <p className="text-sm text-gray-600">
+                    This score evaluates your policy&apos;s overall health based on multiple factors
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <Button onClick={handleSignOut} variant="outline">
-            Sign Out
-          </Button>
-        </header>
 
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-white border rounded-xl p-1 shadow-sm mb-6">
-            <TabsTrigger
-              value="overview"
-              className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
-            >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger
-              value="details"
-              className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
-            >
-              Policy Details
-            </TabsTrigger>
-            <TabsTrigger
-              value="analysis"
-              className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
-            >
-              AI Analysis
-            </TabsTrigger>
-            <TabsTrigger
-              value="projections"
-              className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
-            >
-              Projections
-            </TabsTrigger>
-            <TabsTrigger
-              value="chatbot"
-              className="data-[state=active]:bg-[#4361EE] data-[state=active]:text-white rounded-lg transition-all"
-            >
-              AI Assistant
-            </TabsTrigger>
-          </TabsList>
+          <Card className="bg-white rounded-xl shadow-sm">
+            <CardHeader>
+              <CardTitle>Policy Assessment</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-700 leading-relaxed">{policyData.data.finalThoughts}</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-white rounded-xl shadow-sm">
-                <CardHeader>
-                  <CardTitle>Policy Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <dt className="font-semibold text-gray-700">Death Benefit</dt>
-                      <dd className="text-2xl text-[#4361EE]">
-                        {formatCurrency(policyData.data.policyOverview.deathBenefit)}
-                      </dd>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <dt className="font-semibold text-gray-700">Annual Premium</dt>
-                      <dd className="text-2xl text-[#4361EE]">
-                        {formatCurrency(policyData.data.policyOverview.annualPremium)}
-                      </dd>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <dt className="font-semibold text-gray-700">Policy Type</dt>
-                      <dd className="text-2xl text-[#4361EE]">{policyData.data.policyOverview.productType}</dd>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+        <TabsContent value="details" className="space-y-6">
+          <Card className="bg-white rounded-xl shadow-sm">
+            <CardHeader>
+              <CardTitle>Policy Riders</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {policyData.data.policyOverview.riders.map((rider, index) => (
+                  <li key={index} className="bg-gray-50 p-4 rounded-lg">
+                    {rider}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
 
-              <Card className="bg-white rounded-xl shadow-sm">
-                <CardHeader>
-                  <CardTitle>Policy Health</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center space-y-4">
-                    <div className="text-6xl font-bold text-[#4361EE]">{healthScore}%</div>
-                    <Progress value={healthScore} className="h-2" />
-                    <p className="text-sm text-gray-600">
-                      This score evaluates your policy&apos;s overall health based on multiple factors
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="bg-white rounded-xl shadow-sm">
-              <CardHeader>
-                <CardTitle>Policy Assessment</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed">{policyData.data.finalThoughts}</p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="details" className="space-y-6">
-            <Card className="bg-white rounded-xl shadow-sm">
-              <CardHeader>
-                <CardTitle>Policy Riders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {policyData.data.policyOverview.riders.map((rider, index) => (
-                    <li key={index} className="bg-gray-50 p-4 rounded-lg">
-                      {rider}
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white rounded-xl shadow-sm">
-              <CardHeader>
-                <CardTitle>Value Projections</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {policyData.data.values.map((timePoint, index) => (
-                    <div key={index} className="bg-gray-50 p-6 rounded-lg">
-                      <h4 className="text-lg font-semibold text-[#4361EE] mb-4">{timePoint.timePoint}</h4>
-                      <div className="grid md:grid-cols-3 gap-4">
-                        <div className="bg-white p-4 rounded-lg shadow-sm">
-                          <p className="text-sm text-gray-600">Cash Value</p>
-                          <p className="text-lg font-semibold">{formatCurrency(timePoint.values.cashValue)}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg shadow-sm">
-                          <p className="text-sm text-gray-600">Net Surrender Value</p>
-                          <p className="text-lg font-semibold">{formatCurrency(timePoint.values.netSurrenderValue)}</p>
-                        </div>
-                        <div className="bg-white p-4 rounded-lg shadow-sm">
-                          <p className="text-sm text-gray-600">Death Benefit</p>
-                          <p className="text-lg font-semibold">{formatCurrency(timePoint.values.deathBenefitAmount)}</p>
-                        </div>
+          <Card className="bg-white rounded-xl shadow-sm">
+            <CardHeader>
+              <CardTitle>Value Projections</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {policyData.data.values.map((timePoint, index) => (
+                  <div key={index} className="bg-gray-50 p-6 rounded-lg">
+                    <h4 className="text-lg font-semibold text-[#4361EE] mb-4">{timePoint.timePoint}</h4>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-gray-600">Cash Value</p>
+                        <p className="text-lg font-semibold">{formatCurrency(timePoint.values.cashValue)}</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-gray-600">Net Surrender Value</p>
+                        <p className="text-lg font-semibold">{formatCurrency(timePoint.values.netSurrenderValue)}</p>
+                      </div>
+                      <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <p className="text-sm text-gray-600">Death Benefit</p>
+                        <p className="text-lg font-semibold">{formatCurrency(timePoint.values.deathBenefitAmount)}</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="analysis" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
-              <div className="space-y-4">
-                <Card className="bg-white rounded-xl shadow-sm">
-                  <CardHeader>
-                    <CardTitle>Policy Sections</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {policyData.data.sections.map((section, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedSection(section)}
-                          className={cn(
-                            "w-full flex items-center justify-between px-4 py-3 text-left rounded-lg hover:bg-gray-50",
-                            selectedSection?.title === section.title && "bg-[#4361EE] text-white hover:bg-[#4361EE]",
-                          )}
-                        >
-                          <span>{section.title}</span>
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="space-y-6">
-                {selectedSection ? (
-                  <>
-                    <Card className="bg-white rounded-xl shadow-sm">
-                      <CardHeader>
-                        <CardTitle>{selectedSection.title}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-6">
-                          <div className="bg-green-50 p-6 rounded-lg">
-                            <h4 className="font-semibold flex items-center gap-2 text-green-700 mb-3">
-                              <Lightbulb className="w-5 h-5" />
-                              Hidden Gem
-                            </h4>
-                            <p className="text-green-700">{selectedSection.hiddengem}</p>
-                          </div>
-
-                          <div className="bg-orange-50 p-6 rounded-lg">
-                            <h4 className="font-semibold flex items-center gap-2 text-orange-700 mb-3">
-                              <AlertTriangle className="w-5 h-5" />
-                              Blind Spot
-                            </h4>
-                            <p className="text-orange-700">{selectedSection.blindspot}</p>
-                          </div>
-
-                          <div className="bg-red-50 p-6 rounded-lg">
-                            <h4 className="font-semibold flex items-center gap-2 text-red-700 mb-3">
-                              <Flag className="w-5 h-5" />
-                              Red Flag
-                            </h4>
-                            <p className="text-red-700">{selectedSection.redflag}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-white rounded-xl shadow-sm">
-                      <CardHeader>
-                        <CardTitle>Key Insights</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <ul className="space-y-4">
-                          {selectedSection.quotes.map((quote, index) => (
-                            <li key={index} className="p-4 bg-gray-50 rounded-lg border-l-4 border-[#4361EE]">
-                              {quote}
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-gray-500">Select a section to view analysis</p>
                   </div>
-                )}
+                ))}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analysis" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
+            <div className="space-y-4">
+              <Card className="bg-white rounded-xl shadow-sm">
+                <CardHeader>
+                  <CardTitle>Policy Sections</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {policyData.data.sections.map((section, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedSection(section)}
+                        className={cn(
+                          "w-full flex items-center justify-between px-4 py-3 text-left rounded-lg hover:bg-gray-50",
+                          selectedSection?.title === section.title && "bg-[#4361EE] text-white hover:bg-[#4361EE]",
+                        )}
+                      >
+                        <span>{section.title}</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          </TabsContent>
 
-          <TabsContent value="projections" className="space-y-4">
-            <Card className="bg-white rounded-xl shadow-sm">
-              <CardHeader>
-                <CardTitle>Policy Values Chart</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[400px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={policyData.data.values}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="timePoint" />
-                      <YAxis />
-                      <Tooltip />
-                      <Area
-                        type="monotone"
-                        dataKey="values.cashValue"
-                        name="Cash Value"
-                        stroke="#4361EE"
-                        fill="#4361EE"
-                        fillOpacity={0.1}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="values.netSurrenderValue"
-                        name="Net Surrender Value"
-                        stroke="#82ca9d"
-                        fill="#82ca9d"
-                        fillOpacity={0.1}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
+            <div className="space-y-6">
+              {selectedSection ? (
+                <>
+                  <Card className="bg-white rounded-xl shadow-sm">
+                    <CardHeader>
+                      <CardTitle>{selectedSection.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div className="bg-green-50 p-6 rounded-lg">
+                          <h4 className="font-semibold flex items-center gap-2 text-green-700 mb-3">
+                            <Lightbulb className="w-5 h-5" />
+                            Hidden Gem
+                          </h4>
+                          <p className="text-green-700">{selectedSection.hiddengem}</p>
+                        </div>
+
+                        <div className="bg-orange-50 p-6 rounded-lg">
+                          <h4 className="font-semibold flex items-center gap-2 text-orange-700 mb-3">
+                            <AlertTriangle className="w-5 h-5" />
+                            Blind Spot
+                          </h4>
+                          <p className="text-orange-700">{selectedSection.blindspot}</p>
+                        </div>
+
+                        <div className="bg-red-50 p-6 rounded-lg">
+                          <h4 className="font-semibold flex items-center gap-2 text-red-700 mb-3">
+                            <Flag className="w-5 h-5" />
+                            Red Flag
+                          </h4>
+                          <p className="text-red-700">{selectedSection.redflag}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-white rounded-xl shadow-sm">
+                    <CardHeader>
+                      <CardTitle>Key Insights</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-4">
+                        {selectedSection.quotes.map((quote, index) => (
+                          <li key={index} className="p-4 bg-gray-50 rounded-lg border-l-4 border-[#4361EE]">
+                            {quote}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">Select a section to view analysis</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              )}
+            </div>
+          </div>
+        </TabsContent>
 
-          <TabsContent value="chatbot">
-  <PolicyChatbot 
-    session_id={policy.session_id} 
-    userEmail={userEmail} 
-  />
-</TabsContent>
-        </Tabs>
+        <TabsContent value="projections" className="space-y-4">
+          <Card className="bg-white rounded-xl shadow-sm">
+            <CardHeader>
+              <CardTitle>Policy Values Chart</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={policyData.data.values}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="timePoint" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area
+                      type="monotone"
+                      dataKey="values.cashValue"
+                      name="Cash Value"
+                      stroke="#4361EE"
+                      fill="#4361EE"
+                      fillOpacity={0.1}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="values.netSurrenderValue"
+                      name="Net Surrender Value"
+                      stroke="#82ca9d"
+                      fill="#82ca9d"
+                      fillOpacity={0.1}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Chat Section */}
+      <div className="bg-white rounded-xl shadow-sm">
+        <div className="p-6 border-b">
+          <h2 className="text-2xl font-semibold text-[#4361EE]">AI Policy Assistant</h2>
+          <p className="text-gray-600">Chat with our AI to learn more about your policy</p>
+        </div>
+        {policyData && (
+          <PolicyChatbot 
+            session_id={policyData.sessionId}
+            userEmail={userEmail}
+          />
+        )}
       </div>
-    </div>
-  )
-}
 
+    </div>
+  </div>
+)
