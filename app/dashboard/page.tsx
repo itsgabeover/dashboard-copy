@@ -14,34 +14,6 @@ import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 import { PolicyChatbot } from "@/components/PolicyChatbot"
 
-// Types for component props and internal state
-interface PolicyValue {
-  timePoint: string
-  values: {
-    cashValue: number
-    netSurrenderValue: number
-    deathBenefitAmount: number
-  }
-}
-
-interface PolicySectionDetails {
-  title: string
-  hiddengem: string
-  blindspot: string
-  redflag: string
-  clientImplications: string
-  quotes: string[]
-}
-
-interface PolicyOverview {
-  productName: string
-  issuer: string
-  deathBenefit: number
-  annualPremium: number
-  productType: string
-  riders: string[]
-}
-
 // Helper Components
 const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) => {
   const [email, setEmail] = useState("")
