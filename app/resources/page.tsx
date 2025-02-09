@@ -81,7 +81,7 @@ export default function ResourcesPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
                 { title: "How to Request Your Illustration", duration: "2 min" },
-                { title: "Uploading Your Policy Documents", duration: "2 min" },
+                { title: "Uploading Your Policy Illustrations", duration: "2 min" },
                 { title: "Reading Your AI Analysis", duration: "4 min" },
                 { title: "Taking Action on Your Results", duration: "3 min" },
               ].map((video, index) => (
