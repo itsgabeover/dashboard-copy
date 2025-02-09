@@ -42,7 +42,7 @@ export const createChatCompletion = async ({ messages, policyData, stream = fals
   })
 }
 
-export async function* createChatCompletionStream({ messages, policyData }: ChatCompletionOptions) {
+export async function createChatCompletionStream({ messages, policyData }: ChatCompletionOptions) {
   const response = await createChatCompletion({
     messages,
     policyData,
@@ -51,8 +51,6 @@ export async function* createChatCompletionStream({ messages, policyData }: Chat
 
   if (!response) throw new Error("No response from OpenAI")
 
-  // @ts-expect-error - We expect this to be a stream because we set stream: true
-  for await (const chunk of response) {
-    yield chunk.choices[0]?.delta?.content || ""
-  }
+  return response
 }
+
