@@ -1,3 +1,4 @@
+// Core policy data structures
 export interface PolicyValue {
   timePoint: string
   values: {
@@ -25,18 +26,31 @@ export interface PolicyOverview {
   annualPremium: number
 }
 
+// Matches the analysis_data JSONB column in policies table
 export interface ParsedPolicyData {
-  sessionId: string  // Added sessionId at root level
+  sessionId: string
   data: {
     values: PolicyValue[]
     sections: PolicySection[]
     finalThoughts: string
     policyOverview: PolicyOverview
-    email: string    // Added email inside data object
+    email: string
   }
   status: "completed" | string
   updated_at: string
-  timestamp?: string // Added optional timestamp
+  timestamp?: string
+}
+
+// Matches Supabase policies table structure
+export interface Policy {
+  id: string // UUID from Supabase
+  policy_name: string
+  created_at: string
+  analysis_data: ParsedPolicyData
+  status: string
+  updated_at: string
+  email: string
+  session_id: string
 }
 
 export interface APIResponse {
@@ -45,14 +59,14 @@ export interface APIResponse {
   error?: string
 }
 
-// Updated Policy interface with new fields from Supabase
-export interface Policy {
-  id: string               // Added from Supabase
-  policy_name: string
-  created_at: string
-  analysis_data: ParsedPolicyData
-  status: string          // Added from Supabase
-  updated_at: string      // Added from Supabase
-  email: string
+// Database query helper types
+export interface PolicyQueryResponse {
+  data: Policy | null
+  error: Error | null
+}
+
+// RLS policy types
+export interface PolicyRLSContext {
+  user_email: string
   session_id: string
 }
