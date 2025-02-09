@@ -517,7 +517,7 @@ export default function Dashboard() {
             </Tabs>
           </div>
           <div className="lg:col-span-1">
-            <PolicyChatbot sessionId={policyData.sessionId} userEmail={userEmail} />
+            <PolicyChatbot sessionId={policyData.data.session_id} userEmail={userEmail} />
           </div>
         </div>
       </div>
