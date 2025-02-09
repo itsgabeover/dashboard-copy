@@ -13,11 +13,11 @@ import { createClient } from "@supabase/supabase-js"
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 interface PolicyChatbotProps {
-  session_id: string
+  sessionId: string
   userEmail: string
 }
 
-export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
+export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   const [chat, setChat] = useState<Chat | null>(null)
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
@@ -31,7 +31,7 @@ export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
     },
     body: {
       chat_id: chat?.id,
-      session_id: session_id,
+      sessionId: sessionId,
     },
   })
 
@@ -39,11 +39,7 @@ export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
   useEffect(() => {
     const fetchPolicyData = async () => {
       try {
-        const { data: policy, error } = await supabase
-          .from("policies")
-          .select("*")
-          .eq("session_id", session_id)
-          .single()
+        const { data: policy, error } = await supabase.from("policies").select("*").eq("session_id", sessionId).single()
 
         if (error) throw error
         setPolicyData(policy.analysis_data)
@@ -54,7 +50,7 @@ export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
     }
 
     fetchPolicyData()
-  }, [session_id])
+  }, [sessionId])
 
   useEffect(() => {
     const fetchOrCreateChat = async () => {
@@ -70,7 +66,7 @@ export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
           .from("chats")
           .select("*")
           .eq("user_email", userEmail)
-          .eq("session_id", session_id)
+          .eq("session_id", sessionId)
           .order("created_at", { ascending: false })
           .limit(1)
           .single()
@@ -81,12 +77,12 @@ export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
           return
         }
 
-        console.log("Creating new chat for session:", session_id)
+        console.log("Creating new chat for session:", sessionId)
         const { data: newChat, error: insertError } = await supabase
           .from("chats")
           .insert({
             user_email: userEmail,
-            session_id: session_id,
+            session_id: sessionId,
             is_active: true,
           })
           .select()
@@ -105,10 +101,10 @@ export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
       }
     }
 
-    if (userEmail && session_id) {
+    if (userEmail && sessionId) {
       fetchOrCreateChat()
     }
-  }, [userEmail, session_id])
+  }, [userEmail, sessionId])
 
   useEffect(() => {
     if (chat?.id) {
@@ -260,3 +256,4 @@ export function PolicyChatbot({ session_id, userEmail }: PolicyChatbotProps) {
     </Card>
   )
 }
+
