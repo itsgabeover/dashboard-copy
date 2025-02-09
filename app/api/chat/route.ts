@@ -3,7 +3,6 @@ import OpenAI from 'openai'
 import { createClient } from '@supabase/supabase-js'
 import type { NextRequest } from 'next/server'
 import type { Chat, ParsedPolicyData } from '@/types/chat'
-import type { ChatCompletionChunk } from 'openai/resources/chat/completions'
 
 // Initialize Supabase client with environment variables
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
