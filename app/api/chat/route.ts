@@ -1,5 +1,5 @@
 import { StreamingTextResponse, type Message, OpenAIStream, experimental_StreamData } from "ai"
-import { openai } from "@ai-sdk/openai"
+import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
 import type { Chat } from "@/types/chat"
@@ -17,6 +17,11 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
     autoRefreshToken: false,
     persistSession: false,
   },
+})
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
 })
 
 export async function POST(req: NextRequest) {
@@ -52,21 +57,21 @@ export async function POST(req: NextRequest) {
       })),
     ]
 
-    const stream = OpenAIStream(
-      await openai("gpt-4o").chat.completions.create({
-        messages: messagesToSend,
-        stream: true,
-      }),
-      {
-        async onCompletion(completion) {
-          await saveMessageToDatabase(chat.id, completion)
-          await updateChatTimestamp(chat.id)
-        },
-        onFinal() {
-          data.close()
-        },
+    const response = await openai.chat.completions.create({
+      model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
+      messages: messagesToSend,
+      stream: true,
+    })
+
+    const stream = OpenAIStream(response, {
+      async onCompletion(completion) {
+        await saveMessageToDatabase(chat.id, completion)
+        await updateChatTimestamp(chat.id)
       },
-    )
+      onFinal() {
+        data.close()
+      },
+    })
 
     return new StreamingTextResponse(stream, { headers: {} }, data)
   } catch (error) {
