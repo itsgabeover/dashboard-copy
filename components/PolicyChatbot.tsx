@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useChat } from "ai/react"
+import { useChat, Message } from "ai/react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -104,13 +104,12 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
           }
 
           if (fetchedMessages) {
-            setMessages(
-              fetchedMessages.map((msg) => ({
-                id: msg.id,
-                role: msg.role as "user" | "assistant" | "system",
-                content: msg.content,
-              })),
-            )
+            const formattedMessages: Message[] = fetchedMessages.map((msg) => ({
+              id: msg.id,
+              role: msg.role as Message['role'],
+              content: msg.content,
+            }))
+            setMessages(formattedMessages)
           }
         } catch (err) {
           console.error("Error in fetchMessages:", err)
@@ -151,8 +150,8 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
         {
           id: Date.now().toString(),
           role: "system",
-          content: `Error: ${errorMessage}`,
-        },
+          content: `Error: ${errorMessage}`
+        } as Message
       ])
     }
   }
@@ -240,4 +239,3 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
     </Card>
   )
 }
-
