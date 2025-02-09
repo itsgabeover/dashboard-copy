@@ -561,8 +561,11 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="chatbot">
-            <PolicyChatbot policyData={policyData} userEmail={userEmail} />
-          </TabsContent>
+  <PolicyChatbot 
+    session_id={policy.session_id} 
+    userEmail={userEmail} 
+  />
+</TabsContent>
         </Tabs>
       </div>
     </div>
