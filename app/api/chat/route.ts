@@ -29,7 +29,7 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
-    const { chat_id, session_id, content, context }: SendMessageParams = await req.json()
+    const { chat_id, session_id, content }: SendMessageParams = await req.json()
     const userEmail = req.headers.get("X-User-Email")
 
     if (!userEmail) {
