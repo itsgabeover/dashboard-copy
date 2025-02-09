@@ -171,23 +171,29 @@ export default function Dashboard() {
   const [showPolicySelection, setShowPolicySelection] = useState(false)
   const [userEmail, setUserEmail] = useState<string>("")
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    localStorage.removeItem("userEmail")
+    setIsVerified(false)
+    router.push("/auth")
+  }
+
   const loadPolicies = useCallback(
     async (email: string) => {
       try {
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-
         if (sessionError || !sessionData.session) {
           router.push("/auth")
           return
         }
 
-        const { data, error: policiesError } = await supabase
+        const { data, error: supabaseError } = await supabase
           .from("policies")
           .select("*")
           .eq("email", email.toLowerCase())
           .order("created_at", { ascending: false })
 
-        if (policiesError) throw policiesError
+        if (supabaseError) throw supabaseError
         if (!data?.length) throw new Error("No policy data found")
 
         setPolicies(data as Policy[])
@@ -211,7 +217,6 @@ export default function Dashboard() {
       setIsLoading(false)
     }
 
-    // Setup Supabase auth listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
@@ -239,13 +244,6 @@ export default function Dashboard() {
     if (policy.analysis_data.data.sections?.length > 0) {
       setSelectedSection(policy.analysis_data.data.sections[0])
     }
-  }
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    localStorage.removeItem("userEmail")
-    setIsVerified(false)
-    router.push("/auth")
   }
 
   if (isLoading) {
