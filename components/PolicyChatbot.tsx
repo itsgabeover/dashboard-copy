@@ -10,7 +10,10 @@ import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
 import { createClient } from "@supabase/supabase-js"
 
 // Initialize Supabase client
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 interface PolicyChatbotProps {
   policyData: ParsedPolicyData
@@ -106,7 +109,7 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
           if (fetchedMessages) {
             const formattedMessages: Message[] = fetchedMessages.map((msg) => ({
               id: msg.id,
-              role: msg.role as Message['role'],
+              role: msg.role as Message["role"],
               content: msg.content,
             }))
             setMessages(formattedMessages)
@@ -143,9 +146,8 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
       await handleSubmit(e)
     } catch (err) {
       console.error("Error in handleFormSubmit:", err)
-      // Show error to user
       const errorMessage = err instanceof Error ? err.message : "Failed to send message"
-      setMessages((prev) => [
+      setMessages((prev: Message[]) => [
         ...prev,
         {
           id: Date.now().toString(),
