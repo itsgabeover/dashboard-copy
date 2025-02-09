@@ -174,11 +174,9 @@ export default function Dashboard() {
   const loadPolicies = useCallback(
     async (email: string) => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession()
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
 
-        if (!session) {
+        if (sessionError || !sessionData.session) {
           router.push("/auth")
           return
         }
