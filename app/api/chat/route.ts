@@ -1,5 +1,5 @@
 import { type Message, experimental_StreamData } from "ai"
-import { OpenAIStream, StreamingTextResponse as VercelStreamingTextResponse } from "ai"
+import { StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
@@ -43,6 +43,13 @@ function convertToChatCompletionMessage(message: Message): OpenAI.ChatCompletion
       return { role: "function", content, name: "function" }
     default:
       throw new Error(`Unsupported role: ${role}`)
+  }
+}
+
+// Helper function to handle streaming
+async function* streamToAsyncIterable(stream: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>) {
+  for await (const chunk of stream) {
+    yield chunk.choices[0]?.delta?.content || ''
   }
 }
 
@@ -102,18 +109,31 @@ export async function POST(req: NextRequest) {
       stream: true,
     })
 
-    const stream = OpenAIStream(response, {
-      async onCompletion(completion) {
-        await saveMessageToDatabase(chat.id, "assistant", completion)
-        await updateChatTimestamp(chat.id)
-      },
-      onFinal() {
-        data.close()
+    // Create a ReadableStream from the OpenAI response
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+        let fullCompletion = ''
+
+        try {
+          for await (const chunk of streamToAsyncIterable(response)) {
+            if (chunk) {
+              fullCompletion += chunk
+              controller.enqueue(encoder.encode(chunk))
+            }
+          }
+          // Save the complete message after streaming is done
+          await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
+          await updateChatTimestamp(chat.id)
+          controller.close()
+          data.close()
+        } catch (error) {
+          controller.error(error)
+        }
       },
     })
 
-    // Use VercelStreamingTextResponse instead of StreamingTextResponse
-    return new VercelStreamingTextResponse(stream, { headers: {} }, data)
+    return new StreamingTextResponse(stream, {}, data)
   } catch (error) {
     console.error("Error in chat API:", error)
     return NextResponse.json(
@@ -246,4 +266,3 @@ async function updateChatTimestamp(chat_id: string) {
     console.error("Error updating chat timestamp:", updateError)
   }
 }
-
