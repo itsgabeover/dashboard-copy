@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useChat, Message } from "ai/react"
+import { useChat, type Message } from "ai/react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,10 +10,7 @@ import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
 import { createClient } from "@supabase/supabase-js"
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 interface PolicyChatbotProps {
   policyData: ParsedPolicyData
@@ -147,13 +144,13 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
     } catch (err) {
       console.error("Error in handleFormSubmit:", err)
       const errorMessage = err instanceof Error ? err.message : "Failed to send message"
-      setMessages((prev: Message[]) => [
-        ...prev,
+      setMessages([
+        ...messages,
         {
           id: Date.now().toString(),
           role: "system",
-          content: `Error: ${errorMessage}`
-        } as Message
+          content: `Error: ${errorMessage}`,
+        },
       ])
     }
   }
@@ -241,3 +238,4 @@ export function PolicyChatbot({ policyData, userEmail }: PolicyChatbotProps) {
     </Card>
   )
 }
+
