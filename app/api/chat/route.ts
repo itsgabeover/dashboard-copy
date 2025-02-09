@@ -3,6 +3,7 @@ import OpenAI from 'openai'
 import { createClient } from '@supabase/supabase-js'
 import type { NextRequest } from 'next/server'
 import type { Chat, ParsedPolicyData } from '@/types/chat'
+import type { ChatCompletionChunk } from 'openai/resources/chat/completions'
 
 // Initialize Supabase client with environment variables
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
@@ -171,12 +172,12 @@ export async function POST(req: NextRequest) {
       }))
     ]
 
-    // Create OpenAI completion
+    // Create OpenAI completion with proper typing
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
       messages: messagesToSend,
       stream: true,
-    })
+    }) as unknown as Response
 
     // Convert the response to a friendly stream
     const stream = OpenAIStream(response, {
