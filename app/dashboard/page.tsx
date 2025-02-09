@@ -41,6 +41,7 @@ interface PolicyOverview {
   productType: string
   riders: string[]
 }
+
 // Helper Components
 const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) => {
   const [email, setEmail] = useState("")
@@ -130,6 +131,7 @@ const getHealthDescription = (score: number): string => {
   if (score >= 60) return "Fair"
   return "Needs Improvement"
 }
+
 // Main Dashboard Component
 export default function Dashboard() {
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
@@ -416,7 +418,7 @@ export default function Dashboard() {
                     </div>
                   </CardContent>
                 </Card>
-                <div<div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
                   <div className="flex gap-2 text-sm text-blue-700">
                     <Info className="w-4 h-4 mt-0.5" />
                     <p>Click on a section to view detailed analysis and insights</p>
@@ -550,3 +552,4 @@ export default function Dashboard() {
     </div>
   )
 }
+
