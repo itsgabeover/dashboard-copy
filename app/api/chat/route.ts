@@ -2,7 +2,10 @@ import { StreamingTextResponse, type Message, OpenAIStream, experimental_StreamD
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
-import type { Chat } from "@/types/chat"
+import type { Chat, SendMessageParams } from "@/types/chat"
+import type { Policy, PolicyQueryResponse } from "@/types/policy"
+
+type Role = "system" | "user" | "assistant"
 
 // Initialize Supabase client with environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -26,20 +29,20 @@ const openai = new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, chat_id, policy_id } = await req.json()
+    const { chat_id, session_id, content, context }: SendMessageParams = await req.json()
     const userEmail = req.headers.get("X-User-Email")
 
     if (!userEmail) {
       return NextResponse.json({ error: "User email is required" }, { status: 401 })
     }
 
-    const chat = await getOrCreateChat(userEmail, chat_id, policy_id)
+    const chat = await getOrCreateChat(userEmail, chat_id, session_id)
 
     if (!chat) {
-      return NextResponse.json({ error: "Invalid chat or policy ID" }, { status: 400 })
+      return NextResponse.json({ error: "Invalid chat or session ID" }, { status: 400 })
     }
 
-    const policyData = await fetchPolicyData(policy_id)
+    const policyData = await fetchPolicyData(session_id)
 
     if (!policyData) {
       return NextResponse.json({ error: "Policy data not found" }, { status: 404 })
@@ -49,12 +52,9 @@ export async function POST(req: NextRequest) {
 
     const data = new experimental_StreamData()
 
-    const messagesToSend = [
+    const messagesToSend: Message[] = [
       { role: "system", content: systemMessage },
-      ...messages.map((m: Message) => ({
-        role: m.role,
-        content: m.content,
-      })),
+      { role: "user", content },
     ]
 
     const response = await openai.chat.completions.create({
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     const stream = OpenAIStream(response, {
       async onCompletion(completion) {
-        await saveMessageToDatabase(chat.id, completion)
+        await saveMessageToDatabase(chat.id, "assistant", completion)
         await updateChatTimestamp(chat.id)
       },
       onFinal() {
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function getOrCreateChat(userEmail: string, chat_id?: string, policy_id?: string): Promise<Chat | null> {
+async function getOrCreateChat(userEmail: string, chat_id?: string, session_id?: string): Promise<Chat | null> {
   if (chat_id) {
     const { data: existingChat, error: chatError } = await supabase
       .from("chats")
@@ -101,11 +101,11 @@ async function getOrCreateChat(userEmail: string, chat_id?: string, policy_id?: 
     }
 
     return existingChat
-  } else if (policy_id) {
+  } else if (session_id) {
     const { data: existingChat, error: fetchError } = await supabase
       .from("chats")
       .select("*")
-      .eq("policy_id", policy_id)
+      .eq("session_id", session_id)
       .eq("user_email", userEmail)
       .single()
 
@@ -116,7 +116,7 @@ async function getOrCreateChat(userEmail: string, chat_id?: string, policy_id?: 
         .from("chats")
         .insert({
           user_email: userEmail,
-          policy_id: policy_id,
+          session_id: session_id,
           is_active: true,
         })
         .select()
@@ -134,11 +134,11 @@ async function getOrCreateChat(userEmail: string, chat_id?: string, policy_id?: 
   return null
 }
 
-async function fetchPolicyData(policy_id: string) {
-  const { data: policyData, error: policyError } = await supabase
+async function fetchPolicyData(session_id: string): Promise<Policy | null> {
+  const { data: policyData, error: policyError }: PolicyQueryResponse = await supabase
     .from("policies")
     .select("*")
-    .eq("id", policy_id)
+    .eq("session_id", session_id)
     .single()
 
   if (policyError) {
@@ -149,21 +149,24 @@ async function fetchPolicyData(policy_id: string) {
   return policyData
 }
 
-function constructSystemMessage(policyData: any) {
+function constructSystemMessage(policyData: Policy): string {
+  const { analysis_data } = policyData
+  const { policyOverview } = analysis_data.data
+
   return `
 You are Sage, an expert guide who helps policyholders understand their personalized Insurance Planner AI analysis reports.
 
 The user's policy details are as follows:
 - **Policy Name:** ${policyData.policy_name}
-- **Issuer:** ${policyData.analysis_data?.data?.policyOverview?.issuer || "Unknown"}
-- **Death Benefit:** ${policyData.analysis_data?.data?.policyOverview?.deathBenefit || "N/A"}
-- **Annual Premium:** ${policyData.analysis_data?.data?.policyOverview?.annualPremium || "N/A"}
-- **Policy Type:** ${policyData.analysis_data?.data?.policyOverview?.productType || "Unknown"}
+- **Issuer:** ${policyOverview.issuer}
+- **Death Benefit:** $${policyOverview.deathBenefit.toLocaleString()}
+- **Annual Premium:** $${policyOverview.annualPremium.toLocaleString()}
+- **Policy Type:** ${policyOverview.productType}
 - **Policy Status:** ${policyData.status}
 - **Last Updated:** ${policyData.updated_at}
 
 Additional Analysis:
-${JSON.stringify(policyData.analysis_data, null, 2)}
+${JSON.stringify(analysis_data, null, 2)}
 
 Use this information to provide **detailed, relevant, and accurate** responses. 
 - Always **reference specific details from this user's policy**.
@@ -174,10 +177,10 @@ Your goal is to **help them understand their policy** while staying within the p
 `
 }
 
-async function saveMessageToDatabase(chat_id: string, content: string) {
+async function saveMessageToDatabase(chat_id: string, role: Role, content: string) {
   const { error: insertError } = await supabase.from("chat_messages").insert({
     chat_id,
-    role: "assistant",
+    role,
     content,
     is_complete: true,
   })
