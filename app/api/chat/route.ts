@@ -6,7 +6,7 @@ import type { Chat, SendMessageParams } from "@/types/chat"
 import type { Policy, PolicyQueryResponse } from "@/types/policy"
 import { v4 as uuidv4 } from "uuid"
 
-type Role = "system" | "user" | "assistant"
+type Role = "system" | "user" | "assistant" | "function"
 
 // Initialize Supabase client with environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -27,6 +27,23 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
+
+// Convert Message to ChatCompletionMessageParam
+function convertToChatCompletionMessage(message: Message): OpenAI.ChatCompletionMessageParam {
+  const { role, content } = message
+  switch (role) {
+    case "system":
+      return { role: "system", content }
+    case "user":
+      return { role: "user", content }
+    case "assistant":
+      return { role: "assistant", content }
+    case "function":
+      return { role: "function", content, name: "function" }
+    default:
+      throw new Error(`Unsupported role: ${role}`)
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,9 +75,29 @@ export async function POST(req: NextRequest) {
       { id: uuidv4(), role: "user", content },
     ]
 
+    // Fetch previous messages from the database
+    const { data: previousMessages, error: messagesError } = await supabase
+      .from("chat_messages")
+      .select("id, role, content")
+      .eq("chat_id", chat.id)
+      .order("created_at", { ascending: true })
+
+    if (messagesError) {
+      console.error("Error fetching previous messages:", messagesError)
+    } else {
+      // Add previous messages to messagesToSend, using their existing IDs
+      messagesToSend.unshift(
+        ...previousMessages.map((msg) => ({
+          id: msg.id,
+          role: msg.role as Role,
+          content: msg.content,
+        })),
+      )
+    }
+
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
-      messages: messagesToSend,
+      messages: messagesToSend.map(convertToChatCompletionMessage),
       stream: true,
     })
 
@@ -179,16 +216,22 @@ Your goal is to **help them understand their policy** while staying within the p
 }
 
 async function saveMessageToDatabase(chat_id: string, role: Role, content: string) {
-  const { error: insertError } = await supabase.from("chat_messages").insert({
-    chat_id,
-    role,
-    content,
-    is_complete: true,
-  })
+  const { data, error: insertError } = await supabase
+    .from("chat_messages")
+    .insert({
+      chat_id,
+      role,
+      content,
+      is_complete: true,
+    })
+    .select()
+    .single()
 
   if (insertError) {
     console.error("Error saving message:", insertError)
   }
+
+  return data
 }
 
 async function updateChatTimestamp(chat_id: string) {
