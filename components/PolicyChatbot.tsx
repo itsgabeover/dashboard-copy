@@ -13,7 +13,7 @@ import { createClient } from "@supabase/supabase-js"
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 interface PolicyChatbotProps {
-  sessionId: string
+  sessionId: string // Keep prop name as sessionId for React conventions
   userEmail: string
 }
 
@@ -31,7 +31,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     },
     body: {
       chat_id: chat?.id,
-      sessionId: sessionId,
+      session_id: sessionId, // Use snake_case for database interaction
     },
   })
 
@@ -39,7 +39,11 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   useEffect(() => {
     const fetchPolicyData = async () => {
       try {
-        const { data: policy, error } = await supabase.from("policies").select("*").eq("session_id", sessionId).single()
+        const { data: policy, error } = await supabase
+          .from("policies")
+          .select("*")
+          .eq("session_id", sessionId) // Use snake_case for database column
+          .single()
 
         if (error) throw error
         setPolicyData(policy.analysis_data)
@@ -66,7 +70,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
           .from("chats")
           .select("*")
           .eq("user_email", userEmail)
-          .eq("session_id", sessionId)
+          .eq("session_id", sessionId) // Use snake_case for database column
           .order("created_at", { ascending: false })
           .limit(1)
           .single()
@@ -82,7 +86,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
           .from("chats")
           .insert({
             user_email: userEmail,
-            session_id: sessionId,
+            session_id: sessionId, // Use snake_case for database column
             is_active: true,
           })
           .select()
