@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
 import type { Chat, SendMessageParams } from "@/types/chat"
 import type { Policy, PolicyQueryResponse } from "@/types/policy"
+import { v4 as uuidv4 } from "uuid"
 
 type Role = "system" | "user" | "assistant"
 
@@ -53,8 +54,8 @@ export async function POST(req: NextRequest) {
     const data = new experimental_StreamData()
 
     const messagesToSend: Message[] = [
-      { role: "system", content: systemMessage },
-      { role: "user", content },
+      { id: uuidv4(), role: "system", content: systemMessage },
+      { id: uuidv4(), role: "user", content },
     ]
 
     const response = await openai.chat.completions.create({
