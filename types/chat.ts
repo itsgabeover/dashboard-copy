@@ -1,4 +1,4 @@
-import type { Message } from 'ai'
+import type { Message } from "ai"
 import type { ParsedPolicyData } from "./policy"
 
 export type Role = "user" | "assistant" | "system"
@@ -60,3 +60,4 @@ export interface MessageQueryResponse {
   data: ChatMessage[] | null
   error: Error | null
 }
+
