@@ -515,7 +515,7 @@ export default function Dashboard() {
                 <CardTitle className="text-xl font-semibold text-gray-900">AI Policy Assistant</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <PolicyChatbot policyData={policyData} userEmail={userEmail} />
+                <PolicyChatbot policy={policyData.data} email={userEmail} />
               </CardContent>
             </Card>
           </TabsContent>
