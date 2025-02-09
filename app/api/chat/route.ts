@@ -1,4 +1,5 @@
-import { StreamingTextResponse, type Message, OpenAIStream, experimental_StreamData } from "ai"
+import { type Message, experimental_StreamData } from "ai"
+import { OpenAIStream, StreamingTextResponse as VercelStreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
@@ -111,7 +112,8 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    return new StreamingTextResponse(stream, { headers: {} }, data)
+    // Use VercelStreamingTextResponse instead of StreamingTextResponse
+    return new VercelStreamingTextResponse(stream, { headers: {} }, data)
   } catch (error) {
     console.error("Error in chat API:", error)
     return NextResponse.json(
