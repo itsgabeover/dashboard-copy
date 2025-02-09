@@ -214,7 +214,7 @@ export default function Dashboard() {
     // Setup Supabase auth listener
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         localStorage.removeItem("userEmail")
         setIsVerified(false)
