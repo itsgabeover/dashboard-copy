@@ -555,20 +555,21 @@ return (
         </TabsContent>
       </Tabs>
 
-      {/* Chat Section */}
-      <div className="bg-white rounded-xl shadow-sm">
-        <div className="p-6 border-b">
-          <h2 className="text-2xl font-semibold text-[#4361EE]">AI Policy Assistant</h2>
-          <p className="text-gray-600">Chat with our AI to learn more about your policy</p>
+       {/* Chat Section */}
+        <div className="bg-white rounded-xl shadow-sm">
+          <div className="p-6 border-b">
+            <h2 className="text-2xl font-semibold text-[#4361EE]">AI Policy Assistant</h2>
+            <p className="text-gray-600">Chat with our AI to learn more about your policy</p>
+          </div>
+          {policyData && (
+            <PolicyChatbot 
+              session_id={policyData.sessionId}
+              userEmail={userEmail}
+            />
+          )}
         </div>
-        {policyData && (
-          <PolicyChatbot 
-            session_id={policyData.sessionId}
-            userEmail={userEmail}
-          />
-        )}
-      </div>
 
+      </div>
     </div>
-  </div>
-)
+  )
+}
