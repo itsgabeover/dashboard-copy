@@ -556,20 +556,22 @@ return (
       </Tabs>
 
        {/* Chat Section */}
-        <div className="bg-white rounded-xl shadow-sm">
-          <div className="p-6 border-b">
-            <h2 className="text-2xl font-semibold text-[#4361EE]">AI Policy Assistant</h2>
-            <p className="text-gray-600">Chat with our AI to learn more about your policy</p>
-          </div>
-          {policyData && (
-            <PolicyChatbot 
-              session_id={policyData.sessionId}
-              userEmail={userEmail}
-            />
-          )}
+      <div className="bg-white rounded-xl shadow-sm">
+        <div className="p-6 border-b">
+          <h2 className="text-2xl font-semibold text-[#4361EE]">AI Policy Assistant</h2>
+          <p className="text-gray-600">Chat with our AI to learn more about your policy</p>
         </div>
-
+        {policies.length > 0 && (
+          <PolicyChatbot 
+            session_id={policies[0].session_id}
+            userEmail={userEmail}
+          />
+        )}
       </div>
+
     </div>
-  )
+  </div>
+)
 }
+
+export default Dashboard
