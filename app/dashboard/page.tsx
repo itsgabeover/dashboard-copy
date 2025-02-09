@@ -211,16 +211,14 @@ export default function Dashboard() {
       setIsLoading(false)
     }
 
-    // Setup Supabase auth listener
-    const {
-      data: { subscription },
-    } = supabase.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
-        localStorage.removeItem("userEmail")
-        setIsVerified(false)
-        router.push("/auth")
-      }
-    })
+   // Setup Supabase auth listener
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, _session) => {  // Added underscore to prevent unused var warning
+    if (event === "SIGNED_OUT") {
+      localStorage.removeItem("userEmail")
+      setIsVerified(false)
+      router.push("/auth")
+    }
+  })
 
     return () => {
       subscription.unsubscribe()
