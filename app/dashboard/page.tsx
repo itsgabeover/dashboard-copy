@@ -73,17 +73,10 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
 
     setLoading(true)
     try {
-      const {
-        data: { session },
-        error: authError,
-      } = await supabase.auth.getSession()
-
-      if (authError || !session) {
-        const { error: signInError } = await supabase.auth.signInWithOtp({
-          email: email.toLowerCase().trim(),
-        })
-        if (signInError) throw signInError
-      }
+      const { error: authError } = await supabase.auth.signInWithOtp({
+        email: email.toLowerCase().trim(),
+      })
+      if (authError) throw authError
 
       const { data, error: policiesError } = await supabase
         .from("policies")
@@ -383,7 +376,7 @@ export default function Dashboard() {
                     <div className="text-6xl font-bold text-[#4361EE]">{healthScore}%</div>
                     <Progress value={healthScore} className="h-2" />
                     <p className="text-sm text-gray-600">
-                      This score evaluates your policy's overall health based on multiple factors
+                      This score evaluates your policy&apos;s overall health based on multiple factors
                     </p>
                   </div>
                 </CardContent>
