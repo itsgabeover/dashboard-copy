@@ -2,6 +2,9 @@ import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { type NextRequest, NextResponse } from "next/server"
 
+// Required for streaming responses in Edge functions
+export const runtime = 'edge'
+
 // Initialize the OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -40,27 +43,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid or empty messages array" }, { status: 400 })
     }
 
-    // Map the messages to the format expected by OpenAI
-    const mappedMessages = messages.map((message) => ({
-      content: message.content,
-      role: message.role,
-    }))
-
     // Create the chat completion
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       stream: true,
-      messages: mappedMessages,
+      messages: messages.map((message) => ({
+        content: message.content,
+        role: message.role,
+      })),
     })
 
-    // Create a stream from the response
-    const stream = OpenAIStream(response)
+    // Create a stream from the response and return it
+    return new StreamingTextResponse(OpenAIStream(response))
 
-    // Return the streaming response
-    return new StreamingTextResponse(stream)
   } catch (error) {
     console.error("Error in chat API:", error)
     return NextResponse.json({ error: "An error occurred while processing your request" }, { status: 500 })
   }
 }
-
