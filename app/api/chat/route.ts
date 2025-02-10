@@ -55,9 +55,22 @@ async function* streamToAsyncIterable(stream: AsyncIterable<OpenAI.Chat.Completi
 
 export async function POST(req: NextRequest) {
   try {
-    // Parse request
-    const { chat_id, session_id, content }: SendMessageParams = await req.json()
+    const body = await req.json()
+    const { chat_id, session_id, content } = body
     const userEmail = req.headers.get("X-User-Email")
+
+    console.log("Received request body:", body)
+
+    if (!userEmail) {
+      return NextResponse.json({ error: "User email is required" }, { status: 401 })
+    }
+
+    if (!content || typeof content !== 'string' || !content.trim()) {
+      return NextResponse.json({ 
+        error: "Message content is required and must be a non-empty string",
+        received: content 
+      }, { status: 400 })
+    }
 
     console.log("Received request:", { chat_id, session_id, content, userEmail })
 
