@@ -28,23 +28,32 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     api: "/api/chat",
     initialMessages: [],
     headers: {
-      "Content-Type": "application/json",
       "X-User-Email": userEmail,
     },
     body: {
       chat_id: chat?.id,
       session_id: sessionId,
     },
-    onError: (_error) => {
-      console.error("Chat error:", _error)
+    onResponse: (response) => {
+      console.log("Chat response:", response)
     },
+    onFinish: (message) => {
+      console.log("Chat finished:", message)
+    },
+    onError: (error) => {
+      console.error("Chat error:", error)
+    }
   })
 
   // Fetch policy data
   useEffect(() => {
     const fetchPolicyData = async () => {
       try {
-        const { data: policy, error } = await supabase.from("policies").select("*").eq("session_id", sessionId).single()
+        const { data: policy, error } = await supabase
+          .from("policies")
+          .select("*")
+          .eq("session_id", sessionId)
+          .single()
 
         if (error) throw error
         setPolicyData(policy.analysis_data)
@@ -113,64 +122,58 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   }, [userEmail, sessionId])
 
   useEffect(() => {
-    if (chat?.id) {
-      const fetchMessages = async () => {
-        try {
-          const { data: fetchedMessages, error } = await supabase
-            .from("chat_messages")
-            .select("*")
-            .eq("chat_id", chat.id)
-            .order("created_at", { ascending: true })
+    if (!chat?.id) return;
 
-          if (error) {
-            console.error("Error fetching messages:", error)
-            return
-          }
+    const fetchMessages = async () => {
+      try {
+        const { data: fetchedMessages, error } = await supabase
+          .from("chat_messages")
+          .select("*")
+          .eq("chat_id", chat.id)
+          .order("created_at", { ascending: true })
 
-          if (fetchedMessages) {
-            const formattedMessages: Message[] = fetchedMessages.map((msg) => ({
-              id: msg.id,
-              role: msg.role as Message["role"],
-              content: msg.content,
-            }))
-            setMessages(formattedMessages)
-          }
-        } catch (err) {
-          console.error("Error in fetchMessages:", err)
+        if (error) {
+          console.error("Error fetching messages:", error)
+          return
         }
-      }
 
-      fetchMessages()
+        if (fetchedMessages) {
+          const formattedMessages: Message[] = fetchedMessages.map((msg) => ({
+            id: msg.id,
+            role: msg.role as Message["role"],
+            content: msg.content,
+          }))
+          
+          // Only update if messages have changed
+          setMessages((prev) => {
+            if (JSON.stringify(prev) !== JSON.stringify(formattedMessages)) {
+              return formattedMessages
+            }
+            return prev
+          })
+        }
+      } catch (err) {
+        console.error("Error in fetchMessages:", err)
+      }
     }
-  }, [chat?.id, setMessages])
+
+    fetchMessages()
+  }, [chat?.id]) // Removed setMessages from dependencies
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!chat?.id || !input.trim()) return
 
     try {
-      const response = await handleSubmit(e, {
+      await handleSubmit(e, {
         options: {
           body: {
-            messages: messages,
             chat_id: chat.id,
             session_id: sessionId,
-            content: input.trim(),
-          },
-        },
-      })
-
-      // If the response is a string, try to parse it as JSON
-      if (typeof response === "string") {
-        try {
-          const jsonResponse = JSON.parse(response)
-          // Handle the JSON response if needed
-          console.log("Parsed JSON response:", jsonResponse)
-        } catch {
-          // If parsing fails, it's not JSON, so we can use it as is
-          console.log("String response:", response)
+            content: input.trim()
+          }
         }
-      }
+      })
     } catch (err) {
       console.error("Error in handleFormSubmit:", err)
     }
@@ -259,4 +262,3 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     </Card>
   )
 }
-
