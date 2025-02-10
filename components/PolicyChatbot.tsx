@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
 import { createClient } from "@supabase/supabase-js"
+import { v4 as uuidv4 } from 'uuid'
 
 // Initialize Supabase client
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -148,7 +149,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
 
     try {
       const userMessage: ChatMessage = {
-        id: Date.now().toString(),
+        id: uuidv4(),
         chat_id: chat.id,
         role: "user",
         content: input.trim(),
@@ -169,7 +170,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
       setMessages([
         ...messages,
         {
-          id: Date.now().toString(),
+          id: uuidv4(),
           role: "system",
           content: `Error: ${errorMessage}`,
         },
@@ -260,4 +261,3 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     </Card>
   )
 }
-
