@@ -47,32 +47,6 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   const [isInitializing, setIsInitializing] = useState(true)
   const [initError, setInitError] = useState<string | null>(null)
 
-  const fetchMessages = useCallback(
-    async (chatId: string) => {
-      try {
-        const { data: messages, error } = await supabase
-          .from("chat_messages")
-          .select("*")
-          .eq("chat_id", chatId)
-          .order("created_at", { ascending: true })
-
-        if (error) throw error
-
-        if (messages) {
-          const formattedMessages: Message[] = messages.map((msg) => ({
-            id: msg.id,
-            role: msg.role as Message["role"],
-            content: msg.content,
-          }))
-          setMessages(formattedMessages)
-        }
-      } catch (err) {
-        console.error("Error fetching messages:", err)
-      }
-    },
-    [setMessages, chatId],
-  ) // Added chatId as a dependency
-
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error, reload } = useChat({
     api: "/api/chat",
     initialMessages: [],
@@ -97,6 +71,32 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
       console.error("Chat error:", error)
     },
   })
+
+  const fetchMessages = useCallback(
+    async (chatId: string) => {
+      try {
+        const { data: messages, error } = await supabase
+          .from("chat_messages")
+          .select("*")
+          .eq("chat_id", chatId)
+          .order("created_at", { ascending: true })
+
+        if (error) throw error
+
+        if (messages) {
+          const formattedMessages: Message[] = messages.map((msg) => ({
+            id: msg.id,
+            role: msg.role as Message["role"],
+            content: msg.content,
+          }))
+          setMessages(formattedMessages)
+        }
+      } catch (err) {
+        console.error("Error fetching messages:", err)
+      }
+    },
+    [setMessages],
+  )
 
   // Fetch policy data
   useEffect(() => {
