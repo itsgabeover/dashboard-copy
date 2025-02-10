@@ -1,6 +1,5 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from 'openai'
-import { ChatCompletionMessageParam } from 'openai/resources/chat'
 import { NextRequest, NextResponse } from 'next/server'
 
 // Initialize the OpenAI client
@@ -50,17 +49,11 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Map the messages to the format expected by OpenAI
-    const mappedMessages: ChatCompletionMessageParam[] = messages.map((message) => ({
-      content: message.content,
-      role: message.role,
-    }))
-
     // Create the chat completion
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       stream: true,
-      messages: mappedMessages,
+      messages: messages,
     })
 
     // Create a stream from the response
