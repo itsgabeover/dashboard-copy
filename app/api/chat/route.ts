@@ -29,7 +29,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
 
-// Convert Message to ChatCompletionMessageParam
 function convertToChatCompletionMessage(message: Message): OpenAI.ChatCompletionMessageParam {
   const { role, content } = message
   switch (role) {
@@ -85,33 +84,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to save user message" }, { status: 500 })
     }
 
-    // Prepare system message and messages array
+    // Prepare messages
     const systemMessage = constructSystemMessage(policyData)
     const data = new experimental_StreamData()
 
-    const messagesToSend: Message[] = [
+    const messagesToSend = [
       { id: uuidv4(), role: "system", content: systemMessage },
-      { id: uuidv4(), role: "user", content },
+      { id: uuidv4(), role: "user", content }
     ]
-
-    // Fetch previous messages
-    const { data: previousMessages, error: messagesError } = await supabase
-      .from("chat_messages")
-      .select("id, role, content")
-      .eq("chat_id", chat.id)
-      .order("created_at", { ascending: true })
-
-    if (messagesError) {
-      console.error("Error fetching previous messages:", messagesError)
-    } else {
-      messagesToSend.unshift(
-        ...previousMessages.map((msg) => ({
-          id: msg.id,
-          role: msg.role as Role,
-          content: msg.content,
-        }))
-      )
-    }
 
     // Create OpenAI chat completion
     const response = await openai.chat.completions.create({
@@ -120,49 +100,33 @@ export async function POST(req: NextRequest) {
       stream: true,
     })
 
+    // Create ReadableStream
     const stream = new ReadableStream({
-  async start(controller) {
-    const encoder = new TextEncoder()
-    let fullCompletion = ""
+      async start(controller) {
+        const encoder = new TextEncoder()
+        let fullCompletion = ""
 
-    try {
-      for await (const chunk of response) {
-        const content = chunk.choices[0]?.delta?.content
-        if (content) {
-          fullCompletion += content
-          // Ensure we're sending a properly encoded chunk
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
-        }
-      }
+        try {
+          for await (const chunk of response) {
+            const content = chunk.choices[0]?.delta?.content
+            if (content) {
+              fullCompletion += content
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
+            }
+          }
 
-      if (fullCompletion) {
-        // Save the complete message
-        await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
-        await updateChatTimestamp(chat.id)
-      }
-
-      controller.close()
-      data.close()
-    } catch (error) {
-      console.error("Streaming error:", error)
-      controller.error(error)
-    }
-  }
-})
-          
-          // Save assistant's complete message after streaming is done
           if (fullCompletion) {
             await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
             await updateChatTimestamp(chat.id)
           }
-          
+
           controller.close()
           data.close()
         } catch (error) {
           console.error("Streaming error:", error)
           controller.error(error)
         }
-      },
+      }
     })
 
     return new StreamingTextResponse(stream, {}, data)
@@ -195,7 +159,6 @@ async function getOrCreateChat(userEmail: string, chat_id?: string, session_id?:
 
       return existingChat
     } else if (session_id) {
-      // Try to find existing chat for this session
       const { data: existingChat, error: fetchError } = await supabase
         .from("chats")
         .select("*")
@@ -207,7 +170,6 @@ async function getOrCreateChat(userEmail: string, chat_id?: string, session_id?:
         return existingChat
       }
 
-      // Create new chat if none exists
       const { data: newChat, error: insertError } = await supabase
         .from("chats")
         .insert({
@@ -250,7 +212,7 @@ async function fetchPolicyData(session_id: string): Promise<Policy | null> {
 
 function constructSystemMessage(policyData: Policy): string {
   const { analysis_data } = policyData
-  const { policyOverview, sections, values } = analysis_data.data
+  const { policyOverview } = analysis_data.data
 
   return `
 You are Sage, an expert guide who helps policyholders understand their personalized Insurance Planner AI analysis reports.
@@ -264,27 +226,6 @@ Current Policy Details:
 - Status: ${policyData.status}
 - Last Updated: ${policyData.updated_at}
 
-Policy Features:
-${policyOverview.riders.map(rider => `- ${rider}`).join('\n')}
-
-Analysis Sections:
-${sections.map(section => `
-${section.title}:
-Key Points: ${section.quotes.join('; ')}
-Hidden Gem: ${section.hiddengem}
-Blind Spot: ${section.blindspot}
-Red Flag: ${section.redflag}
-Client Implications: ${section.clientImplications}
-`).join('\n')}
-
-Policy Values Over Time:
-${values.map(v => `
-${v.timePoint}:
-- Death Benefit: $${v.values.deathBenefitAmount.toLocaleString()}
-- Cash Value: $${v.values.cashValue.toLocaleString()}
-- Net Surrender Value: $${v.values.netSurrenderValue.toLocaleString()}
-`).join('\n')}
-
 Instructions:
 1. Provide detailed, accurate responses using specific details from this policy
 2. If asked about details not provided here, direct users to their policy documents
@@ -296,7 +237,6 @@ Instructions:
 
 async function saveMessageToDatabase(chat_id: string, role: Role, content: string) {
   try {
-    // Validate UUID format
     if (!chat_id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)) {
       throw new Error(`Invalid UUID format for chat_id: ${chat_id}`)
     }
