@@ -152,31 +152,37 @@ export async function POST(req: NextRequest) {
       stream: true,
     })
 
-    // Create ReadableStream from OpenAI response
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder()
-        let fullCompletion = ''
+  // Create ReadableStream from OpenAI response
+const stream = new ReadableStream({
+  async start(controller) {
+    const encoder = new TextEncoder()
+    let fullCompletion = ''
 
-        try {
-          for await (const chunk of streamToAsyncIterable(response)) {
-            if (chunk) {
-              fullCompletion += chunk
-              controller.enqueue(encoder.encode(chunk))
-            }
-          }
-          // Save assistant's complete message
-          await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
-          await updateChatTimestamp(chat.id)
-          controller.close()
-          data.close()
-        } catch (error) {
-          console.error("Streaming error:", error)
-          controller.error(error)
+    try {
+      for await (const chunk of response) {
+        const content = chunk.choices[0]?.delta?.content || ''
+        if (content) {
+          fullCompletion += content
+          controller.enqueue(encoder.encode(content))
         }
-      },
-    })
+      }
+      
+      // Save assistant's complete message after streaming is done
+      if (fullCompletion) {
+        await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
+        await updateChatTimestamp(chat.id)
+      }
+      
+      controller.close()
+      data.close()
+    } catch (error) {
+      console.error("Streaming error:", error)
+      controller.error(error)
+    }
+  },
+})
 
+return new StreamingTextResponse(stream, {}, data)
     return new StreamingTextResponse(stream, {}, data)
   } catch (error) {
     console.error("Error in chat API:", error)
