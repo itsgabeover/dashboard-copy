@@ -38,13 +38,6 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     onError: (_error) => {
       console.error("Chat error:", _error)
     },
-    parser: (text) => {
-      try {
-        return JSON.parse(text)
-      } catch {
-        return text
-      }
-    },
   })
 
   // Fetch policy data
@@ -156,7 +149,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     if (!chat?.id || !input.trim()) return
 
     try {
-      await handleSubmit(e, {
+      const response = await handleSubmit(e, {
         options: {
           body: {
             messages: messages,
@@ -166,6 +159,18 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
           },
         },
       })
+
+      // If the response is a string, try to parse it as JSON
+      if (typeof response === "string") {
+        try {
+          const jsonResponse = JSON.parse(response)
+          // Handle the JSON response if needed
+          console.log("Parsed JSON response:", jsonResponse)
+        } catch {
+          // If parsing fails, it's not JSON, so we can use it as is
+          console.log("String response:", response)
+        }
+      }
     } catch (err) {
       console.error("Error in handleFormSubmit:", err)
     }
@@ -204,7 +209,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   return (
     <Card className="w-full h-[500px] flex flex-col">
       <CardHeader>
-        <CardTitle>Chat about your {policyData.data.policyOverview.productName} policy</CardTitle>
+        <CardTitle>Chat about your {policyData?.data?.policyOverview?.productName} policy</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden">
         <ScrollArea className="h-full">
