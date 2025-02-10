@@ -59,8 +59,14 @@ export async function POST(req: NextRequest) {
     const { chat_id, session_id, content }: SendMessageParams = await req.json()
     const userEmail = req.headers.get("X-User-Email")
 
+    console.log("Received request:", { chat_id, session_id, content, userEmail })
+
     if (!userEmail) {
       return NextResponse.json({ error: "User email is required" }, { status: 401 })
+    }
+
+    if (!content) {
+      return NextResponse.json({ error: "Message content is required" }, { status: 400 })
     }
 
     // Get or create chat session
@@ -75,11 +81,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Policy data not found" }, { status: 404 })
     }
 
-    // Save user's message first
+    // Save user's message first with explicit content check
     try {
-      await saveMessageToDatabase(chat.id, "user", content)
+      const userMessageId = uuidv4()
+      const { error: saveError } = await supabase
+        .from("chat_messages")
+        .insert({
+          id: userMessageId,
+          chat_id: chat.id,
+          role: "user",
+          content: content.trim(),
+          created_at: new Date().toISOString(),
+          is_complete: true,
+        })
+
+      if (saveError) {
+        console.error("Error saving user message:", saveError)
+        throw new Error(`Failed to save user message: ${saveError.message}`)
+      }
     } catch (error) {
-      console.error("Error saving user message:", error)
+      console.error("Error saving message:", error)
       return NextResponse.json({ error: "Failed to save user message" }, { status: 500 })
     }
 
@@ -189,7 +210,7 @@ async function getOrCreateChat(userEmail: string, chat_id?: string, session_id?:
       const { data: newChat, error: insertError } = await supabase
         .from("chats")
         .insert({
-          id: uuidv4(), // Explicitly generate UUID
+          id: uuidv4(),
           user_email: userEmail,
           session_id: session_id,
           is_active: true,
