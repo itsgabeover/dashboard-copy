@@ -9,15 +9,21 @@ const openai = new OpenAI({
 // Set runtime config
 export const runtime = "edge"
 
+// Define the structure of a chat message
+interface ChatMessage {
+  content: string
+  role: "system" | "user" | "assistant"
+}
+
 export async function POST(req: Request) {
   // Extract the `messages` from the body of the request
-  const { messages } = await req.json()
+  const { messages }: { messages: ChatMessage[] } = await req.json()
 
   // Ask OpenAI for a streaming chat completion given the prompt
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     stream: true,
-    messages: messages.map((message: any) => ({
+    messages: messages.map((message: ChatMessage) => ({
       content: message.content,
       role: message.role,
     })),
