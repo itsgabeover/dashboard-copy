@@ -25,25 +25,47 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   const [initError, setInitError] = useState<string | null>(null)
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error } = useChat({
-    api: "/api/chat",
-    initialMessages: [],
-    headers: {
-      "X-User-Email": userEmail,
-    },
-    body: {
-      chat_id: chat?.id,
-      session_id: sessionId,
-    },
-    onResponse: (response) => {
-      console.log("Chat response:", response)
-    },
-    onFinish: (message) => {
-      console.log("Chat finished:", message)
-    },
-    onError: (error) => {
-      console.error("Chat error:", error)
+  api: "/api/chat",
+  initialMessages: [],
+  headers: {
+    "X-User-Email": userEmail,
+  },
+  body: {
+    chat_id: chat?.id,
+    session_id: sessionId,
+  },
+  onResponse: (response) => {
+    // Check if the response is ok
+    if (!response.ok) {
+      console.error("Response error:", response.statusText)
+      return
     }
-  })
+    console.log("Streaming started")
+  },
+  onFinish: async (message) => {
+    console.log("Stream finished:", message)
+    // Fetch latest messages after stream completes
+    if (chat?.id) {
+      const { data: latestMessages } = await supabase
+        .from("chat_messages")
+        .select("*")
+        .eq("chat_id", chat.id)
+        .order("created_at", { ascending: true })
+
+      if (latestMessages) {
+        const formattedMessages = latestMessages.map((msg) => ({
+          id: msg.id,
+          role: msg.role as Message["role"],
+          content: msg.content,
+        }))
+        setMessages(formattedMessages)
+      }
+    }
+  },
+  onError: (error) => {
+    console.error("Chat error:", error)
+  }
+})
 
   // Fetch policy data
   useEffect(() => {
