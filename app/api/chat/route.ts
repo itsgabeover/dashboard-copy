@@ -3,7 +3,7 @@ import { StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
-import type { Chat, SendMessageParams } from "@/types/chat"
+import type { Chat } from "@/types/chat"
 import type { Policy, PolicyQueryResponse } from "@/types/policy"
 import { v4 as uuidv4 } from "uuid"
 
