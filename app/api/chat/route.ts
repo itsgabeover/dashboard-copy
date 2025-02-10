@@ -14,7 +14,7 @@ export const maxDuration = 30
 interface ChatRequest {
   messages: {
     content: string;
-    role: 'system' | 'user' | 'assistant' | 'function';
+    role: 'system' | 'user' | 'assistant';
   }[];
   session_id: string;
 }
@@ -49,11 +49,17 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Map the messages to the format expected by OpenAI
+    const mappedMessages = messages.map((message) => ({
+      content: message.content,
+      role: message.role,
+    }))
+
     // Create the chat completion
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       stream: true,
-      messages: messages,
+      messages: mappedMessages,
     })
 
     // Create a stream from the response
