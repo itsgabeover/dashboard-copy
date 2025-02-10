@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid'
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 interface PolicyChatbotProps {
-  sessionId: string // Keep prop name as sessionId for React conventions
+  sessionId: string
   userEmail: string
 }
 
@@ -32,7 +32,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     },
     body: {
       chat_id: chat?.id,
-      session_id: sessionId, // Use snake_case for database interaction
+      session_id: sessionId,
     },
   })
 
@@ -43,7 +43,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
         const { data: policy, error } = await supabase
           .from("policies")
           .select("*")
-          .eq("session_id", sessionId) // Use snake_case for database column
+          .eq("session_id", sessionId)
           .single()
 
         if (error) throw error
@@ -71,7 +71,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
           .from("chats")
           .select("*")
           .eq("user_email", userEmail)
-          .eq("session_id", sessionId) // Use snake_case for database column
+          .eq("session_id", sessionId)
           .order("created_at", { ascending: false })
           .limit(1)
           .single()
@@ -86,8 +86,9 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
         const { data: newChat, error: insertError } = await supabase
           .from("chats")
           .insert({
+            id: uuidv4(),
             user_email: userEmail,
-            session_id: sessionId, // Use snake_case for database column
+            session_id: sessionId,
             is_active: true,
           })
           .select()
@@ -148,22 +149,33 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     if (!chat?.id || !input.trim()) return
 
     try {
+      // Store the trimmed content
+      const messageContent = input.trim()
+      
+      // First submit to AI
+      await handleSubmit(e)
+
+      // Then save to Supabase
       const userMessage: ChatMessage = {
         id: uuidv4(),
         chat_id: chat.id,
         role: "user",
-        content: input.trim(),
+        content: messageContent,
         created_at: new Date().toISOString(),
         is_complete: true,
       }
 
-      const { error: saveError } = await supabase.from("chat_messages").insert(userMessage)
+      console.log("Saving message to Supabase:", userMessage)
+
+      const { error: saveError } = await supabase
+        .from("chat_messages")
+        .insert(userMessage)
 
       if (saveError) {
+        console.error("Supabase save error:", saveError)
         throw new Error(`Failed to save message: ${saveError.message}`)
       }
 
-      await handleSubmit(e)
     } catch (err) {
       console.error("Error in handleFormSubmit:", err)
       const errorMessage = err instanceof Error ? err.message : "Failed to send message"
