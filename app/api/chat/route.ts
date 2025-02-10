@@ -1,13 +1,35 @@
-import { type Message, experimental_StreamData } from "ai"
+import { experimental_StreamData as StreamData } from "ai"
 import { StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
-import type { Chat } from "@/types/chat"
-import type { Policy, PolicyQueryResponse } from "@/types/policy"
 import { v4 as uuidv4 } from "uuid"
 
+// Types
 type Role = "system" | "user" | "assistant" | "function"
+
+interface Chat {
+  id: string
+  user_email: string
+  session_id: string
+  is_active: boolean
+}
+
+interface Policy {
+  policy_name: string
+  status: string
+  updated_at: string
+  analysis_data: {
+    data: {
+      policyOverview: {
+        issuer: string
+        deathBenefit: number
+        annualPremium: number
+        productType: string
+      }
+    }
+  }
+}
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -29,15 +51,13 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
 
-function convertToChatCompletionMessage(message: Message): OpenAI.ChatCompletionMessageParam {
+function convertToChatCompletionMessage(message: { role: string; content: string }): OpenAI.ChatCompletionMessageParam {
   const { role, content } = message
   switch (role) {
     case "system":
-      return { role: "system", content }
     case "user":
-      return { role: "user", content }
     case "assistant":
-      return { role: "assistant", content }
+      return { role, content }
     case "function":
       return { role: "function", content, name: "function" }
     default:
@@ -57,11 +77,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User email is required" }, { status: 401 })
     }
 
-    if (!content || typeof content !== 'string' || !content.trim()) {
-      return NextResponse.json({ 
-        error: "Message content is required and must be a non-empty string",
-        received: content 
-      }, { status: 400 })
+    if (!content || typeof content !== "string" || !content.trim()) {
+      return NextResponse.json(
+        {
+          error: "Message content is required and must be a non-empty string",
+          received: content,
+        },
+        { status: 400 },
+      )
     }
 
     // Get or create chat session
@@ -86,11 +109,11 @@ export async function POST(req: NextRequest) {
 
     // Prepare messages
     const systemMessage = constructSystemMessage(policyData)
-    const data = new experimental_StreamData()
+    const data = new StreamData()
 
     const messagesToSend = [
-      { id: uuidv4(), role: "system", content: systemMessage },
-      { id: uuidv4(), role: "user", content }
+      { role: "system", content: systemMessage },
+      { role: "user", content },
     ]
 
     // Create OpenAI chat completion
@@ -126,7 +149,7 @@ export async function POST(req: NextRequest) {
           console.error("Streaming error:", error)
           controller.error(error)
         }
-      }
+      },
     })
 
     return new StreamingTextResponse(stream, {}, data)
@@ -137,7 +160,7 @@ export async function POST(req: NextRequest) {
         error: "An unexpected error occurred",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -196,7 +219,7 @@ async function getOrCreateChat(userEmail: string, chat_id?: string, session_id?:
 }
 
 async function fetchPolicyData(session_id: string): Promise<Policy | null> {
-  const { data: policyData, error: policyError }: PolicyQueryResponse = await supabase
+  const { data: policyData, error: policyError } = await supabase
     .from("policies")
     .select("*")
     .eq("session_id", session_id)
@@ -281,3 +304,4 @@ async function updateChatTimestamp(chat_id: string) {
     throw error
   }
 }
+
