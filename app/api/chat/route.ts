@@ -1,4 +1,4 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { OpenAIStream, StreamingTextResponse } from "ai"
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
@@ -41,16 +41,16 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
+    persistSession: false,
   },
   db: {
-    schema: 'public'
+    schema: "public",
   },
   global: {
     headers: {
-      'X-Client-Info': 'chat-api'
-    }
-  }
+      "X-Client-Info": "chat-api",
+    },
+  },
 })
 
 // Initialize OpenAI client
@@ -74,9 +74,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: "Message content is required and must be a non-empty string",
-          received: { content, type: typeof content }
+          received: { content, type: typeof content },
         },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -102,30 +102,47 @@ export async function POST(req: NextRequest) {
 
     // Prepare messages for OpenAI
     const systemMessage = constructSystemMessage(policyData)
-    
+
     // Create OpenAI chat completion
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
       messages: [
         { role: "system", content: systemMessage },
-        { role: "user", content }
+        { role: "user", content },
       ],
       stream: true,
     })
 
-    // Create a stream using Vercel AI SDK's OpenAIStream
-    const stream = OpenAIStream(response, {
-      async onCompletion(completion) {
-        // Save the complete message
-        await saveMessageToDatabase(chat.id, "assistant", completion)
-        await updateChatTimestamp(chat.id)
-        console.log("Saved assistant response:", { length: completion.length })
-      },
-    })
+    // Create stream with proper error handling
+    try {
+      const stream = OpenAIStream(response, {
+        async onCompletion(completion) {
+          try {
+            // Save the complete message
+            await saveMessageToDatabase(chat.id, "assistant", completion)
+            await updateChatTimestamp(chat.id)
+            console.log("Saved assistant response:", { length: completion.length })
+          } catch (error) {
+            console.error("Error in onCompletion:", error)
+          }
+        },
+        onStart: () => {
+          console.log("Starting stream")
+        },
+        onToken: () => {
+          // Optional: Handle individual tokens
+        },
+        onFinal: (completion) => {
+          console.log("Stream completed:", { length: completion.length })
+        },
+      })
 
-    // Return the stream
-    return new StreamingTextResponse(stream)
-
+      // Return the streaming response
+      return new StreamingTextResponse(stream)
+    } catch (streamError) {
+      console.error("Streaming error:", streamError)
+      throw streamError
+    }
   } catch (error) {
     console.error("Error in chat API:", error)
     return NextResponse.json(
@@ -133,7 +150,7 @@ export async function POST(req: NextRequest) {
         error: "An unexpected error occurred",
         details: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     )
   }
 }
@@ -277,3 +294,4 @@ async function updateChatTimestamp(chat_id: string) {
     throw error
   }
 }
+
