@@ -35,8 +35,8 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
       chat_id: chat?.id,
       session_id: sessionId,
     },
-    onError: (error) => {
-      console.error("Chat error:", error)
+    onError: (_error) => {
+      console.error("Chat error:", _error)
     },
     parser: (text) => {
       try {
