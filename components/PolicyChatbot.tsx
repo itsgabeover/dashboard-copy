@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import type { Message } from "ai"
+import { Message } from 'ai'
 
 interface PolicyChatbotProps {
   sessionId: string
@@ -20,7 +20,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     },
     body: {
       session_id: sessionId,
-    },
+    }
   })
 
   return (
@@ -47,7 +47,12 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
       </CardContent>
       <CardFooter>
         <form onSubmit={handleSubmit} className="flex w-full space-x-2">
-          <Input value={input} onChange={handleInputChange} placeholder="Type your message..." className="flex-grow" />
+          <Input
+            value={input}
+            onChange={handleInputChange}
+            placeholder="Type your message..."
+            className="flex-grow"
+          />
           <Button type="submit" disabled={isLoading}>
             Send
           </Button>
@@ -56,4 +61,3 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     </Card>
   )
 }
-
