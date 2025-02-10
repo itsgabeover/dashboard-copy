@@ -1,5 +1,6 @@
 import OpenAI from "openai"
 import { OpenAIStream, StreamingTextResponse } from "ai"
+import { experimental_StreamData } from 'ai'
 
 // Create an OpenAI API client
 const openai = new OpenAI({
@@ -16,10 +17,10 @@ interface ChatMessage {
 }
 
 export async function POST(req: Request) {
-  // Extract the `messages` from the body of the request
   const { messages }: { messages: ChatMessage[] } = await req.json()
 
-  // Ask OpenAI for a streaming chat completion given the prompt
+  const data = new experimental_StreamData()
+  
   const response = await openai.chat.completions.create({
     model: "gpt-4",
     stream: true,
@@ -29,9 +30,13 @@ export async function POST(req: Request) {
     })),
   })
 
-  // Convert the response into a friendly text-stream
-  const stream = OpenAIStream(response)  // Removed .toReadableStream()
+  const stream = OpenAIStream(response, {
+    onCompletion: (completion) => {
+      // Optional: do something with the completion
+      data.append({ completion })
+    },
+    experimental_streamData: true,
+  })
 
-  // Respond with the stream
-  return new StreamingTextResponse(stream)
+  return new StreamingTextResponse(stream, {}, data)
 }
