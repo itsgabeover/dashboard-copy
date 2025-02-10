@@ -25,16 +25,22 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   const [initError, setInitError] = useState<string | null>(null)
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error } = useChat({
-    api: "/api/chat",
-    initialMessages: [],
-    headers: {
-      "X-User-Email": userEmail,
-    },
-    body: {
-      chat_id: chat?.id,
-      session_id: sessionId,
-    },
-  })
+  api: "/api/chat",
+  initialMessages: [],
+  headers: {
+    "X-User-Email": userEmail,
+  },
+  body: {
+    chat_id: chat?.id,
+    session_id: sessionId,
+  },
+  onResponse: (response) => {
+    console.log("Chat API Response:", response)
+  },
+  onError: (error) => {
+    console.error("Chat API Error:", error)
+  },
+})
 
   // Fetch policy data
   useEffect(() => {
@@ -144,51 +150,59 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     }
   }, [chat?.id, setMessages])
 
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!chat?.id || !input.trim()) return
+// REPLACE THIS ENTIRE FUNCTION
+const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault()
+  if (!chat?.id || !input.trim()) return
 
-    try {
-      // Store the trimmed content
-      const messageContent = input.trim()
-      
-      // First submit to AI
-      await handleSubmit(e)
-
-      // Then save to Supabase
-      const userMessage: ChatMessage = {
-        id: uuidv4(),
-        chat_id: chat.id,
-        role: "user",
-        content: messageContent,
-        created_at: new Date().toISOString(),
-        is_complete: true,
-      }
-
-      console.log("Saving message to Supabase:", userMessage)
-
-      const { error: saveError } = await supabase
-        .from("chat_messages")
-        .insert(userMessage)
-
-      if (saveError) {
-        console.error("Supabase save error:", saveError)
-        throw new Error(`Failed to save message: ${saveError.message}`)
-      }
-
-    } catch (err) {
-      console.error("Error in handleFormSubmit:", err)
-      const errorMessage = err instanceof Error ? err.message : "Failed to send message"
-      setMessages([
-        ...messages,
-        {
-          id: uuidv4(),
-          role: "system",
-          content: `Error: ${errorMessage}`,
+  try {
+    const messageContent = input.trim()
+    
+    // Submit to AI with the content in the body
+    await handleSubmit(e, {
+      options: {
+        body: {
+          chat_id: chat.id,
+          session_id: sessionId,
+          content: messageContent,
         },
-      ])
+      },
+    })
+
+    // Save to Supabase
+    const userMessage: ChatMessage = {
+      id: uuidv4(),
+      chat_id: chat.id,
+      role: "user",
+      content: messageContent,
+      created_at: new Date().toISOString(),
+      is_complete: true,
     }
+
+    console.log("Saving message to Supabase:", userMessage)
+
+    const { error: saveError } = await supabase
+      .from("chat_messages")
+      .insert(userMessage)
+
+    if (saveError) {
+      console.error("Supabase save error:", saveError)
+      throw new Error(`Failed to save message: ${saveError.message}`)
+    }
+
+  } catch (err) {
+    console.error("Error in handleFormSubmit:", err)
+    const errorMessage = err instanceof Error ? err.message : "Failed to send message"
+    setMessages([
+      ...messages,
+      {
+        id: uuidv4(),
+        role: "system",
+        content: `Error: ${errorMessage}`,
+      },
+    ])
   }
+}
 
   if (isInitializing) {
     return (
