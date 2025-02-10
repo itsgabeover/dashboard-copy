@@ -1,5 +1,4 @@
-import { experimental_StreamData as StreamData } from "ai"
-import { StreamingTextResponse } from "ai"
+import { OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from "openai"
 import { createClient } from "@supabase/supabase-js"
 import { type NextRequest, NextResponse } from "next/server"
@@ -31,7 +30,7 @@ interface Policy {
   }
 }
 
-// Initialize Supabase client
+// Initialize Supabase client with enhanced configuration
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -42,28 +41,22 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false,
+    persistSession: false
   },
+  db: {
+    schema: 'public'
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'chat-api'
+    }
+  }
 })
 
 // Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
-
-function convertToChatCompletionMessage(message: { role: string; content: string }): OpenAI.ChatCompletionMessageParam {
-  const { role, content } = message
-  switch (role) {
-    case "system":
-    case "user":
-    case "assistant":
-      return { role, content }
-    case "function":
-      return { role: "function", content, name: "function" }
-    default:
-      throw new Error(`Unsupported role: ${role}`)
-  }
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -93,13 +86,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid chat or session ID" }, { status: 400 })
     }
 
-    // Fetch associated policy data
+    // Fetch policy data
     const policyData = await fetchPolicyData(session_id)
     if (!policyData) {
       return NextResponse.json({ error: "Policy data not found" }, { status: 404 })
     }
 
-    // Save user's message first
+    // Save user message first
     try {
       await saveMessageToDatabase(chat.id, "user", content)
     } catch (error) {
@@ -107,68 +100,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to save user message" }, { status: 500 })
     }
 
-    // Prepare messages
+    // Prepare messages for OpenAI
     const systemMessage = constructSystemMessage(policyData)
-    const data = new StreamData()
-
-    const messagesToSend = [
-      { role: "system", content: systemMessage },
-      { role: "user", content }
-    ]
-
-    console.log("Sending messages to OpenAI:", messagesToSend)
-
+    
     // Create OpenAI chat completion
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
-      messages: messagesToSend.map(convertToChatCompletionMessage),
+      messages: [
+        { role: "system", content: systemMessage },
+        { role: "user", content }
+      ],
       stream: true,
-      temperature: 0.7,
     })
 
-    // Create ReadableStream
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder()
-        let fullCompletion = ""
-
-        try {
-          for await (const chunk of response) {
-            const content = chunk.choices[0]?.delta?.content
-            if (content) {
-              fullCompletion += content
-              // Format the SSE data properly
-              const streamData = {
-                id: uuidv4(),
-                role: 'assistant',
-                content: content
-              }
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify(streamData)}\n\n`))
-            }
-          }
-
-          if (fullCompletion) {
-            console.log("Saving assistant response:", { length: fullCompletion.length })
-            await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
-            await updateChatTimestamp(chat.id)
-          }
-
-          controller.close()
-          data.close()
-        } catch (error) {
-          console.error("Streaming error:", error)
-          controller.error(error)
-        }
-      }
+    // Create a stream using Vercel AI SDK's OpenAIStream
+    const stream = OpenAIStream(response, {
+      async onCompletion(completion) {
+        // Save the complete message
+        await saveMessageToDatabase(chat.id, "assistant", completion)
+        await updateChatTimestamp(chat.id)
+        console.log("Saved assistant response:", { length: completion.length })
+      },
     })
 
-    return new StreamingTextResponse(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      }
-    }, data)
+    // Return the stream
+    return new StreamingTextResponse(stream)
 
   } catch (error) {
     console.error("Error in chat API:", error)
