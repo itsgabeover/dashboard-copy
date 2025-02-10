@@ -1,4 +1,4 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
+import { OpenAIStream, StreamingTextResponse, Message } from 'ai'
 import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages, session_id } = await req.json()
+    const { messages, session_id } = await req.json() as { messages: Message[], session_id: string }
     const userEmail = req.headers.get("X-User-Email")
 
     if (!userEmail || !session_id) {
@@ -27,10 +27,17 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json(
+        { error: 'Invalid or empty messages array' },
+        { status: 400 }
+      )
+    }
+
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       stream: true,
-      messages: messages.map((message: any) => ({
+      messages: messages.map((message: Message) => ({
         content: message.content,
         role: message.role,
       })),
