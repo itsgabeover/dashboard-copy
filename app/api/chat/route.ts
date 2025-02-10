@@ -1,5 +1,5 @@
 import { OpenAIStream, StreamingTextResponse } from "ai";
-import { OpenAI } from "openai";
+import { OpenAI, APIChatCompletion } from "openai";
 import { type NextRequest } from "next/server";
 
 // Required for streaming responses in Edge functions
@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const response = await openai.chat.completions.create({
+    // Fetch streaming response from OpenAI
+    const response: APIChatCompletion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: messages.map((message) => ({
         content: message.content,
@@ -56,10 +57,10 @@ export async function POST(req: NextRequest) {
       max_tokens: 500,
     });
 
-    // Ensure response is properly converted for streaming
-    const stream = OpenAIStream(response as any);
+    // Convert OpenAI response into a text stream
+    const stream = OpenAIStream(response);
 
-    // Return a StreamingTextResponse, which can be consumed by the client
+    // Return the stream response
     return new StreamingTextResponse(stream);
   } catch (error) {
     console.error("Error in chat API:", error);
