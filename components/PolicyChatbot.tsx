@@ -1,63 +1,69 @@
 "use client"
 
+import { useState } from "react"
 import { useChat } from "ai/react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Message } from 'ai'
 
-interface PolicyChatbotProps {
-  sessionId: string
-  userEmail: string
-}
-
-export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
+export function PolicyChatbot({ sessionId, userEmail }: { sessionId: string; userEmail: string }) {
+  const [chatStarted, setChatStarted] = useState(false)
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
     api: "/api/chat",
-    headers: {
-      "X-User-Email": userEmail,
-    },
-    body: {
-      session_id: sessionId,
-    }
+    initialMessages: [
+      {
+        id: "1",
+        role: "system",
+        content: `You are a helpful assistant for insurance policy questions. The user's email is ${userEmail} and the session ID is ${sessionId}.`,
+      },
+    ],
   })
 
+  const startChat = () => {
+    setChatStarted(true)
+  }
+
   return (
-    <Card className="w-full h-[500px] flex flex-col">
+    <Card className="w-full h-[calc(100vh-2rem)] flex flex-col">
       <CardHeader>
-        <CardTitle>Chat with AI Assistant</CardTitle>
+        <CardTitle>Policy Assistant</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="space-y-4 p-4">
-            {messages.map((message: Message) => (
-              <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`rounded-lg p-2 max-w-[80%] ${
-                    message.role === "user" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
-                  }`}
+          {chatStarted ? (
+            messages.map((message) => (
+              <div key={message.id} className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}>
+                <span
+                  className={`inline-block p-2 rounded-lg ${message.role === "user" ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}
                 >
                   {message.content}
-                </div>
+                </span>
               </div>
-            ))}
-          </div>
+            ))
+          ) : (
+            <div className="h-full flex items-center justify-center">
+              <Button onClick={startChat}>Start Chat</Button>
+            </div>
+          )}
         </ScrollArea>
       </CardContent>
-      <CardFooter>
-        <form onSubmit={handleSubmit} className="flex w-full space-x-2">
-          <Input
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Type your message..."
-            className="flex-grow"
-          />
-          <Button type="submit" disabled={isLoading}>
-            Send
-          </Button>
-        </form>
-      </CardFooter>
+      {chatStarted && (
+        <CardFooter>
+          <form onSubmit={handleSubmit} className="flex w-full space-x-2">
+            <Input
+              value={input}
+              onChange={handleInputChange}
+              placeholder="Ask a question about your policy..."
+              disabled={isLoading}
+            />
+            <Button type="submit" disabled={isLoading}>
+              Send
+            </Button>
+          </form>
+        </CardFooter>
+      )}
     </Card>
   )
 }
+
