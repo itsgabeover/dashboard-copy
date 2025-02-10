@@ -30,11 +30,48 @@ const nextConfig = {
 
     return config
   },
-  // Ensure images from placeholder.svg are allowed
+
+  // Ensure images from placeholder.svg and other necessary domains are allowed
   images: {
-    domains: ["placeholder.svg"],
+    domains: ["placeholder.svg", "openai.com", "avatars.githubusercontent.com"],
+  },
+
+  // Enable SWC minification for improved performance
+  swcMinify: true,
+
+  // Opt-in to newer Node.js runtime
+  experimental: {
+    serverComponents: true,
+    appDir: true,
+  },
+
+  // Configure headers for security
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+    ]
+  },
+
+  // Optimize for Vercel deployment
+  serverRuntimeConfig: {
+    PROJECT_ROOT: __dirname,
   },
 }
 
 module.exports = nextConfig
-
