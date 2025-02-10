@@ -1,14 +1,27 @@
-import { OpenAIStream, StreamingTextResponse, Message } from 'ai'
+import { OpenAIStream, StreamingTextResponse } from 'ai'
 import OpenAI from 'openai'
+import { ChatCompletionMessageParam } from 'openai/resources/chat'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Initialize the OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
 
+// Set the maximum duration for the API route
 export const maxDuration = 30
 
+// Define the structure of the incoming request body
+interface ChatRequest {
+  messages: {
+    content: string;
+    role: 'system' | 'user' | 'assistant' | 'function';
+  }[];
+  session_id: string;
+}
+
 export async function POST(req: NextRequest) {
+  // Check if the OpenAI API key is configured
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json(
       { error: 'OpenAI API key not configured' },
@@ -17,9 +30,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages, session_id } = await req.json() as { messages: Message[], session_id: string }
+    // Parse the request body
+    const { messages, session_id } = await req.json() as ChatRequest
     const userEmail = req.headers.get("X-User-Email")
 
+    // Validate required fields
     if (!userEmail || !session_id) {
       return NextResponse.json(
         { error: 'Missing required fields' },
@@ -27,6 +42,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Validate messages array
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
         { error: 'Invalid or empty messages array' },
@@ -34,16 +50,23 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Map the messages to the format expected by OpenAI
+    const mappedMessages: ChatCompletionMessageParam[] = messages.map((message) => ({
+      content: message.content,
+      role: message.role,
+    }))
+
+    // Create the chat completion
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       stream: true,
-      messages: messages.map((message: Message) => ({
-        content: message.content,
-        role: message.role,
-      })),
+      messages: mappedMessages,
     })
 
+    // Create a stream from the response
     const stream = OpenAIStream(response)
+
+    // Return the streaming response
     return new StreamingTextResponse(stream)
   } catch (error) {
     console.error('Error in chat API:', error)
