@@ -28,6 +28,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     api: "/api/chat",
     initialMessages: [],
     headers: {
+      "Content-Type": "application/json",
       "X-User-Email": userEmail,
     },
     body: {
@@ -36,6 +37,13 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     },
     onError: (error) => {
       console.error("Chat error:", error)
+    },
+    parser: (text) => {
+      try {
+        return JSON.parse(text)
+      } catch (e) {
+        return text
+      }
     },
   })
 
@@ -151,6 +159,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
       await handleSubmit(e, {
         options: {
           body: {
+            messages: messages,
             chat_id: chat.id,
             session_id: sessionId,
             content: input.trim(),
