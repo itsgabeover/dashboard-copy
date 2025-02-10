@@ -46,13 +46,6 @@ function convertToChatCompletionMessage(message: Message): OpenAI.ChatCompletion
   }
 }
 
-// Helper function to handle streaming
-async function* streamToAsyncIterable(stream: AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>) {
-  for await (const chunk of stream) {
-    yield chunk.choices[0]?.delta?.content || ''
-  }
-}
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -72,16 +65,6 @@ export async function POST(req: NextRequest) {
       }, { status: 400 })
     }
 
-    console.log("Received request:", { chat_id, session_id, content, userEmail })
-
-    if (!userEmail) {
-      return NextResponse.json({ error: "User email is required" }, { status: 401 })
-    }
-
-    if (!content) {
-      return NextResponse.json({ error: "Message content is required" }, { status: 400 })
-    }
-
     // Get or create chat session
     const chat = await getOrCreateChat(userEmail, chat_id, session_id)
     if (!chat) {
@@ -94,26 +77,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Policy data not found" }, { status: 404 })
     }
 
-    // Save user's message first with explicit content check
+    // Save user's message first
     try {
-      const userMessageId = uuidv4()
-      const { error: saveError } = await supabase
-        .from("chat_messages")
-        .insert({
-          id: userMessageId,
-          chat_id: chat.id,
-          role: "user",
-          content: content.trim(),
-          created_at: new Date().toISOString(),
-          is_complete: true,
-        })
-
-      if (saveError) {
-        console.error("Error saving user message:", saveError)
-        throw new Error(`Failed to save user message: ${saveError.message}`)
-      }
+      await saveMessageToDatabase(chat.id, "user", content)
     } catch (error) {
-      console.error("Error saving message:", error)
+      console.error("Error saving user message:", error)
       return NextResponse.json({ error: "Failed to save user message" }, { status: 500 })
     }
 
@@ -152,37 +120,36 @@ export async function POST(req: NextRequest) {
       stream: true,
     })
 
-  // Create ReadableStream from OpenAI response
-const stream = new ReadableStream({
-  async start(controller) {
-    const encoder = new TextEncoder()
-    let fullCompletion = ''
+    // Create ReadableStream from OpenAI response
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder()
+        let fullCompletion = ''
 
-    try {
-      for await (const chunk of response) {
-        const content = chunk.choices[0]?.delta?.content || ''
-        if (content) {
-          fullCompletion += content
-          controller.enqueue(encoder.encode(content))
+        try {
+          for await (const chunk of response) {
+            const content = chunk.choices[0]?.delta?.content || ''
+            if (content) {
+              fullCompletion += content
+              controller.enqueue(encoder.encode(content))
+            }
+          }
+          
+          // Save assistant's complete message after streaming is done
+          if (fullCompletion) {
+            await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
+            await updateChatTimestamp(chat.id)
+          }
+          
+          controller.close()
+          data.close()
+        } catch (error) {
+          console.error("Streaming error:", error)
+          controller.error(error)
         }
-      }
-      
-      // Save assistant's complete message after streaming is done
-      if (fullCompletion) {
-        await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
-        await updateChatTimestamp(chat.id)
-      }
-      
-      controller.close()
-      data.close()
-    } catch (error) {
-      console.error("Streaming error:", error)
-      controller.error(error)
-    }
-  },
-})
+      },
+    })
 
-return new StreamingTextResponse(stream, {}, data)
     return new StreamingTextResponse(stream, {}, data)
   } catch (error) {
     console.error("Error in chat API:", error)
