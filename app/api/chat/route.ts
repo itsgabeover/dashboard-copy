@@ -67,39 +67,45 @@ function convertToChatCompletionMessage(message: { role: string; content: string
 
 export async function POST(req: NextRequest) {
   try {
+    // Parse and validate request
     const body = await req.json()
-    const { chat_id, session_id, content } = body
+    const { chat_id, session_id, content, messages = [] } = body
     const userEmail = req.headers.get("X-User-Email")
 
-    console.log("Received request body:", body)
+    console.log("Received request:", { chat_id, session_id, content, userEmail, messagesCount: messages.length })
 
+    // Validate required fields
     if (!userEmail) {
       return NextResponse.json({ error: "User email is required" }, { status: 401 })
+    }
+
+    if (!session_id) {
+      return NextResponse.json({ error: "Session ID is required" }, { status: 400 })
     }
 
     if (!content || typeof content !== "string" || !content.trim()) {
       return NextResponse.json(
         {
           error: "Message content is required and must be a non-empty string",
-          received: content,
+          received: { content, type: typeof content }
         },
-        { status: 400 },
+        { status: 400 }
       )
     }
 
     // Get or create chat session
     const chat = await getOrCreateChat(userEmail, chat_id, session_id)
     if (!chat) {
-      return NextResponse.json({ error: "Invalid chat or session ID" }, { status: 400 })
+      return NextResponse.json({ error: "Failed to get or create chat session" }, { status: 400 })
     }
 
-    // Fetch associated policy data
+    // Fetch policy data
     const policyData = await fetchPolicyData(session_id)
     if (!policyData) {
       return NextResponse.json({ error: "Policy data not found" }, { status: 404 })
     }
 
-    // Save user's message first
+    // Save user message
     try {
       await saveMessageToDatabase(chat.id, "user", content)
     } catch (error) {
@@ -107,23 +113,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to save user message" }, { status: 500 })
     }
 
-    // Prepare messages
+    // Prepare messages for OpenAI
     const systemMessage = constructSystemMessage(policyData)
     const data = new StreamData()
 
     const messagesToSend = [
       { role: "system", content: systemMessage },
-      { role: "user", content },
+      ...messages, // Include previous messages if available
+      { role: "user", content }
     ]
 
-    // Create OpenAI chat completion
+    console.log("Sending to OpenAI:", { messageCount: messagesToSend.length })
+
+    // Create OpenAI completion
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-3.5-turbo",
       messages: messagesToSend.map(convertToChatCompletionMessage),
+      temperature: 0.7,
       stream: true,
     })
 
-    // Create ReadableStream
+    // Handle streaming response
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder()
@@ -134,11 +144,15 @@ export async function POST(req: NextRequest) {
             const content = chunk.choices[0]?.delta?.content
             if (content) {
               fullCompletion += content
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
+              // Send properly formatted SSE
+              const message = { role: "assistant", content }
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(message)}\n\n`))
             }
           }
 
+          // Save complete response
           if (fullCompletion) {
+            console.log("Saving assistant response:", { length: fullCompletion.length })
             await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
             await updateChatTimestamp(chat.id)
           }
@@ -149,18 +163,26 @@ export async function POST(req: NextRequest) {
           console.error("Streaming error:", error)
           controller.error(error)
         }
-      },
+      }
     })
 
-    return new StreamingTextResponse(stream, {}, data)
+    // Return streaming response
+    return new StreamingTextResponse(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      }
+    }, data)
+
   } catch (error) {
-    console.error("Error in chat API:", error)
+    console.error("API error:", error)
     return NextResponse.json(
       {
         error: "An unexpected error occurred",
-        details: error instanceof Error ? error.message : String(error),
+        details: error instanceof Error ? error.message : String(error)
       },
-      { status: 500 },
+      { status: 500 }
     )
   }
 }
