@@ -41,7 +41,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     parser: (text) => {
       try {
         return JSON.parse(text)
-      } catch (_e) {
+      } catch {
         return text
       }
     },
