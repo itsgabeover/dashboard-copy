@@ -6,9 +6,9 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
+import type { Chat, ParsedPolicyData } from "@/types/chat"
 import { createClient } from "@supabase/supabase-js"
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from "uuid"
 
 // Initialize Supabase client
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
@@ -25,32 +25,25 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   const [initError, setInitError] = useState<string | null>(null)
 
   const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error } = useChat({
-  api: "/api/chat",
-  initialMessages: [],
-  headers: {
-    "X-User-Email": userEmail,
-  },
-  body: {
-    chat_id: chat?.id,
-    session_id: sessionId,
-  },
-  onResponse: (response) => {
-    console.log("Chat API Response:", response)
-  },
-  onError: (error) => {
-    console.error("Chat API Error:", error)
-  },
-})
+    api: "/api/chat",
+    initialMessages: [],
+    headers: {
+      "X-User-Email": userEmail,
+    },
+    body: {
+      chat_id: chat?.id,
+      session_id: sessionId,
+    },
+    onError: (error) => {
+      console.error("Chat error:", error)
+    },
+  })
 
   // Fetch policy data
   useEffect(() => {
     const fetchPolicyData = async () => {
       try {
-        const { data: policy, error } = await supabase
-          .from("policies")
-          .select("*")
-          .eq("session_id", sessionId)
-          .single()
+        const { data: policy, error } = await supabase.from("policies").select("*").eq("session_id", sessionId).single()
 
         if (error) throw error
         setPolicyData(policy.analysis_data)
@@ -150,59 +143,24 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     }
   }, [chat?.id, setMessages])
 
-// REPLACE THIS ENTIRE FUNCTION
-const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault()
-  if (!chat?.id || !input.trim()) return
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!chat?.id || !input.trim()) return
 
-  try {
-    const messageContent = input.trim()
-    
-    // Submit to AI with the content in the body
-    await handleSubmit(e, {
-      options: {
-        body: {
-          chat_id: chat.id,
-          session_id: sessionId,
-          content: messageContent,
+    try {
+      await handleSubmit(e, {
+        options: {
+          body: {
+            chat_id: chat.id,
+            session_id: sessionId,
+            content: input.trim(),
+          },
         },
-      },
-    })
-
-    // Save to Supabase
-    const userMessage: ChatMessage = {
-      id: uuidv4(),
-      chat_id: chat.id,
-      role: "user",
-      content: messageContent,
-      created_at: new Date().toISOString(),
-      is_complete: true,
+      })
+    } catch (err) {
+      console.error("Error in handleFormSubmit:", err)
     }
-
-    console.log("Saving message to Supabase:", userMessage)
-
-    const { error: saveError } = await supabase
-      .from("chat_messages")
-      .insert(userMessage)
-
-    if (saveError) {
-      console.error("Supabase save error:", saveError)
-      throw new Error(`Failed to save message: ${saveError.message}`)
-    }
-
-  } catch (err) {
-    console.error("Error in handleFormSubmit:", err)
-    const errorMessage = err instanceof Error ? err.message : "Failed to send message"
-    setMessages([
-      ...messages,
-      {
-        id: uuidv4(),
-        role: "system",
-        content: `Error: ${errorMessage}`,
-      },
-    ])
   }
-}
 
   if (isInitializing) {
     return (
@@ -287,3 +245,4 @@ const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     </Card>
   )
 }
+
