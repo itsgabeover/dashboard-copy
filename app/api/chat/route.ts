@@ -1,5 +1,5 @@
 import { OpenAIStream, StreamingTextResponse } from "ai";
-import { OpenAI, APIChatCompletion } from "openai";
+import { OpenAI } from "openai";
 import { type NextRequest } from "next/server";
 
 // Required for streaming responses in Edge functions
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch streaming response from OpenAI
-    const response: APIChatCompletion = await openai.chat.completions.create({
+    const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: messages.map((message) => ({
         content: message.content,
