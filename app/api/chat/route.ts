@@ -120,20 +120,35 @@ export async function POST(req: NextRequest) {
       stream: true,
     })
 
-    // Create ReadableStream from OpenAI response
     const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder()
-        let fullCompletion = ''
+  async start(controller) {
+    const encoder = new TextEncoder()
+    let fullCompletion = ""
 
-        try {
-          for await (const chunk of response) {
-            const content = chunk.choices[0]?.delta?.content || ''
-            if (content) {
-              fullCompletion += content
-              controller.enqueue(encoder.encode(content))
-            }
-          }
+    try {
+      for await (const chunk of response) {
+        const content = chunk.choices[0]?.delta?.content
+        if (content) {
+          fullCompletion += content
+          // Ensure we're sending a properly encoded chunk
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
+        }
+      }
+
+      if (fullCompletion) {
+        // Save the complete message
+        await saveMessageToDatabase(chat.id, "assistant", fullCompletion)
+        await updateChatTimestamp(chat.id)
+      }
+
+      controller.close()
+      data.close()
+    } catch (error) {
+      console.error("Streaming error:", error)
+      controller.error(error)
+    }
+  }
+})
           
           // Save assistant's complete message after streaming is done
           if (fullCompletion) {
