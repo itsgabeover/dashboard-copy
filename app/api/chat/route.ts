@@ -1,28 +1,36 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
-import OpenAI from 'openai'
-import { type NextRequest } from 'next/server'
+import { streamText } from "ai"
+import { openai } from "@ai-sdk/openai"
+import { type NextRequest, NextResponse } from "next/server"
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-})
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30
 
 export async function POST(req: NextRequest) {
-  const { messages, session_id } = await req.json()
-  const userEmail = req.headers.get("X-User-Email")
-
-  if (!userEmail || !session_id) {
-    return new Response("Missing required fields", { status: 400 })
+  // Check if the OpenAI API key is set
+  if (!process.env.OPENAI_API_KEY) {
+    return NextResponse.json({ error: "OpenAI API key not configured" }, { status: 500 })
   }
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
-    stream: true,
-    messages: messages.map((message: any) => ({
-      content: message.content,
-      role: message.role,
-    })),
-  })
+  try {
+    const { messages } = await req.json()
 
-  const stream = OpenAIStream(response)
-  return new StreamingTextResponse(stream)
+    // Validate the messages array
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ error: "Invalid or empty messages array" }, { status: 400 })
+    }
+
+    const result = streamText({
+      model: openai("gpt-3.5-turbo"),
+      messages: messages.map((message: any) => ({
+        content: message.content,
+        role: message.role,
+      })),
+    })
+
+    return result.toDataStreamResponse()
+  } catch (error) {
+    console.error("Error in chat API:", error)
+    return NextResponse.json({ error: "An error occurred while processing your request" }, { status: 500 })
+  }
 }
+
