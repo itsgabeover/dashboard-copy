@@ -6,17 +6,40 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import type { Chat, ParsedPolicyData } from "@/types/chat"
 import { createClient } from "@supabase/supabase-js"
 import { v4 as uuidv4 } from "uuid"
 
-// Initialize Supabase client
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+// Types
+interface Chat {
+  id: string
+  user_email: string
+  session_id: string
+  is_active: boolean
+  created_at?: string
+  last_message_at?: string
+}
+
+interface PolicyOverview {
+  productName: string
+  issuer: string
+  deathBenefit: number
+  annualPremium: number
+  productType: string
+}
+
+interface ParsedPolicyData {
+  data: {
+    policyOverview: PolicyOverview
+  }
+}
 
 interface PolicyChatbotProps {
   sessionId: string
   userEmail: string
 }
+
+// Initialize Supabase client
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   const [chat, setChat] = useState<Chat | null>(null)
@@ -24,58 +47,36 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
   const [isInitializing, setIsInitializing] = useState(true)
   const [initError, setInitError] = useState<string | null>(null)
 
-  const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error } = useChat({
-  api: "/api/chat",
-  initialMessages: [],
-  headers: {
-    "X-User-Email": userEmail,
-  },
-  body: {
-    chat_id: chat?.id,
-    session_id: sessionId,
-  },
-  onResponse: (response) => {
-    // Check if the response is ok
-    if (!response.ok) {
-      console.error("Response error:", response.statusText)
-      return
-    }
-    console.log("Streaming started")
-  },
-  onFinish: async (message) => {
-    console.log("Stream finished:", message)
-    // Fetch latest messages after stream completes
-    if (chat?.id) {
-      const { data: latestMessages } = await supabase
-        .from("chat_messages")
-        .select("*")
-        .eq("chat_id", chat.id)
-        .order("created_at", { ascending: true })
-
-      if (latestMessages) {
-        const formattedMessages = latestMessages.map((msg) => ({
-          id: msg.id,
-          role: msg.role as Message["role"],
-          content: msg.content,
-        }))
-        setMessages(formattedMessages)
+  const { messages, input, handleInputChange, handleSubmit, setMessages, isLoading, error, reload } = useChat({
+    api: "/api/chat",
+    initialMessages: [],
+    headers: {
+      "X-User-Email": userEmail,
+    },
+    body: {
+      chat_id: chat?.id,
+      session_id: sessionId,
+    },
+    onResponse: (response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
       }
-    }
-  },
-  onError: (error) => {
-    console.error("Chat error:", error)
-  }
-})
+    },
+    onFinish: async (message) => {
+      if (chat?.id) {
+        await fetchMessages(chat.id)
+      }
+    },
+    onError: (error) => {
+      console.error("Chat error:", error)
+    },
+  })
 
   // Fetch policy data
   useEffect(() => {
     const fetchPolicyData = async () => {
       try {
-        const { data: policy, error } = await supabase
-          .from("policies")
-          .select("*")
-          .eq("session_id", sessionId)
-          .single()
+        const { data: policy, error } = await supabase.from("policies").select("*").eq("session_id", sessionId).single()
 
         if (error) throw error
         setPolicyData(policy.analysis_data)
@@ -88,15 +89,12 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     fetchPolicyData()
   }, [sessionId])
 
+  // Initialize or fetch existing chat
   useEffect(() => {
-    const fetchOrCreateChat = async () => {
+    const initializeChat = async () => {
       try {
         setIsInitializing(true)
         setInitError(null)
-
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-          throw new Error("Missing Supabase configuration")
-        }
 
         const { data: existingChat, error: fetchError } = await supabase
           .from("chats")
@@ -108,12 +106,11 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
           .single()
 
         if (!fetchError && existingChat) {
-          console.log("Found existing chat:", existingChat.id)
           setChat(existingChat)
+          await fetchMessages(existingChat.id)
           return
         }
 
-        console.log("Creating new chat for session:", sessionId)
         const { data: newChat, error: insertError } = await supabase
           .from("chats")
           .insert({
@@ -125,13 +122,10 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
           .select()
           .single()
 
-        if (insertError) {
-          throw new Error(`Error creating chat: ${insertError.message}`)
-        }
-
+        if (insertError) throw insertError
         setChat(newChat)
       } catch (err) {
-        console.error("Error in fetchOrCreateChat:", err)
+        console.error("Error initializing chat:", err)
         setInitError(err instanceof Error ? err.message : "Failed to initialize chat")
       } finally {
         setIsInitializing(false)
@@ -139,62 +133,41 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     }
 
     if (userEmail && sessionId) {
-      fetchOrCreateChat()
+      initializeChat()
     }
   }, [userEmail, sessionId])
 
- useEffect(() => {
-    if (!chat?.id) return;
+  const fetchMessages = async (chatId: string) => {
+    try {
+      const { data: messages, error } = await supabase
+        .from("chat_messages")
+        .select("*")
+        .eq("chat_id", chatId)
+        .order("created_at", { ascending: true })
 
-    const fetchMessages = async () => {
-      try {
-        const { data: fetchedMessages, error } = await supabase
-          .from("chat_messages")
-          .select("*")
-          .eq("chat_id", chat.id)
-          .order("created_at", { ascending: true })
+      if (error) throw error
 
-        if (error) {
-          console.error("Error fetching messages:", error)
-          return
-        }
-
-        if (fetchedMessages) {
-          const formattedMessages: Message[] = fetchedMessages.map((msg) => ({
-            id: msg.id,
-            role: msg.role as Message["role"],
-            content: msg.content,
-          }))
-          
-          // Directly set messages if they're different
-          if (JSON.stringify(messages) !== JSON.stringify(formattedMessages)) {
-            setMessages(formattedMessages)
-          }
-        }
-      } catch (err) {
-        console.error("Error in fetchMessages:", err)
+      if (messages) {
+        const formattedMessages: Message[] = messages.map((msg) => ({
+          id: msg.id,
+          role: msg.role as Message["role"],
+          content: msg.content,
+        }))
+        setMessages(formattedMessages)
       }
+    } catch (err) {
+      console.error("Error fetching messages:", err)
     }
-
-    fetchMessages()
-  }, [chat?.id, messages, setMessages])
+  }
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!chat?.id || !input.trim()) return
 
     try {
-      await handleSubmit(e, {
-        options: {
-          body: {
-            chat_id: chat.id,
-            session_id: sessionId,
-            content: input.trim()
-          }
-        }
-      })
+      await handleSubmit(e)
     } catch (err) {
-      console.error("Error in handleFormSubmit:", err)
+      console.error("Error submitting message:", err)
     }
   }
 
@@ -202,7 +175,10 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     return (
       <Card className="w-full p-4">
         <CardContent>
-          <p className="text-gray-500">Initializing chat...</p>
+          <div className="flex items-center justify-center">
+            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-gray-900" />
+            <span className="ml-2">Initializing chat...</span>
+          </div>
         </CardContent>
       </Card>
     )
@@ -212,7 +188,10 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     return (
       <Card className="w-full p-4">
         <CardContent>
-          <p className="text-red-500">Error: {initError}</p>
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-red-500">Error: {initError}</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
         </CardContent>
       </Card>
     )
@@ -222,25 +201,28 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     return (
       <Card className="w-full p-4">
         <CardContent>
-          <p className="text-red-500">Error: Missing required policy data</p>
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-red-500">Error: Missing required policy data</p>
+            <Button onClick={() => window.location.reload()}>Retry</Button>
+          </div>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card className="w-full h-[500px] flex flex-col">
+    <Card className="w-full h-[600px] flex flex-col">
       <CardHeader>
-        <CardTitle>Chat about your {policyData?.data?.policyOverview?.productName} policy</CardTitle>
+        <CardTitle>Chat about your {policyData?.data?.policyOverview?.productName || "Insurance"} policy</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="space-y-4 p-4">
+        <ScrollArea className="h-full pr-4">
+          <div className="space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`rounded-lg p-2 max-w-[80%] ${
-                    message.role === "user" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"
+                  className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                    message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {message.content}
@@ -249,12 +231,23 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="rounded-lg p-2 max-w-[80%] bg-gray-200 text-gray-800">Thinking...</div>
+                <div className="rounded-lg px-4 py-2 max-w-[80%] bg-muted text-muted-foreground">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-current animate-bounce" />
+                    <div className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:0.2s]" />
+                    <div className="w-2 h-2 rounded-full bg-current animate-bounce [animation-delay:0.4s]" />
+                  </div>
+                </div>
               </div>
             )}
             {error && (
               <div className="flex justify-center">
-                <div className="rounded-lg p-2 max-w-[80%] bg-red-500 text-white">Error: {error.message}</div>
+                <div className="rounded-lg px-4 py-2 bg-destructive text-destructive-foreground flex items-center gap-2">
+                  <span>Error: {error.message}</span>
+                  <Button variant="secondary" size="sm" onClick={() => reload()} className="h-7 px-2">
+                    Retry
+                  </Button>
+                </div>
               </div>
             )}
           </div>
@@ -272,7 +265,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
           <Button
             type="submit"
             disabled={isLoading || !input.trim() || !chat?.id}
-            className="bg-blue-500 hover:bg-blue-600 text-white"
+            className="bg-primary hover:bg-primary/90"
           >
             {isLoading ? "Sending..." : "Send"}
           </Button>
@@ -281,3 +274,4 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     </Card>
   )
 }
+
