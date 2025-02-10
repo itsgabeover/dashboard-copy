@@ -121,7 +121,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     }
   }, [userEmail, sessionId])
 
-  useEffect(() => {
+ useEffect(() => {
     if (!chat?.id) return;
 
     const fetchMessages = async () => {
@@ -144,13 +144,10 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
             content: msg.content,
           }))
           
-          // Only update if messages have changed
-          setMessages((prev) => {
-            if (JSON.stringify(prev) !== JSON.stringify(formattedMessages)) {
-              return formattedMessages
-            }
-            return prev
-          })
+          // Directly set messages if they're different
+          if (JSON.stringify(messages) !== JSON.stringify(formattedMessages)) {
+            setMessages(formattedMessages)
+          }
         }
       } catch (err) {
         console.error("Error in fetchMessages:", err)
@@ -158,7 +155,7 @@ export function PolicyChatbot({ sessionId, userEmail }: PolicyChatbotProps) {
     }
 
     fetchMessages()
-  }, [chat?.id]) // Removed setMessages from dependencies
+  }, [chat?.id, messages, setMessages])
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
