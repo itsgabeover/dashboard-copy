@@ -6,8 +6,11 @@ import { supabase } from '@/lib/supabase'
 export async function POST(request: NextRequest) {
   try {
     // Parse incoming dashboard data from n8n
-    const dashboardData: ParsedDashboardData = await request.json()
-    console.log("Received dashboard data:", dashboardData)
+    const rawBody = await request.text()
+    console.log("Raw request body:", rawBody)
+    
+    const dashboardData: ParsedDashboardData = JSON.parse(rawBody)
+    console.log("Successfully parsed dashboard data:", dashboardData)
     
     // Get sessionId from the dashboard data
     const sessionId = dashboardData.sessionId
@@ -34,7 +37,7 @@ export async function POST(request: NextRequest) {
       const { error: updateError } = await supabase
         .from('policy_dashboards')
         .update({ 
-          policy_name: dashboardData.data.policyName,
+          policy_name: dashboardData.data.policyOverview.productName,
           analysis_data: dashboardData,
           status: 'completed',
           updated_at: new Date().toISOString()
@@ -51,7 +54,7 @@ export async function POST(request: NextRequest) {
       const { error: insertError } = await supabase
         .from('policy_dashboards')
         .insert({
-          policy_name: dashboardData.data.policyName,
+          policy_name: dashboardData.data.policyOverview.productName,
           analysis_data: dashboardData,
           status: 'completed',
           updated_at: new Date().toISOString(),
@@ -69,8 +72,14 @@ export async function POST(request: NextRequest) {
       success: true,
       data: dashboardData
     } as APIResponse)
+
   } catch (error) {
-    console.error("Error processing dashboard data:", error)
+    console.error("Error processing dashboard data:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      rawError: error
+    })
+
     return NextResponse.json({ 
       success: false,
       error: "Failed to process dashboard data",
@@ -112,6 +121,7 @@ export async function GET(request: NextRequest) {
       success: true,
       data: dashboard.analysis_data as ParsedDashboardData
     } as APIResponse)
+
   } catch (error) {
     console.error("Error retrieving dashboard data:", error)
     return NextResponse.json({ 
