@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { AlertTriangle, Lightbulb, Flag, ChevronRight, Info } from "lucide-react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { ParsedPolicyData, PolicySection, Policy } from "@/types/policy"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
@@ -215,7 +214,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4 bg-white border rounded-xl p-1 shadow-sm mb-6">
+              <TabsList className="grid w-full grid-cols-3 bg-white border rounded-xl p-1 shadow-sm mb-6">
                 <TabsTrigger
                   value="overview"
                   className="data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white rounded-lg transition-all"
@@ -233,12 +232,6 @@ export default function Dashboard() {
                   className="data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white rounded-lg transition-all"
                 >
                   AI Analysis
-                </TabsTrigger>
-                <TabsTrigger
-                  value="projections"
-                  className="data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white rounded-lg transition-all"
-                >
-                  Projections
                 </TabsTrigger>
               </TabsList>
 
@@ -471,49 +464,6 @@ export default function Dashboard() {
                   </div>
                 </div>
               </TabsContent>
-
-              <TabsContent value="projections" className="space-y-4">
-                <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200">
-                  <CardHeader className="pb-2 border-b">
-                    <CardTitle className="text-xl font-semibold text-gray-900">Policy Values Chart</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="bg-gray-50 p-6 rounded-lg">
-                      <ResponsiveContainer width="100%" height={400}>
-                        <AreaChart data={policyData.data.values}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                          <XAxis dataKey="timePoint" tick={{ fill: "#6B7280" }} axisLine={{ stroke: "#E5E7EB" }} />
-                          <YAxis tick={{ fill: "#6B7280" }} axisLine={{ stroke: "#E5E7EB" }} />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: "white",
-                              border: "1px solid #E5E7EB",
-                              borderRadius: "0.5rem",
-                              boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-                            }}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="values.cashValue"
-                            name="Cash Value"
-                            stroke="rgb(82,102,255)"
-                            fill="rgba(82,102,255,0.1)"
-                            strokeWidth={2}
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="values.netSurrenderValue"
-                            name="Net Surrender Value"
-                            stroke="rgb(99,102,241)"
-                            fill="rgba(99,102,241,0.1)"
-                            strokeWidth={2}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
             </Tabs>
           </div>
           <div className="lg:col-span-1">
@@ -524,3 +474,4 @@ export default function Dashboard() {
     </div>
   )
 }
+
