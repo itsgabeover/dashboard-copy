@@ -1,53 +1,44 @@
+// types/policy-dashboard.ts
+
 // Core dashboard data structures
-export interface DashboardSection1 {
-  title: string
-  content: string[]
-}
-
-export interface DashboardSection2 {
-  title: string
-  content: string[]
-}
-
-export interface StaticSection {
+export interface PolicyBullet {
   title: string
   content: string
 }
 
-export interface DashboardContent {
-  atAGlance: {
-    overview: DashboardSection1
-    keyFeatures: DashboardSection2
-  }
-  coverage: {
-    protection: DashboardSection1
-    requirements: DashboardSection2
-  }
-  features: {
-    primary: DashboardSection1
-    static: StaticSection
-  }
-  planning: {
-    topics: DashboardSection1
-    static: StaticSection
-  }
-  management: {
-    tasks: DashboardSection1
-    static: StaticSection
-  }
+export interface PolicySection {
+  title: string
+  opening: string
+  bullets: PolicyBullet[]
+}
+
+export interface PolicyOverview {
+  productName: string
+  issuer: string
+  productType: string
+  deathBenefit: number
+  annualPremium: number
+}
+
+export interface PolicySections {
+  policyOverview: PolicySection
+  protectionGlance: PolicySection
+  policyPower: PolicySection
+  builtInAdvantages: PolicySection
+  protectionInsights: PolicySection
+  keyTopics: PolicySection
+  pathForward: PolicySection
 }
 
 // Matches the analysis_data JSONB column in policy_dashboards table
 export interface ParsedDashboardData {
+  timestamp: string
   sessionId: string
   data: {
-    policyName: string
-    dashboardContent: DashboardContent
+    policyOverview: PolicyOverview
+    sections: PolicySections
     email: string
   }
-  status: "completed" | string
-  updated_at: string
-  timestamp?: string
 }
 
 // Matches Supabase policy_dashboards table structure
@@ -62,10 +53,12 @@ export interface PolicyDashboard {
   session_id: string
 }
 
+// API response types
 export interface APIResponse {
   success: boolean
   data?: ParsedDashboardData
   error?: string
+  details?: string
 }
 
 // Database query helper types
