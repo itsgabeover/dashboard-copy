@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -117,8 +116,6 @@ const tabStructure = [
 ]
 
 export default function Dashboard() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const [isVerified, setIsVerified] = useState(false)
   const [userEmail, setUserEmail] = useState("")
   const [policies, setPolicies] = useState<PolicyDashboard[]>([])
