@@ -113,17 +113,29 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
       return
     }
 
+    console.log("Attempting query with email:", email.toLowerCase().trim())
+
     const { data, error: supabaseError } = await supabase
       .from("policy_dashboards")
       .select("*")
       .eq("email", email.toLowerCase().trim())
       .order("created_at", { ascending: false })
 
-    if (supabaseError || !data?.length) {
+    console.log("Query results:", { data, error: supabaseError })
+
+    if (supabaseError) {
+      console.error("Supabase error:", supabaseError)
+      setError("Error fetching policy data")
+      return
+    }
+
+    if (!data?.length) {
+      console.log("No data found")
       setError("No policy analysis found for this email")
       return
     }
 
+    console.log("Found policies:", data)
     localStorage.setItem("userEmail", email.toLowerCase().trim())
     onVerify(email)
   }
