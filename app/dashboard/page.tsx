@@ -379,5 +379,3 @@ const renderSkeletonContent = () => (
   </Card>
 )
 
-}
-
