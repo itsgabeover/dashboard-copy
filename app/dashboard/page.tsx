@@ -115,13 +115,16 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
 
     console.log("Attempting query with email:", email.toLowerCase().trim())
 
+    const { data: rls } = await supabase.rpc("get_supabase_config")
+    console.log("RLS Status:", rls)
+
     const { data, error: supabaseError } = await supabase
       .from("policy_dashboards")
       .select("*")
-      .eq("email", email.toLowerCase().trim())
+      .ilike("email", email.toLowerCase().trim())
       .order("created_at", { ascending: false })
 
-    console.log("Query results:", { data, error: supabaseError })
+    console.log("Query results:", { data, supabaseError })
 
     if (supabaseError) {
       console.error("Supabase error:", supabaseError)
