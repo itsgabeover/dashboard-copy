@@ -17,89 +17,6 @@ const tabStructure = [
   { id: "planning", label: "Planning", sections: ["keyTopics", "pathForward"] },
 ]
 
-// Fallback mock data
-const mockPolicyDashboard: PolicyDashboard = {
-  id: "mock-id",
-  policy_name: "Sample Policy",
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-  email: "user@example.com",
-  session_id: "mock-session",
-  status: "active",
-  analysis_data: {
-    timestamp: new Date().toISOString(),
-    sessionId: "mock-session",
-    data: {
-      policyOverview: {
-        productName: "Sample Policy",
-        issuer: "Sample Insurance Company",
-        productType: "Term Life Insurance",
-        deathBenefit: 500000,
-        annualPremium: 1000,
-      },
-      sections: {
-        policyOverview: {
-          title: "POLICY OVERVIEW",
-          opening: "This is a sample policy overview.",
-          bullets: [
-            { title: "Product name", content: "Sample Policy" },
-            { title: "Carrier name", content: "Sample Insurance Company" },
-          ],
-        },
-        protectionGlance: {
-          title: "PROTECTION AT A GLANCE",
-          opening: "Here's a quick overview of your policy's key protection features.",
-          bullets: [
-            { title: "Protection Amount", content: "$500,000 Death Benefit" },
-            { title: "Investment Level", content: "Premium: $1,000 annually" },
-          ],
-        },
-        policyPower: {
-          title: "POLICY POWER",
-          opening: "Your policy combines protection with potential growth opportunities.",
-          bullets: [
-            { title: "Protection Design", content: "Term life insurance" },
-            { title: "Flexibility Options", content: "Renewable term" },
-          ],
-        },
-        builtInAdvantages: {
-          title: "BUILT-IN ADVANTAGES",
-          opening: "Your policy includes several valuable features and benefits.",
-          bullets: [
-            { title: "Living Benefits", content: "Accelerated death benefit rider" },
-            { title: "Added Value", content: "Convertible to permanent insurance" },
-          ],
-        },
-        protectionInsights: {
-          title: "PROTECTION INSIGHTS",
-          opening: "Important considerations for maintaining your policy's effectiveness.",
-          bullets: [
-            { title: "Key Requirements", content: "Pay premiums on time" },
-            { title: "Watch Points", content: "Monitor term expiration date" },
-          ],
-        },
-        keyTopics: {
-          title: "KEY TOPICS FOR YOUR ADVISOR",
-          opening: "Discussion points for your next policy review.",
-          bullets: [
-            { title: "Review Items", content: "Coverage amount adequacy" },
-            { title: "Planning Topics", content: "Long-term insurance needs" },
-          ],
-        },
-        pathForward: {
-          title: "YOUR PATH FORWARD",
-          opening: "Next steps for maximizing your policy's value.",
-          bullets: [
-            { title: "Action Items", content: "Schedule annual review with advisor" },
-            { title: "Monitoring Tasks", content: "Track changes in insurance needs" },
-          ],
-        },
-      },
-      email: "user@example.com",
-    },
-  },
-}
-
 export default function Dashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -117,13 +34,11 @@ export default function Dashboard() {
 
         if (error) {
           console.error("Error fetching policy data:", error)
-          setPolicyDashboard(mockPolicyDashboard)
         } else {
           setPolicyDashboard(data)
         }
       } else {
-        console.warn("Supabase client not initialized. Using mock data.")
-        setPolicyDashboard(mockPolicyDashboard)
+        console.error("Supabase client not initialized.")
       }
       setIsLoading(false)
     }
@@ -132,15 +47,17 @@ export default function Dashboard() {
   }, [])
 
   useEffect(() => {
-    const tab = searchParams.get("tab")
-    if (tab && tabStructure.some((t) => t.id === tab)) {
-      setActiveTab(tab)
-      setActiveSection(tabStructure.find((t) => t.id === tab)!.sections[0] as keyof PolicySections)
+    if (searchParams) {
+      const tab = searchParams.get("tab")
+      if (tab && tabStructure.some((t) => t.id === tab)) {
+        setActiveTab(tab)
+        setActiveSection(tabStructure.find((t) => t.id === tab)!.sections[0] as keyof PolicySections)
+      }
     }
   }, [searchParams])
 
   useEffect(() => {
-    const newSearchParams = new URLSearchParams(searchParams)
+    const newSearchParams = new URLSearchParams(searchParams?.toString() ?? "")
     newSearchParams.set("tab", activeTab)
     router.push(`?${newSearchParams.toString()}`, { scroll: false })
   }, [activeTab, router, searchParams])
