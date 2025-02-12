@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ArrowRight, Send } from "lucide-react"
+import { AlertCircle, ArrowRight, Send } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
 
@@ -23,28 +24,62 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview")
   const [activeSection, setActiveSection] = useState<keyof PolicySections>("policyOverview")
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [policyDashboard, setPolicyDashboard] = useState<PolicyDashboard | null>(null)
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
 
   useEffect(() => {
     const fetchPolicyData = async () => {
-      if (supabase) {
-        const { data, error } = await supabase.from("policy_dashboards").select("*").single()
-
-        if (error) {
-          console.error("Error fetching policy data:", error)
-        } else {
-          setPolicyDashboard(data)
+      try {
+        if (!supabase) {
+          throw new Error("Supabase client not initialized")
         }
-      } else {
-        console.error("Supabase client not initialized.")
+
+        // Get email from URL params or session
+        const email = searchParams?.get("email") || sessionStorage.getItem("userEmail")
+        if (!email) {
+          throw new Error("No email provided")
+        }
+
+        // Store email in session for persistence
+        sessionStorage.setItem("userEmail", email)
+
+        const { data, error: supabaseError } = await supabase
+          .from("policy_dashboards")
+          .select("*")
+          .eq("email", email)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single()
+
+        if (supabaseError) {
+          if (supabaseError.code === "406") {
+            throw new Error("No policy found for this email. Please upload a policy first.")
+          }
+          throw supabaseError
+        }
+
+        if (!data) {
+          throw new Error("No policy data found")
+        }
+
+        setPolicyDashboard(data)
+        setError(null)
+      } catch (err) {
+        console.error("Error fetching policy data:", err)
+        setError(err instanceof Error ? err.message : "Failed to load policy data")
+        // Redirect to upload page if no policy found
+        if (err instanceof Error && err.message.includes("upload")) {
+          router.push("/upload")
+        }
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     }
 
     fetchPolicyData()
-  }, [])
+  }, [searchParams, router])
 
   useEffect(() => {
     if (searchParams) {
@@ -63,7 +98,7 @@ export default function Dashboard() {
   }, [activeTab, router, searchParams])
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return
+    if (!inputMessage.trim() || !policyDashboard) return
 
     const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage }]
     setChatMessages(newMessages)
@@ -77,7 +112,8 @@ export default function Dashboard() {
         },
         body: JSON.stringify({
           message: inputMessage,
-          context: policyDashboard?.analysis_data.data.sections[activeSection].opening,
+          context: policyDashboard.analysis_data.data.sections[activeSection].opening,
+          email: sessionStorage.getItem("userEmail"),
         }),
       })
 
@@ -142,11 +178,40 @@ export default function Dashboard() {
     </Card>
   )
 
-  if (!policyDashboard && !isLoading) {
-    return <div>Error loading policy data</div>
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    )
   }
 
   const policyData = policyDashboard?.analysis_data.data
+
+  if (!policyData && !isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>No Policy Found</AlertTitle>
+            <AlertDescription>
+              Please upload a policy to view the dashboard.{" "}
+              <Button variant="link" className="p-0" onClick={() => router.push("/upload")}>
+                Upload Policy
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
