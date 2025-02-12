@@ -109,10 +109,12 @@ function PolicySelection({
 }
 
 const tabStructure = [
-  { id: "overview", label: "Overview", sections: ["policyOverview", "protectionGlance"] },
-  { id: "protection", label: "Protection", sections: ["policyPower", "protectionInsights"] },
-  { id: "benefits", label: "Benefits", sections: ["builtInAdvantages"] },
-  { id: "planning", label: "Planning", sections: ["keyTopics", "pathForward"] },
+  { id: "policyOverview", label: "Policy Overview", sections: ["policyOverview"] },
+  { id: "policyPower", label: "The Power Of Your Policy", sections: ["policyPower"] },
+  { id: "builtInAdvantages", label: "Built-In Advantages", sections: ["builtInAdvantages"] },
+  { id: "protectionInsights", label: "Protection Insights", sections: ["protectionInsights"] },
+  { id: "advisorTopics", label: "Advisor Topics", sections: ["keyTopics"] },
+  { id: "pathForward", label: "Path Forward", sections: ["pathForward"] },
 ]
 
 export default function Dashboard() {
@@ -123,8 +125,7 @@ export default function Dashboard() {
   const [policyData, setPolicyData] = useState<PolicyDashboard | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState("overview")
-  const [activeSection, setActiveSection] = useState<keyof PolicySections>("policyOverview")
+  const [activeTab, setActiveTab] = useState("policyOverview")
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
@@ -180,7 +181,7 @@ export default function Dashboard() {
   const handlePolicySelect = (policy: PolicyDashboard) => {
     setPolicyData(policy)
     setShowPolicySelection(false)
-    setActiveSection(tabStructure[0].sections[0] as keyof PolicySections)
+    setActiveTab(tabStructure[0].id)
   }
 
   const handleSendMessage = async () => {
@@ -232,7 +233,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [chatEndRef]) // Fixed useEffect dependency
+  }, [chatEndRef]) //Corrected dependency
 
   // Show loading state
   if (isLoading) {
@@ -280,9 +281,13 @@ export default function Dashboard() {
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full justify-start mb-6">
+          <TabsList className="w-full justify-start mb-6 flex flex-wrap gap-2">
             {tabStructure.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id} className="flex-1">
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none"
+              >
                 {tab.label}
               </TabsTrigger>
             ))}
@@ -305,7 +310,7 @@ export default function Dashboard() {
         <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mt-8">
           <CardHeader className="pb-2 border-b">
             <CardTitle className="text-xl font-semibold text-gray-900">
-              Chat about {policyData?.analysis_data.data?.sections[activeSection].title}
+              Chat about {tabStructure.find((tab) => tab.id === activeTab)?.label}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
@@ -320,11 +325,13 @@ export default function Dashboard() {
               <div ref={chatEndRef} />
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
-              {policyData?.analysis_data.data?.sections[activeSection].bullets.slice(0, 3).map((bullet, index) => (
-                <Button key={index} variant="outline" size="sm" onClick={() => setInputMessage(bullet.title)}>
-                  {bullet.title}
-                </Button>
-              ))}
+              {policyData?.analysis_data.data?.sections[activeTab as keyof PolicySections]?.bullets
+                .slice(0, 3)
+                .map((bullet, index) => (
+                  <Button key={index} variant="outline" size="sm" onClick={() => setInputMessage(bullet.title)}>
+                    {bullet.title}
+                  </Button>
+                ))}
             </div>
             <div className="flex gap-2">
               <input
@@ -358,7 +365,6 @@ const renderSectionContent = (section: PolicySection) => (
     <CardContent className="p-6">
       <div className="space-y-6">
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-          <h4 className="font-semibold mb-3">Policy Snapshot</h4>
           <p className="text-gray-700 leading-relaxed">{section.opening}</p>
         </div>
 
