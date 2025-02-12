@@ -7,13 +7,13 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { ChevronRight, Info } from "lucide-react"
-import type { ParsedPolicyData, Policy } from "@/types/policy-dashboard"
+import type { ParsedDashboardData, PolicyDashboard } from "@/types/policy-dashboard"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 import { PolicyChatbot } from "@/components/PolicyChatbot"
 
-// Interfaces as provided
+// Interfaces adjusted to match policy-dashboard.ts
 interface SectionContent {
   id: string
   title: string
@@ -23,66 +23,65 @@ interface SectionContent {
 
 interface PolicySectionMapping {
   [key: string]: {
-    getOpening: (data: ParsedPolicyData) => string
-    getDetails: (data: ParsedPolicyData) => string[]
+    getOpening: (data: ParsedDashboardData) => string
+    getDetails: (data: ParsedDashboardData) => string[]
   }
 }
 
-// Data mapping as provided
+// Data mapping adjusted to match new structure
 const sectionMappings: PolicySectionMapping = {
   protection: {
-    getOpening: (data) => data.data.policyOverview.opening,
+    getOpening: (data) => data.data.sections.policyOverview.opening,
     getDetails: (data) => [
-      data.data.protectionGlance.bullets[0].content,
-      `${data.data.policyOverview.bullets[0].content} by ${data.data.policyOverview.bullets[1].content}`,
-      data.data.policyPower.bullets[0].content,
-      data.data.protectionGlance.bullets[4].content,
-      data.data.protectionGlance.bullets[0].content,
+      data.data.sections.protectionGlance.bullets[0].content,
+      `${data.data.sections.policyOverview.bullets[0].content} by ${data.data.sections.policyOverview.bullets[1].content}`,
+      data.data.sections.policyPower.bullets[0].content,
+      data.data.sections.protectionGlance.bullets[4].content,
+      data.data.sections.protectionGlance.bullets[0].content,
     ],
   },
   premium: {
     getOpening: () => "Understanding your premium structure and funding requirements",
     getDetails: (data) => [
-      data.data.protectionGlance.bullets[1].content,
-      data.data.protectionGlance.bullets[2].content,
-      data.data.protectionInsights.bullets[0].content,
-      data.data.protectionInsights.bullets[1].content,
-      data.data.keyTopics.bullets[0].content,
+      data.data.sections.protectionGlance.bullets[1].content,
+      data.data.sections.protectionGlance.bullets[2].content,
+      data.data.sections.protectionInsights.bullets[0].content,
+      data.data.sections.protectionInsights.bullets[1].content,
+      data.data.sections.keyTopics.bullets[0].content,
     ],
   },
   growth: {
-    getOpening: (data) => data.data.policyPower.opening,
+    getOpening: (data) => data.data.sections.policyPower.opening,
     getDetails: (data) => [
-      data.data.policyPower.bullets[1].content,
-      data.data.policyPower.bullets[4].content,
-      data.data.builtInAdvantages.bullets[3].content,
-      data.data.protectionInsights.bullets[3].content,
-      data.data.keyTopics.bullets[2].content,
+      data.data.sections.policyPower.bullets[1].content,
+      data.data.sections.policyPower.bullets[4].content,
+      data.data.sections.builtInAdvantages.bullets[3].content,
+      data.data.sections.protectionInsights.bullets[3].content,
+      data.data.sections.keyTopics.bullets[2].content,
     ],
   },
   benefits: {
-    getOpening: (data) => data.data.builtInAdvantages.opening,
+    getOpening: (data) => data.data.sections.builtInAdvantages.opening,
     getDetails: (data) => [
-      data.data.builtInAdvantages.bullets[0].content,
-      data.data.builtInAdvantages.bullets[1].content,
-      data.data.builtInAdvantages.bullets[2].content,
-      data.data.policyPower.bullets[3].content,
-      data.data.builtInAdvantages.bullets[3].content,
+      data.data.sections.builtInAdvantages.bullets[0].content,
+      data.data.sections.builtInAdvantages.bullets[1].content,
+      data.data.sections.builtInAdvantages.bullets[2].content,
+      data.data.sections.policyPower.bullets[3].content,
+      data.data.sections.builtInAdvantages.bullets[3].content,
     ],
   },
   management: {
-    getOpening: (data) => data.data.protectionInsights.opening,
+    getOpening: (data) => data.data.sections.protectionInsights.opening,
     getDetails: (data) => [
-      data.data.protectionInsights.bullets[2].content,
-      data.data.pathForward.bullets[0].content,
-      data.data.pathForward.bullets[1].content,
-      data.data.keyTopics.bullets[2].content,
-      data.data.pathForward.bullets[2].content,
+      data.data.sections.protectionInsights.bullets[2].content,
+      data.data.sections.pathForward.bullets[0].content,
+      data.data.sections.pathForward.bullets[1].content,
+      data.data.sections.keyTopics.bullets[2].content,
+      data.data.sections.pathForward.bullets[2].content,
     ],
   },
 }
 
-// Navigation array as provided
 const analysisNavigation = [
   { id: "protection", title: "Protection Structure" },
   { id: "premium", title: "Premium & Funding Analysis" },
@@ -91,8 +90,7 @@ const analysisNavigation = [
   { id: "management", title: "Ongoing Policy Management" },
 ]
 
-// Content generator function as provided
-const getSectionContent = (sectionId: string, policyData: ParsedPolicyData): SectionContent | null => {
+const getSectionContent = (sectionId: string, policyData: ParsedDashboardData): SectionContent | null => {
   const mapping = sectionMappings[sectionId]
   if (!mapping) return null
 
@@ -116,7 +114,7 @@ const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) 
     }
 
     const { data, error: supabaseError } = await supabase
-      .from("policies")
+      .from("policy_dashboards")
       .select("*")
       .eq("email", email.toLowerCase().trim())
       .order("created_at", { ascending: false })
@@ -160,8 +158,8 @@ const PolicySelection = ({
   policies,
   onSelect,
 }: {
-  policies: Policy[]
-  onSelect: (policy: Policy) => void
+  policies: PolicyDashboard[]
+  onSelect: (policy: PolicyDashboard) => void
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -196,19 +194,19 @@ const getHealthDescription = (score: number): string => {
 
 // Main Dashboard Component
 export default function Dashboard() {
-  const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
+  const [policyData, setPolicyData] = useState<ParsedDashboardData | null>(null)
   const [selectedSection, setSelectedSection] = useState<SectionContent | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isVerified, setIsVerified] = useState(false)
-  const [policies, setPolicies] = useState<Policy[]>([])
+  const [policies, setPolicies] = useState<PolicyDashboard[]>([])
   const [showPolicySelection, setShowPolicySelection] = useState(false)
   const [userEmail, setUserEmail] = useState<string>("")
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
       const { data, error: supabaseError } = await supabase
-        .from("policies")
+        .from("policy_dashboards")
         .select("*")
         .eq("email", email.toLowerCase())
         .order("created_at", { ascending: false })
@@ -216,7 +214,7 @@ export default function Dashboard() {
       if (supabaseError) throw supabaseError
       if (!data?.length) throw new Error("No policy data found")
 
-      setPolicies(data as Policy[])
+      setPolicies(data as PolicyDashboard[])
       setShowPolicySelection(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred while fetching policies")
@@ -243,7 +241,7 @@ export default function Dashboard() {
     loadPolicies(email)
   }
 
-  const handlePolicySelect = (policy: Policy) => {
+  const handlePolicySelect = (policy: PolicyDashboard) => {
     setPolicyData(policy.analysis_data)
     setShowPolicySelection(false)
     if (analysisNavigation.length > 0) {
@@ -376,9 +374,9 @@ export default function Dashboard() {
                       </div>
                       <Progress value={healthScore} className="w-full h-3 bg-gray-100 rounded-full" />
                       <p className="mt-6 text-sm text-gray-600 text-center bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        This health score evaluates your policy&apos;s performance across premium structure, guarantees,
-                        cash accumulation, available riders, and flexibility options. Higher scores indicate robust
-                        features and stronger long-term value.
+                        This health score evaluates your policy's performance across premium structure, guarantees, cash
+                        accumulation, available riders, and flexibility options. Higher scores indicate robust features
+                        and stronger long-term value.
                       </p>
                     </CardContent>
                   </Card>
@@ -390,7 +388,7 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent className="p-6">
                     <p className="text-gray-700 leading-relaxed bg-gray-50 p-6 rounded-lg">
-                      {policyData.data.finalThoughts}
+                      {policyData.data.sections.pathForward.opening}
                     </p>
                   </CardContent>
                 </Card>
@@ -403,10 +401,10 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent className="p-6">
                     <ul className="space-y-3">
-                      {policyData.data.policyOverview.riders.map((rider, index) => (
+                      {policyData.data.sections.builtInAdvantages.bullets.map((bullet, index) => (
                         <li key={index} className="bg-gray-50 p-4 rounded-lg flex items-start">
                           <span className="inline-block w-2 h-2 rounded-full bg-[rgb(82,102,255)] mt-2 mr-3" />
-                          <span>{rider}</span>
+                          <span>{bullet.content}</span>
                         </li>
                       ))}
                     </ul>
@@ -415,31 +413,14 @@ export default function Dashboard() {
 
                 <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200">
                   <CardHeader className="pb-2 border-b">
-                    <CardTitle className="text-xl font-semibold text-gray-900">Value Projections</CardTitle>
+                    <CardTitle className="text-xl font-semibold text-gray-900">Key Policy Details</CardTitle>
                   </CardHeader>
                   <CardContent className="p-6">
                     <div className="space-y-6">
-                      {policyData.data.values.map((timePoint, index) => (
+                      {policyData.data.sections.keyTopics.bullets.map((bullet, index) => (
                         <div key={index} className="bg-gray-50 p-6 rounded-lg">
-                          <h4 className="text-lg font-semibold text-[rgb(82,102,255)] mb-4">{timePoint.timePoint}</h4>
-                          <div className="grid md:grid-cols-3 gap-4">
-                            <div className="bg-white p-4 rounded-lg shadow-sm">
-                              <p className="text-sm text-gray-600 mb-1">Cash Value</p>
-                              <p className="text-lg font-semibold">{formatCurrency(timePoint.values.cashValue)}</p>
-                            </div>
-                            <div className="bg-white p-4 rounded-lg shadow-sm">
-                              <p className="text-sm text-gray-600 mb-1">Net Surrender Value</p>
-                              <p className="text-lg font-semibold">
-                                {formatCurrency(timePoint.values.netSurrenderValue)}
-                              </p>
-                            </div>
-                            <div className="bg-white p-4 rounded-lg shadow-sm">
-                              <p className="text-sm text-gray-600 mb-1">Death Benefit</p>
-                              <p className="text-lg font-semibold">
-                                {formatCurrency(timePoint.values.deathBenefitAmount)}
-                              </p>
-                            </div>
-                          </div>
+                          <h4 className="text-lg font-semibold text-[rgb(82,102,255)] mb-4">{bullet.title}</h4>
+                          <p>{bullet.content}</p>
                         </div>
                       ))}
                     </div>
