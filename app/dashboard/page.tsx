@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -127,6 +127,8 @@ export default function Dashboard() {
   const [activeSection, setActiveSection] = useState<keyof PolicySections>("policyOverview")
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
+  const [isTyping, setIsTyping] = useState(false)
+  const chatEndRef = useRef<HTMLDivElement>(null)
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
@@ -187,32 +189,50 @@ export default function Dashboard() {
     const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage }]
     setChatMessages(newMessages)
     setInputMessage("")
+    setIsTyping(true)
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          message: inputMessage,
-          context: policyData.analysis_data.data.sections[activeSection].opening,
-          email: userEmail,
-          sessionId: policyData.session_id,
+          content: inputMessage,
+          session_id: policyData.session_id,
         }),
       })
 
       if (!response.ok) {
-        throw new Error("Network response was not ok")
+        throw new Error(`Error: ${response.status}`)
       }
 
-      const data = await response.json()
-      setChatMessages([...newMessages, { role: "assistant", content: data.reply }])
+      const reader = response.body?.getReader()
+      let assistantMessage = ""
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const text = new TextDecoder().decode(value)
+          assistantMessage += text
+
+          setChatMessages([...newMessages, { role: "assistant", content: assistantMessage }])
+        }
+      }
     } catch (error) {
-      console.error("Error:", error)
+      console.error("Chat error:", error)
       setChatMessages([...newMessages, { role: "assistant", content: "Sorry, I couldn't process your request." }])
+    } finally {
+      setIsTyping(false)
     }
   }
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [chatEndRef]) // Fixed useEffect dependency
 
   // Show loading state
   if (isLoading) {
@@ -296,6 +316,8 @@ export default function Dashboard() {
                   {message.content}
                 </div>
               ))}
+              {isTyping && <div className="text-gray-500">Assistant is typing...</div>}
+              <div ref={chatEndRef} />
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
               {policyData?.analysis_data.data?.sections[activeSection].bullets.slice(0, 3).map((bullet, index) => (
@@ -316,6 +338,7 @@ export default function Dashboard() {
               <Button
                 className="bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90"
                 onClick={handleSendMessage}
+                disabled={isTyping}
               >
                 <Send className="w-4 h-4" />
               </Button>
