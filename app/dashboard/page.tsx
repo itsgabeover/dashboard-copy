@@ -378,7 +378,6 @@ const renderSkeletonContent = () => (
     </CardContent>
   </Card>
 )
-}
 
-export default Dashboard
+}
 
