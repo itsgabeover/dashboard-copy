@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ArrowRight, Send } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import type { PolicyData, PolicySection } from "@/types/policy-dashboard"
+import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
 
 const tabStructure = [
   { id: "overview", label: "Overview", sections: ["policyOverview", "protectionGlance"] },
@@ -17,71 +17,85 @@ const tabStructure = [
   { id: "planning", label: "Planning", sections: ["keyTopics", "pathForward"] },
 ]
 
-// Fallback mock data in case Supabase is not initialized
-const mockPolicyData: PolicyData = {
-  policyCore: {
-    productName: "Sample Policy",
-    issuer: "Sample Insurance Company",
-    productType: "Term Life Insurance",
-    deathBenefit: "$500,000",
-    annualPremium: "$1,000",
-  },
-  sections: {
-    policyOverview: {
-      title: "POLICY OVERVIEW",
-      opening: "This is a sample policy overview.",
-      bullets: [
-        { title: "Product name", content: "Sample Policy" },
-        { title: "Carrier name", content: "Sample Insurance Company" },
-      ],
-    },
-    protectionGlance: {
-      title: "PROTECTION AT A GLANCE",
-      opening: "Here's a quick overview of your policy's key protection features.",
-      bullets: [
-        { title: "Protection Amount", content: "$500,000 Death Benefit" },
-        { title: "Investment Level", content: "Premium: $1,000 annually" },
-      ],
-    },
-    policyPower: {
-      title: "POLICY POWER",
-      opening: "Your policy combines protection with potential growth opportunities.",
-      bullets: [
-        { title: "Protection Design", content: "Term life insurance" },
-        { title: "Flexibility Options", content: "Renewable term" },
-      ],
-    },
-    builtInAdvantages: {
-      title: "BUILT-IN ADVANTAGES",
-      opening: "Your policy includes several valuable features and benefits.",
-      bullets: [
-        { title: "Living Benefits", content: "Accelerated death benefit rider" },
-        { title: "Added Value", content: "Convertible to permanent insurance" },
-      ],
-    },
-    protectionInsights: {
-      title: "PROTECTION INSIGHTS",
-      opening: "Important considerations for maintaining your policy's effectiveness.",
-      bullets: [
-        { title: "Key Requirements", content: "Pay premiums on time" },
-        { title: "Watch Points", content: "Monitor term expiration date" },
-      ],
-    },
-    keyTopics: {
-      title: "KEY TOPICS FOR YOUR ADVISOR",
-      opening: "Discussion points for your next policy review.",
-      bullets: [
-        { title: "Review Items", content: "Coverage amount adequacy" },
-        { title: "Planning Topics", content: "Long-term insurance needs" },
-      ],
-    },
-    pathForward: {
-      title: "YOUR PATH FORWARD",
-      opening: "Next steps for maximizing your policy's value.",
-      bullets: [
-        { title: "Action Items", content: "Schedule annual review with advisor" },
-        { title: "Monitoring Tasks", content: "Track changes in insurance needs" },
-      ],
+// Fallback mock data
+const mockPolicyDashboard: PolicyDashboard = {
+  id: "mock-id",
+  policy_name: "Sample Policy",
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  email: "user@example.com",
+  session_id: "mock-session",
+  status: "active",
+  analysis_data: {
+    timestamp: new Date().toISOString(),
+    sessionId: "mock-session",
+    data: {
+      policyOverview: {
+        productName: "Sample Policy",
+        issuer: "Sample Insurance Company",
+        productType: "Term Life Insurance",
+        deathBenefit: 500000,
+        annualPremium: 1000,
+      },
+      sections: {
+        policyOverview: {
+          title: "POLICY OVERVIEW",
+          opening: "This is a sample policy overview.",
+          bullets: [
+            { title: "Product name", content: "Sample Policy" },
+            { title: "Carrier name", content: "Sample Insurance Company" },
+          ],
+        },
+        protectionGlance: {
+          title: "PROTECTION AT A GLANCE",
+          opening: "Here's a quick overview of your policy's key protection features.",
+          bullets: [
+            { title: "Protection Amount", content: "$500,000 Death Benefit" },
+            { title: "Investment Level", content: "Premium: $1,000 annually" },
+          ],
+        },
+        policyPower: {
+          title: "POLICY POWER",
+          opening: "Your policy combines protection with potential growth opportunities.",
+          bullets: [
+            { title: "Protection Design", content: "Term life insurance" },
+            { title: "Flexibility Options", content: "Renewable term" },
+          ],
+        },
+        builtInAdvantages: {
+          title: "BUILT-IN ADVANTAGES",
+          opening: "Your policy includes several valuable features and benefits.",
+          bullets: [
+            { title: "Living Benefits", content: "Accelerated death benefit rider" },
+            { title: "Added Value", content: "Convertible to permanent insurance" },
+          ],
+        },
+        protectionInsights: {
+          title: "PROTECTION INSIGHTS",
+          opening: "Important considerations for maintaining your policy's effectiveness.",
+          bullets: [
+            { title: "Key Requirements", content: "Pay premiums on time" },
+            { title: "Watch Points", content: "Monitor term expiration date" },
+          ],
+        },
+        keyTopics: {
+          title: "KEY TOPICS FOR YOUR ADVISOR",
+          opening: "Discussion points for your next policy review.",
+          bullets: [
+            { title: "Review Items", content: "Coverage amount adequacy" },
+            { title: "Planning Topics", content: "Long-term insurance needs" },
+          ],
+        },
+        pathForward: {
+          title: "YOUR PATH FORWARD",
+          opening: "Next steps for maximizing your policy's value.",
+          bullets: [
+            { title: "Action Items", content: "Schedule annual review with advisor" },
+            { title: "Monitoring Tasks", content: "Track changes in insurance needs" },
+          ],
+        },
+      },
+      email: "user@example.com",
     },
   },
 }
@@ -90,26 +104,26 @@ export default function Dashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState("overview")
-  const [activeSection, setActiveSection] = useState<keyof PolicyData["sections"]>("policyOverview")
+  const [activeSection, setActiveSection] = useState<keyof PolicySections>("policyOverview")
   const [isLoading, setIsLoading] = useState(true)
-  const [policyData, setPolicyData] = useState<PolicyData | null>(null)
+  const [policyDashboard, setPolicyDashboard] = useState<PolicyDashboard | null>(null)
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
 
   useEffect(() => {
     const fetchPolicyData = async () => {
       if (supabase) {
-        const { data, error } = await supabase.from("policies").select("*").single()
+        const { data, error } = await supabase.from("policy_dashboards").select("*").single()
 
         if (error) {
           console.error("Error fetching policy data:", error)
-          setPolicyData(mockPolicyData)
+          setPolicyDashboard(mockPolicyDashboard)
         } else {
-          setPolicyData(data)
+          setPolicyDashboard(data)
         }
       } else {
         console.warn("Supabase client not initialized. Using mock data.")
-        setPolicyData(mockPolicyData)
+        setPolicyDashboard(mockPolicyDashboard)
       }
       setIsLoading(false)
     }
@@ -121,7 +135,7 @@ export default function Dashboard() {
     const tab = searchParams.get("tab")
     if (tab && tabStructure.some((t) => t.id === tab)) {
       setActiveTab(tab)
-      setActiveSection(tabStructure.find((t) => t.id === tab)!.sections[0] as keyof PolicyData["sections"])
+      setActiveSection(tabStructure.find((t) => t.id === tab)!.sections[0] as keyof PolicySections)
     }
   }, [searchParams])
 
@@ -146,7 +160,7 @@ export default function Dashboard() {
         },
         body: JSON.stringify({
           message: inputMessage,
-          context: policyData?.sections[activeSection].opening,
+          context: policyDashboard?.analysis_data.data.sections[activeSection].opening,
         }),
       })
 
@@ -211,16 +225,18 @@ export default function Dashboard() {
     </Card>
   )
 
-  if (!policyData && !isLoading) {
+  if (!policyDashboard && !isLoading) {
     return <div>Error loading policy data</div>
   }
+
+  const policyData = policyDashboard?.analysis_data.data
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
         <header className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm">
-          <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">{policyData?.policyCore.productName}</h1>
-          <p className="text-xl text-gray-600">{policyData?.policyCore.issuer}</p>
+          <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">{policyData?.policyOverview.productName}</h1>
+          <p className="text-xl text-gray-600">{policyData?.policyOverview.issuer}</p>
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -238,7 +254,7 @@ export default function Dashboard() {
                 <div key={sectionId}>
                   {isLoading || !policyData
                     ? renderSkeletonContent()
-                    : renderSectionContent(policyData.sections[sectionId as keyof PolicyData["sections"]])}
+                    : renderSectionContent(policyData.sections[sectionId as keyof PolicySections])}
                 </div>
               ))}
             </TabsContent>
