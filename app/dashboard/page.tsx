@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ArrowRight, Send } from "lucide-react"
-import { supabase } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabase"
 import type { PolicyData, PolicySection } from "@/types/policy-dashboard"
 
 const tabStructure = [
@@ -16,6 +16,75 @@ const tabStructure = [
   { id: "benefits", label: "Benefits", sections: ["builtInAdvantages"] },
   { id: "planning", label: "Planning", sections: ["keyTopics", "pathForward"] },
 ]
+
+// Fallback mock data in case Supabase is not initialized
+const mockPolicyData: PolicyData = {
+  policyCore: {
+    productName: "Sample Policy",
+    issuer: "Sample Insurance Company",
+    productType: "Term Life Insurance",
+    deathBenefit: "$500,000",
+    annualPremium: "$1,000",
+  },
+  sections: {
+    policyOverview: {
+      title: "POLICY OVERVIEW",
+      opening: "This is a sample policy overview.",
+      bullets: [
+        { title: "Product name", content: "Sample Policy" },
+        { title: "Carrier name", content: "Sample Insurance Company" },
+      ],
+    },
+    protectionGlance: {
+      title: "PROTECTION AT A GLANCE",
+      opening: "Here's a quick overview of your policy's key protection features.",
+      bullets: [
+        { title: "Protection Amount", content: "$500,000 Death Benefit" },
+        { title: "Investment Level", content: "Premium: $1,000 annually" },
+      ],
+    },
+    policyPower: {
+      title: "POLICY POWER",
+      opening: "Your policy combines protection with potential growth opportunities.",
+      bullets: [
+        { title: "Protection Design", content: "Term life insurance" },
+        { title: "Flexibility Options", content: "Renewable term" },
+      ],
+    },
+    builtInAdvantages: {
+      title: "BUILT-IN ADVANTAGES",
+      opening: "Your policy includes several valuable features and benefits.",
+      bullets: [
+        { title: "Living Benefits", content: "Accelerated death benefit rider" },
+        { title: "Added Value", content: "Convertible to permanent insurance" },
+      ],
+    },
+    protectionInsights: {
+      title: "PROTECTION INSIGHTS",
+      opening: "Important considerations for maintaining your policy's effectiveness.",
+      bullets: [
+        { title: "Key Requirements", content: "Pay premiums on time" },
+        { title: "Watch Points", content: "Monitor term expiration date" },
+      ],
+    },
+    keyTopics: {
+      title: "KEY TOPICS FOR YOUR ADVISOR",
+      opening: "Discussion points for your next policy review.",
+      bullets: [
+        { title: "Review Items", content: "Coverage amount adequacy" },
+        { title: "Planning Topics", content: "Long-term insurance needs" },
+      ],
+    },
+    pathForward: {
+      title: "YOUR PATH FORWARD",
+      opening: "Next steps for maximizing your policy's value.",
+      bullets: [
+        { title: "Action Items", content: "Schedule annual review with advisor" },
+        { title: "Monitoring Tasks", content: "Track changes in insurance needs" },
+      ],
+    },
+  },
+}
 
 export default function Dashboard() {
   const router = useRouter()
@@ -29,12 +98,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchPolicyData = async () => {
-      const { data, error } = await supabase.from("policies").select("*").single()
+      if (supabase) {
+        const { data, error } = await supabase.from("policies").select("*").single()
 
-      if (error) {
-        console.error("Error fetching policy data:", error)
+        if (error) {
+          console.error("Error fetching policy data:", error)
+          setPolicyData(mockPolicyData)
+        } else {
+          setPolicyData(data)
+        }
       } else {
-        setPolicyData(data)
+        console.warn("Supabase client not initialized. Using mock data.")
+        setPolicyData(mockPolicyData)
       }
       setIsLoading(false)
     }
