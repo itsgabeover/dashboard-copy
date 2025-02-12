@@ -374,9 +374,9 @@ export default function Dashboard() {
                       </div>
                       <Progress value={healthScore} className="w-full h-3 bg-gray-100 rounded-full" />
                       <p className="mt-6 text-sm text-gray-600 text-center bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        This health score evaluates your policy's performance across premium structure, guarantees, cash
-                        accumulation, available riders, and flexibility options. Higher scores indicate robust features
-                        and stronger long-term value.
+                        This health score evaluates your policy&apos;s performance across premium structure, guarantees,
+                        cash accumulation, available riders, and flexibility options. Higher scores indicate robust
+                        features and stronger long-term value.
                       </p>
                     </CardContent>
                   </Card>
