@@ -380,3 +380,5 @@ const renderSkeletonContent = () => (
 )
 }
 
+export default Dashboard
+
