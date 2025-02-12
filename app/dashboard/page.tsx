@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 import { PolicyChatbot } from "@/components/PolicyChatbot"
 
-// New interfaces and mappings
+// Interfaces as provided
 interface SectionContent {
   id: string
   title: string
@@ -28,59 +28,61 @@ interface PolicySectionMapping {
   }
 }
 
+// Data mapping as provided
 const sectionMappings: PolicySectionMapping = {
   protection: {
-    getOpening: (data) => data.data.policyOverview.productName,
+    getOpening: (data) => data.data.policyOverview.opening,
     getDetails: (data) => [
-      data.data.protectionGlance?.bullets[0]?.content || "",
-      `${data.data.policyOverview.productType} with ${data.data.policyOverview.issuer}`,
-      data.data.policyPower?.bullets[0]?.content || "",
-      data.data.protectionGlance?.bullets[4]?.content || "",
-      data.data.protectionGlance?.bullets[0]?.content || "",
+      data.data.protectionGlance.bullets[0].content,
+      `${data.data.policyOverview.bullets[0].content} by ${data.data.policyOverview.bullets[1].content}`,
+      data.data.policyPower.bullets[0].content,
+      data.data.protectionGlance.bullets[4].content,
+      data.data.protectionGlance.bullets[0].content,
     ],
   },
   premium: {
-    getOpening: (data) => `Understanding your premium structure for ${data.data.policyOverview.productName}`,
+    getOpening: () => "Understanding your premium structure and funding requirements",
     getDetails: (data) => [
-      data.data.protectionGlance?.bullets[1]?.content || "",
-      data.data.protectionGlance?.bullets[2]?.content || "",
-      data.data.protectionInsights?.bullets[0]?.content || "",
-      data.data.protectionInsights?.bullets[1]?.content || "",
-      data.data.keyTopics?.bullets[0]?.content || "",
+      data.data.protectionGlance.bullets[1].content,
+      data.data.protectionGlance.bullets[2].content,
+      data.data.protectionInsights.bullets[0].content,
+      data.data.protectionInsights.bullets[1].content,
+      data.data.keyTopics.bullets[0].content,
     ],
   },
   growth: {
-    getOpening: (data) => `Growth potential of ${data.data.policyOverview.productName}`,
+    getOpening: (data) => data.data.policyPower.opening,
     getDetails: (data) => [
-      data.data.policyPower?.bullets[1]?.content || "",
-      data.data.policyPower?.bullets[4]?.content || "",
-      data.data.builtInAdvantages?.bullets[3]?.content || "",
-      data.data.protectionInsights?.bullets[3]?.content || "",
-      data.data.keyTopics?.bullets[2]?.content || "",
+      data.data.policyPower.bullets[1].content,
+      data.data.policyPower.bullets[4].content,
+      data.data.builtInAdvantages.bullets[3].content,
+      data.data.protectionInsights.bullets[3].content,
+      data.data.keyTopics.bullets[2].content,
     ],
   },
   benefits: {
-    getOpening: (data) => `Benefits and riders of ${data.data.policyOverview.productName}`,
+    getOpening: (data) => data.data.builtInAdvantages.opening,
     getDetails: (data) => [
-      data.data.builtInAdvantages?.bullets[0]?.content || "",
-      data.data.builtInAdvantages?.bullets[1]?.content || "",
-      data.data.builtInAdvantages?.bullets[2]?.content || "",
-      data.data.policyPower?.bullets[3]?.content || "",
-      data.data.builtInAdvantages?.bullets[3]?.content || "",
+      data.data.builtInAdvantages.bullets[0].content,
+      data.data.builtInAdvantages.bullets[1].content,
+      data.data.builtInAdvantages.bullets[2].content,
+      data.data.policyPower.bullets[3].content,
+      data.data.builtInAdvantages.bullets[3].content,
     ],
   },
   management: {
-    getOpening: (data) => `Managing your ${data.data.policyOverview.productName} policy`,
+    getOpening: (data) => data.data.protectionInsights.opening,
     getDetails: (data) => [
-      data.data.protectionInsights?.bullets[2]?.content || "",
-      data.data.pathForward?.bullets[0]?.content || "",
-      data.data.pathForward?.bullets[1]?.content || "",
-      data.data.keyTopics?.bullets[2]?.content || "",
-      data.data.pathForward?.bullets[2]?.content || "",
+      data.data.protectionInsights.bullets[2].content,
+      data.data.pathForward.bullets[0].content,
+      data.data.pathForward.bullets[1].content,
+      data.data.keyTopics.bullets[2].content,
+      data.data.pathForward.bullets[2].content,
     ],
   },
 }
 
+// Navigation array as provided
 const analysisNavigation = [
   { id: "protection", title: "Protection Structure" },
   { id: "premium", title: "Premium & Funding Analysis" },
@@ -89,6 +91,7 @@ const analysisNavigation = [
   { id: "management", title: "Ongoing Policy Management" },
 ]
 
+// Content generator function as provided
 const getSectionContent = (sectionId: string, policyData: ParsedPolicyData): SectionContent | null => {
   const mapping = sectionMappings[sectionId]
   if (!mapping) return null
