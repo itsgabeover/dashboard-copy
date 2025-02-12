@@ -1,5 +1,3 @@
-// types/policy-dashboard.ts
-
 // Core dashboard data structures
 export interface PolicyBullet {
   title: string
@@ -72,3 +70,4 @@ export interface DashboardRLSContext {
   user_email: string
   session_id: string
 }
+
