@@ -6,12 +6,100 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { AlertTriangle, Lightbulb, Flag, ChevronRight, Info } from "lucide-react"
-import type { ParsedPolicyData, PolicySection, Policy } from "@/types/policy"
+import { ChevronRight, Info } from "lucide-react"
+import type { ParsedPolicyData, Policy } from "@/types/policy"
 import { formatCurrency } from "@/lib/utils"
 import { cn } from "@/lib/utils"
 import { supabase } from "@/lib/supabase"
 import { PolicyChatbot } from "@/components/PolicyChatbot"
+
+// New interfaces and mappings
+interface SectionContent {
+  id: string
+  title: string
+  opening: string
+  details: string[]
+}
+
+interface PolicySectionMapping {
+  [key: string]: {
+    getOpening: (data: ParsedPolicyData) => string
+    getDetails: (data: ParsedPolicyData) => string[]
+  }
+}
+
+const sectionMappings: PolicySectionMapping = {
+  protection: {
+    getOpening: (data) => data.data.policyOverview.opening,
+    getDetails: (data) => [
+      data.data.protectionGlance.bullets[0].content,
+      `${data.data.policyOverview.bullets[0].content} by ${data.data.policyOverview.bullets[1].content}`,
+      data.data.policyPower.bullets[0].content,
+      data.data.protectionGlance.bullets[4].content,
+      data.data.protectionGlance.bullets[0].content,
+    ],
+  },
+  premium: {
+    getOpening: () => "Understanding your premium structure and funding requirements",
+    getDetails: (data) => [
+      data.data.protectionGlance.bullets[1].content,
+      data.data.protectionGlance.bullets[2].content,
+      data.data.protectionInsights.bullets[0].content,
+      data.data.protectionInsights.bullets[1].content,
+      data.data.keyTopics.bullets[0].content,
+    ],
+  },
+  growth: {
+    getOpening: (data) => data.data.policyPower.opening,
+    getDetails: (data) => [
+      data.data.policyPower.bullets[1].content,
+      data.data.policyPower.bullets[4].content,
+      data.data.builtInAdvantages.bullets[3].content,
+      data.data.protectionInsights.bullets[3].content,
+      data.data.keyTopics.bullets[2].content,
+    ],
+  },
+  benefits: {
+    getOpening: (data) => data.data.builtInAdvantages.opening,
+    getDetails: (data) => [
+      data.data.builtInAdvantages.bullets[0].content,
+      data.data.builtInAdvantages.bullets[1].content,
+      data.data.builtInAdvantages.bullets[2].content,
+      data.data.policyPower.bullets[3].content,
+      data.data.builtInAdvantages.bullets[3].content,
+    ],
+  },
+  management: {
+    getOpening: (data) => data.data.protectionInsights.opening,
+    getDetails: (data) => [
+      data.data.protectionInsights.bullets[2].content,
+      data.data.pathForward.bullets[0].content,
+      data.data.pathForward.bullets[1].content,
+      data.data.keyTopics.bullets[2].content,
+      data.data.pathForward.bullets[2].content,
+    ],
+  },
+}
+
+const analysisNavigation = [
+  { id: "protection", title: "Protection Structure" },
+  { id: "premium", title: "Premium & Funding Analysis" },
+  { id: "growth", title: "Growth & Value Features" },
+  { id: "benefits", title: "Policy Benefits & Riders" },
+  { id: "management", title: "Ongoing Policy Management" },
+]
+
+const getSectionContent = (sectionId: string, policyData: ParsedPolicyData): SectionContent | null => {
+  const mapping = sectionMappings[sectionId]
+  if (!mapping) return null
+
+  return {
+    id: sectionId,
+    title: analysisNavigation.find((nav) => nav.id === sectionId)?.title || "",
+    opening: mapping.getOpening(policyData),
+    details: mapping.getDetails(policyData),
+  }
+}
 
 // Helper Components
 const EmailVerification = ({ onVerify }: { onVerify: (email: string) => void }) => {
@@ -106,7 +194,7 @@ const getHealthDescription = (score: number): string => {
 // Main Dashboard Component
 export default function Dashboard() {
   const [policyData, setPolicyData] = useState<ParsedPolicyData | null>(null)
-  const [selectedSection, setSelectedSection] = useState<PolicySection | null>(null)
+  const [selectedSection, setSelectedSection] = useState<SectionContent | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isVerified, setIsVerified] = useState(false)
@@ -155,8 +243,8 @@ export default function Dashboard() {
   const handlePolicySelect = (policy: Policy) => {
     setPolicyData(policy.analysis_data)
     setShowPolicySelection(false)
-    if (policy.analysis_data.data.sections?.length > 0) {
-      setSelectedSection(policy.analysis_data.data.sections[0])
+    if (analysisNavigation.length > 0) {
+      setSelectedSection(getSectionContent(analysisNavigation[0].id, policy.analysis_data))
     }
   }
 
@@ -365,13 +453,13 @@ export default function Dashboard() {
                       </CardHeader>
                       <CardContent className="p-4">
                         <div className="space-y-2">
-                          {policyData.data.sections.map((section, index) => (
+                          {analysisNavigation.map((section) => (
                             <button
-                              key={index}
-                              onClick={() => setSelectedSection(section)}
+                              key={section.id}
+                              onClick={() => setSelectedSection(getSectionContent(section.id, policyData))}
                               className={cn(
                                 "w-full flex items-center justify-between px-4 py-3 text-left transition-all rounded-lg hover:bg-gray-50",
-                                selectedSection?.title === section.title &&
+                                selectedSection?.id === section.id &&
                                   "bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)] shadow-md",
                               )}
                             >
@@ -379,7 +467,7 @@ export default function Dashboard() {
                               <ChevronRight
                                 className={cn(
                                   "w-4 h-4 transition-transform",
-                                  selectedSection?.title === section.title && "rotate-90",
+                                  selectedSection?.id === section.id && "rotate-90",
                                 )}
                               />
                             </button>
@@ -406,53 +494,23 @@ export default function Dashboard() {
                           </CardHeader>
                           <CardContent className="p-6">
                             <div className="space-y-6">
-                              <div className="bg-green-50 p-6 rounded-lg border border-green-100">
-                                <h4 className="font-semibold flex items-center gap-2 text-green-700 mb-3">
-                                  <Lightbulb className="w-5 h-5" />
-                                  Hidden Gem
-                                </h4>
-                                <p className="text-green-700 leading-relaxed">{selectedSection.hiddengem}</p>
-                              </div>
-
-                              <div className="bg-orange-50 p-6 rounded-lg border border-orange-100">
-                                <h4 className="font-semibold flex items-center gap-2 text-orange-700 mb-3">
-                                  <AlertTriangle className="w-5 h-5" />
-                                  Blind Spot
-                                </h4>
-                                <p className="text-orange-700 leading-relaxed">{selectedSection.blindspot}</p>
-                              </div>
-
-                              <div className="bg-red-50 p-6 rounded-lg border border-red-100">
-                                <h4 className="font-semibold flex items-center gap-2 text-red-700 mb-3">
-                                  <Flag className="w-5 h-5" />
-                                  Red Flag
-                                </h4>
-                                <p className="text-red-700 leading-relaxed">{selectedSection.redflag}</p>
+                              <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
+                                <h4 className="font-semibold mb-3">Overview</h4>
+                                <p className="text-gray-700 leading-relaxed">{selectedSection.opening}</p>
                               </div>
 
                               <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                                <h4 className="font-semibold mb-3">Key Takeaways</h4>
-                                <p className="text-gray-700 leading-relaxed">{selectedSection.clientImplications}</p>
+                                <h4 className="font-semibold mb-3">Key Details</h4>
+                                <ul className="space-y-2">
+                                  {selectedSection.details.map((detail, index) => (
+                                    <li key={index} className="flex items-start">
+                                      <span className="inline-block w-2 h-2 rounded-full bg-[rgb(82,102,255)] mt-2 mr-3" />
+                                      <span>{detail}</span>
+                                    </li>
+                                  ))}
+                                </ul>
                               </div>
                             </div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200">
-                          <CardHeader className="pb-2 border-b">
-                            <CardTitle className="text-xl font-semibold text-gray-900">Key Insights</CardTitle>
-                          </CardHeader>
-                          <CardContent className="p-6">
-                            <ul className="space-y-4">
-                              {selectedSection.quotes.map((quote, index) => (
-                                <li
-                                  key={index}
-                                  className="p-4 bg-gray-50 rounded-lg border-l-4 border-[rgb(82,102,255)] shadow-sm"
-                                >
-                                  {quote}
-                                </li>
-                              ))}
-                            </ul>
                           </CardContent>
                         </Card>
                       </>
