@@ -190,7 +190,7 @@ export default function Dashboard() {
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  const dashboardTopRef = useRef<HTMLDivElement>(null)
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
@@ -243,12 +243,17 @@ export default function Dashboard() {
     setPolicyData(policy)
     setShowPolicySelection(false)
     setActiveTab(tabStructure[0].id)
+    // Scroll to the top of the dashboard after a short delay
+    setTimeout(() => {
+      dashboardTopRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, 100)
   }
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || !policyData) return
+  const handleSendMessage = async (message?: string) => {
+    const messageToSend = message || inputMessage.trim()
+    if (!messageToSend || !policyData) return
 
-    const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage }]
+    const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
     setChatMessages(newMessages)
     setInputMessage("")
     setIsTyping(true)
@@ -261,7 +266,7 @@ export default function Dashboard() {
           "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          content: inputMessage,
+          content: messageToSend,
           session_id: policyData.session_id,
         }),
       })
@@ -292,9 +297,9 @@ export default function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [])
+  const handleQuickPrompt = (prompt: string) => {
+    handleSendMessage(prompt)
+  }
 
   // Show loading state
   if (isLoading) {
@@ -332,7 +337,7 @@ export default function Dashboard() {
 
   // Main dashboard UI
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div ref={dashboardTopRef} className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
         <header className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm">
           <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">
@@ -382,6 +387,7 @@ export default function Dashboard() {
           onStartNewChat={() => setChatMessages([])}
           quickPrompts={tabStructure.find((tab) => tab.id === activeTab)?.chatPrompts || []}
           chatTitle={tabStructure.find((tab) => tab.id === activeTab)?.chatTitle || "Chat"}
+          onQuickPrompt={handleQuickPrompt}
         />
       </div>
     </div>
