@@ -121,7 +121,7 @@ const tabStructure = [
     ],
     preamble: "Here's what your policy includes:",
     chatTitle: "Questions About Your Policy",
-    title: "Your Policy Basics",
+    title: "Here's What Your Policy Includes",
   },
   {
     id: "policyPower",
@@ -130,7 +130,7 @@ const tabStructure = [
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
     preamble: "Here's how your policy works:",
     chatTitle: "Questions About Your Coverage",
-    title: "Your Policy Protection & Growth",
+    title: "Here's How Your Policy Works",
   },
   {
     id: "builtInAdvantages",
@@ -139,7 +139,7 @@ const tabStructure = [
     chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
     preamble: "Your policy comes with these helpful extras:",
     chatTitle: "Questions About Your Benefits",
-    title: "Your Policy Benefits",
+    title: "Your Policy Comes With These Helpful Extras",
   },
   {
     id: "protectionInsights",
@@ -152,7 +152,7 @@ const tabStructure = [
     ],
     preamble: "Keep these key points in mind:",
     chatTitle: "Questions About Policy Details",
-    title: "Important Things to Know",
+    title: "Keep These Key Points In Mind",
   },
   {
     id: "advisorTopics",
@@ -161,7 +161,7 @@ const tabStructure = [
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
     preamble: "Topics for your next advisor meeting:",
     chatTitle: "Questions For Your Advisor",
-    title: "Review With Your Advisor",
+    title: "Topics For Your Next Advisor Meeting",
   },
   {
     id: "pathForward",
@@ -174,7 +174,7 @@ const tabStructure = [
     ],
     preamble: "Steps to keep your policy on track:",
     chatTitle: "Questions About Policy Management",
-    title: "Taking Care of Your Policy",
+    title: "Steps To Keep Your Policy On Track",
   },
 ]
 
@@ -245,19 +245,12 @@ export default function Dashboard() {
     setActiveTab(tabStructure[0].id)
   }
 
- const handleSendMessage = async (directMessage?: string) => {
-    // Use directMessage if provided, otherwise use inputMessage
-    const messageToSend = directMessage || inputMessage.trim()
-    if (!messageToSend || !policyData) return
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || !policyData) return
 
-    const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
+    const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage }]
     setChatMessages(newMessages)
-    
-    // Only clear input if it wasn't a direct message
-    if (!directMessage) {
-      setInputMessage("")
-    }
-    
+    setInputMessage("")
     setIsTyping(true)
 
     try {
@@ -268,7 +261,7 @@ export default function Dashboard() {
           "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          content: messageToSend,
+          content: inputMessage,
           session_id: policyData.session_id,
         }),
       })
@@ -356,7 +349,7 @@ export default function Dashboard() {
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none"
+                className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white data-[state=active]:shadow-md"
               >
                 {tab.label}
               </TabsTrigger>
@@ -397,9 +390,6 @@ export default function Dashboard() {
 
 const renderSectionContent = (section: PolicySection, tabData: (typeof tabStructure)[0]) => (
   <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
-    <CardHeader className="pb-2 border-b">
-      <CardTitle className="text-xl font-semibold text-gray-900">{tabData.title}</CardTitle>
-    </CardHeader>
     <CardContent className="p-6">
       <div className="space-y-6">
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
