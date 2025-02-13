@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, Send } from "lucide-react"
+import { AlertCircle, ArrowRight } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
+import { ChatInterface } from "./components/chat-interface"
 
 // Email verification component
 function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
@@ -372,51 +373,16 @@ export default function Dashboard() {
         </Tabs>
 
         {/* Chat Section */}
-        <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mt-8">
-          <CardHeader className="pb-2 border-b">
-            <CardTitle className="text-xl font-semibold text-gray-900">
-              {tabStructure.find((tab) => tab.id === activeTab)?.chatTitle || "Chat"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4">
-            <div className="h-64 overflow-y-auto mb-4 bg-gray-50 rounded-lg p-4">
-              {chatMessages.map((message, index) => (
-                <div key={index} className={`mb-2 ${message.role === "assistant" ? "text-blue-600" : "text-gray-800"}`}>
-                  <strong>{message.role === "assistant" ? "Assistant: " : "You: "}</strong>
-                  {message.content}
-                </div>
-              ))}
-              {isTyping && <div className="text-gray-500">Assistant is typing...</div>}
-              <div ref={chatEndRef} />
-            </div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {tabStructure
-                .find((tab) => tab.id === activeTab)
-                ?.chatPrompts.map((prompt, index) => (
-                  <Button key={index} variant="outline" size="sm" onClick={() => setInputMessage(prompt)}>
-                    {prompt}
-                  </Button>
-                ))}
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)]"
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-              />
-              <Button
-                className="bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90"
-                onClick={handleSendMessage}
-                disabled={isTyping}
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <ChatInterface
+          messages={chatMessages}
+          inputMessage={inputMessage}
+          isTyping={isTyping}
+          onInputChange={setInputMessage}
+          onSendMessage={handleSendMessage}
+          onStartNewChat={() => setChatMessages([])}
+          quickPrompts={tabStructure.find((tab) => tab.id === activeTab)?.chatPrompts || []}
+          chatTitle={tabStructure.find((tab) => tab.id === activeTab)?.chatTitle || "Chat"}
+        />
       </div>
     </div>
   )
