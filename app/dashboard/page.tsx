@@ -245,12 +245,19 @@ export default function Dashboard() {
     setActiveTab(tabStructure[0].id)
   }
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || !policyData) return
+ const handleSendMessage = async (directMessage?: string) => {
+    // Use directMessage if provided, otherwise use inputMessage
+    const messageToSend = directMessage || inputMessage.trim()
+    if (!messageToSend || !policyData) return
 
-    const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage }]
+    const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
     setChatMessages(newMessages)
-    setInputMessage("")
+    
+    // Only clear input if it wasn't a direct message
+    if (!directMessage) {
+      setInputMessage("")
+    }
+    
     setIsTyping(true)
 
     try {
@@ -261,7 +268,7 @@ export default function Dashboard() {
           "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          content: inputMessage,
+          content: messageToSend,
           session_id: policyData.session_id,
         }),
       })
