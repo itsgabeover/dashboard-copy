@@ -249,11 +249,10 @@ export default function Dashboard() {
     }, 100)
   }
 
-  const handleSendMessage = async (directMessage?: string) => {
-    const messageToSend = directMessage || inputMessage.trim()
-    if (!messageToSend || !policyData) return
+  const handleSendMessage = async (message: string) => {
+    if (!message || !policyData) return
 
-    const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
+    const newMessages = [...chatMessages, { role: "user" as const, content: message }]
     setChatMessages(newMessages)
     setInputMessage("")
     setIsTyping(true)
@@ -266,7 +265,7 @@ export default function Dashboard() {
           "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          content: messageToSend,
+          content: message,
           session_id: policyData.session_id,
         }),
       })
@@ -295,11 +294,6 @@ export default function Dashboard() {
     } finally {
       setIsTyping(false)
     }
-  }
-
-  const handleQuickPrompt = (prompt: string) => {
-    setInputMessage(prompt)
-    handleSendMessage()
   }
 
   // Show loading state
