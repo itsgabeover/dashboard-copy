@@ -190,7 +190,6 @@ export default function Dashboard() {
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const chatEndRef = useRef<HTMLDivElement>(null)
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
