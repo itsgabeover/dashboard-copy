@@ -1,6 +1,7 @@
 import { Send, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChatMessage } from "./chat-message"
+import { useEffect, useRef } from 'react'
 
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
@@ -23,61 +24,72 @@ export function ChatInterface({
   quickPrompts,
   chatTitle,
 }: ChatInterfaceProps) {
+  // Add ref for message container
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to bottom whenever messages change or isTyping changes
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isTyping])
+
   const handleQuickPrompt = (prompt: string) => {
     onInputChange(prompt)
     onSendMessage()
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-xl shadow-sm border ring-1 ring-gray-200">
-      <div className="flex items-center justify-between px-6 py-4 border-b">
-        <h2 className="text-xl font-semibold text-gray-900">{chatTitle}</h2>
-        <Button variant="outline" size="sm" onClick={onStartNewChat} className="flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" />
+    <div className="flex flex-col h-[600px] bg-white rounded-xl shadow-sm border border-gray-200">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900">{chatTitle}</h2>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onStartNewChat}
+          className="flex items-center gap-1.5 text-sm hover:bg-gray-50"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
           Start New Chat
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         {messages.map((message, index) => (
           <ChatMessage key={index} role={message.role} content={message.content} />
         ))}
-        {isTyping && (
-          <div className="flex items-center gap-2 text-gray-500">
-            <div className="animate-bounce">●</div>
-            <div className="animate-bounce delay-100">●</div>
-            <div className="animate-bounce delay-200">●</div>
-          </div>
-        )}
+        {isTyping && <TypingIndicator />}
+        {/* Add div for scroll anchor */}
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 border-t">
-        <div className="flex flex-wrap gap-2 mb-4">
+      {/* Input Area */}
+      <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex flex-wrap gap-2 mb-3">
           {quickPrompts.map((prompt, index) => (
             <Button
               key={index}
               variant="outline"
               size="sm"
               onClick={() => handleQuickPrompt(prompt)}
-              className="text-sm"
+              className="text-sm bg-white hover:bg-gray-50 border-gray-200"
             >
               {prompt}
             </Button>
           ))}
         </div>
-
         <div className="flex gap-2">
           <input
             type="text"
             value={inputMessage}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 rounded-full border focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)]"
+            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white"
             onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
-            className="rounded-full bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90"
             onClick={onSendMessage}
+            className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
             <Send className="w-4 h-4" />
           </Button>
@@ -87,3 +99,12 @@ export function ChatInterface({
   )
 }
 
+function TypingIndicator() {
+  return (
+    <div className="flex items-center gap-1 text-gray-400 h-8 px-3">
+      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" />
+      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-150" />
+      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-300" />
+    </div>
+  )
+}
