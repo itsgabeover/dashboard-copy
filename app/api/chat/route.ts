@@ -5,7 +5,6 @@ import { type NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 import { createChatCompletion } from "@/lib/openai";
 
-// Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -57,7 +56,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Create stream
-    const stream = OpenAIStream(response as any, {
+    const stream = OpenAIStream(response, {
       async onCompletion(completion) {
         await saveMessageToDatabase(chat.id, "assistant", completion);
         await updateChatTimestamp(chat.id);
