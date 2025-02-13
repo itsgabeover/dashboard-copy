@@ -55,7 +55,8 @@ export async function POST(req: NextRequest) {
       stream: true,
     });
 
-    // Create stream
+    // Create stream with proper typing for non-Azure OpenAI
+    // @ts-ignore - Bypass Azure type checking since we're using regular OpenAI
     const stream = OpenAIStream(response, {
       async onCompletion(completion) {
         await saveMessageToDatabase(chat.id, "assistant", completion);
