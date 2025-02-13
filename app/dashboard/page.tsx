@@ -190,7 +190,7 @@ export default function Dashboard() {
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
-  const dashboardTopRef = useRef<HTMLDivElement>(null)
+  const chatEndRef = useRef<HTMLDivElement>(null)
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
@@ -243,16 +243,12 @@ export default function Dashboard() {
     setPolicyData(policy)
     setShowPolicySelection(false)
     setActiveTab(tabStructure[0].id)
-    // Scroll to the top of the dashboard after a short delay
-    setTimeout(() => {
-      dashboardTopRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, 100)
   }
 
-  const handleSendMessage = async (message: string) => {
-    if (!message || !policyData) return
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || !policyData) return
 
-    const newMessages = [...chatMessages, { role: "user" as const, content: message }]
+    const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage }]
     setChatMessages(newMessages)
     setInputMessage("")
     setIsTyping(true)
@@ -265,7 +261,7 @@ export default function Dashboard() {
           "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          content: message,
+          content: inputMessage,
           session_id: policyData.session_id,
         }),
       })
@@ -295,6 +291,10 @@ export default function Dashboard() {
       setIsTyping(false)
     }
   }
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [])
 
   // Show loading state
   if (isLoading) {
@@ -332,7 +332,7 @@ export default function Dashboard() {
 
   // Main dashboard UI
   return (
-    <div ref={dashboardTopRef} className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
         <header className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm">
           <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">
@@ -430,4 +430,3 @@ const renderSkeletonContent = () => (
     </CardContent>
   </Card>
 )
-
