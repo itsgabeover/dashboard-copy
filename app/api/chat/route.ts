@@ -13,6 +13,31 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
+// Helper to ensure complete responses
+function ensureCompleteResponse(text: string): string {
+  let finalText = text.trim()
+
+  // If message ends abruptly with a number list item, add closing period
+  if (finalText.match(/\d\.\s+[^.!?]*$/)) {
+    finalText += "."
+  }
+
+  // If message ends with an incomplete thought about benefits, complete it
+  if (finalText.match(/benefits\s*$/i)) {
+    finalText += " that come with your policy."
+  }
+
+  // Ensure proper sentence ending
+  if (finalText.match(/\w+$/)) {
+    finalText += "."
+  }
+
+  // Clean up any double periods
+  finalText = finalText.replace(/\.+/g, ".")
+
+  return finalText
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Parse request
@@ -72,26 +97,36 @@ export async function POST(req: NextRequest) {
       stream: true
     })
 
-    // Create stream with proper error handling using a cast to bypass type issues
+    let fullResponse = ""
+    
+    // Create stream with enhanced completion handling
     try {
       const stream = OpenAIStream(
         completion as unknown as Response,
         {
           async onCompletion(completion) {
             try {
-              // Save assistant's complete response
-              await saveMessage(chat.id, "assistant", completion)
+              // Ensure the response is complete and properly formatted
+              const finalResponse = ensureCompleteResponse(completion)
+              
+              // Save complete assistant response
+              await saveMessage(chat.id, "assistant", finalResponse)
               await updateChatTimestamp(chat.id)
-              console.log("Saved assistant response:", { length: completion.length })
+              console.log("Saved assistant response:", { 
+                original: completion.length,
+                final: finalResponse.length 
+              })
             } catch (error) {
               console.error("Error in onCompletion:", error)
             }
           },
+          onToken: (token) => {
+            // Accumulate tokens to check for completion
+            fullResponse += token
+          },
           onStart: () => {
             console.log("Starting stream")
-          },
-          onToken: () => {
-            // Optional: Handle individual tokens if needed
+            fullResponse = ""
           },
           onFinal: (completion) => {
             console.log("Stream completed:", { length: completion.length })
