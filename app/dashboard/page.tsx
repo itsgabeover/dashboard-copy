@@ -9,7 +9,7 @@ import { AlertCircle, ArrowRight } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
-import { ChatInterface } from "./components/chat-interface"
+import { ChatInterface } from "@/components/chat-interface"
 
 // Email verification component
 function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
