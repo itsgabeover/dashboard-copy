@@ -1,7 +1,6 @@
-// chat-interface.tsx
 import { Send, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ChatMessage } from "./chat-message"
+import ReactMarkdown from 'react-markdown'
 import { useEffect, useRef } from 'react'
 
 interface ChatInterfaceProps {
@@ -9,7 +8,7 @@ interface ChatInterfaceProps {
   inputMessage: string
   isTyping: boolean
   onInputChange: (value: string) => void
-  onSendMessage: (directMessage?: string) => void // Modified to accept optional direct message
+  onSendMessage: (directMessage?: string) => void // Modified to accept optional message
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
@@ -25,15 +24,18 @@ export function ChatInterface({
   quickPrompts,
   chatTitle,
 }: ChatInterfaceProps) {
-  // Add ref for message container
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const prevMessagesLengthRef = useRef(messages.length)
 
-  // Scroll to bottom whenever messages change or isTyping changes
+  // Only scroll when new messages are added or typing status changes
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (messages.length > prevMessagesLengthRef.current || isTyping) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+    prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
 
-  // Modified to directly send the prompt without updating input
+  // Modified to directly send the message without updating input
   const handleQuickPrompt = (prompt: string) => {
     onSendMessage(prompt)
   }
@@ -85,12 +87,12 @@ export function ChatInterface({
             value={inputMessage}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white"
+            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
             onClick={() => onSendMessage()}
-            className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
+            className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4"
           >
             <Send className="w-4 h-4" />
           </Button>
@@ -109,3 +111,65 @@ function TypingIndicator() {
     </div>
   )
 }
+
+interface ChatMessageProps {
+  role: "user" | "assistant"
+  content: string
+}
+
+function ChatMessage({ role, content }: ChatMessageProps) {
+  const isUser = role === "user"
+  
+  // Function to fix common markdown formatting issues
+  const formatContent = (text: string) => {
+    return text
+      // Ensure proper spacing after bullet points
+      .replace(/^-(?=\S)/gm, '- ')
+      // Add proper line breaks before and after lists
+      .replace(/\n-/g, '\n\n-')
+      // Fix double asterisks for bold (ensure spaces around words)
+      .replace(/\*\*(\S+)\*\*/g, '**$1**')
+      // Ensure proper line breaks between paragraphs
+      .replace(/\n\n+/g, '\n\n')
+      .trim()
+  }
+
+  return (
+    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+      <div
+        className={`
+          max-w-[85%] rounded-2xl px-4 py-2.5
+          ${isUser 
+            ? "bg-blue-600 text-white" 
+            : "bg-gray-100 text-gray-800"}
+        `}
+      >
+        <div className={`text-xs font-medium mb-1 ${isUser ? "text-blue-100" : "text-gray-500"}`}>
+          {isUser ? "You" : "Assistant"}
+        </div>
+        <div className="text-sm leading-relaxed">
+          <ReactMarkdown
+            className={`
+              markdown-content
+              ${isUser ? 'text-white' : 'text-gray-800'}
+              [&_p]:mb-2
+              [&_p:last-child]:mb-0
+              [&_ul]:mt-1
+              [&_ul]:mb-2
+              [&_li]:ml-4
+              [&_li]:pl-1
+              [&_strong]:font-semibold
+              ${isUser 
+                ? '[&_strong]:text-white' 
+                : '[&_strong]:text-gray-900'}
+            `}
+          >
+            {formatContent(content)}
+          </ReactMarkdown>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export { ChatMessage }
