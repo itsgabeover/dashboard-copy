@@ -109,12 +109,54 @@ function PolicySelection({
 }
 
 const tabStructure = [
-  { id: "policyOverview", label: "Policy Overview", sections: ["policyOverview"] },
-  { id: "policyPower", label: "The Power Of Your Policy", sections: ["policyPower"] },
-  { id: "builtInAdvantages", label: "Built-In Advantages", sections: ["builtInAdvantages"] },
-  { id: "protectionInsights", label: "Protection Insights", sections: ["protectionInsights"] },
-  { id: "advisorTopics", label: "Advisor Topics", sections: ["keyTopics"] },
-  { id: "pathForward", label: "Path Forward", sections: ["pathForward"] },
+  {
+    id: "policyOverview",
+    label: "Policy Overview",
+    sections: ["policyOverview"],
+    chatPrompts: [
+      "Break down my policy in simple words",
+      "What makes my policy special?",
+      "How much protection do I have?",
+    ],
+  },
+  {
+    id: "policyPower",
+    label: "The Power Of Your Policy",
+    sections: ["policyPower"],
+    chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
+  },
+  {
+    id: "builtInAdvantages",
+    label: "Built-In Advantages",
+    sections: ["builtInAdvantages"],
+    chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
+  },
+  {
+    id: "protectionInsights",
+    label: "Protection Insights",
+    sections: ["protectionInsights"],
+    chatPrompts: [
+      "Help me understand my illness benefits",
+      "Tell me about policy loans",
+      "What happens as I get older?",
+    ],
+  },
+  {
+    id: "advisorTopics",
+    label: "Advisor Topics",
+    sections: ["keyTopics"],
+    chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
+  },
+  {
+    id: "pathForward",
+    label: "Path Forward",
+    sections: ["pathForward"],
+    chatPrompts: [
+      "How do I keep my policy healthy?",
+      "What changes should I expect?",
+      "Policy management best practices?",
+    ],
+  },
 ]
 
 export default function Dashboard() {
@@ -233,7 +275,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [chatEndRef]) //Corrected dependency
+  }, [chatEndRef]) //Fixed useEffect dependency
 
   // Show loading state
   if (isLoading) {
@@ -275,9 +317,11 @@ export default function Dashboard() {
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
         <header className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm">
           <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">
-            {policyData?.analysis_data.data?.policyOverview.productName}
+            {policyData?.analysis_data.data?.policyOverview.productName || "Your Policy"}
           </h1>
-          <p className="text-xl text-gray-600">{policyData?.analysis_data.data?.policyOverview.issuer}</p>
+          <p className="text-xl text-gray-600">
+            {policyData?.analysis_data.data?.policyOverview.issuer || "Insurance Carrier"}
+          </p>
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -325,11 +369,11 @@ export default function Dashboard() {
               <div ref={chatEndRef} />
             </div>
             <div className="flex flex-wrap gap-2 mb-4">
-              {policyData?.analysis_data.data?.sections[activeTab as keyof PolicySections]?.bullets
-                .slice(0, 3)
-                .map((bullet, index) => (
-                  <Button key={index} variant="outline" size="sm" onClick={() => setInputMessage(bullet.title)}>
-                    {bullet.title}
+              {tabStructure
+                .find((tab) => tab.id === activeTab)
+                ?.chatPrompts.map((prompt, index) => (
+                  <Button key={index} variant="outline" size="sm" onClick={() => setInputMessage(prompt)}>
+                    {prompt}
                   </Button>
                 ))}
             </div>
