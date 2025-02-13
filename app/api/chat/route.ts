@@ -97,8 +97,6 @@ export async function POST(req: NextRequest) {
       stream: true
     })
 
-    let fullResponse = ""
-    
     // Create stream with enhanced completion handling
     try {
       const stream = OpenAIStream(
@@ -120,13 +118,8 @@ export async function POST(req: NextRequest) {
               console.error("Error in onCompletion:", error)
             }
           },
-          onToken: (token) => {
-            // Accumulate tokens to check for completion
-            fullResponse += token
-          },
           onStart: () => {
             console.log("Starting stream")
-            fullResponse = ""
           },
           onFinal: (completion) => {
             console.log("Stream completed:", { length: completion.length })
