@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 import { createChatCompletion } from "@/lib/openai"
 import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
+import type { ChatCompletionChunk } from "openai/resources/chat/completions"
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
     })
 
     // Create stream processor
-    const stream = OpenAIStream(response as any, {
+    const stream = OpenAIStream(response as AsyncIterable<ChatCompletionChunk>, {
       async onCompletion(completion) {
         // Save assistant's complete response
         await saveMessage(chat.id, "assistant", completion)
