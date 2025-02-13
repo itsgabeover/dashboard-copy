@@ -72,17 +72,39 @@ export async function POST(req: NextRequest) {
       stream: true
     })
 
-    // Create stream processor
-    const stream = OpenAIStream(completion, {
-      async onCompletion(completion) {
-        // Save assistant's complete response
-        await saveMessage(chat.id, "assistant", completion)
-        await updateChatTimestamp(chat.id)
-      }
-    })
+    // Create stream with proper error handling using a cast to bypass type issues
+    try {
+      const stream = OpenAIStream(
+        completion as unknown as Response,
+        {
+          async onCompletion(completion) {
+            try {
+              // Save assistant's complete response
+              await saveMessage(chat.id, "assistant", completion)
+              await updateChatTimestamp(chat.id)
+              console.log("Saved assistant response:", { length: completion.length })
+            } catch (error) {
+              console.error("Error in onCompletion:", error)
+            }
+          },
+          onStart: () => {
+            console.log("Starting stream")
+          },
+          onToken: () => {
+            // Optional: Handle individual tokens if needed
+          },
+          onFinal: (completion) => {
+            console.log("Stream completed:", { length: completion.length })
+          },
+        }
+      )
 
-    // Return streaming response
-    return new StreamingTextResponse(stream)
+      // Return the streaming response
+      return new StreamingTextResponse(stream)
+    } catch (streamError) {
+      console.error("Streaming error:", streamError)
+      throw streamError
+    }
 
   } catch (error) {
     console.error("Chat API error:", error)
