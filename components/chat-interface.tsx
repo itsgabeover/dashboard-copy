@@ -25,12 +25,16 @@ export function ChatInterface({
   chatTitle,
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
 
-  // Only scroll when new messages are added or typing status changes
+  // Modified scroll behavior to stay within container
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      if (messagesContainerRef.current && messagesEndRef.current) {
+        // Scroll the messages container instead of the whole page
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+      }
     }
     prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
@@ -57,12 +61,14 @@ export function ChatInterface({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto px-6 py-4 space-y-4"
+      >
         {messages.map((message, index) => (
           <ChatMessage key={index} role={message.role} content={message.content} />
         ))}
         {isTyping && <TypingIndicator />}
-        {/* Add div for scroll anchor */}
         <div ref={messagesEndRef} />
       </div>
 
