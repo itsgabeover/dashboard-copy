@@ -249,10 +249,11 @@ export default function Dashboard() {
     }, 100)
   }
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim() || !policyData) return
+  const handleSendMessage = async (directMessage?: string) => {
+    const messageToSend = directMessage || inputMessage.trim()
+    if (!messageToSend || !policyData) return
 
-    const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage.trim() }]
+    const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
     setChatMessages(newMessages)
     setInputMessage("")
     setIsTyping(true)
@@ -265,7 +266,7 @@ export default function Dashboard() {
           "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          content: inputMessage.trim(),
+          content: messageToSend,
           session_id: policyData.session_id,
         }),
       })
@@ -383,11 +384,10 @@ export default function Dashboard() {
           inputMessage={inputMessage}
           isTyping={isTyping}
           onInputChange={setInputMessage}
-          onSendMessage={() => handleSendMessage()}
+          onSendMessage={handleSendMessage}
           onStartNewChat={() => setChatMessages([])}
           quickPrompts={tabStructure.find((tab) => tab.id === activeTab)?.chatPrompts || []}
           chatTitle={tabStructure.find((tab) => tab.id === activeTab)?.chatTitle || "Chat"}
-          onQuickPrompt={handleQuickPrompt}
         />
       </div>
     </div>
