@@ -239,11 +239,18 @@ export default function Dashboard() {
     loadPolicies(email)
   }
 
-  const handlePolicySelect = (policy: PolicyDashboard) => {
-    setPolicyData(policy)
-    setShowPolicySelection(false)
-    setActiveTab(tabStructure[0].id)
-  }
+ const handlePolicySelect = (policy: PolicyDashboard) => {
+  // First scroll to top smoothly
+  window.scrollTo({ 
+    top: 0, 
+    behavior: "smooth" 
+  })
+    
+  // Then update state
+  setPolicyData(policy)
+  setShowPolicySelection(false)
+  setActiveTab(tabStructure[0].id)
+}
 
  const handleSendMessage = async (directMessage?: string) => {
     // Use directMessage if provided, otherwise use inputMessage
@@ -299,9 +306,7 @@ export default function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [])
+
 
   // Show loading state
   if (isLoading) {
