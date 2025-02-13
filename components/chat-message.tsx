@@ -1,13 +1,14 @@
 import { Send, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from 'react-markdown'
+import { useEffect, useRef } from 'react'
 
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
   inputMessage: string
   isTyping: boolean
   onInputChange: (value: string) => void
-  onSendMessage: () => void
+  onSendMessage: (directMessage?: string) => void // Modified to accept optional message
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
@@ -23,9 +24,17 @@ export function ChatInterface({
   quickPrompts,
   chatTitle,
 }: ChatInterfaceProps) {
+  // Add ref for message container
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to bottom whenever messages change or isTyping changes
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isTyping])
+
+  // Modified to directly send the message without updating input
   const handleQuickPrompt = (prompt: string) => {
-    onInputChange(prompt)
-    onSendMessage()
+    onSendMessage(prompt)
   }
 
   return (
@@ -50,6 +59,8 @@ export function ChatInterface({
           <ChatMessage key={index} role={message.role} content={message.content} />
         ))}
         {isTyping && <TypingIndicator />}
+        {/* Add div for scroll anchor */}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
@@ -77,7 +88,7 @@ export function ChatInterface({
             onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
-            onClick={onSendMessage}
+            onClick={() => onSendMessage()}
             className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4"
           >
             <Send className="w-4 h-4" />
