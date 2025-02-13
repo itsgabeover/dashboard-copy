@@ -118,18 +118,27 @@ const tabStructure = [
       "What makes my policy special?",
       "How much protection do I have?",
     ],
+    preamble: "Here's what your policy includes:",
+    chatTitle: "Questions About Your Policy",
+    title: "Your Policy Basics",
   },
   {
     id: "policyPower",
-    label: "The Power Of Your Policy",
+    label: "The Power of Your Policy",
     sections: ["policyPower"],
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
+    preamble: "Here's how your policy works:",
+    chatTitle: "Questions About Your Coverage",
+    title: "Your Policy Protection & Growth",
   },
   {
     id: "builtInAdvantages",
     label: "Built-In Advantages",
     sections: ["builtInAdvantages"],
     chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
+    preamble: "Your policy comes with these helpful extras:",
+    chatTitle: "Questions About Your Benefits",
+    title: "Your Policy Benefits",
   },
   {
     id: "protectionInsights",
@@ -140,12 +149,18 @@ const tabStructure = [
       "Tell me about policy loans",
       "What happens as I get older?",
     ],
+    preamble: "Keep these key points in mind:",
+    chatTitle: "Questions About Policy Details",
+    title: "Important Things to Know",
   },
   {
     id: "advisorTopics",
     label: "Advisor Topics",
     sections: ["keyTopics"],
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
+    preamble: "Topics for your next advisor meeting:",
+    chatTitle: "Questions For Your Advisor",
+    title: "Review With Your Advisor",
   },
   {
     id: "pathForward",
@@ -156,6 +171,9 @@ const tabStructure = [
       "What changes should I expect?",
       "Policy management best practices?",
     ],
+    preamble: "Steps to keep your policy on track:",
+    chatTitle: "Questions About Policy Management",
+    title: "Taking Care of Your Policy",
   },
 ]
 
@@ -275,7 +293,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [chatEndRef]) //Fixed useEffect dependency
+  }, []) //Fixed useEffect dependency
 
   // Show loading state
   if (isLoading) {
@@ -343,7 +361,10 @@ export default function Dashboard() {
                 <div key={sectionId}>
                   {isLoading || !policyData?.analysis_data.data
                     ? renderSkeletonContent()
-                    : renderSectionContent(policyData.analysis_data.data.sections[sectionId as keyof PolicySections])}
+                    : renderSectionContent(
+                        policyData.analysis_data.data.sections[sectionId as keyof PolicySections],
+                        tab,
+                      )}
                 </div>
               ))}
             </TabsContent>
@@ -354,7 +375,7 @@ export default function Dashboard() {
         <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mt-8">
           <CardHeader className="pb-2 border-b">
             <CardTitle className="text-xl font-semibold text-gray-900">
-              Chat about {tabStructure.find((tab) => tab.id === activeTab)?.label}
+              {tabStructure.find((tab) => tab.id === activeTab)?.chatTitle || "Chat"}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4">
@@ -401,14 +422,15 @@ export default function Dashboard() {
   )
 }
 
-const renderSectionContent = (section: PolicySection) => (
+const renderSectionContent = (section: PolicySection, tabData: (typeof tabStructure)[0]) => (
   <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
     <CardHeader className="pb-2 border-b">
-      <CardTitle className="text-xl font-semibold text-gray-900">{section.title}</CardTitle>
+      <CardTitle className="text-xl font-semibold text-gray-900">{tabData.title}</CardTitle>
     </CardHeader>
     <CardContent className="p-6">
       <div className="space-y-6">
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
+          <h4 className="font-semibold mb-2">{tabData.preamble}</h4>
           <p className="text-gray-700 leading-relaxed">{section.opening}</p>
         </div>
 
