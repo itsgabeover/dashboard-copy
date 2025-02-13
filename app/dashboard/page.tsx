@@ -249,11 +249,10 @@ export default function Dashboard() {
     }, 100)
   }
 
-  const handleSendMessage = async (message?: string) => {
-    const messageToSend = message || inputMessage.trim()
-    if (!messageToSend || !policyData) return
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || !policyData) return
 
-    const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
+    const newMessages = [...chatMessages, { role: "user" as const, content: inputMessage.trim() }]
     setChatMessages(newMessages)
     setInputMessage("")
     setIsTyping(true)
@@ -266,7 +265,7 @@ export default function Dashboard() {
           "X-User-Email": userEmail,
         },
         body: JSON.stringify({
-          content: messageToSend,
+          content: inputMessage.trim(),
           session_id: policyData.session_id,
         }),
       })
@@ -298,7 +297,8 @@ export default function Dashboard() {
   }
 
   const handleQuickPrompt = (prompt: string) => {
-    handleSendMessage(prompt)
+    setInputMessage(prompt)
+    handleSendMessage()
   }
 
   // Show loading state
@@ -383,7 +383,7 @@ export default function Dashboard() {
           inputMessage={inputMessage}
           isTyping={isTyping}
           onInputChange={setInputMessage}
-          onSendMessage={handleSendMessage}
+          onSendMessage={() => handleSendMessage()}
           onStartNewChat={() => setChatMessages([])}
           quickPrompts={tabStructure.find((tab) => tab.id === activeTab)?.chatPrompts || []}
           chatTitle={tabStructure.find((tab) => tab.id === activeTab)?.chatTitle || "Chat"}
