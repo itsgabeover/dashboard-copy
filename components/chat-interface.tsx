@@ -1,3 +1,4 @@
+// chat-interface.tsx
 import { Send, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChatMessage } from "./chat-message"
@@ -8,7 +9,7 @@ interface ChatInterfaceProps {
   inputMessage: string
   isTyping: boolean
   onInputChange: (value: string) => void
-  onSendMessage: () => void
+  onSendMessage: (directMessage?: string) => void // Modified to accept optional direct message
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
@@ -32,9 +33,9 @@ export function ChatInterface({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages, isTyping])
 
+  // Modified to directly send the prompt without updating input
   const handleQuickPrompt = (prompt: string) => {
-    onInputChange(prompt)
-    onSendMessage()
+    onSendMessage(prompt)
   }
 
   return (
@@ -88,7 +89,7 @@ export function ChatInterface({
             onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
-            onClick={onSendMessage}
+            onClick={() => onSendMessage()}
             className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
             <Send className="w-4 h-4" />
