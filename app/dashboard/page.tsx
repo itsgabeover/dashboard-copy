@@ -401,21 +401,26 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
       <div className="space-y-6">
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
           <ul className="space-y-2">
-            {section.bullets.map((bullet, index) => (
-              <li key={index} className="flex items-start">
-                <ArrowRight className="w-4 h-4 mr-2 mt-1 text-[rgb(82,102,255)]" />
-                <div>
-                  <span className="font-medium">{bullet.title}: </span>
-                  <span>{bullet.content}</span>
-                </div>
-              </li>
-            ))}
+            {section.bullets
+              .filter((bullet) => 
+                !["Product Name", "Issuer", "Net Cash Surrender Value"].includes(bullet.title) // Remove unwanted fields
+              )
+              .map((bullet, index) => (
+                <li key={index} className="flex items-start">
+                  <ArrowRight className="w-4 h-4 mr-2 mt-1 text-[rgb(82,102,255)]" />
+                  <div>
+                    <span className="font-medium">{bullet.title}: </span>
+                    <span>{bullet.content}</span>
+                  </div>
+                </li>
+              ))}
           </ul>
         </div>
       </div>
     </CardContent>
   </Card>
 )
+
 
 const renderSkeletonContent = () => (
   <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
