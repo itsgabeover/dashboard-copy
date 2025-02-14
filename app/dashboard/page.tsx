@@ -114,14 +114,14 @@ function PolicySelection({
 const tabStructure = [
   {
     id: "policyOverview",
-    label: "Policy Overview",
+    label: "Policy Snapshot",
     sections: ["policyOverview"],
     chatPrompts: [
       "Break down my policy in simple words",
       "What makes my policy special?",
       "How much protection do I have?",
     ],
-    chatTitle: "Questions About Your Policy",
+    chatTitle: "Policy Basics Chat",
     title: "Your Policy Basics",
   },
   {
@@ -129,7 +129,7 @@ const tabStructure = [
     label: "The Power of Your Policy",
     sections: ["policyPower"],
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
-    chatTitle: "Questions About Your Coverage",
+    chatTitle: "Coverage Chat Help",
     title: "Your Policy Protection & Growth",
   },
   {
@@ -137,7 +137,7 @@ const tabStructure = [
     label: "Built-In Advantages",
     sections: ["builtInAdvantages"],
     chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
-    chatTitle: "Questions About Your Benefits",
+    chatTitle: "Benefits Chat Support",
     title: "Your Policy Benefits",
   },
   {
@@ -149,7 +149,7 @@ const tabStructure = [
       "Tell me about policy loans",
       "What happens as I get older?",
     ],
-    chatTitle: "Questions About Policy Details",
+    chatTitle: "Protection Details Chat",
     title: "Important Things to Know",
   },
   {
@@ -157,6 +157,7 @@ const tabStructure = [
     label: "Advisor Topics",
     sections: ["keyTopics"],
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
+    chatTitle: "Advisor Chat Corner",
     title: "Review With Your Advisor",
   },
   {
@@ -168,7 +169,7 @@ const tabStructure = [
       "What changes should I expect?",
       "Policy management best practices?",
     ],
-    chatTitle: "Questions About Policy Management",
+    chatTitle: "Policy Management Chat",
     title: "Taking Care of Your Policy",
   },
 ]
