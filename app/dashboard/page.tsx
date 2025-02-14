@@ -360,7 +360,7 @@ export default function Dashboard() {
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none"
+               className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none"
               >
                 {tab.label}
               </TabsTrigger>
