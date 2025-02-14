@@ -145,8 +145,8 @@ function ChatMessage({ role, content }: ChatMessageProps) {
         <div className="text-sm leading-relaxed">
           <ReactMarkdown
             components={{
-              pre: ({ ...props }) => <div {...props} />,
-              code: ({ ...props }) => <code className="px-1 py-0.5 rounded-md bg-gray-200" {...props} />
+              pre: ({ children }) => <div className="whitespace-pre-wrap">{children}</div>,
+              code: ({ children }) => <code className="px-1 py-0.5 rounded-md bg-gray-200">{children}</code>
             }}
             className={`
               markdown-content
