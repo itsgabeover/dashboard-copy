@@ -8,7 +8,7 @@ interface ChatInterfaceProps {
   inputMessage: string
   isTyping: boolean
   onInputChange: (value: string) => void
-  onSendMessage: (directMessage?: string) => void // Modified to accept optional message
+  onSendMessage: (directMessage?: string) => void
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
@@ -28,18 +28,15 @@ export function ChatInterface({
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
 
-  // Modified scroll behavior to stay within container
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
       if (messagesContainerRef.current && messagesEndRef.current) {
-        // Scroll the messages container instead of the whole page
         messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
       }
     }
     prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
 
-  // Modified to directly send the message without updating input
   const handleQuickPrompt = (prompt: string) => {
     onSendMessage(prompt)
   }
@@ -126,16 +123,11 @@ interface ChatMessageProps {
 function ChatMessage({ role, content }: ChatMessageProps) {
   const isUser = role === "user"
   
-  // Function to fix common markdown formatting issues
   const formatContent = (text: string) => {
     return text
-      // Ensure proper spacing after bullet points
       .replace(/^-(?=\S)/gm, '- ')
-      // Add proper line breaks before and after lists
       .replace(/\n-/g, '\n\n-')
-      // Fix double asterisks for bold (ensure spaces around words)
       .replace(/\*\*(\S+)\*\*/g, '**$1**')
-      // Ensure proper line breaks between paragraphs
       .replace(/\n\n+/g, '\n\n')
       .trim()
   }
@@ -150,9 +142,12 @@ function ChatMessage({ role, content }: ChatMessageProps) {
             : "bg-gray-100 text-gray-800"}
         `}
       >
-       
         <div className="text-sm leading-relaxed">
           <ReactMarkdown
+            components={{
+              pre: ({ node, ...props }) => <div {...props} />,
+              code: ({ node, ...props }) => <code className="px-1 py-0.5 rounded-md bg-gray-200" {...props} />
+            }}
             className={`
               markdown-content
               ${isUser ? 'text-white' : 'text-gray-800'}
