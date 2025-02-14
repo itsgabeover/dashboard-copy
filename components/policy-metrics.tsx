@@ -2,13 +2,31 @@ import { Card } from "@/components/ui/card"
 import { FileText, Heart, DollarSign } from "lucide-react"
 
 interface PolicyMetricsProps {
-  productType: string
-  deathBenefit: number
-  annualPremium: number
+  policyData: {
+    bullets: Array<{
+      title: string
+      content: string
+    }>
+  }
 }
 
-export function PolicyMetrics({ productType, deathBenefit, annualPremium }: PolicyMetricsProps) {
-  const formatCurrency = (value: number) => {
+export function PolicyMetrics({ policyData }: PolicyMetricsProps) {
+  // Extract values from bullets
+  const getValueFromBullets = (title: string) => {
+    const bullet = policyData.bullets.find((b) => b.title === title)
+    if (!bullet) return null
+
+    // Extract number from content (removes currency symbol and commas)
+    const numberMatch = bullet.content.replace(/[$,]/g, "").match(/\d+/)
+    return numberMatch ? Number.parseInt(numberMatch[0], 10) : null
+  }
+
+  const policyType = policyData.bullets.find((b) => b.title === "Policy design")?.content || "N/A"
+  const deathBenefit = getValueFromBullets("Death benefit")
+  const premiumAmount = getValueFromBullets("Premium amount")
+
+  const formatCurrency = (value: number | null) => {
+    if (value === null) return "N/A"
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -25,7 +43,7 @@ export function PolicyMetrics({ productType, deathBenefit, annualPremium }: Poli
             <FileText className="h-6 w-6 text-blue-600" />
           </div>
           <p className="text-sm text-gray-600 mb-1">Policy Type</p>
-          <p className="font-semibold text-lg">{productType}</p>
+          <p className="font-semibold text-lg">{policyType}</p>
         </div>
       </Card>
 
@@ -45,7 +63,7 @@ export function PolicyMetrics({ productType, deathBenefit, annualPremium }: Poli
             <DollarSign className="h-6 w-6 text-purple-600" />
           </div>
           <p className="text-sm text-gray-600 mb-1">Annual Premium</p>
-          <p className="font-semibold text-lg">{formatCurrency(annualPremium)}</p>
+          <p className="font-semibold text-lg">{formatCurrency(premiumAmount)}</p>
         </div>
       </Card>
     </div>
