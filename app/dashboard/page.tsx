@@ -400,7 +400,6 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
     <CardContent className="p-6">
       <div className="space-y-6">
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-          <h4 className="font-semibold mb-2">{tabData.preamble}</h4>
           <ul className="space-y-2">
             {section.bullets.map((bullet, index) => (
               <li key={index} className="flex items-start">
