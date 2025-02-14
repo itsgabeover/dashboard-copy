@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       const { error: updateError } = await supabase
         .from('policy_dashboards')
         .update({ 
-          policy_name: dashboardData.data.policyOverview.productName,
+          policy_name: dashboardData.data.policyOverview?.name || '',
           analysis_data: dashboardData,
           status: 'completed',
           updated_at: new Date().toISOString()
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       const { error: insertError } = await supabase
         .from('policy_dashboards')
         .insert({
-          policy_name: dashboardData.data.policyOverview.productName,
+          policy_name: dashboardData.data.policyOverview?.name || '',
           analysis_data: dashboardData,
           status: 'completed',
           updated_at: new Date().toISOString(),
