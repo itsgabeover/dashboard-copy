@@ -231,32 +231,32 @@ export default function Dashboard() {
     loadPolicies(email)
   }
 
- const handlePolicySelect = (policy: PolicyDashboard) => {
-  // First scroll to top smoothly
-  window.scrollTo({ 
-    top: 0, 
-    behavior: "smooth" 
-  })
-    
-  // Then update state
-  setPolicyData(policy)
-  setShowPolicySelection(false)
-  setActiveTab(tabStructure[0].id)
-}
+  const handlePolicySelect = (policy: PolicyDashboard) => {
+    // First scroll to top smoothly
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
 
- const handleSendMessage = async (directMessage?: string) => {
+    // Then update state
+    setPolicyData(policy)
+    setShowPolicySelection(false)
+    setActiveTab(tabStructure[0].id)
+  }
+
+  const handleSendMessage = async (directMessage?: string) => {
     // Use directMessage if provided, otherwise use inputMessage
     const messageToSend = directMessage || inputMessage.trim()
     if (!messageToSend || !policyData) return
 
     const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
     setChatMessages(newMessages)
-    
+
     // Only clear input if it wasn't a direct message
     if (!directMessage) {
       setInputMessage("")
     }
-    
+
     setIsTyping(true)
 
     try {
@@ -297,8 +297,6 @@ export default function Dashboard() {
       setIsTyping(false)
     }
   }
-
-
 
   // Show loading state
   if (isLoading) {
@@ -353,7 +351,7 @@ export default function Dashboard() {
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-               className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none"
+                className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none"
               >
                 {tab.label}
               </TabsTrigger>
@@ -402,9 +400,7 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
           <ul className="space-y-2">
             {section.bullets
-              .filter((bullet) => 
-                !["Product Name", "Issuer", "Net Cash Surrender Value"].includes(bullet.title) // Remove unwanted fields
-              )
+              .filter((bullet) => !["Policy Name", "Issuer", "Net Cash Surrender Value"].includes(bullet.title))
               .map((bullet, index) => (
                 <li key={index} className="flex items-start">
                   <ArrowRight className="w-4 h-4 mr-2 mt-1 text-[rgb(82,102,255)]" />
@@ -420,7 +416,6 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
     </CardContent>
   </Card>
 )
-
 
 const renderSkeletonContent = () => (
   <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
@@ -439,3 +434,4 @@ const renderSkeletonContent = () => (
     </CardContent>
   </Card>
 )
+
