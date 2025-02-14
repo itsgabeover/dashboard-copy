@@ -5,8 +5,8 @@ export interface PolicyBullet {
 }
 
 export interface PolicySection {
-  title: string
-  opening: string
+  title?: string
+  opening?: string
   bullets: PolicyBullet[]
 }
 
@@ -70,4 +70,3 @@ export interface DashboardRLSContext {
   user_email: string
   session_id: string
 }
-
