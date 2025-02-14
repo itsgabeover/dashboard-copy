@@ -1,5 +1,6 @@
 "use client"
 
+import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -354,13 +355,12 @@ export default function Dashboard() {
             ))}
           </TabsList>
 
-          {/* Add PolicyMetrics component here */}
+          {/* PolicyMetrics component */}
           {policyData && (
             <PolicyMetrics
-              policyDesign={policyData.analysis_data.data.policyOverview.policyDesign}
+              productType={policyData.analysis_data.data.policyOverview.productType}
               deathBenefit={policyData.analysis_data.data.policyOverview.deathBenefit}
-              premium={policyData.analysis_data.data.policyOverview.premium}
-              netCashValue={policyData.analysis_data.data.policyOverview.netCashValue}
+              annualPremium={policyData.analysis_data.data.policyOverview.annualPremium}
             />
           )}
 
@@ -403,10 +403,11 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
     </CardHeader>
     <CardContent className="p-6">
       <div className="space-y-6">
+        {section.opening && <p className="text-gray-700">{section.opening}</p>}
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
           <ul className="space-y-2">
             {section.bullets
-              .filter((bullet) => !["Policy Name", "Issuer", "Net Cash Surrender Value"].includes(bullet.title))
+              .filter((bullet) => !["Product Name", "Issuer"].includes(bullet.title))
               .map((bullet, index) => (
                 <li key={index} className="flex items-start">
                   <ArrowRight className="w-4 h-4 mr-2 mt-1 text-[rgb(82,102,255)]" />
