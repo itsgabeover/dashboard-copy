@@ -1,3 +1,5 @@
+// types/policy-dashboard.ts
+
 // Core dashboard data structures
 export interface PolicyBullet {
   title: string
@@ -5,41 +7,39 @@ export interface PolicyBullet {
 }
 
 export interface PolicySection {
+  title: string
   opening?: string
-  bullets: Array<{
-    title: string
-    content: string
-  }>
+  bullets: PolicyBullet[]
 }
 
-export interface PolicyOverview extends PolicySection {
-  opening?: string
-  bullets: Array<{
-    title: string
-    content: string
-  }>
-  productType?: string
-  deathBenefit?: number
-  annualPremium?: number
+// Direct policy overview data structure that exists at the top level
+export interface PolicyOverviewData {
+  issuer: string
+  productName: string
+  productType: string
+  deathBenefit: string
+  annualPremium: string
 }
 
+// Policy sections including the one in the sections array
 export interface PolicySections {
-  policyOverview: PolicyOverview
+  policyOverview: PolicySection
   policyPower: PolicySection
   builtInAdvantages: PolicySection
   protectionInsights: PolicySection
   keyTopics: PolicySection
   pathForward: PolicySection
+  protectionGlance?: PolicySection
 }
 
-// Matches the analysis_data JSONB column in policy_dashboards table
+// Full dashboard data structure
 export interface ParsedDashboardData {
   timestamp: string
   sessionId: string
   data: {
-    policyOverview: PolicyOverview
-    sections: PolicySections
     email: string
+    sections: PolicySections
+    policyOverview: PolicyOverviewData
   }
 }
 
@@ -50,9 +50,7 @@ export interface PolicyDashboard {
   policy_name: string
   created_at: string
   session_id: string
-  analysis_data: {
-    data: PolicySections
-  }
+  analysis_data: ParsedDashboardData
   status?: string
   updated_at?: string
 }
