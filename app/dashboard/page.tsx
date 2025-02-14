@@ -360,20 +360,20 @@ export default function Dashboard() {
             <PolicyMetrics policyData={policyData.analysis_data.data.policyOverview} />
           )}
 
-          {tabStructure.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id} className="space-y-6">
-              {tab.sections.map((sectionId) => (
-                <div key={sectionId}>
-                  {isLoading || !policyData?.analysis_data.data.sections
-                    ? renderSkeletonContent()
-                    : renderSectionContent(
-                        policyData.analysis_data.data.sections[sectionId as keyof PolicySections],
-                        tab,
-                      )}
-                </div>
-              ))}
-            </TabsContent>
-          ))}
+         {tabStructure.map((tab) => (
+  <TabsContent key={tab.id} value={tab.id} className="space-y-6">
+    {tab.sections.map((sectionId) => {
+      const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections];
+      return (
+        <div key={sectionId}>
+          {isLoading || !section
+            ? renderSkeletonContent()
+            : renderSectionContent(section, tab)}
+        </div>
+      );
+    })}
+  </TabsContent>
+))}
         </Tabs>
 
         {/* Chat Section */}
