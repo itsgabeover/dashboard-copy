@@ -3,6 +3,22 @@ import { type NextRequest, NextResponse } from "next/server"
 import type { ParsedDashboardData, APIResponse } from "@/types/policy-dashboard"
 import { supabase } from '@/lib/supabase'
 
+// Helper function to safely extract policy name from the dashboard data
+const getPolicyName = (dashboardData: ParsedDashboardData): string => {
+  // First try to get it from the direct policyOverview field
+  if (dashboardData.data.policyOverview?.productName) {
+    return dashboardData.data.policyOverview.productName;
+  }
+  
+  // Fallback to sections if direct field isn't available
+  const policySection = dashboardData.data.sections.policyOverview;
+  const productNameBullet = policySection?.bullets.find(
+    bullet => bullet.title.toLowerCase() === "product name"
+  );
+  
+  return productNameBullet?.content || 'Unnamed Policy';
+};
+
 export async function POST(request: NextRequest) {
   try {
     // Parse incoming dashboard data from n8n
@@ -37,7 +53,7 @@ export async function POST(request: NextRequest) {
       const { error: updateError } = await supabase
         .from('policy_dashboards')
         .update({ 
-          policy_name: dashboardData.data.policyOverview?.name || '',
+          policy_name: getPolicyName(dashboardData),
           analysis_data: dashboardData,
           status: 'completed',
           updated_at: new Date().toISOString()
@@ -54,7 +70,7 @@ export async function POST(request: NextRequest) {
       const { error: insertError } = await supabase
         .from('policy_dashboards')
         .insert({
-          policy_name: dashboardData.data.policyOverview?.name || '',
+          policy_name: getPolicyName(dashboardData),
           analysis_data: dashboardData,
           status: 'completed',
           updated_at: new Date().toISOString(),
