@@ -355,13 +355,9 @@ export default function Dashboard() {
             ))}
           </TabsList>
 
-          {/* PolicyMetrics component */}
-          {policyData && (
-            <PolicyMetrics
-              productType={policyData.analysis_data.data.policyOverview.productType}
-              deathBenefit={policyData.analysis_data.data.policyOverview.deathBenefit}
-              annualPremium={policyData.analysis_data.data.policyOverview.annualPremium}
-            />
+          {/* PolicyMetrics component with updated props */}
+          {policyData && policyData.analysis_data.data.policyOverview && (
+            <PolicyMetrics policyData={policyData.analysis_data.data.policyOverview} />
           )}
 
           {tabStructure.map((tab) => (
@@ -370,10 +366,7 @@ export default function Dashboard() {
                 <div key={sectionId}>
                   {isLoading || !policyData?.analysis_data.data
                     ? renderSkeletonContent()
-                    : renderSectionContent(
-                        policyData.analysis_data.data.sections[sectionId as keyof PolicySections],
-                        tab,
-                      )}
+                    : renderSectionContent(policyData.analysis_data.data[sectionId as keyof PolicySections], tab)}
                 </div>
               ))}
             </TabsContent>
