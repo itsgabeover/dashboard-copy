@@ -1,9 +1,8 @@
 import { Card } from "@/components/ui/card"
 import { FileText, Heart, DollarSign } from "lucide-react"
-import type { PolicyOverview } from "@/types/policy-dashboard"
-
+import type { PolicyOverviewData } from "@/types/policy-dashboard"
 interface PolicyMetricsProps {
-  policyData: PolicyOverview
+  policyData: PolicyOverviewData
 }
 
 export function PolicyMetrics({ policyData }: PolicyMetricsProps) {
