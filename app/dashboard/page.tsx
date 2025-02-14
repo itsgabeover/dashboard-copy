@@ -155,7 +155,6 @@ const tabStructure = [
     label: "Advisor Topics",
     sections: ["keyTopics"],
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
-    preamble: "Topics for your next advisor meeting:",
     title: "Review With Your Advisor",
   },
   {
