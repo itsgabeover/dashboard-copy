@@ -150,9 +150,7 @@ function ChatMessage({ role, content }: ChatMessageProps) {
             : "bg-gray-100 text-gray-800"}
         `}
       >
-        <div className={`text-xs font-medium mb-1 ${isUser ? "text-blue-100" : "text-gray-500"}`}>
-          {isUser ? "You" : "Assistant"}
-        </div>
+       
         <div className="text-sm leading-relaxed">
           <ReactMarkdown
             className={`
