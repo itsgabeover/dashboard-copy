@@ -364,9 +364,12 @@ export default function Dashboard() {
             <TabsContent key={tab.id} value={tab.id} className="space-y-6">
               {tab.sections.map((sectionId) => (
                 <div key={sectionId}>
-                  {isLoading || !policyData?.analysis_data.data
+                  {isLoading || !policyData?.analysis_data.data.sections
                     ? renderSkeletonContent()
-                    : renderSectionContent(policyData.analysis_data.data[sectionId as keyof PolicySections], tab)}
+                    : renderSectionContent(
+                        policyData.analysis_data.data.sections[sectionId as keyof PolicySections],
+                        tab,
+                      )}
                 </div>
               ))}
             </TabsContent>
