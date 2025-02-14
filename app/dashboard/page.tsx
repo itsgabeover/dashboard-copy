@@ -10,6 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
 import { ChatInterface } from "@/components/chat-interface"
+import { PolicyMetrics } from "@/components/policy-metrics"
 
 // Email verification component
 function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
@@ -337,12 +338,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
         <header className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm">
-          <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">
-            {policyData?.analysis_data.data?.policyOverview.productName || "Your Policy"}
-          </h1>
-          <p className="text-xl text-gray-600">
-            {policyData?.analysis_data.data?.policyOverview.issuer || "Insurance Carrier"}
-          </p>
+          <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">Your Policy Overview</h1>
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -357,6 +353,16 @@ export default function Dashboard() {
               </TabsTrigger>
             ))}
           </TabsList>
+
+          {/* Add PolicyMetrics component here */}
+          {policyData && (
+            <PolicyMetrics
+              policyDesign={policyData.analysis_data.data.policyOverview.policyDesign}
+              deathBenefit={policyData.analysis_data.data.policyOverview.deathBenefit}
+              premium={policyData.analysis_data.data.policyOverview.premium}
+              netCashValue={policyData.analysis_data.data.policyOverview.netCashValue}
+            />
+          )}
 
           {tabStructure.map((tab) => (
             <TabsContent key={tab.id} value={tab.id} className="space-y-6">
