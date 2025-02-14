@@ -5,22 +5,26 @@ export interface PolicyBullet {
 }
 
 export interface PolicySection {
-  title?: string
   opening?: string
-  bullets: PolicyBullet[]
+  bullets: Array<{
+    title: string
+    content: string
+  }>
 }
 
-export interface PolicyOverview {
-  productName: string
-  issuer: string
-  productType: string
-  deathBenefit: number
-  annualPremium: number
+export interface PolicyOverview extends PolicySection {
+  opening?: string
+  bullets: Array<{
+    title: string
+    content: string
+  }>
+  productType?: string
+  deathBenefit?: number
+  annualPremium?: number
 }
 
 export interface PolicySections {
-  policyOverview: PolicySection
-  protectionGlance: PolicySection
+  policyOverview: PolicyOverview
   policyPower: PolicySection
   builtInAdvantages: PolicySection
   protectionInsights: PolicySection
@@ -42,13 +46,15 @@ export interface ParsedDashboardData {
 // Matches Supabase policy_dashboards table structure
 export interface PolicyDashboard {
   id: string // UUID from Supabase
+  email: string
   policy_name: string
   created_at: string
-  analysis_data: ParsedDashboardData
-  status: string
-  updated_at: string
-  email: string
   session_id: string
+  analysis_data: {
+    data: PolicySections
+  }
+  status?: string
+  updated_at?: string
 }
 
 // API response types
