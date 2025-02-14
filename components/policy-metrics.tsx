@@ -1,19 +1,15 @@
 import { Card } from "@/components/ui/card"
 import { FileText, Heart, DollarSign } from "lucide-react"
+import type { PolicyOverview } from "@/types/policy-dashboard"
 
 interface PolicyMetricsProps {
-  policyData: {
-    bullets: Array<{
-      title: string
-      content: string
-    }>
-  }
+  policyData: PolicyOverview
 }
 
 export function PolicyMetrics({ policyData }: PolicyMetricsProps) {
   // Extract values from bullets
-  const getValueFromBullets = (title: string) => {
-    const bullet = policyData.bullets.find((b) => b.title === title)
+  const getValueFromBullets = (targetTitle: string): number | null => {
+    const bullet = policyData.bullets.find((b) => b.title.toLowerCase() === targetTitle.toLowerCase())
     if (!bullet) return null
 
     // Extract number from content (removes currency symbol and commas)
@@ -21,9 +17,18 @@ export function PolicyMetrics({ policyData }: PolicyMetricsProps) {
     return numberMatch ? Number.parseInt(numberMatch[0], 10) : null
   }
 
-  const policyType = policyData.bullets.find((b) => b.title === "Policy design")?.content || "N/A"
-  const deathBenefit = getValueFromBullets("Death benefit")
-  const premiumAmount = getValueFromBullets("Premium amount")
+  // Get policy type from bullets or productType field
+  const getPolicyType = (): string => {
+    if (policyData.productType) return policyData.productType
+
+    const designBullet = policyData.bullets.find((b) => b.title.toLowerCase() === "policy design")
+    return designBullet?.content || "N/A"
+  }
+
+  // Get values with fallbacks
+  const policyType = getPolicyType()
+  const deathBenefit = policyData.deathBenefit || getValueFromBullets("death benefit")
+  const premiumAmount = policyData.annualPremium || getValueFromBullets("premium amount")
 
   const formatCurrency = (value: number | null) => {
     if (value === null) return "N/A"
