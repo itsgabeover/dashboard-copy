@@ -1,7 +1,9 @@
-import { Send, RefreshCw } from "lucide-react"
+"use client"
+
+import { Send, RefreshCw, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import ReactMarkdown from 'react-markdown'
-import { useEffect, useRef } from 'react'
+import ReactMarkdown from "react-markdown"
+import { useEffect, useRef } from "react"
 
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
@@ -12,6 +14,7 @@ interface ChatInterfaceProps {
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
+  chatSubtext: string
 }
 
 export function ChatInterface({
@@ -23,6 +26,7 @@ export function ChatInterface({
   onStartNewChat,
   quickPrompts,
   chatTitle,
+  chatSubtext,
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -44,24 +48,27 @@ export function ChatInterface({
   return (
     <div className="flex flex-col h-[600px] bg-white rounded-xl shadow-sm border border-gray-200">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">{chatTitle}</h2>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onStartNewChat}
-          className="flex items-center gap-1.5 text-sm hover:bg-gray-50"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Start New Chat
-        </Button>
+      <div className="flex flex-col px-6 py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <MessageCircle className="w-5 h-5" />
+            {chatTitle}
+          </h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onStartNewChat}
+            className="flex items-center gap-1.5 text-sm hover:bg-gray-50"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Start New Chat
+          </Button>
+        </div>
+        <p className="text-sm text-gray-500 mt-1">{chatSubtext}</p>
       </div>
 
       {/* Messages */}
-      <div 
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-6 py-4 space-y-4"
-      >
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
         {messages.map((message, index) => (
           <ChatMessage key={index} role={message.role} content={message.content} />
         ))}
@@ -122,13 +129,13 @@ interface ChatMessageProps {
 
 function ChatMessage({ role, content }: ChatMessageProps) {
   const isUser = role === "user"
-  
+
   const formatContent = (text: string) => {
     return text
-      .replace(/^-(?=\S)/gm, '- ')
-      .replace(/\n-/g, '\n\n-')
-      .replace(/\*\*(\S+)\*\*/g, '**$1**')
-      .replace(/\n\n+/g, '\n\n')
+      .replace(/^-(?=\S)/gm, "- ")
+      .replace(/\n-/g, "\n\n-")
+      .replace(/\*\*(\S+)\*\*/g, "**$1**")
+      .replace(/\n\n+/g, "\n\n")
       .trim()
   }
 
@@ -137,20 +144,18 @@ function ChatMessage({ role, content }: ChatMessageProps) {
       <div
         className={`
           max-w-[85%] rounded-2xl px-4 py-2.5
-          ${isUser 
-            ? "bg-blue-600 text-white" 
-            : "bg-gray-100 text-gray-800"}
+          ${isUser ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}
         `}
       >
         <div className="text-sm leading-relaxed">
           <ReactMarkdown
             components={{
               pre: ({ children }) => <div className="whitespace-pre-wrap">{children}</div>,
-              code: ({ children }) => <code className="px-1 py-0.5 rounded-md bg-gray-200">{children}</code>
+              code: ({ children }) => <code className="px-1 py-0.5 rounded-md bg-gray-200">{children}</code>,
             }}
             className={`
               markdown-content
-              ${isUser ? 'text-white' : 'text-gray-800'}
+              ${isUser ? "text-white" : "text-gray-800"}
               [&_p]:mb-2
               [&_p:last-child]:mb-0
               [&_ul]:mt-1
@@ -158,9 +163,7 @@ function ChatMessage({ role, content }: ChatMessageProps) {
               [&_li]:ml-4
               [&_li]:pl-1
               [&_strong]:font-semibold
-              ${isUser 
-                ? '[&_strong]:text-white' 
-                : '[&_strong]:text-gray-900'}
+              ${isUser ? "[&_strong]:text-white" : "[&_strong]:text-gray-900"}
             `}
           >
             {formatContent(content)}
@@ -172,3 +175,4 @@ function ChatMessage({ role, content }: ChatMessageProps) {
 }
 
 export { ChatMessage }
+
