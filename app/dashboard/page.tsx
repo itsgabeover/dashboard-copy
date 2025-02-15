@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown, ChevronUp } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
@@ -301,10 +301,15 @@ export default function Dashboard() {
     }
   }
 
+  const contentSectionRef = useRef<HTMLDivElement>(null)
   const chatSectionRef = useRef<HTMLDivElement>(null)
 
   const scrollToChat = () => {
     chatSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  const scrollToContent = () => {
+    contentSectionRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
   if (isLoading) {
@@ -366,7 +371,8 @@ export default function Dashboard() {
 
           {tabStructure.map((tab) => (
             <TabsContent key={tab.id} value={tab.id} className="space-y-6">
-              <div className="min-h-[calc(100vh-16rem)] flex flex-col justify-between">
+              {/* Content Section (Area 1) */}
+              <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-8">
                 <div className="space-y-6">
                   {tab.sections.map((sectionId) => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
@@ -380,14 +386,26 @@ export default function Dashboard() {
                     <p className="text-center mb-2 text-gray-600">{tab.chatSubtext}</p>
                     <Button
                       onClick={scrollToChat}
-                      className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300 animate-pulse hover:animate-none"
+                      className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
                     >
                       Chat With Your AI Helper
                       <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
                     </Button>
                   </div>
                 </div>
-                <div ref={chatSectionRef} className="pt-12 border-t border-gray-200 mt-12 mb-16">
+              </div>
+
+              {/* Chat Section (Area 2) */}
+              <div ref={chatSectionRef} className="relative bg-white rounded-xl shadow-sm">
+                <Button
+                  onClick={scrollToContent}
+                  className="absolute -top-4 right-4 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
+                  size="icon"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                  <span className="sr-only">Return to top</span>
+                </Button>
+                <div className="p-6">
                   <ChatInterface
                     messages={chatMessages}
                     inputMessage={inputMessage}
