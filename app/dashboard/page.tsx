@@ -392,7 +392,11 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
         <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
           <ul className="space-y-2">
             {section.bullets
-              .filter((bullet) => !["Product Name", "Issuer", "Product Carrier"].includes(bullet.title))
+              .filter(
+                (bullet) =>
+                  !["Product Name", "Carrier Name"].includes(bullet.title) &&
+                  (bullet.title === "Policy Design" ? -1 : 1), // Ensures Policy Design comes first
+              )
               .map((bullet, index) => (
                 <li key={index} className="flex items-start">
                   <ArrowRight className="w-4 h-4 mr-2 mt-1 text-[rgb(82,102,255)]" />
