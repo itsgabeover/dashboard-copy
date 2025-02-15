@@ -403,19 +403,21 @@ export default function Dashboard() {
               {/* Chat helper text and button (now outside the white box) */}
               <div className="text-center mb-6">
                 <p className="text-gray-600 mb-3">{tab.chatSubtext}</p>
-                <Button
-                  onClick={scrollToChat}
-                  className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
-                >
-                  Chat With Your AI Helper
-                  <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                </Button>
+                <div className="flex justify-center">
+                  <Button
+                    onClick={scrollToChat}
+                    className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
+                  >
+                    Chat With Your AI Helper
+                    <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                  </Button>
+                </div>
               </div>
 
               {/* Chat Section (Area 2) */}
               <div
                 ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-8 pt-12"
+                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-8"
               >
                 <Button
                   onClick={scrollToContent}
@@ -425,18 +427,23 @@ export default function Dashboard() {
                   <ChevronUp className="w-4 h-4" />
                   <span className="sr-only">Return to top</span>
                 </Button>
-                <div className="px-4 h-full flex flex-col justify-between mt-36">
-                  <ChatInterface
-                    messages={chatMessages}
-                    inputMessage={inputMessage}
-                    isTyping={isTyping}
-                    onInputChange={setInputMessage}
-                    onSendMessage={handleSendMessage}
-                    onStartNewChat={() => setChatMessages([])}
-                    quickPrompts={tab.chatPrompts}
-                    chatTitle={tab.chatTitle}
-                    chatSubtext=""
-                  />
+                <div className="px-4 h-full flex flex-col">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold">{tab.chatTitle}</h3>
+                  </div>
+                  <div className="flex-grow overflow-y-auto mb-4">
+                    <ChatInterface
+                      messages={chatMessages}
+                      inputMessage={inputMessage}
+                      isTyping={isTyping}
+                      onInputChange={setInputMessage}
+                      onSendMessage={handleSendMessage}
+                      onStartNewChat={() => setChatMessages([])}
+                      quickPrompts={tab.chatPrompts}
+                      chatTitle=""
+                      chatSubtext=""
+                    />
+                  </div>
                 </div>
               </div>
             </TabsContent>
