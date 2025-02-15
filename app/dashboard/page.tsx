@@ -120,7 +120,8 @@ const tabStructure = [
       "What makes my policy special?",
       "How much protection do I have?",
     ],
-    chatTitle: "Have Questions About Your Coverage?",
+    chatTitle: "💬 Want to Learn More About Your Policy?",
+    chatSubtext: "Hi! I'm here to help explain anything you'd like to know more about.",
     title: "Understanding Your Policy",
   },
   {
@@ -128,7 +129,8 @@ const tabStructure = [
     label: "How Your Policy Works",
     sections: ["policyPower"],
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
-    chatTitle: "Want to Learn More About Your Policy?",
+    chatTitle: "💬 Want to Understand How Things Work?",
+    chatSubtext: "Let me explain any part of your policy in more detail.",
     title: "Making Sense of Your Coverage",
   },
   {
@@ -136,7 +138,8 @@ const tabStructure = [
     label: "What Your Policy Includes",
     sections: ["builtInAdvantages"],
     chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
-    chatTitle: "Curious About Your Benefits?",
+    chatTitle: "💬 Want to Explore Your Benefits?",
+    chatSubtext: "I can help you understand all the ways your policy helps protect you.",
     title: "Your Policy's Special Features",
   },
   {
@@ -148,7 +151,8 @@ const tabStructure = [
       "Tell me about policy loans",
       "What happens as I get older?",
     ],
-    chatTitle: "Want to Know More About Your Protection?",
+    chatTitle: "💬 Need More Details About Your Coverage?",
+    chatSubtext: "I can explain how to keep your protection strong.",
     title: "Keeping Your Policy Strong",
   },
   {
@@ -156,7 +160,8 @@ const tabStructure = [
     label: "Talk With Your Advisor",
     sections: ["keyTopics"],
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
-    chatTitle: "Have Topics For Your Advisor?",
+    chatTitle: "💬 Want to Prepare for Your Advisor Meeting?",
+    chatSubtext: "I can help you get ready for your next advisor conversation.",
     title: "Topics For Your Next Review",
   },
   {
@@ -168,7 +173,8 @@ const tabStructure = [
       "What changes should I expect?",
       "Policy management best practices?",
     ],
-    chatTitle: "Need Help With Next Steps?",
+    chatTitle: "💬 Want Help Getting Started?",
+    chatSubtext: "I can walk you through exactly what to do next.",
     title: "Keeping Your Policy on Track",
   },
 ]
@@ -362,20 +368,20 @@ export default function Dashboard() {
                   </div>
                 )
               })}
+              <ChatInterface
+                messages={chatMessages}
+                inputMessage={inputMessage}
+                isTyping={isTyping}
+                onInputChange={setInputMessage}
+                onSendMessage={handleSendMessage}
+                onStartNewChat={() => setChatMessages([])}
+                quickPrompts={tab.chatPrompts}
+                chatTitle={tab.chatTitle}
+                chatSubtext={tab.chatSubtext}
+              />
             </TabsContent>
           ))}
         </Tabs>
-
-        <ChatInterface
-          messages={chatMessages}
-          inputMessage={inputMessage}
-          isTyping={isTyping}
-          onInputChange={setInputMessage}
-          onSendMessage={handleSendMessage}
-          onStartNewChat={() => setChatMessages([])}
-          quickPrompts={tabStructure.find((tab) => tab.id === activeTab)?.chatPrompts || []}
-          chatTitle={tabStructure.find((tab) => tab.id === activeTab)?.chatTitle || "Chat"}
-        />
       </div>
     </div>
   )
@@ -391,7 +397,7 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
         {section.opening && (
           <p className="text-gray-700">
             {tabData.id === "policyOverview"
-              ? `${section.opening}`
+              ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
               : tabData.id === "policyPower"
                 ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
                 : tabData.id === "builtInAdvantages"
