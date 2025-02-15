@@ -391,7 +391,7 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
         {section.opening && (
           <p className="text-gray-700">
             {tabData.id === "policyOverview"
-              ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
+              ? `${section.opening}`
               : tabData.id === "policyPower"
                 ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
                 : tabData.id === "builtInAdvantages"
