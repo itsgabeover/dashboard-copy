@@ -314,18 +314,17 @@ export default function Dashboard() {
 
   const scrollToChat = () => {
     if (chatSectionRef.current) {
-      const yOffset = -80 // Adjust this value to fine-tune the scroll position
+      const yOffset = -60 // Adjust this value to fine-tune the scroll position
       const y = chatSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
       window.scrollTo({ top: y, behavior: "smooth" })
     }
   }
 
   const scrollToContent = () => {
-    if (contentSectionRef.current) {
-      const yOffset = -20 // Adjust this value to fine-tune the scroll position
-      const y = contentSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
-      window.scrollTo({ top: y, behavior: "smooth" })
-    }
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
   }
 
   if (isLoading) {
@@ -390,9 +389,9 @@ export default function Dashboard() {
               {/* Content Section (Area 1) */}
               <div
                 ref={contentSectionRef}
-                className="bg-white rounded-xl shadow-sm p-6 mb-24 min-h-screen flex flex-col"
+                className="bg-white rounded-xl shadow-sm p-6 mb-12 min-h-[calc(100vh-4rem)] flex flex-col"
               >
-                <div className="space-y-6 flex-grow">
+                <div className="space-y-4 flex-grow">
                   {tab.sections.map((sectionId) => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
                     return (
@@ -402,8 +401,8 @@ export default function Dashboard() {
                     )
                   })}
                 </div>
-                <div className="mt-auto pt-8 flex flex-col items-center border-t border-gray-200">
-                  <p className="text-center mb-4 text-gray-600">{tab.chatSubtext}</p>
+                <div className="mt-6 pt-4 flex flex-col items-center border-t border-gray-200">
+                  <p className="text-center mb-3 text-gray-600">{tab.chatSubtext}</p>
                   <Button
                     onClick={scrollToChat}
                     className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
@@ -417,17 +416,17 @@ export default function Dashboard() {
               {/* Chat Section (Area 2) */}
               <div
                 ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-screen mt-24 pb-24 pt-16"
+                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-12 pt-12"
               >
                 <Button
                   onClick={scrollToContent}
-                  className="absolute top-4 right-4 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
+                  className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
                   size="icon"
                 >
                   <ChevronUp className="w-4 h-4" />
                   <span className="sr-only">Return to top</span>
                 </Button>
-                <div className="p-6 h-full">
+                <div className="px-4 py-2 h-full">
                   <ChatInterface
                     messages={chatMessages}
                     inputMessage={inputMessage}
@@ -450,12 +449,12 @@ export default function Dashboard() {
 }
 
 const renderSectionContent = (section: PolicySection, tabData: (typeof tabStructure)[0]) => (
-  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
+  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-4">
     <CardHeader className="pb-2 border-b">
       <CardTitle className="text-xl font-semibold text-gray-900">{tabData.title}</CardTitle>
     </CardHeader>
-    <CardContent className="p-6">
-      <div className="space-y-6">
+    <CardContent className="p-4">
+      <div className="space-y-4">
         {section.opening && (
           <p className="text-gray-700">
             {tabData.id === "policyOverview"
@@ -473,7 +472,7 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
                         : section.opening}
           </p>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {section.bullets
             .filter((bullet) => !["Product Name", "Carrier Name"].includes(bullet.title))
             .map((bullet, index) => (
