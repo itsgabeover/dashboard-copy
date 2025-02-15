@@ -401,7 +401,9 @@ export default function Dashboard() {
                     )
                   })}
                 </div>
-                <div className="mt-4 pt-3 flex flex-col items-center border-t border-gray-200">
+                <div className="mt-6 pt-6 flex flex-col items-center border-t border-gray-200">
+                  {" "}
+                  {/* Updated margin class */}
                   <p className="text-center mb-2 text-gray-600">{tab.chatSubtext}</p>
                   <Button
                     onClick={scrollToChat}
@@ -426,7 +428,7 @@ export default function Dashboard() {
                   <ChevronUp className="w-4 h-4" />
                   <span className="sr-only">Return to top</span>
                 </Button>
-                <div className="px-4 h-full flex flex-col justify-between">
+                <div className="px-4 h-full flex flex-col justify-between mt-36">
                   <ChatInterface
                     messages={chatMessages}
                     inputMessage={inputMessage}
