@@ -332,12 +332,9 @@ export default function Dashboard() {
           {policyData && policyData.analysis_data.data.policyOverview && (
             <>
               <h1 className="text-3xl font-bold mb-2 text-[rgb(82,102,255)]">
-                {policyData.analysis_data.data.policyOverview.bullets.find((b) => b.title === "Product Name")
-                  ?.content || "Policy Overview"}
+                {policyData.analysis_data.data.policyOverview.productName || "Policy Overview"}
               </h1>
-              <h2 className="text-xl text-gray-600">
-                {policyData.analysis_data.data.policyOverview.bullets.find((b) => b.title === "Issuer")?.content || ""}
-              </h2>
+              <h2 className="text-xl text-gray-600">{policyData.analysis_data.data.policyOverview.issuer || ""}</h2>
             </>
           )}
         </header>
