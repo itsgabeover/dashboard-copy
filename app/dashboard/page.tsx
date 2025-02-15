@@ -1,12 +1,12 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
@@ -120,7 +120,7 @@ const tabStructure = [
       "What makes my policy special?",
       "How much protection do I have?",
     ],
-    chatTitle: "Want to Learn More About Your Policy?",
+    chatTitle: "💬 Want to Learn More About Your Policy?",
     chatSubtext: "Hi! I'm here to help explain anything you'd like to know more about.",
     title: "Understanding Your Policy",
   },
@@ -129,7 +129,7 @@ const tabStructure = [
     label: "How Your Policy Works",
     sections: ["policyPower"],
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
-    chatTitle: "Want to Understand How Things Work?",
+    chatTitle: "💬 Want to Understand How Things Work?",
     chatSubtext: "Let me explain any part of your policy in more detail.",
     title: "Making Sense of Your Coverage",
   },
@@ -138,7 +138,7 @@ const tabStructure = [
     label: "What Your Policy Includes",
     sections: ["builtInAdvantages"],
     chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
-    chatTitle: "Want to Explore Your Benefits?",
+    chatTitle: "💬 Want to Explore Your Benefits?",
     chatSubtext: "I can help you understand all the ways your policy helps protect you.",
     title: "Your Policy's Special Features",
   },
@@ -151,7 +151,7 @@ const tabStructure = [
       "Tell me about policy loans",
       "What happens as I get older?",
     ],
-    chatTitle: "Need More Details About Your Coverage?",
+    chatTitle: "💬 Need More Details About Your Coverage?",
     chatSubtext: "I can explain how to keep your protection strong.",
     title: "Keeping Your Policy Strong",
   },
@@ -160,7 +160,7 @@ const tabStructure = [
     label: "Talk With Your Advisor",
     sections: ["keyTopics"],
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
-    chatTitle: "Want to Prepare for Your Advisor Meeting?",
+    chatTitle: "💬 Want to Prepare for Your Advisor Meeting?",
     chatSubtext: "I can help you get ready for your next advisor conversation.",
     title: "Topics For Your Next Review",
   },
@@ -173,7 +173,7 @@ const tabStructure = [
       "What changes should I expect?",
       "Policy management best practices?",
     ],
-    chatTitle: "Want Help Getting Started?",
+    chatTitle: "💬 Want Help Getting Started?",
     chatSubtext: "I can walk you through exactly what to do next.",
     title: "Keeping Your Policy on Track",
   },
@@ -301,6 +301,12 @@ export default function Dashboard() {
     }
   }
 
+  const chatSectionRef = useRef<HTMLDivElement>(null)
+
+  const scrollToChat = () => {
+    chatSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -360,25 +366,40 @@ export default function Dashboard() {
 
           {tabStructure.map((tab) => (
             <TabsContent key={tab.id} value={tab.id} className="space-y-6">
-              {tab.sections.map((sectionId) => {
-                const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
-                return (
-                  <div key={sectionId}>
-                    {isLoading || !section ? renderSkeletonContent() : renderSectionContent(section, tab)}
-                  </div>
-                )
-              })}
-              <ChatInterface
-                messages={chatMessages}
-                inputMessage={inputMessage}
-                isTyping={isTyping}
-                onInputChange={setInputMessage}
-                onSendMessage={handleSendMessage}
-                onStartNewChat={() => setChatMessages([])}
-                quickPrompts={tab.chatPrompts}
-                chatTitle={tab.chatTitle}
-                chatSubtext={tab.chatSubtext}
-              />
+              <div className="min-h-[calc(100vh-16rem)] flex flex-col justify-between">
+                <div className="space-y-6">
+                  {tab.sections.map((sectionId) => {
+                    const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
+                    return (
+                      <div key={sectionId}>
+                        {isLoading || !section ? renderSkeletonContent() : renderSectionContent(section, tab)}
+                      </div>
+                    )
+                  })}
+                </div>
+                <div className="flex justify-center mt-8">
+                  <Button
+                    onClick={scrollToChat}
+                    className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300 animate-pulse hover:animate-none"
+                  >
+                    Chat With Your AI Helper
+                    <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                  </Button>
+                </div>
+              </div>
+              <div ref={chatSectionRef} className="pt-12 border-t border-gray-200 mt-12">
+                <ChatInterface
+                  messages={chatMessages}
+                  inputMessage={inputMessage}
+                  isTyping={isTyping}
+                  onInputChange={setInputMessage}
+                  onSendMessage={handleSendMessage}
+                  onStartNewChat={() => setChatMessages([])}
+                  quickPrompts={tab.chatPrompts}
+                  chatTitle={tab.chatTitle}
+                  chatSubtext={tab.chatSubtext}
+                />
+              </div>
             </TabsContent>
           ))}
         </Tabs>
