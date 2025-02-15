@@ -110,7 +110,15 @@ function PolicySelection({
   )
 }
 
-const tabStructure = [
+const tabStructure: Array<{
+  id: string
+  label: string
+  sections: string[]
+  chatPrompts: string[]
+  chatTitle: string
+  chatSubtext: string
+  title: string
+}> = [
   {
     id: "policyOverview",
     label: "Your Quick Look",
@@ -370,9 +378,12 @@ export default function Dashboard() {
           </TabsList>
 
           {tabStructure.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id} className="space-y-6">
+            <TabsContent key={tab.id} value={tab.id} className="space-y-0">
               {/* Content Section (Area 1) */}
-              <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-8">
+              <div
+                ref={contentSectionRef}
+                className="bg-white rounded-xl shadow-sm p-6 mb-24 min-h-screen flex flex-col"
+              >
                 <div className="space-y-6">
                   {tab.sections.map((sectionId) => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
@@ -382,7 +393,7 @@ export default function Dashboard() {
                       </div>
                     )
                   })}
-                  <div className="flex flex-col items-center mt-8">
+                  <div className="mt-auto pt-8 flex flex-col items-center">
                     <p className="text-center mb-2 text-gray-600">{tab.chatSubtext}</p>
                     <Button
                       onClick={scrollToChat}
@@ -396,7 +407,7 @@ export default function Dashboard() {
               </div>
 
               {/* Chat Section (Area 2) */}
-              <div ref={chatSectionRef} className="relative bg-white rounded-xl shadow-sm">
+              <div ref={chatSectionRef} className="relative bg-white rounded-xl shadow-sm min-h-screen mt-24 pb-24">
                 <Button
                   onClick={scrollToContent}
                   className="absolute -top-4 right-4 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
@@ -405,7 +416,7 @@ export default function Dashboard() {
                   <ChevronUp className="w-4 h-4" />
                   <span className="sr-only">Return to top</span>
                 </Button>
-                <div className="p-6">
+                <div className="p-6 h-full">
                   <ChatInterface
                     messages={chatMessages}
                     inputMessage={inputMessage}
