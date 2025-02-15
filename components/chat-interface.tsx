@@ -75,7 +75,7 @@ export function ChatInterface({
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
+    <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto">
         <div className="flex flex-wrap gap-2 mb-3">
           {quickPrompts.map((prompt, index) => (
             <Button
