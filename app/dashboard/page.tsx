@@ -120,8 +120,8 @@ const tabStructure = [
       "What makes my policy special?",
       "How much protection do I have?",
     ],
-    chatTitle: "Want to Learn More About Your Policy?",
-    chatSubtext: "Hi! I'm here to help explain anything you'd like to know more about.",
+    chatTitle: "Hi! I'm here to help explain anything you'd like to know more about.",
+    chatSubtext: "Have questions about your policy? I'm here to help!",
     title: "Understanding Your Policy",
   },
   {
@@ -129,8 +129,8 @@ const tabStructure = [
     label: "How Your Policy Works",
     sections: ["policyPower"],
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
-    chatTitle: "Want to Understand How Things Work?",
-    chatSubtext: "Let me explain any part of your policy in more detail.",
+    chatTitle: "Let me explain any part of your policy in more detail.",
+    chatSubtext: "Would you like me to explain how your policy works?",
     title: "Making Sense of Your Coverage",
   },
   {
@@ -138,8 +138,8 @@ const tabStructure = [
     label: "What Your Policy Includes",
     sections: ["builtInAdvantages"],
     chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
-    chatTitle: "Want to Explore Your Benefits?",
-    chatSubtext: "I can help you understand all the ways your policy helps protect you.",
+    chatTitle: "I can help you understand all the ways your policy helps protect you.",
+    chatSubtext: "Want to learn more about your policy benefits?",
     title: "Your Policy's Special Features",
   },
   {
@@ -151,8 +151,8 @@ const tabStructure = [
       "Tell me about policy loans",
       "What happens as I get older?",
     ],
-    chatTitle: "Need More Details About Your Coverage?",
-    chatSubtext: "I can explain how to keep your protection strong.",
+    chatTitle: "I can explain how to keep your protection strong.",
+    chatSubtext: "Need help understanding how your coverage stays strong?",
     title: "Keeping Your Policy Strong",
   },
   {
@@ -160,8 +160,8 @@ const tabStructure = [
     label: "Talk With Your Advisor",
     sections: ["keyTopics"],
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
-    chatTitle: "Want to Prepare for Your Advisor Meeting?",
-    chatSubtext: "I can help you get ready for your next advisor conversation.",
+    chatTitle: "I can help you get ready for your next advisor conversation.",
+    chatSubtext: "Would you like help preparing for your advisor meeting?",
     title: "Topics For Your Next Review",
   },
   {
@@ -173,8 +173,8 @@ const tabStructure = [
       "What changes should I expect?",
       "Policy management best practices?",
     ],
-    chatTitle: "Want Help Getting Started?",
-    chatSubtext: "I can walk you through exactly what to do next.",
+    chatTitle: "I can walk you through exactly what to do next.",
+    chatSubtext: "Ready to get started? Let me show you what to do next!",
     title: "Keeping Your Policy on Track",
   },
 ]
@@ -376,7 +376,8 @@ export default function Dashboard() {
                       </div>
                     )
                   })}
-                  <div className="flex justify-center mt-8">
+                  <div className="flex flex-col items-center mt-8">
+                    <p className="text-center mb-2 text-gray-600">{tab.chatSubtext}</p>
                     <Button
                       onClick={scrollToChat}
                       className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300 animate-pulse hover:animate-none"
@@ -396,7 +397,7 @@ export default function Dashboard() {
                     onStartNewChat={() => setChatMessages([])}
                     quickPrompts={tab.chatPrompts}
                     chatTitle={tab.chatTitle}
-                    chatSubtext={tab.chatSubtext}
+                    chatSubtext=""
                   />
                 </div>
               </div>
