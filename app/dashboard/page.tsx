@@ -391,7 +391,7 @@ export default function Dashboard() {
                 ref={contentSectionRef}
                 className="bg-white rounded-xl shadow-sm p-6 mb-12 min-h-[calc(100vh-4rem)] flex flex-col"
               >
-                <div className="space-y-4 flex-grow">
+                <div className="space-y-3 flex-grow">
                   {tab.sections.map((sectionId) => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
                     return (
@@ -401,8 +401,8 @@ export default function Dashboard() {
                     )
                   })}
                 </div>
-                <div className="mt-6 pt-4 flex flex-col items-center border-t border-gray-200">
-                  <p className="text-center mb-3 text-gray-600">{tab.chatSubtext}</p>
+                <div className="mt-4 pt-3 flex flex-col items-center border-t border-gray-200">
+                  <p className="text-center mb-2 text-gray-600">{tab.chatSubtext}</p>
                   <Button
                     onClick={scrollToChat}
                     className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
@@ -416,7 +416,7 @@ export default function Dashboard() {
               {/* Chat Section (Area 2) */}
               <div
                 ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-12 pt-12"
+                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-8 pt-12"
               >
                 <Button
                   onClick={scrollToContent}
@@ -426,7 +426,7 @@ export default function Dashboard() {
                   <ChevronUp className="w-4 h-4" />
                   <span className="sr-only">Return to top</span>
                 </Button>
-                <div className="px-4 py-2 h-full">
+                <div className="px-4 h-full flex flex-col justify-between">
                   <ChatInterface
                     messages={chatMessages}
                     inputMessage={inputMessage}
@@ -449,12 +449,12 @@ export default function Dashboard() {
 }
 
 const renderSectionContent = (section: PolicySection, tabData: (typeof tabStructure)[0]) => (
-  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-4">
+  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-3">
     <CardHeader className="pb-2 border-b">
       <CardTitle className="text-xl font-semibold text-gray-900">{tabData.title}</CardTitle>
     </CardHeader>
-    <CardContent className="p-4">
-      <div className="space-y-4">
+    <CardContent className="p-3">
+      <div className="space-y-3">
         {section.opening && (
           <p className="text-gray-700">
             {tabData.id === "policyOverview"
