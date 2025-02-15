@@ -313,11 +313,19 @@ export default function Dashboard() {
   const chatSectionRef = useRef<HTMLDivElement>(null)
 
   const scrollToChat = () => {
-    chatSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (chatSectionRef.current) {
+      const yOffset = -80 // Adjust this value to fine-tune the scroll position
+      const y = chatSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
+      window.scrollTo({ top: y, behavior: "smooth" })
+    }
   }
 
   const scrollToContent = () => {
-    contentSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (contentSectionRef.current) {
+      const yOffset = -20 // Adjust this value to fine-tune the scroll position
+      const y = contentSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
+      window.scrollTo({ top: y, behavior: "smooth" })
+    }
   }
 
   if (isLoading) {
@@ -384,7 +392,7 @@ export default function Dashboard() {
                 ref={contentSectionRef}
                 className="bg-white rounded-xl shadow-sm p-6 mb-24 min-h-screen flex flex-col"
               >
-                <div className="space-y-6">
+                <div className="space-y-6 flex-grow">
                   {tab.sections.map((sectionId) => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
                     return (
@@ -393,24 +401,27 @@ export default function Dashboard() {
                       </div>
                     )
                   })}
-                  <div className="mt-auto pt-8 flex flex-col items-center">
-                    <p className="text-center mb-2 text-gray-600">{tab.chatSubtext}</p>
-                    <Button
-                      onClick={scrollToChat}
-                      className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
-                    >
-                      Chat With Your AI Helper
-                      <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                    </Button>
-                  </div>
+                </div>
+                <div className="mt-auto pt-8 flex flex-col items-center border-t border-gray-200">
+                  <p className="text-center mb-4 text-gray-600">{tab.chatSubtext}</p>
+                  <Button
+                    onClick={scrollToChat}
+                    className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
+                  >
+                    Chat With Your AI Helper
+                    <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                  </Button>
                 </div>
               </div>
 
               {/* Chat Section (Area 2) */}
-              <div ref={chatSectionRef} className="relative bg-white rounded-xl shadow-sm min-h-screen mt-24 pb-24">
+              <div
+                ref={chatSectionRef}
+                className="relative bg-white rounded-xl shadow-sm min-h-screen mt-24 pb-24 pt-16"
+              >
                 <Button
                   onClick={scrollToContent}
-                  className="absolute -top-4 right-4 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
+                  className="absolute top-4 right-4 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
                   size="icon"
                 >
                   <ChevronUp className="w-4 h-4" />
