@@ -329,7 +329,17 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
         <header className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm">
-          <h1 className="text-4xl font-bold mb-2 text-[rgb(82,102,255)]">Your Policy Overview</h1>
+          {policyData && policyData.analysis_data.data.policyOverview && (
+            <>
+              <h1 className="text-3xl font-bold mb-2 text-[rgb(82,102,255)]">
+                {policyData.analysis_data.data.policyOverview.bullets.find((b) => b.title === "Product Name")
+                  ?.content || "Policy Overview"}
+              </h1>
+              <h2 className="text-xl text-gray-600">
+                {policyData.analysis_data.data.policyOverview.bullets.find((b) => b.title === "Issuer")?.content || ""}
+              </h2>
+            </>
+          )}
         </header>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
