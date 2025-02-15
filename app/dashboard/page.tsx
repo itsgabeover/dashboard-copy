@@ -427,7 +427,7 @@ export default function Dashboard() {
         <ChevronUp className="w-4 h-4" />
         <span className="sr-only">Return to top</span>
       </Button>
-      <div className="px-4 h-full flex flex-col justify-between mt-36">
+      <div className="px-4 h-full flex flex-col justify-between mt-8">
         <ChatInterface
           messages={chatMessages}
           inputMessage={inputMessage}
