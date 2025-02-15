@@ -389,24 +389,26 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
     <CardContent className="p-6">
       <div className="space-y-6">
         {section.opening && <p className="text-gray-700">{section.opening}</p>}
-        <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-          <ul className="space-y-2">
-            {section.bullets
-              .filter(
-                (bullet) =>
-                  !["Product Name", "Carrier Name"].includes(bullet.title) &&
-                  (bullet.title === "Policy Design" ? -1 : 1), // Ensures Policy Design comes first
-              )
-              .map((bullet, index) => (
-                <li key={index} className="flex items-start">
-                  <ArrowRight className="w-4 h-4 mr-2 mt-1 text-[rgb(82,102,255)]" />
-                  <div>
-                    <span className="font-medium">{bullet.title}: </span>
-                    <span>{bullet.content}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {section.bullets
+            .filter((bullet) => !["Product Name", "Carrier Name"].includes(bullet.title))
+            .map((bullet, index) => (
+              <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-start space-x-4">
+                    <div className="mt-1 flex-shrink-0">
+                      <div className="rounded-full bg-[rgb(82,102,255)]/10 p-2">
+                        <ArrowRight className="h-4 w-4 text-[rgb(82,102,255)]" />
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <h3 className="font-medium text-gray-900">{bullet.title.replace(":", "")}</h3>
+                      <p className="text-sm text-gray-600">{bullet.content}</p>
+                    </div>
                   </div>
-                </li>
-              ))}
-          </ul>
+                </CardContent>
+              </Card>
+            ))}
         </div>
       </div>
     </CardContent>
