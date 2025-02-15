@@ -14,7 +14,7 @@ interface ChatInterfaceProps {
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
-  chatSubtext: string
+  chatSubtext?: string
 }
 
 export function ChatInterface({
@@ -26,7 +26,6 @@ export function ChatInterface({
   onStartNewChat,
   quickPrompts,
   chatTitle,
-  chatSubtext,
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -46,7 +45,7 @@ export function ChatInterface({
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-xl shadow-sm border border-gray-200">
+    <div className="flex flex-col h-[600px] bg-white rounded-xl">
       {/* Header */}
       <div className="flex flex-col px-6 py-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -64,7 +63,6 @@ export function ChatInterface({
             Start New Chat
           </Button>
         </div>
-        <p className="text-sm text-gray-500 mt-1">{chatSubtext}</p>
       </div>
 
       {/* Messages */}
