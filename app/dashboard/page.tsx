@@ -113,63 +113,63 @@ function PolicySelection({
 const tabStructure = [
   {
     id: "policyOverview",
-    label: "Policy Snapshot",
+    label: "Your Quick Look",
     sections: ["policyOverview"],
     chatPrompts: [
       "Break down my policy in simple words",
       "What makes my policy special?",
       "How much protection do I have?",
     ],
-    chatTitle: "Policy Basics Chat",
-    title: "Your Policy Basics",
+    chatTitle: "Have Questions About Your Coverage?",
+    title: "Understanding Your Policy",
   },
   {
     id: "policyPower",
-    label: "The Power of Your Policy",
+    label: "How Your Policy Works",
     sections: ["policyPower"],
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
-    chatTitle: "Coverage Chat Help",
-    title: "Your Policy Protection & Growth",
+    chatTitle: "Want to Learn More About Your Policy?",
+    title: "Making Sense of Your Coverage",
   },
   {
     id: "builtInAdvantages",
-    label: "Built-In Advantages",
+    label: "What Your Policy Includes",
     sections: ["builtInAdvantages"],
     chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
-    chatTitle: "Benefits Chat Support",
-    title: "Your Policy Benefits",
+    chatTitle: "Curious About Your Benefits?",
+    title: "Your Policy's Special Features",
   },
   {
     id: "protectionInsights",
-    label: "Protection Insights",
+    label: "How Your Coverage Works",
     sections: ["protectionInsights"],
     chatPrompts: [
       "Help me understand my illness benefits",
       "Tell me about policy loans",
       "What happens as I get older?",
     ],
-    chatTitle: "Protection Details Chat",
-    title: "Important Things to Know",
+    chatTitle: "Want to Know More About Your Protection?",
+    title: "Keeping Your Policy Strong",
   },
   {
     id: "advisorTopics",
-    label: "Advisor Topics",
+    label: "Talk With Your Advisor",
     sections: ["keyTopics"],
     chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
-    chatTitle: "Advisor Chat Corner",
-    title: "Review With Your Advisor",
+    chatTitle: "Have Topics For Your Advisor?",
+    title: "Topics For Your Next Review",
   },
   {
     id: "pathForward",
-    label: "Path Forward",
+    label: "Your Next Steps",
     sections: ["pathForward"],
     chatPrompts: [
       "How do I keep my policy healthy?",
       "What changes should I expect?",
       "Policy management best practices?",
     ],
-    chatTitle: "Policy Management Chat",
-    title: "Taking Care of Your Policy",
+    chatTitle: "Need Help With Next Steps?",
+    title: "Keeping Your Policy on Track",
   },
 ]
 
@@ -388,7 +388,23 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
     </CardHeader>
     <CardContent className="p-6">
       <div className="space-y-6">
-        {section.opening && <p className="text-gray-700">{section.opening}</p>}
+        {section.opening && (
+          <p className="text-gray-700">
+            {tabData.id === "policyOverview"
+              ? "Let's walk through your life insurance policy in simple terms."
+              : tabData.id === "policyPower"
+                ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
+                : tabData.id === "builtInAdvantages"
+                  ? "Your life insurance comes with valuable extras built right in. Here's how these features work for you and your family when you need them."
+                  : tabData.id === "protectionInsights"
+                    ? "Let's look at what keeps your life insurance solid and dependable. Understanding these points helps you get the most from your coverage."
+                    : tabData.id === "advisorTopics"
+                      ? "Your advisor helps make sure your life insurance stays aligned with your goals. Here are key points to discuss at your next meeting."
+                      : tabData.id === "pathForward"
+                        ? "Let's make sure your life insurance stays strong. Here are simple steps you can take to keep everything running smoothly."
+                        : section.opening}
+          </p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {section.bullets
             .filter((bullet) => !["Product Name", "Carrier Name"].includes(bullet.title))
