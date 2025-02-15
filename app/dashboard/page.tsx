@@ -385,13 +385,10 @@ export default function Dashboard() {
           </TabsList>
 
           {tabStructure.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id} className="space-y-0">
+            <TabsContent key={tab.id} value={tab.id} className="space-y-6">
               {/* Content Section (Area 1) */}
-              <div
-                ref={contentSectionRef}
-                className="bg-white rounded-xl shadow-sm p-6 mb-12 min-h-[calc(100vh-4rem)] flex flex-col"
-              >
-                <div className="space-y-3 flex-grow">
+              <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6 min-h-[calc(100vh-16rem)]">
+                <div className="space-y-3">
                   {tab.sections.map((sectionId) => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
                     return (
@@ -401,18 +398,18 @@ export default function Dashboard() {
                     )
                   })}
                 </div>
-                <div className="mt-6 pt-6 flex flex-col items-center border-t border-gray-200">
-                  {" "}
-                  {/* Updated margin class */}
-                  <p className="text-center mb-2 text-gray-600">{tab.chatSubtext}</p>
-                  <Button
-                    onClick={scrollToChat}
-                    className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
-                  >
-                    Chat With Your AI Helper
-                    <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                  </Button>
-                </div>
+              </div>
+
+              {/* Chat helper text and button (now outside the white box) */}
+              <div className="text-center mb-6">
+                <p className="text-gray-600 mb-3">{tab.chatSubtext}</p>
+                <Button
+                  onClick={scrollToChat}
+                  className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300"
+                >
+                  Chat With Your AI Helper
+                  <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                </Button>
               </div>
 
               {/* Chat Section (Area 2) */}
