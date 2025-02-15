@@ -417,7 +417,7 @@ export default function Dashboard() {
               {/* Chat Section (Area 2) */}
               <div
                 ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-8"
+                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-8 pt-12"
               >
                 <Button
                   onClick={scrollToContent}
@@ -427,23 +427,18 @@ export default function Dashboard() {
                   <ChevronUp className="w-4 h-4" />
                   <span className="sr-only">Return to top</span>
                 </Button>
-                <div className="px-4 h-full flex flex-col">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold">{tab.chatTitle}</h3>
-                  </div>
-                  <div className="flex-grow overflow-y-auto mb-4">
-                    <ChatInterface
-                      messages={chatMessages}
-                      inputMessage={inputMessage}
-                      isTyping={isTyping}
-                      onInputChange={setInputMessage}
-                      onSendMessage={handleSendMessage}
-                      onStartNewChat={() => setChatMessages([])}
-                      quickPrompts={tab.chatPrompts}
-                      chatTitle=""
-                      chatSubtext=""
-                    />
-                  </div>
+                <div className="px-4 h-full flex flex-col justify-between mt-36">
+                  <ChatInterface
+                    messages={chatMessages}
+                    inputMessage={inputMessage}
+                    isTyping={isTyping}
+                    onInputChange={setInputMessage}
+                    onSendMessage={handleSendMessage}
+                    onStartNewChat={() => setChatMessages([])}
+                    quickPrompts={tab.chatPrompts}
+                    chatTitle={tab.chatTitle}
+                    chatSubtext=""
+                  />
                 </div>
               </div>
             </TabsContent>
