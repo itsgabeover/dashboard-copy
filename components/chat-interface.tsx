@@ -45,7 +45,7 @@ export function ChatInterface({
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-xl">
+    <div className="flex flex-col h-[800px] bg-white rounded-xl">
       {/* Header */}
       <div className="flex flex-col px-6 py-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -66,7 +66,7 @@ export function ChatInterface({
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[600px]">
         {messages.map((message, index) => (
           <ChatMessage key={index} role={message.role} content={message.content} />
         ))}
