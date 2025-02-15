@@ -11,7 +11,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
 import { ChatInterface } from "@/components/chat-interface"
-import { PolicyMetrics } from "@/components/policy-metrics"
 
 // Email verification component
 function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
@@ -235,27 +234,22 @@ export default function Dashboard() {
   }
 
   const handlePolicySelect = (policy: PolicyDashboard) => {
-    // First scroll to top smoothly
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     })
-
-    // Then update state
     setPolicyData(policy)
     setShowPolicySelection(false)
     setActiveTab(tabStructure[0].id)
   }
 
   const handleSendMessage = async (directMessage?: string) => {
-    // Use directMessage if provided, otherwise use inputMessage
     const messageToSend = directMessage || inputMessage.trim()
     if (!messageToSend || !policyData) return
 
     const newMessages = [...chatMessages, { role: "user" as const, content: messageToSend }]
     setChatMessages(newMessages)
 
-    // Only clear input if it wasn't a direct message
     if (!directMessage) {
       setInputMessage("")
     }
@@ -301,7 +295,6 @@ export default function Dashboard() {
     }
   }
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -310,17 +303,14 @@ export default function Dashboard() {
     )
   }
 
-  // Show email verification if not verified
   if (!isVerified) {
     return <EmailVerification onVerify={handleEmailVerify} />
   }
 
-  // Show policy selection if multiple policies
   if (showPolicySelection && policies.length > 1) {
     return <PolicySelection policies={policies} onSelect={handlePolicySelect} />
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
@@ -335,7 +325,6 @@ export default function Dashboard() {
     )
   }
 
-  // Main dashboard UI
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
@@ -356,28 +345,20 @@ export default function Dashboard() {
             ))}
           </TabsList>
 
-          {/* PolicyMetrics component with updated props */}
-          {policyData && policyData.analysis_data.data.policyOverview && (
-            <PolicyMetrics policyData={policyData.analysis_data.data.policyOverview} />
-          )}
-
-         {tabStructure.map((tab) => (
-  <TabsContent key={tab.id} value={tab.id} className="space-y-6">
-    {tab.sections.map((sectionId) => {
-      const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections];
-      return (
-        <div key={sectionId}>
-          {isLoading || !section
-            ? renderSkeletonContent()
-            : renderSectionContent(section, tab)}
-        </div>
-      );
-    })}
-  </TabsContent>
-))}
+          {tabStructure.map((tab) => (
+            <TabsContent key={tab.id} value={tab.id} className="space-y-6">
+              {tab.sections.map((sectionId) => {
+                const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
+                return (
+                  <div key={sectionId}>
+                    {isLoading || !section ? renderSkeletonContent() : renderSectionContent(section, tab)}
+                  </div>
+                )
+              })}
+            </TabsContent>
+          ))}
         </Tabs>
 
-        {/* Chat Section */}
         <ChatInterface
           messages={chatMessages}
           inputMessage={inputMessage}
