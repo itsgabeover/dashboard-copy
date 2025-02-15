@@ -413,21 +413,20 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
-
-    {/* Chat Section (Area 2) */}
-    <div
-      ref={chatSectionRef}
-      className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-12 pb-8 pt-12"
-    >
-      <Button
-        onClick={scrollToContent}
-        className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
-        size="icon"
-      >
-        <ChevronUp className="w-4 h-4" />
-        <span className="sr-only">Return to top</span>
-      </Button>
-      <div className="px-4 h-full flex flex-col justify-between mt-8">
+{/* Chat Section (Area 2) */}
+<div
+  ref={chatSectionRef}
+  className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6"
+>
+  <Button
+    onClick={scrollToContent}
+    className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
+    size="icon"
+  >
+    <ChevronUp className="w-4 h-4" />
+    <span className="sr-only">Return to top</span>
+  </Button>
+  <div className="px-4 h-full flex flex-col justify-between">  {/* Removed mt-8 completely */}
         <ChatInterface
           messages={chatMessages}
           inputMessage={inputMessage}
