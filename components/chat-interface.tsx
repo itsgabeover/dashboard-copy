@@ -5,9 +5,6 @@ import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import { useEffect, useRef } from "react"
 
-// Add message limit constant
-const USER_MESSAGE_LIMIT = 500
-
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
   inputMessage: string
@@ -43,28 +40,13 @@ export function ChatInterface({
     prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
 
-  // Updated handleQuickPrompt with length check
   const handleQuickPrompt = (prompt: string) => {
-    if (prompt.length <= USER_MESSAGE_LIMIT) {
-      onSendMessage(prompt)
-    }
-  }
-
-  // Updated handleInputChange with length limit
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const truncatedValue = e.target.value.slice(0, USER_MESSAGE_LIMIT)
-    onInputChange(truncatedValue)
-  }
-
-  // Updated handleSendMessage with length check
-  const handleSendMessage = () => {
-    if (inputMessage.trim() && inputMessage.length <= USER_MESSAGE_LIMIT) {
-      onSendMessage()
-    }
+    onSendMessage(prompt)
   }
 
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
+      {/* Updated Header with softer background */}
       <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgba(82,102,255,0.15)] to-[rgba(82,102,255,0.05)] rounded-t-xl border-b border-[rgba(82,102,255,0.1)]">
         <div className="flex items-center space-x-3">
           <MessageCircle className="w-6 h-6 text-[rgb(82,102,255)]" />
@@ -84,6 +66,7 @@ export function ChatInterface({
         </Button>
       </div>
 
+      {/* Messages */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px]">
         {messages.map((message, index) => (
           <ChatMessage key={index} role={message.role} content={message.content} />
@@ -92,6 +75,7 @@ export function ChatInterface({
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Quick Prompts and Input Area */}
       <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto rounded-b-xl">
         <div className="flex flex-wrap gap-2 mb-3">
           {quickPrompts.map((prompt, index) => (
@@ -110,13 +94,13 @@ export function ChatInterface({
           <input
             type="text"
             value={inputMessage}
-            onChange={handleInputChange}
+            onChange={(e) => onInputChange(e.target.value)}
             placeholder="Type your message..."
             className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white"
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
-            onClick={handleSendMessage}
+            onClick={() => onSendMessage()}
             className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
             <Send className="w-4 h-4" />
