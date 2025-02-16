@@ -1,17 +1,20 @@
-import { Send, RefreshCw } from "lucide-react"
+"use client"
+
+import { Send, RefreshCw, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import ReactMarkdown from 'react-markdown'
-import { useEffect, useRef } from 'react'
+import ReactMarkdown from "react-markdown"
+import { useEffect, useRef } from "react"
 
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
   inputMessage: string
   isTyping: boolean
   onInputChange: (value: string) => void
-  onSendMessage: (directMessage?: string) => void // Modified to accept optional message
+  onSendMessage: (directMessage?: string) => void
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
+  chatSubtext?: string
 }
 
 export function ChatInterface({
@@ -24,47 +27,56 @@ export function ChatInterface({
   quickPrompts,
   chatTitle,
 }: ChatInterfaceProps) {
-  // Add ref for message container
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const prevMessagesLengthRef = useRef(messages.length)
 
-  // Scroll to bottom whenever messages change or isTyping changes
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    if (messages.length > prevMessagesLengthRef.current || isTyping) {
+      if (messagesContainerRef.current && messagesEndRef.current) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+      }
+    }
+    prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
 
-  // Modified to directly send the message without updating input
   const handleQuickPrompt = (prompt: string) => {
     onSendMessage(prompt)
   }
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-xl shadow-sm border border-gray-200">
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">{chatTitle}</h2>
-        <Button 
-          variant="outline" 
-          size="sm" 
+    <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
+      {/* Updated Header with softer background */}
+      <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgba(82,102,255,0.15)] to-[rgba(82,102,255,0.05)] rounded-t-xl border-b border-[rgba(82,102,255,0.1)]">
+        <div className="flex items-center space-x-3">
+          <MessageCircle className="w-6 h-6 text-[rgb(82,102,255)]" />
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800">{chatTitle}</h2>
+            <p className="text-sm text-gray-600">Ask me anything about your policy</p>
+          </div>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={onStartNewChat}
-          className="flex items-center gap-1.5 text-sm hover:bg-gray-50"
+          className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Start New Chat
+          <RefreshCw className="w-4 h-4 mr-2" />
+          New Chat
         </Button>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px]">
         {messages.map((message, index) => (
           <ChatMessage key={index} role={message.role} content={message.content} />
         ))}
         {isTyping && <TypingIndicator />}
-        {/* Add div for scroll anchor */}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
+      {/* Quick Prompts and Input Area */}
+      <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto rounded-b-xl">
         <div className="flex flex-wrap gap-2 mb-3">
           {quickPrompts.map((prompt, index) => (
             <Button
@@ -84,12 +96,12 @@ export function ChatInterface({
             value={inputMessage}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white"
             onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
             onClick={() => onSendMessage()}
-            className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4"
+            className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
             <Send className="w-4 h-4" />
           </Button>
@@ -116,18 +128,13 @@ interface ChatMessageProps {
 
 function ChatMessage({ role, content }: ChatMessageProps) {
   const isUser = role === "user"
-  
-  // Function to fix common markdown formatting issues
+
   const formatContent = (text: string) => {
     return text
-      // Ensure proper spacing after bullet points
-      .replace(/^-(?=\S)/gm, '- ')
-      // Add proper line breaks before and after lists
-      .replace(/\n-/g, '\n\n-')
-      // Fix double asterisks for bold (ensure spaces around words)
-      .replace(/\*\*(\S+)\*\*/g, '**$1**')
-      // Ensure proper line breaks between paragraphs
-      .replace(/\n\n+/g, '\n\n')
+      .replace(/^-(?=\S)/gm, "- ")
+      .replace(/\n-/g, "\n\n-")
+      .replace(/\*\*(\S+)\*\*/g, "**$1**")
+      .replace(/\n\n+/g, "\n\n")
       .trim()
   }
 
@@ -136,19 +143,18 @@ function ChatMessage({ role, content }: ChatMessageProps) {
       <div
         className={`
           max-w-[85%] rounded-2xl px-4 py-2.5
-          ${isUser 
-            ? "bg-blue-600 text-white" 
-            : "bg-gray-100 text-gray-800"}
+          ${isUser ? "bg-[rgb(82,102,255)] text-white" : "bg-gray-100 text-gray-800"}
         `}
       >
-        <div className={`text-xs font-medium mb-1 ${isUser ? "text-blue-100" : "text-gray-500"}`}>
-          {isUser ? "You" : "Assistant"}
-        </div>
         <div className="text-sm leading-relaxed">
           <ReactMarkdown
+            components={{
+              pre: ({ children }) => <div className="whitespace-pre-wrap">{children}</div>,
+              code: ({ children }) => <code className="px-1 py-0.5 rounded-md bg-gray-200">{children}</code>,
+            }}
             className={`
               markdown-content
-              ${isUser ? 'text-white' : 'text-gray-800'}
+              ${isUser ? "text-white" : "text-gray-800"}
               [&_p]:mb-2
               [&_p:last-child]:mb-0
               [&_ul]:mt-1
@@ -156,9 +162,7 @@ function ChatMessage({ role, content }: ChatMessageProps) {
               [&_li]:ml-4
               [&_li]:pl-1
               [&_strong]:font-semibold
-              ${isUser 
-                ? '[&_strong]:text-white' 
-                : '[&_strong]:text-gray-900'}
+              ${isUser ? "[&_strong]:text-white" : "[&_strong]:text-gray-900"}
             `}
           >
             {formatContent(content)}
