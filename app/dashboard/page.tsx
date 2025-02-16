@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, Circle } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
@@ -408,7 +408,7 @@ export default function Dashboard() {
                 {/* Chat helper text and button inside the white box */}
                 <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
                   <div className="flex items-center space-x-2 text-gray-600">
-                    <Circle className="w-5 h-5 text-[rgb(82,102,255)]" />
+                    <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
                     <span className="text-sm">{tab.chatSubtext}</span>
                   </div>
                   <Button
@@ -435,8 +435,6 @@ export default function Dashboard() {
                   <span className="sr-only">Return to top</span>
                 </Button>
                 <div className="px-4 h-full flex flex-col justify-between">
-                  {" "}
-                  {/* Removed mt-8 completely */}
                   <ChatInterface
                     messages={chatMessages}
                     inputMessage={inputMessage}
@@ -466,7 +464,7 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
     <CardContent className="p-3">
       <div className="space-y-3">
         {section.opening && (
-          <p className="text-gray-700">
+          <p className="text-gray-700 pl-4">
             {tabData.id === "policyOverview"
               ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
               : tabData.id === "policyPower"
@@ -484,12 +482,14 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
         )}
         <div className="md:hidden">
           <MobileCardGrid
-            items={section.bullets.filter((bullet) => !["Product Name", "Carrier Name"].includes(bullet.title))}
+            items={section.bullets.filter(
+              (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
+            )}
           />
         </div>
         <div className="hidden md:grid md:grid-cols-2 gap-3">
           {section.bullets
-            .filter((bullet) => !["Product Name", "Carrier Name"].includes(bullet.title))
+            .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
             .map((bullet, index) => (
               <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
