@@ -3,7 +3,7 @@
 import { Send, RefreshCw, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
@@ -30,6 +30,7 @@ export function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
+  const [showQuickPrompts, setShowQuickPrompts] = useState(false)
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -42,12 +43,13 @@ export function ChatInterface({
 
   const handleQuickPrompt = (prompt: string) => {
     onSendMessage(prompt)
+    setShowQuickPrompts(false)
   }
 
   return (
-    <div className="flex flex-col h-[800px] bg-white rounded-xl">
+    <div className="flex flex-col h-full bg-white rounded-xl">
       {/* Header */}
-      <div className="flex flex-col px-6 py-3 border-b border-gray-200">
+      <div className="flex flex-col px-4 py-3 border-b border-gray-200 sm:px-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <MessageCircle className="w-5 h-5" />
@@ -60,13 +62,17 @@ export function ChatInterface({
             className="flex items-center gap-1.5 text-sm hover:bg-gray-50"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            Start New Chat
+            <span className="hidden sm:inline">Start New Chat</span>
           </Button>
         </div>
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px]">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-4 sm:px-6"
+        style={{ maxHeight: "calc(100vh - 200px)" }}
+      >
         {messages.map((message, index) => (
           <ChatMessage key={index} role={message.role} content={message.content} />
         ))}
@@ -75,20 +81,22 @@ export function ChatInterface({
       </div>
 
       {/* Input Area */}
-    <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto">
-        <div className="flex flex-wrap gap-2 mb-3">
-          {quickPrompts.map((prompt, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickPrompt(prompt)}
-              className="text-sm bg-white hover:bg-gray-50 border-gray-200"
-            >
-              {prompt}
-            </Button>
-          ))}
-        </div>
+      <div className="p-4 border-t border-gray-200 bg-gray-50 mt-auto">
+        {showQuickPrompts && (
+          <div className="flex flex-wrap gap-2 mb-3 max-h-32 overflow-y-auto">
+            {quickPrompts.map((prompt, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                onClick={() => handleQuickPrompt(prompt)}
+                className="text-sm bg-white hover:bg-gray-50 border-gray-200"
+              >
+                {prompt}
+              </Button>
+            ))}
+          </div>
+        )}
         <div className="flex gap-2">
           <input
             type="text"
@@ -99,8 +107,14 @@ export function ChatInterface({
             onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
+            onClick={() => setShowQuickPrompts(!showQuickPrompts)}
+            className="rounded-full bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 sm:px-4"
+          >
+            <MessageCircle className="w-4 h-4" />
+          </Button>
+          <Button
             onClick={() => onSendMessage()}
-            className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4"
+            className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4"
           >
             <Send className="w-4 h-4" />
           </Button>
