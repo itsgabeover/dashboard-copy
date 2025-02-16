@@ -11,6 +11,8 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
 import { ChatInterface } from "@/components/chat-interface"
+import { MobileTabsNavigation } from "@/components/MobileTabsNavigation"
+import { MobileCardGrid } from "@/components/MobileCardGrid"
 
 // Email verification component
 function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
@@ -371,8 +373,12 @@ export default function Dashboard() {
           )}
         </header>
 
+        <div className="md:hidden mb-4">
+          <MobileTabsNavigation tabs={tabStructure} activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full justify-start mb-6 flex flex-wrap gap-2">
+          <TabsList className="w-full justify-start mb-6 hidden md:flex flex-wrap gap-2">
             {tabStructure.map((tab) => (
               <TabsTrigger
                 key={tab.id}
@@ -384,64 +390,66 @@ export default function Dashboard() {
             ))}
           </TabsList>
 
-        {tabStructure.map((tab) => (
-  <TabsContent key={tab.id} value={tab.id} className="space-y-6">
-    {/* Content Section (Area 1) */}
-    <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6 min-h-[calc(100vh-16rem)]">
-      <div className="space-y-3">
-        {tab.sections.map((sectionId) => {
-          const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
-          return (
-            <div key={sectionId}>
-              {isLoading || !section ? renderSkeletonContent() : renderSectionContent(section, tab)}
-            </div>
-          )
-        })}
-      </div>
+          {tabStructure.map((tab) => (
+            <TabsContent key={tab.id} value={tab.id} className="space-y-6">
+              {/* Content Section (Area 1) */}
+              <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6 min-h-[calc(100vh-16rem)]">
+                <div className="space-y-3">
+                  {tab.sections.map((sectionId) => {
+                    const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
+                    return (
+                      <div key={sectionId}>
+                        {isLoading || !section ? renderSkeletonContent() : renderSectionContent(section, tab)}
+                      </div>
+                    )
+                  })}
+                </div>
 
-      {/* Chat helper text and button inside the white box */}
-      <div className="text-center mt-6 pt-6 border-t">
-        <p className="text-gray-600 mb-3">{tab.chatSubtext}</p>
-        <div className="flex justify-center">
-          <Button
-            onClick={scrollToChat}
-            className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300 w-48"
-          >
-            Chat With Your AI Helper
-            <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-          </Button>
-        </div>
-      </div>
-    </div>
-{/* Chat Section (Area 2) */}
-<div
-  ref={chatSectionRef}
-  className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6"
->
-  <Button
-    onClick={scrollToContent}
-    className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
-    size="icon"
-  >
-    <ChevronUp className="w-4 h-4" />
-    <span className="sr-only">Return to top</span>
-  </Button>
-  <div className="px-4 h-full flex flex-col justify-between">  {/* Removed mt-8 completely */}
-        <ChatInterface
-          messages={chatMessages}
-          inputMessage={inputMessage}
-          isTyping={isTyping}
-          onInputChange={setInputMessage}
-          onSendMessage={handleSendMessage}
-          onStartNewChat={() => setChatMessages([])}
-          quickPrompts={tab.chatPrompts}
-          chatTitle={tab.chatTitle}
-          chatSubtext=""
-        />
-      </div>
-    </div>
-  </TabsContent>
-))}
+                {/* Chat helper text and button inside the white box */}
+                <div className="text-center mt-6 pt-6 border-t">
+                  <p className="text-gray-600 mb-3">{tab.chatSubtext}</p>
+                  <div className="flex justify-center">
+                    <Button
+                      onClick={scrollToChat}
+                      className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300 w-48"
+                    >
+                      Chat With Your AI Helper
+                      <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              {/* Chat Section (Area 2) */}
+              <div
+                ref={chatSectionRef}
+                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6"
+              >
+                <Button
+                  onClick={scrollToContent}
+                  className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
+                  size="icon"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                  <span className="sr-only">Return to top</span>
+                </Button>
+                <div className="px-4 h-full flex flex-col justify-between">
+                  {" "}
+                  {/* Removed mt-8 completely */}
+                  <ChatInterface
+                    messages={chatMessages}
+                    inputMessage={inputMessage}
+                    isTyping={isTyping}
+                    onInputChange={setInputMessage}
+                    onSendMessage={handleSendMessage}
+                    onStartNewChat={() => setChatMessages([])}
+                    quickPrompts={tab.chatPrompts}
+                    chatTitle={tab.chatTitle}
+                    chatSubtext=""
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          ))}
         </Tabs>
       </div>
     </div>
@@ -472,7 +480,12 @@ const renderSectionContent = (section: PolicySection, tabData: (typeof tabStruct
                         : section.opening}
           </p>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="md:hidden">
+          <MobileCardGrid
+            items={section.bullets.filter((bullet) => !["Product Name", "Carrier Name"].includes(bullet.title))}
+          />
+        </div>
+        <div className="hidden md:grid md:grid-cols-2 gap-3">
           {section.bullets
             .filter((bullet) => !["Product Name", "Carrier Name"].includes(bullet.title))
             .map((bullet, index) => (
