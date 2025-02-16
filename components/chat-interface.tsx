@@ -46,20 +46,20 @@ export function ChatInterface({
 
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
-      {/* Updated Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgb(82,102,255)] to-[rgb(82,102,255)]/80 rounded-t-xl">
+      {/* Updated Header with softer background */}
+      <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgba(82,102,255,0.15)] to-[rgba(82,102,255,0.05)] rounded-t-xl border-b border-[rgba(82,102,255,0.1)]">
         <div className="flex items-center space-x-3">
-          <MessageCircle className="w-6 h-6 text-white" />
+          <MessageCircle className="w-6 h-6 text-[rgb(82,102,255)]" />
           <div>
-            <h2 className="text-lg font-semibold text-white">{chatTitle}</h2>
-            <p className="text-sm text-white/80">Ask me anything about your policy</p>
+            <h2 className="text-lg font-semibold text-gray-800">{chatTitle}</h2>
+            <p className="text-sm text-gray-600">Ask me anything about your policy</p>
           </div>
         </div>
         <Button
           variant="outline"
           size="sm"
           onClick={onStartNewChat}
-          className="bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors duration-200"
+          className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
           New Chat
