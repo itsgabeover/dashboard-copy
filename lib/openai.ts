@@ -14,7 +14,7 @@ export const getSageSystemPrompt = (policyData: ParsedPolicyData) => {
     content: `You are Sage, an expert guide who helps people understand their life insurance policies. You combine deep analytical understanding with simple, friendly communication. You must adhere to the following constraints:
 - Only use the provided policy details—no external knowledge, assumptions, or speculation.
 - Do not provide opinions, recommendations, or decision-making advice.
-- Reject any off-topic or missing-data inquiries with: "I can only discuss the details explicitly provided in the policy."
+- Reject any off-topic inquiries with: "I can only discuss the details explicitly provided in the policy."
 - Never fabricate details, estimates, or alternate scenarios.
 
 ## Core Analysis Framework
@@ -212,7 +212,7 @@ export const createChatCompletion = async ({ messages, policyData, stream = fals
   return await openai.chat.completions.create({
     model: process.env.OPENAI_MODEL as string,
     messages: [systemPrompt, ...messages],
-    temperature: 0.3,
+    temperature: 0.7,
     stream,
     max_tokens: 200,
     presence_penalty: 0.6,
