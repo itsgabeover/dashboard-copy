@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, ChevronDown, ChevronUp } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, Circle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
@@ -406,17 +406,19 @@ export default function Dashboard() {
                 </div>
 
                 {/* Chat helper text and button inside the white box */}
-                <div className="text-center mt-6 pt-6 border-t">
-                  <p className="text-gray-600 mb-3">{tab.chatSubtext}</p>
-                  <div className="flex justify-center">
-                    <Button
-                      onClick={scrollToChat}
-                      className="group flex items-center gap-2 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 transition-all duration-300 w-48"
-                    >
-                      Chat With Your AI Helper
-                      <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                    </Button>
+                <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
+                  <div className="flex items-center space-x-2 text-gray-600">
+                    <Circle className="w-5 h-5 text-[rgb(82,102,255)]" />
+                    <span className="text-sm">{tab.chatSubtext}</span>
                   </div>
+                  <Button
+                    onClick={scrollToChat}
+                    variant="outline"
+                    className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
+                  >
+                    <span>Start Chat</span>
+                    <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                  </Button>
                 </div>
               </div>
               {/* Chat Section (Area 2) */}
