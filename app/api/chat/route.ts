@@ -9,30 +9,28 @@ import type { Chat, ChatMessage, ParsedPolicyData } from "@/types/chat"
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
+// Add message limit constant
+const USER_MESSAGE_LIMIT = 500
+
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
-// Helper to ensure complete responses
 function ensureCompleteResponse(text: string): string {
   let finalText = text.trim()
 
-  // If message ends abruptly with a number list item, add closing period
   if (finalText.match(/\d\.\s+[^.!?]*$/)) {
     finalText += "."
   }
 
-  // If message ends with an incomplete thought about benefits, complete it
   if (finalText.match(/benefits\s*$/i)) {
     finalText += " that come with your policy."
   }
 
-  // Ensure proper sentence ending
   if (finalText.match(/\w+$/)) {
     finalText += "."
   }
 
-  // Clean up any double periods
   finalText = finalText.replace(/\.+/g, ".")
 
   return finalText
@@ -40,7 +38,6 @@ function ensureCompleteResponse(text: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    // Parse request
     const body = await req.json()
     const { chat_id, session_id, content } = body
     const userEmail = req.headers.get("X-User-Email")
@@ -52,14 +49,19 @@ export async function POST(req: NextRequest) {
     if (!content?.trim()) {
       return NextResponse.json({ error: "Message content required" }, { status: 400 })
     }
+    // Add length validation
+    if (content.length > USER_MESSAGE_LIMIT) {
+      return NextResponse.json({ 
+        error: "Message exceeds maximum length",
+        details: `Message must not exceed ${USER_MESSAGE_LIMIT} characters`
+      }, { status: 400 })
+    }
 
-    // Get or create chat session
     const chat = await getOrCreateChat(userEmail, chat_id, session_id)
     if (!chat) {
       return NextResponse.json({ error: "Invalid chat session" }, { status: 400 })
     }
 
-    // Fetch policy data
     const { data: policy, error: policyError } = await supabase
       .from("policies")
       .select("*")
@@ -70,13 +72,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Policy not found" }, { status: 404 })
     }
 
-    // Save user message
     const userMessage = await saveMessage(chat.id, "user", content)
     if (!userMessage) {
       return NextResponse.json({ error: "Failed to save message" }, { status: 500 })
     }
 
-    // Get chat history
     const { data: history } = await supabase
       .from("chat_messages")
       .select("*")
@@ -84,30 +84,25 @@ export async function POST(req: NextRequest) {
       .order("created_at", { ascending: true })
       .limit(10)
 
-    // Format messages for OpenAI
     const messages = history?.map(msg => ({
       role: msg.role,
       content: msg.content
     })) || []
 
-    // Create OpenAI chat completion
     const completion = await createChatCompletion({
       messages: [...messages, { role: "user", content }],
       policyData: policy.analysis_data as ParsedPolicyData,
       stream: true
     })
 
-    // Create stream with enhanced completion handling
     try {
       const stream = OpenAIStream(
         completion as unknown as Response,
         {
           async onCompletion(completion) {
             try {
-              // Ensure the response is complete and properly formatted
               const finalResponse = ensureCompleteResponse(completion)
               
-              // Save complete assistant response
               await saveMessage(chat.id, "assistant", finalResponse)
               await updateChatTimestamp(chat.id)
               console.log("Saved assistant response:", { 
@@ -127,7 +122,6 @@ export async function POST(req: NextRequest) {
         }
       )
 
-      // Return the streaming response
       return new StreamingTextResponse(stream)
     } catch (streamError) {
       console.error("Streaming error:", streamError)
@@ -149,7 +143,6 @@ async function getOrCreateChat(
   session_id?: string
 ): Promise<Chat | null> {
   try {
-    // Try to get existing chat
     if (chat_id) {
       const { data: chat, error } = await supabase
         .from("chats")
@@ -161,7 +154,6 @@ async function getOrCreateChat(
       if (!error && chat) return chat
     }
 
-    // Try to get chat by session
     if (session_id) {
       const { data: chat, error } = await supabase
         .from("chats")
@@ -172,7 +164,6 @@ async function getOrCreateChat(
 
       if (!error && chat) return chat
 
-      // Create new chat
       const { data: newChat, error: createError } = await supabase
         .from("chats")
         .insert({
