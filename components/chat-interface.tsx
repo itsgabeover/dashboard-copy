@@ -45,24 +45,25 @@ export function ChatInterface({
   }
 
   return (
-    <div className="flex flex-col h-[800px] bg-white rounded-xl">
-      {/* Header */}
-      <div className="flex flex-col px-6 py-3 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <MessageCircle className="w-5 h-5" />
-            {chatTitle}
-          </h2>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onStartNewChat}
-            className="flex items-center gap-1.5 text-sm hover:bg-gray-50"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Start New Chat
-          </Button>
+    <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
+      {/* Updated Header */}
+      <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgb(82,102,255)] to-[rgb(82,102,255)]/80 rounded-t-xl">
+        <div className="flex items-center space-x-3">
+          <MessageCircle className="w-6 h-6 text-white" />
+          <div>
+            <h2 className="text-lg font-semibold text-white">{chatTitle}</h2>
+            <p className="text-sm text-white/80">Ask me anything about your policy</p>
+          </div>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onStartNewChat}
+          className="bg-white/10 text-white border-white/20 hover:bg-white/20 transition-colors duration-200"
+        >
+          <RefreshCw className="w-4 h-4 mr-2" />
+          New Chat
+        </Button>
       </div>
 
       {/* Messages */}
@@ -75,7 +76,7 @@ export function ChatInterface({
       </div>
 
       {/* Quick Prompts and Input Area */}
-      <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto">
+      <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto rounded-b-xl">
         <div className="flex flex-wrap gap-2 mb-3">
           {quickPrompts.map((prompt, index) => (
             <Button
@@ -95,12 +96,12 @@ export function ChatInterface({
             value={inputMessage}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white"
             onKeyPress={(e) => e.key === "Enter" && onSendMessage()}
           />
           <Button
             onClick={() => onSendMessage()}
-            className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4"
+            className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
             <Send className="w-4 h-4" />
           </Button>
@@ -142,7 +143,7 @@ function ChatMessage({ role, content }: ChatMessageProps) {
       <div
         className={`
           max-w-[85%] rounded-2xl px-4 py-2.5
-          ${isUser ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}
+          ${isUser ? "bg-[rgb(82,102,255)] text-white" : "bg-gray-100 text-gray-800"}
         `}
       >
         <div className="text-sm leading-relaxed">
