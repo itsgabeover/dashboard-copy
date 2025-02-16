@@ -136,7 +136,7 @@ const tabStructure: Array<{
   },
   {
     id: "policyPower",
-    label: "How Your Policy Works",
+    label: "Smart Policy Care",
     sections: ["policyPower"],
     chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
     chatTitle: "Let me explain any part of your policy in more detail.",
