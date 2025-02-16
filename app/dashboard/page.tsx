@@ -154,7 +154,7 @@ const tabStructure: Array<{
   },
   {
     id: "protectionInsights",
-    label: "How Your Coverage Works",
+    label: "Smart Policy Care",
     sections: ["protectionInsights"],
     chatPrompts: [
       "Help me understand my illness benefits",
