@@ -4,6 +4,7 @@ import type React from "react"
 import { useState, useEffect, useCallback, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import PDFDownloadButton from "@/components/PDFDownloadButton"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle } from "lucide-react"
@@ -451,6 +452,18 @@ export default function Dashboard() {
             </TabsContent>
           ))}
         </Tabs>
+
+        {/* Add the PDFDownloadButton at the bottom of the page */}
+        {policyData && (
+          <div className="mt-8 pb-8">
+            <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
+          </div>
+        )}
+
+        {/* Added button */}
+        <Button className="w-full mt-4 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90">
+          Additional Action Button
+        </Button>
       </div>
     </div>
   )
