@@ -1,25 +1,27 @@
 "use client"
 
-import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-interface PDFDownloadButtonProps {
-  sessionId: string
-  email: string
-}
-
-const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
+export default function PDFDownloadButton({ sessionId, email }) {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(null)
 
   const handleDownload = async () => {
+    if (!sessionId || !email) {
+      setError("Missing required session data")
+      return
+    }
+
     setIsLoading(true)
     setError(null)
-
+    
     try {
+      // Log the request
+      console.log("Starting PDF generation request", { sessionId, email })
+      
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
         headers: {
@@ -31,20 +33,29 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         }),
       })
 
+      // Log the response status
+      console.log("PDF generation response status:", response.status)
+
       if (!response.ok) {
-        throw new Error("Failed to generate PDF")
+        const errorText = await response.text()
+        console.error("Error response:", errorText)
+        throw new Error(`Server error: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log("PDF generation response:", data)
 
-      if (data.downloadUrl) {
-        window.open(data.downloadUrl, "_blank")
-      } else {
-        throw new Error("No download URL received")
+      if (!data.downloadUrl) {
+        throw new Error("No download URL in response")
       }
+
+      // Log the URL we're about to open
+      console.log("Opening download URL:", data.downloadUrl)
+      window.open(data.downloadUrl, "_blank")
+      
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      console.error("Download error:", err)
+      console.error("PDF generation error:", err)
+      setError(err instanceof Error ? err.message : "Failed to generate PDF")
     } finally {
       setIsLoading(false)
     }
@@ -69,15 +80,15 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
           </>
         )}
       </Button>
-
       {error && (
         <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {error}
+            <br />
+            <small>If this persists, check the console for details.</small>
+          </AlertDescription>
         </Alert>
       )}
     </div>
   )
 }
-
-export default PDFDownloadButton
-
