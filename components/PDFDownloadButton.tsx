@@ -25,7 +25,6 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // First call n8n webhook to initiate PDF generation
       console.log("Starting PDF generation request", { sessionId, email })
       
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
@@ -50,16 +49,18 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       const data = await response.json()
       console.log("N8N response data:", data)
 
-      // Check for signedURL in the response structure
-      const signedURL = data?.body?.signedURL || data?.signedURL
-      if (!signedURL) {
+      if (!data?.[0]?.body?.signedURL) {
         console.error("Missing signedURL in response:", data)
         throw new Error("No download URL received")
       }
 
-      // Direct use of signed URL
-      console.log("Opening download URL:", signedURL)
-      window.open(signedURL, "_blank")
+      // Construct the full Supabase URL
+      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co"
+      const signedURL = data[0].body.signedURL
+      const fullUrl = `${supabaseUrl}${signedURL}`
+      
+      console.log("Opening download URL:", fullUrl)
+      window.open(fullUrl, "_blank")
       
     } catch (err) {
       console.error("PDF generation error:", err)
