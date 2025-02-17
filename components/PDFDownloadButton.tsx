@@ -5,6 +5,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { supabase } from "@/lib/supabase" // Make sure this is imported
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -25,12 +26,17 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
+      // Get Supabase session
+      const { data: { session }, error: authError } = await supabase.auth.getSession()
+      if (authError) throw authError
+
       console.log("Starting PDF generation request", { sessionId, email })
       
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": session ? `Bearer ${session.access_token}` : '',
         },
         body: JSON.stringify({
           session_id: sessionId,
@@ -39,25 +45,34 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error("Error response:", errorText)
         throw new Error(`Server error: ${response.status}`)
       }
 
       const responseData = await response.json()
-      const data = Array.isArray(responseData) ? responseData[0] : responseData
+      console.log("N8N Response:", responseData)
 
+      const data = Array.isArray(responseData) ? responseData[0] : responseData
       if (!data?.body?.signedURL) {
         throw new Error("No download URL received")
       }
 
-      // Use the complete Supabase storage API URL
-      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      // Get the signed URL from the response
       const signedURL = data.body.signedURL
-      const fullUrl = `${supabaseUrl}${signedURL}`
+      
+      // Construct the full URL using storage API endpoint
+      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co"
+      const fullUrl = `${supabaseUrl}/storage/v1${signedURL}`
       
       console.log("Opening download URL:", fullUrl)
-      window.open(fullUrl, "_blank")
+
+      // Use anchor element for download
+      const link = document.createElement('a')
+      link.href = fullUrl
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
       
     } catch (err) {
       console.error("PDF generation error:", err)
