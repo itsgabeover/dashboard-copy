@@ -1,5 +1,6 @@
 "use client"
 
+import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
@@ -10,7 +11,16 @@ interface PDFDownloadButtonProps {
   email: string
 }
 
-export default function PDFDownloadButton({ sessionId, email }: PDFDownloadButtonProps) {
+interface N8NResponse {
+  body: {
+    signedURL: string
+  }
+  headers: Record<string, string>
+  statusCode: number
+  statusMessage: string
+}
+
+const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -22,7 +32,7 @@ export default function PDFDownloadButton({ sessionId, email }: PDFDownloadButto
 
     setIsLoading(true)
     setError(null)
-    
+
     try {
       // Log the request
       console.log("Starting PDF generation request", { sessionId, email })
@@ -47,16 +57,19 @@ export default function PDFDownloadButton({ sessionId, email }: PDFDownloadButto
         throw new Error(`Server error: ${response.status}`)
       }
 
-      const data = await response.json()
+      const data: N8NResponse = await response.json()
       console.log("PDF generation response:", data)
 
-      if (!data.downloadUrl) {
-        throw new Error("No download URL in response")
+      if (!data.body?.signedURL) {
+        throw new Error("No signed URL in response")
       }
 
-      // Log the URL we're about to open
-      console.log("Opening download URL:", data.downloadUrl)
-      window.open(data.downloadUrl, "_blank")
+      // Construct the full URL using your Supabase project URL
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      const fullUrl = `${baseUrl}${data.body.signedURL}`
+      
+      console.log("Opening download URL:", fullUrl)
+      window.open(fullUrl, "_blank")
       
     } catch (err) {
       console.error("PDF generation error:", err)
@@ -90,10 +103,12 @@ export default function PDFDownloadButton({ sessionId, email }: PDFDownloadButto
           <AlertDescription>
             {error}
             <br />
-            <small>If this persists, check the console for details.</small>
+            <small>If this persists, please try refreshing the page.</small>
           </AlertDescription>
         </Alert>
       )}
     </div>
   )
 }
+
+export default PDFDownloadButton
