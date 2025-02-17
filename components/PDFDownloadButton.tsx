@@ -5,9 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-export default function PDFDownloadButton({ sessionId, email }) {
+interface PDFDownloadButtonProps {
+  sessionId: string
+  email: string
+}
+
+export default function PDFDownloadButton({ sessionId, email }: PDFDownloadButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleDownload = async () => {
     if (!sessionId || !email) {
