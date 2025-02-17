@@ -34,13 +34,15 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // Log the request
       console.log("Starting PDF generation request", { sessionId, email })
       
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
+          // Add CORS headers if needed
+          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           session_id: sessionId,
@@ -48,7 +50,6 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         }),
       })
 
-      // Log the response status
       console.log("PDF generation response status:", response.status)
 
       if (!response.ok) {
@@ -64,16 +65,35 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error("No signed URL in response")
       }
 
-      // Construct the full URL using your Supabase project URL
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-      const fullUrl = `${baseUrl}${data.body.signedURL}`
+      // Get base URL from response or use default
+      const supabaseStorageUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      
+      // Ensure the signedURL starts with a forward slash
+      const cleanSignedURL = data.body.signedURL.startsWith('/') 
+        ? data.body.signedURL 
+        : '/' + data.body.signedURL
+
+      const fullUrl = `${supabaseStorageUrl}${cleanSignedURL}`
       
       console.log("Opening download URL:", fullUrl)
+
+      // First check if URL is accessible
+      try {
+        const urlCheck = await fetch(fullUrl, { method: 'HEAD' })
+        if (!urlCheck.ok) {
+          throw new Error("Generated URL is not accessible")
+        }
+      } catch (urlError) {
+        console.error("URL verification failed:", urlError)
+        throw new Error("Could not verify download URL")
+      }
+
       window.open(fullUrl, "_blank")
       
     } catch (err) {
       console.error("PDF generation error:", err)
-      setError(err instanceof Error ? err.message : "Failed to generate PDF")
+      const errorMessage = err instanceof Error ? err.message : "Failed to generate PDF"
+      setError(`${errorMessage}. Please try again or contact support.`)
     } finally {
       setIsLoading(false)
     }
@@ -103,7 +123,9 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
           <AlertDescription>
             {error}
             <br />
-            <small>If this persists, please try refreshing the page.</small>
+            <small className="text-xs mt-1 block">
+              If this persists, try refreshing the page or contact support.
+            </small>
           </AlertDescription>
         </Alert>
       )}
