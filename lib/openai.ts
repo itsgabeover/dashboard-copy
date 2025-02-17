@@ -197,7 +197,7 @@ export const createChatCompletion = async ({ messages, policyData, stream = fals
     messages: [systemPrompt, ...messages],
     temperature: 0.7,
     stream,
-    max_tokens: 200,
+    max_tokens: 500,
     presence_penalty: 0.6,
     frequency_penalty: 0.3,
   })
