@@ -38,25 +38,22 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         }),
       })
 
-      console.log("PDF generation response status:", response.status)
-
       if (!response.ok) {
         const errorText = await response.text()
         console.error("Error response:", errorText)
         throw new Error(`Server error: ${response.status}`)
       }
 
-      const data = await response.json()
-      console.log("N8N response data:", data)
+      const responseData = await response.json()
+      const data = Array.isArray(responseData) ? responseData[0] : responseData
 
-      if (!data?.[0]?.body?.signedURL) {
-        console.error("Missing signedURL in response:", data)
+      if (!data?.body?.signedURL) {
         throw new Error("No download URL received")
       }
 
-      // Construct the full Supabase URL
-      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co"
-      const signedURL = data[0].body.signedURL
+      // Use the complete Supabase storage API URL
+      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      const signedURL = data.body.signedURL
       const fullUrl = `${supabaseUrl}${signedURL}`
       
       console.log("Opening download URL:", fullUrl)
