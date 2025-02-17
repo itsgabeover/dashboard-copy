@@ -11,15 +11,6 @@ interface PDFDownloadButtonProps {
   email: string
 }
 
-interface N8NResponse {
-  body: {
-    signedURL: string
-  }
-  headers: Record<string, string>
-  statusCode: number
-  statusMessage: string
-}
-
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -34,15 +25,13 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
+      // First call n8n webhook to initiate PDF generation
       console.log("Starting PDF generation request", { sessionId, email })
       
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
-          // Add CORS headers if needed
-          "Access-Control-Allow-Origin": "*",
         },
         body: JSON.stringify({
           session_id: sessionId,
@@ -58,37 +47,19 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error(`Server error: ${response.status}`)
       }
 
-      const data: N8NResponse = await response.json()
-      console.log("PDF generation response:", data)
+      const data = await response.json()
+      console.log("N8N response data:", data)
 
-      if (!data.body?.signedURL) {
-        throw new Error("No signed URL in response")
+      // Check for signedURL in the response structure
+      const signedURL = data?.body?.signedURL || data?.signedURL
+      if (!signedURL) {
+        console.error("Missing signedURL in response:", data)
+        throw new Error("No download URL received")
       }
 
-      // Get base URL from response or use default
-      const supabaseStorageUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-      
-      // Ensure the signedURL starts with a forward slash
-      const cleanSignedURL = data.body.signedURL.startsWith('/') 
-        ? data.body.signedURL 
-        : '/' + data.body.signedURL
-
-      const fullUrl = `${supabaseStorageUrl}${cleanSignedURL}`
-      
-      console.log("Opening download URL:", fullUrl)
-
-      // First check if URL is accessible
-      try {
-        const urlCheck = await fetch(fullUrl, { method: 'HEAD' })
-        if (!urlCheck.ok) {
-          throw new Error("Generated URL is not accessible")
-        }
-      } catch (urlError) {
-        console.error("URL verification failed:", urlError)
-        throw new Error("Could not verify download URL")
-      }
-
-      window.open(fullUrl, "_blank")
+      // Direct use of signed URL
+      console.log("Opening download URL:", signedURL)
+      window.open(signedURL, "_blank")
       
     } catch (err) {
       console.error("PDF generation error:", err)
@@ -124,7 +95,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
             {error}
             <br />
             <small className="text-xs mt-1 block">
-              If this persists, try refreshing the page or contact support.
+              If this persists, please try refreshing the page or contact support.
             </small>
           </AlertDescription>
         </Alert>
