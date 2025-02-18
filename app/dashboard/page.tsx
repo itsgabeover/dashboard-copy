@@ -7,13 +7,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import PDFDownloadButton from "@/components/PDFDownloadButton"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle, MessageCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
 import { ChatInterface } from "@/components/chat-interface"
 import { MobileTabsNavigation } from "@/components/MobileTabsNavigation"
 import { MobileCardGrid } from "@/components/MobileCardGrid"
+import { motion } from "framer-motion"
 
 // Email verification component
 function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
@@ -113,15 +114,7 @@ function PolicySelection({
   )
 }
 
-const tabStructure: Array<{
-  id: string
-  label: string
-  sections: string[]
-  chatPrompts: string[]
-  chatTitle: string
-  chatSubtext: string
-  title: string
-}> = [
+const tabStructure = [
   {
     id: "policyOverview",
     label: "Your Quick Look",
@@ -330,6 +323,110 @@ export default function Dashboard() {
     })
   }
 
+  const renderSectionContent = (section: PolicySection, tabData: (typeof tabStructure)[0]) => (
+    <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-3">
+      <CardHeader className="pb-2 border-b">
+        <CardTitle className="text-xl font-semibold text-gray-900">{tabData.title}</CardTitle>
+      </CardHeader>
+      <CardContent className="p-3">
+        <div className="space-y-3">
+          {section.opening && (
+            <p className="text-gray-700 pl-4">
+              {tabData.id === "policyOverview"
+                ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
+                : tabData.id === "policyPower"
+                  ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
+                  : tabData.id === "builtInAdvantages"
+                    ? "Your life insurance comes with valuable extras built right in. Here's how these features work for you and your family when you need them."
+                    : tabData.id === "protectionInsights"
+                      ? "Let's look at what keeps your life insurance solid and dependable. Understanding these points helps you get the most from your coverage."
+                      : tabData.id === "advisorTopics"
+                        ? "Your advisor helps make sure your life insurance stays aligned with your goals. Here are key points to discuss at your next meeting."
+                        : tabData.id === "pathForward"
+                          ? "Let's make sure your life insurance stays strong. Here are simple steps you can take to keep everything running smoothly."
+                          : section.opening}
+            </p>
+          )}
+          <div className="md:hidden">
+            <MobileCardGrid
+              items={section.bullets.filter(
+                (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
+              )}
+            />
+          </div>
+          <div className="hidden md:grid md:grid-cols-2 gap-3">
+            {section.bullets
+              .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
+              .map((bullet, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Card className="bg-white shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105">
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-4">
+                        <div className="mt-1 flex-shrink-0">
+                          <div className="rounded-full bg-gradient-to-r from-[rgb(82,102,255)] to-[rgb(82,182,255)] p-2">
+                            <ArrowRight className="h-4 w-4 text-white" />
+                          </div>
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <h3 className="font-medium text-gray-900">{bullet.title.replace(":", "")}</h3>
+                          <p className="text-sm text-gray-600">{bullet.content}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+          </div>
+        </div>
+
+        {/* Enhanced Chat helper text and button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="flex flex-col sm:flex-row items-center justify-between mt-6 pt-6 border-t border-gray-200"
+        >
+          <div className="flex items-center space-x-2 text-gray-600 mb-4 sm:mb-0">
+            <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
+            <span className="text-sm font-medium">{tabData.chatSubtext}</span>
+          </div>
+          <Button
+            onClick={scrollToChat}
+            variant="outline"
+            className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-gradient-to-r from-[rgb(82,102,255)] to-[rgb(82,182,255)] hover:text-white transition-all duration-300 transform hover:scale-105"
+          >
+            <MessageCircle className="w-5 h-5 mr-2" />
+            <span>Start Chat</span>
+            <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+          </Button>
+        </motion.div>
+      </CardContent>
+    </Card>
+  )
+
+  const renderSkeletonContent = () => (
+    <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
+      <CardHeader className="pb-2 border-b">
+        <Skeleton className="h-6 w-2/3" />
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="space-y-6">
+          <Skeleton className="h-24 w-full" />
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-4 w-full" />
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -361,12 +458,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
         <header className="text-center mb-8 bg-white p-6 rounded-xl shadow-sm">
           {policyData && policyData.analysis_data.data.policyOverview && (
             <>
-              <h1 className="text-3xl font-bold mb-2 text-[rgb(82,102,255)]">
+              <h1 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-[rgb(82,102,255)] to-[rgb(82,182,255)]">
                 {policyData.analysis_data.data.policyOverview.productName || "Policy Overview"}
               </h1>
               <h2 className="text-xl text-gray-600">{policyData.analysis_data.data.policyOverview.issuer || ""}</h2>
@@ -380,14 +477,20 @@ export default function Dashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full justify-start mb-6 hidden md:flex flex-wrap gap-2">
-            {tabStructure.map((tab) => (
-              <TabsTrigger
+            {tabStructure.map((tab, index) => (
+              <motion.div
                 key={tab.id}
-                value={tab.id}
-                className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 data-[state=active]:bg-[rgb(82,102,255)] data-[state=active]:text-white focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                {tab.label}
-              </TabsTrigger>
+                <TabsTrigger
+                  value={tab.id}
+                  className="flex-1 py-3 px-4 rounded-lg transition-all duration-200 ease-in-out bg-white shadow-sm hover:bg-gray-50 data-[state=active]:bg-gradient-to-r from-[rgb(82,102,255)] to-[rgb(82,182,255)] data-[state=active]:text-white focus:ring-2 focus:ring-[rgb(82,102,255)] focus:outline-none transform hover:scale-105"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              </motion.div>
             ))}
           </TabsList>
 
@@ -405,37 +508,30 @@ export default function Dashboard() {
                     )
                   })}
                 </div>
-
-                {/* Chat helper text and button inside the white box */}
-                <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
-                    <span className="text-sm">{tab.chatSubtext}</span>
-                  </div>
-                  <Button
-                    onClick={scrollToChat}
-                    variant="outline"
-                    className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
-                  >
-                    <span>Start Chat</span>
-                    <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                  </Button>
-                </div>
               </div>
-              {/* Chat Section (Area 2) */}
-              <div
+
+              {/* Enhanced Chat Section (Area 2) */}
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
                 ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6"
+                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6 overflow-hidden"
               >
+                <div className="absolute inset-0 bg-gradient-to-br from-[rgba(82,102,255,0.05)] to-[rgba(82,182,255,0.05)]"></div>
                 <Button
                   onClick={scrollToContent}
-                  className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
+                  className="absolute top-3 right-3 z-10 bg-gradient-to-r from-[rgb(82,102,255)] to-[rgb(82,182,255)] text-white hover:from-[rgb(82,102,255)]/90 hover:to-[rgb(82,182,255)]/90 rounded-full shadow-md"
                   size="icon"
                 >
                   <ChevronUp className="w-4 h-4" />
                   <span className="sr-only">Return to top</span>
                 </Button>
-                <div className="px-4 h-full flex flex-col justify-between">
+                <div className="px-4 h-full flex flex-col justify-between relative z-10">
+                  <div className="mb-6 text-center">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-2">{tab.chatTitle}</h3>
+                    <p className="text-gray-600">{tab.chatSubtext}</p>
+                  </div>
                   <ChatInterface
                     messages={chatMessages}
                     inputMessage={inputMessage}
@@ -444,11 +540,11 @@ export default function Dashboard() {
                     onSendMessage={handleSendMessage}
                     onStartNewChat={() => setChatMessages([])}
                     quickPrompts={tab.chatPrompts}
-                    chatTitle={tab.chatTitle}
+                    chatTitle=""
                     chatSubtext=""
                   />
                 </div>
-              </div>
+              </motion.div>
             </TabsContent>
           ))}
         </Tabs>
@@ -469,77 +565,3 @@ export default function Dashboard() {
   )
 }
 
-const renderSectionContent = (section: PolicySection, tabData: (typeof tabStructure)[0]) => (
-  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-3">
-    <CardHeader className="pb-2 border-b">
-      <CardTitle className="text-xl font-semibold text-gray-900">{tabData.title}</CardTitle>
-    </CardHeader>
-    <CardContent className="p-3">
-      <div className="space-y-3">
-        {section.opening && (
-          <p className="text-gray-700 pl-4">
-            {tabData.id === "policyOverview"
-              ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
-              : tabData.id === "policyPower"
-                ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
-                : tabData.id === "builtInAdvantages"
-                  ? "Your life insurance comes with valuable extras built right in. Here's how these features work for you and your family when you need them."
-                  : tabData.id === "protectionInsights"
-                    ? "Let's look at what keeps your life insurance solid and dependable. Understanding these points helps you get the most from your coverage."
-                    : tabData.id === "advisorTopics"
-                      ? "Your advisor helps make sure your life insurance stays aligned with your goals. Here are key points to discuss at your next meeting."
-                      : tabData.id === "pathForward"
-                        ? "Let's make sure your life insurance stays strong. Here are simple steps you can take to keep everything running smoothly."
-                        : section.opening}
-          </p>
-        )}
-        <div className="md:hidden">
-          <MobileCardGrid
-            items={section.bullets.filter(
-              (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
-            )}
-          />
-        </div>
-        <div className="hidden md:grid md:grid-cols-2 gap-3">
-          {section.bullets
-            .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
-            .map((bullet, index) => (
-              <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="mt-1 flex-shrink-0">
-                      <div className="rounded-full bg-[rgb(82,102,255)]/10 p-2">
-                        <ArrowRight className="h-4 w-4 text-[rgb(82,102,255)]" />
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <h3 className="font-medium text-gray-900">{bullet.title.replace(":", "")}</h3>
-                      <p className="text-sm text-gray-600">{bullet.content}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-)
-
-const renderSkeletonContent = () => (
-  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
-    <CardHeader className="pb-2 border-b">
-      <Skeleton className="h-6 w-2/3" />
-    </CardHeader>
-    <CardContent className="p-6">
-      <div className="space-y-6">
-        <Skeleton className="h-24 w-full" />
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-4 w-full" />
-          ))}
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-)
