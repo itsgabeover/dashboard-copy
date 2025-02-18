@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { supabase } from '@/lib/supabase' // We need this back!
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -50,29 +51,27 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error("Invalid response format from server")
       }
 
-      const signedURL = data.body.signedURL
-      console.log("Extracted signed URL:", signedURL)
+      // Extract the path from the signed URL
+      const filePath = `${email}/analysis_${sessionId}.pdf`
+      console.log("Attempting to download file:", filePath)
 
-      // Step 3: Construct the full URL with the base URL and signed URL
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co"
-      const fullURL = signedURL.startsWith('http') ? signedURL : `${baseUrl}${signedURL}`
-      
-      console.log("Attempting download with URL:", fullURL)
+      // Use Supabase client instead of direct fetch to avoid CORS
+      const { data: fileData, error: downloadError } = await supabase
+        .storage
+        .from('policy-pdfs')
+        .download(filePath)
 
-      // Step 4: Make the download request with the signed URL
-      const downloadResponse = await fetch(fullURL, {
-        headers: {
-          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        }
-      })
-
-      if (!downloadResponse.ok) {
-        throw new Error(`Download failed: ${downloadResponse.status}`)
+      if (downloadError) {
+        console.error("Download error:", downloadError)
+        throw new Error(`Download failed: ${downloadError.message}`)
       }
 
-      // Step 5: Create and trigger download
-      const blob = await downloadResponse.blob()
-      const url = window.URL.createObjectURL(blob)
+      if (!fileData) {
+        throw new Error("No file data received")
+      }
+
+      // Create and trigger download
+      const url = window.URL.createObjectURL(fileData)
       const a = document.createElement('a')
       a.href = url
       a.download = `insurance_analysis_${sessionId}.pdf`
