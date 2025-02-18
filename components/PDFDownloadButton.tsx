@@ -48,7 +48,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       try {
         data = JSON.parse(rawData)
         console.log("Parsed response data:", data)
-      } catch (parseError) {
+      } catch {
         throw new Error(`Failed to parse response: ${rawData}`)
       }
 
