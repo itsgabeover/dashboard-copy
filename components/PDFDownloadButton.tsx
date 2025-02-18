@@ -5,7 +5,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { supabase } from "@/lib/supabase"
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -26,19 +25,13 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // First, ensure we have a valid Supabase session
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        throw new Error("No authenticated session")
-      }
-
-      console.log("Starting PDF generation request", { sessionId, email })
+      // Step 1: Call n8n webhook to generate PDF
+      console.log("Calling n8n webhook", { sessionId, email })
       
-      const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
+      const n8nResponse = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           session_id: sessionId,
@@ -46,38 +39,34 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         }),
       })
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`)
+      if (!n8nResponse.ok) {
+        const errorText = await n8nResponse.text()
+        console.error("N8N Error:", errorText)
+        throw new Error(`PDF generation failed: ${n8nResponse.status}`)
       }
 
-      const responseData = await response.json()
+      // Step 2: Get the response data
+      const responseData = await n8nResponse.json()
       console.log("N8N Response:", responseData)
 
+      // Handle array response
       const data = Array.isArray(responseData) ? responseData[0] : responseData
-      if (!data?.body?.signedURL) {
-        throw new Error("No download URL received")
-      }
-
-      // Get the signed URL path
-      const signedURLPath = data.body.signedURL
       
-      // Get a direct download URL from Supabase Storage
-      const { data: fileData, error: downloadError } = await supabase
-        .storage
-        .from('policy-pdfs')
-        .createSignedUrl(signedURLPath, 3600) // 1 hour expiry
-
-      if (downloadError || !fileData?.signedUrl) {
-        console.error("Storage access error:", downloadError)
-        throw new Error("Failed to access file storage")
+      if (!data?.body?.signedURL) {
+        console.error("Invalid response format:", data)
+        throw new Error("Invalid response from PDF generation")
       }
 
-      // Use the direct signed URL from Supabase
-      console.log("Opening download URL:", fileData.signedUrl)
-      window.open(fileData.signedUrl, "_blank")
+      // Step 3: Open the signed URL
+      const signedURL = data.body.signedURL
+      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      const fullUrl = `${supabaseUrl}${signedURL}`
+      
+      console.log("Opening URL:", fullUrl)
+      window.open(fullUrl, "_blank")
       
     } catch (err) {
-      console.error("PDF generation error:", err)
+      console.error("Download error:", err)
       const errorMessage = err instanceof Error ? err.message : "Failed to generate PDF"
       setError(`${errorMessage}. Please try again or contact support.`)
     } finally {
