@@ -68,13 +68,16 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
 
           // If we get here, we have a valid signed URL
           const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-          const fullUrl = `${baseUrl}${signedURL}`
-          const encodedUrl = encodeURI(fullUrl)
 
-          console.log("Download URL:", encodedUrl)
+          // Remove the leading slash if it exists
+          const cleanSignedURL = signedURL.startsWith("/") ? signedURL.slice(1) : signedURL
+
+          const fullUrl = `${baseUrl}/${cleanSignedURL}`
+
+          console.log("Download URL:", fullUrl)
 
           // Validate URL accessibility
-          const urlCheck = await fetch(encodedUrl, {
+          const urlCheck = await fetch(fullUrl, {
             method: "HEAD",
             mode: "cors",
             credentials: "omit",
@@ -85,7 +88,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
           }
 
           // Trigger download
-          window.open(encodedUrl, "_blank")
+          window.open(fullUrl, "_blank")
           return // Success - exit the function
         } catch (err) {
           if (err instanceof Error && err.message === "retry" && attempts < maxAttempts - 1) {
