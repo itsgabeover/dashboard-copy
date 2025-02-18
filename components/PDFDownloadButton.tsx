@@ -15,6 +15,37 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+  const attemptPdfDownload = async (): Promise<string> => {
+    const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ session_id: sessionId, email }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`PDF generation request failed with status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    console.log("Response data:", data)
+
+    // Check if we got the workflow started message
+    if (data?.message === "Workflow was started") {
+      throw new Error("retry") // Special error to trigger retry
+    }
+
+    // Check for the expected response format
+    if (Array.isArray(data) && data[0]?.body?.signedURL) {
+      return data[0].body.signedURL
+    }
+
+    throw new Error("Unexpected response format")
+  }
+
   const handleDownload = async () => {
     if (!sessionId || !email) {
       setError("Missing session ID or email")
@@ -25,89 +56,51 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // Step 1: Request PDF generation
-      console.log("Initiating PDF generation request:", { sessionId, email })
+      let attempts = 0
+      const maxAttempts = 5 // Maximum number of retry attempts
+      const initialDelay = 2000 // Start with 2 second delay
 
-      const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ session_id: sessionId, email }),
-      })
+      while (attempts < maxAttempts) {
+        try {
+          console.log(`Attempt ${attempts + 1} of ${maxAttempts}`)
 
-      if (!response.ok) {
-        throw new Error(`PDF generation request failed with status: ${response.status}`)
-      }
+          const signedURL = await attemptPdfDownload()
 
-      // Step 2: Parse the initial response
-      const initialData = await response.json()
-      console.log("Initial response:", initialData)
+          // If we get here, we have a valid signed URL
+          const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+          const fullUrl = `${baseUrl}${signedURL}`
+          const encodedUrl = encodeURI(fullUrl)
 
-      if (initialData?.message === "Workflow was started") {
-        // Step 3: Poll for the actual PDF URL
-        let attempts = 0
-        const maxAttempts = 10
-        const pollInterval = 2000 // 2 seconds
+          console.log("Download URL:", encodedUrl)
 
-        while (attempts < maxAttempts) {
-          await new Promise((resolve) => setTimeout(resolve, pollInterval))
-
-          const pollResponse = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/check-pdf-status", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ session_id: sessionId, email }),
+          // Validate URL accessibility
+          const urlCheck = await fetch(encodedUrl, {
+            method: "HEAD",
+            mode: "cors",
+            credentials: "omit",
           })
 
-          if (!pollResponse.ok) {
+          if (!urlCheck.ok) {
+            throw new Error(`Download URL validation failed: ${urlCheck.status}`)
+          }
+
+          // Trigger download
+          window.open(encodedUrl, "_blank")
+          return // Success - exit the function
+        } catch (err) {
+          if (err instanceof Error && err.message === "retry" && attempts < maxAttempts - 1) {
+            // Wait before retrying, with exponential backoff
+            const waitTime = initialDelay * Math.pow(1.5, attempts)
+            console.log(`Waiting ${waitTime}ms before retry...`)
+            await delay(waitTime)
             attempts++
             continue
           }
-
-          const pollData = await pollResponse.json()
-          console.log("Poll response:", pollData)
-
-          if (pollData?.[0]?.body?.signedURL) {
-            // Step 4: Construct and validate download URL
-            const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-            const fullUrl = `${baseUrl}${pollData[0].body.signedURL}`
-            const encodedUrl = encodeURI(fullUrl)
-
-            console.log("Found download URL:", encodedUrl)
-
-            // Step 5: Validate URL accessibility
-            const urlCheck = await fetch(encodedUrl, {
-              method: "HEAD",
-              mode: "cors",
-              credentials: "omit",
-            })
-
-            if (!urlCheck.ok) {
-              throw new Error(`Download URL validation failed: ${urlCheck.status}`)
-            }
-
-            // Step 6: Trigger download
-            window.open(encodedUrl, "_blank")
-            return
-          }
-
-          attempts++
+          throw err // Re-throw if it's not a retry error or we're out of attempts
         }
-
-        throw new Error("Timeout waiting for PDF generation")
-      } else if (initialData?.[0]?.body?.signedURL) {
-        // Handle immediate response case
-        const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-        const fullUrl = `${baseUrl}${initialData[0].body.signedURL}`
-        const encodedUrl = encodeURI(fullUrl)
-
-        console.log("Immediate download URL:", encodedUrl)
-        window.open(encodedUrl, "_blank")
-      } else {
-        throw new Error("Unexpected response format")
       }
+
+      throw new Error("PDF generation timed out. Please try again.")
     } catch (err) {
       console.error("PDF Download Error:", err)
       const errorMessage = err instanceof Error ? err.message : "Failed to generate PDF"
@@ -127,7 +120,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating PDF...
+            {`Generating PDF...`}
           </>
         ) : (
           <>
