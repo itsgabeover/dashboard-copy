@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { supabase } from "@/lib/supabase" // Make sure this is imported
+import { supabase } from "@/lib/supabase"
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -26,9 +26,11 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // Get Supabase session
-      const { data: { session }, error: authError } = await supabase.auth.getSession()
-      if (authError) throw authError
+      // First, ensure we have a valid Supabase session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error("No authenticated session")
+      }
 
       console.log("Starting PDF generation request", { sessionId, email })
       
@@ -36,7 +38,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": session ? `Bearer ${session.access_token}` : '',
+          "Authorization": `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           session_id: sessionId,
@@ -56,23 +58,23 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error("No download URL received")
       }
 
-      // Get the signed URL from the response
-      const signedURL = data.body.signedURL
+      // Get the signed URL path
+      const signedURLPath = data.body.signedURL
       
-      // Construct the full URL using storage API endpoint
-      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co"
-      const fullUrl = `${supabaseUrl}/storage/v1${signedURL}`
-      
-      console.log("Opening download URL:", fullUrl)
+      // Get a direct download URL from Supabase Storage
+      const { data: fileData, error: downloadError } = await supabase
+        .storage
+        .from('policy-pdfs')
+        .createSignedUrl(signedURLPath, 3600) // 1 hour expiry
 
-      // Use anchor element for download
-      const link = document.createElement('a')
-      link.href = fullUrl
-      link.target = '_blank'
-      link.rel = 'noopener noreferrer'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      if (downloadError || !fileData?.signedUrl) {
+        console.error("Storage access error:", downloadError)
+        throw new Error("Failed to access file storage")
+      }
+
+      // Use the direct signed URL from Supabase
+      console.log("Opening download URL:", fileData.signedUrl)
+      window.open(fileData.signedUrl, "_blank")
       
     } catch (err) {
       console.error("PDF generation error:", err)
