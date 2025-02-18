@@ -1,5 +1,4 @@
 "use client"
-
 import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -9,15 +8,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 interface PDFDownloadButtonProps {
   sessionId: string
   email: string
-}
-
-interface N8NResponse {
-  body: {
-    signedURL: string
-  }
-  headers: Record<string, string>
-  statusCode: number
-  statusMessage: string
 }
 
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
@@ -57,19 +47,16 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error(`Server error: ${response.status}`)
       }
 
-      const data: N8NResponse = await response.json()
-      console.log("PDF generation response:", data)
+      // Wait for the response but we don't need to use the signedURL
+      await response.json()
 
-      if (!data.body?.signedURL) {
-        throw new Error("No signed URL in response")
-      }
-
-      // Construct the full URL using your Supabase project URL
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-      const fullUrl = `${baseUrl}${data.body.signedURL}`
+      // Construct the direct download URL using the known path structure
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1/object/public/policy-pdfs"
+      const filePath = `${email}/analysis_${sessionId}.pdf`
+      const downloadUrl = `${baseUrl}/${filePath}`
       
-      console.log("Opening download URL:", fullUrl)
-      window.open(fullUrl, "_blank")
+      console.log("Opening download URL:", downloadUrl)
+      window.open(downloadUrl, "_blank")
       
     } catch (err) {
       console.error("PDF generation error:", err)
