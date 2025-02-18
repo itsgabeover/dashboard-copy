@@ -52,9 +52,9 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error("Invalid response from PDF service")
       }
 
-      // Construct the full URL
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-      const fullUrl = `${baseUrl}${responseData.body.signedURL}`
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1/auth";
+      const fullUrl = `${baseUrl}${responseData.body.signedURL}`;
+
       
       console.log("Opening download URL:", fullUrl)
       window.open(fullUrl, "_blank")
