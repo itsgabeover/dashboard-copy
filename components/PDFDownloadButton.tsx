@@ -3,52 +3,30 @@
 import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Download, Loader2 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface PDFDownloadButtonProps {
   sessionId: string
   email: string
 }
 
+interface N8NResponse {
+  body: {
+    signedURL: string
+  }
+  headers: Record<string, string>
+  statusCode: number
+  statusMessage: string
+}
+
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-  const attemptPdfDownload = async (): Promise<string> => {
-    const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ session_id: sessionId, email }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`PDF generation request failed with status: ${response.status}`)
-    }
-
-    const data = await response.json()
-    console.log("Response data:", data)
-
-    // Check if we got the workflow started message
-    if (data?.message === "Workflow was started") {
-      throw new Error("retry") // Special error to trigger retry
-    }
-
-    // Check for the expected response format
-    if (Array.isArray(data) && data[0]?.body?.signedURL) {
-      return data[0].body.signedURL
-    }
-
-    throw new Error("Unexpected response format")
-  }
-
   const handleDownload = async () => {
     if (!sessionId || !email) {
-      setError("Missing session ID or email")
+      setError("Missing required session data")
       return
     }
 
@@ -56,58 +34,46 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      let attempts = 0
-      const maxAttempts = 5 // Maximum number of retry attempts
-      const initialDelay = 2000 // Start with 2 second delay
+      // Log the request
+      console.log("Starting PDF generation request", { sessionId, email })
+      
+      const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          session_id: sessionId,
+          email: email,
+        }),
+      })
 
-      while (attempts < maxAttempts) {
-        try {
-          console.log(`Attempt ${attempts + 1} of ${maxAttempts}`)
+      // Log the response status
+      console.log("PDF generation response status:", response.status)
 
-          const signedURL = await attemptPdfDownload()
-
-          // If we get here, we have a valid signed URL
-          const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-
-          // Remove the leading slash if it exists
-          const cleanSignedURL = signedURL.startsWith("/") ? signedURL.slice(1) : signedURL
-
-          const fullUrl = `${baseUrl}/${cleanSignedURL}`
-
-          console.log("Download URL:", fullUrl)
-
-          // Validate URL accessibility
-          const urlCheck = await fetch(fullUrl, {
-            method: "HEAD",
-            mode: "cors",
-            credentials: "omit",
-          })
-
-          if (!urlCheck.ok) {
-            throw new Error(`Download URL validation failed: ${urlCheck.status}`)
-          }
-
-          // Trigger download
-          window.open(fullUrl, "_blank")
-          return // Success - exit the function
-        } catch (err) {
-          if (err instanceof Error && err.message === "retry" && attempts < maxAttempts - 1) {
-            // Wait before retrying, with exponential backoff
-            const waitTime = initialDelay * Math.pow(1.5, attempts)
-            console.log(`Waiting ${waitTime}ms before retry...`)
-            await delay(waitTime)
-            attempts++
-            continue
-          }
-          throw err // Re-throw if it's not a retry error or we're out of attempts
-        }
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("Error response:", errorText)
+        throw new Error(`Server error: ${response.status}`)
       }
 
-      throw new Error("PDF generation timed out. Please try again.")
+      const data: N8NResponse = await response.json()
+      console.log("PDF generation response:", data)
+
+      if (!data.body?.signedURL) {
+        throw new Error("No signed URL in response")
+      }
+
+      // Construct the full URL using your Supabase project URL
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      const fullUrl = `${baseUrl}${data.body.signedURL}`
+      
+      console.log("Opening download URL:", fullUrl)
+      window.open(fullUrl, "_blank")
+      
     } catch (err) {
-      console.error("PDF Download Error:", err)
-      const errorMessage = err instanceof Error ? err.message : "Failed to generate PDF"
-      setError(`${errorMessage}. Please try again.`)
+      console.error("PDF generation error:", err)
+      setError(err instanceof Error ? err.message : "Failed to generate PDF")
     } finally {
       setIsLoading(false)
     }
@@ -118,12 +84,12 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       <Button
         onClick={handleDownload}
         disabled={isLoading}
-        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+        className="w-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white"
       >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {`Generating PDF...`}
+            Generating PDF...
           </>
         ) : (
           <>
@@ -134,7 +100,11 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       </Button>
       {error && (
         <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>
+            {error}
+            <br />
+            <small>If this persists, please try refreshing the page.</small>
+          </AlertDescription>
         </Alert>
       )}
     </div>
@@ -142,4 +112,3 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
 }
 
 export default PDFDownloadButton
-
