@@ -13,32 +13,39 @@ interface PDFDownloadButtonProps {
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [downloadProgress, setDownloadProgress] = useState<string>("")
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-  const attemptDownload = async (signedURL: string, maxAttempts = 5): Promise<Response> => {
+  const attemptDownload = async (signedURL: string, maxAttempts = 3): Promise<Response> => {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         console.log(`Download attempt ${attempt} of ${maxAttempts}...`)
+        console.log('Using signed URL:', signedURL)
+        
         const response = await fetch(signedURL, {
+          method: 'GET',
           headers: {
+            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
             'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            'Content-Type': 'application/json'
           },
         })
 
+        console.log(`Response status:`, response.status)
         if (response.ok) {
           return response
         }
 
         if (attempt < maxAttempts) {
-          // Wait longer between each attempt (3s, 6s, 9s, 12s)
-          const waitTime = attempt * 3000
-          console.log(`File not ready, waiting ${waitTime/1000} seconds before retry...`)
+          const waitTime = 3000
+          console.log(`Waiting ${waitTime/1000} seconds before retry...`)
           await delay(waitTime)
         } else {
           throw new Error(`Download failed after ${maxAttempts} attempts`)
         }
       } catch (err) {
+        console.error(`Attempt ${attempt} error:`, err)
         if (attempt === maxAttempts) {
           throw err
         }
@@ -57,7 +64,6 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // First request to get signed URL
       console.log("Starting PDF generation request", { sessionId, email })
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
@@ -79,19 +85,22 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       const data = await response.json()
       console.log("PDF generation response:", data)
 
-      // Wait initial 2 seconds for n8n to start processing
-      console.log("Waiting initial delay for n8n processing...")
-      await delay(2000)
+      if (!data.signedURL) {
+        throw new Error("No signed URL received from server")
+      }
+      console.log('Received signed URL:', data.signedURL)
 
-      // Attempt download with retries
+      // Wait initial 3 seconds for n8n processing
+      console.log("Waiting for initial n8n processing...")
+      await delay(3000)
+
       const downloadResponse = await attemptDownload(data.signedURL)
       
-      // Create blob and download
       const blob = await downloadResponse.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `analysis_${sessionId}.pdf`
+      a.download = `insurance_analysis_${sessionId}.pdf`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
@@ -115,7 +124,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Generating PDF...
+            {downloadProgress || "Generating PDF..."}
           </>
         ) : (
           <>
