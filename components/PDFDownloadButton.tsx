@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Download, Loader2 } from "lucide-react"
+import { Download, Loader2 } from 'lucide-react'
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface PDFDownloadButtonProps {
@@ -49,14 +49,21 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       const responseData = Array.isArray(data) ? data[0] : data
       
       if (!responseData?.body?.signedURL) {
-        throw new Error("Invalid response from PDF service")
+        throw new Error("Invalid response from PDF service: Missing signedURL")
       }
 
       const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1";
       const fullUrl = `${baseUrl}${responseData.body.signedURL}`;
 
-      
       console.log("Opening download URL:", fullUrl)
+      
+      // Use fetch to check if the URL is valid before opening it
+      const urlCheck = await fetch(fullUrl, { method: 'HEAD' })
+      if (!urlCheck.ok) {
+        throw new Error(`Invalid download URL: ${urlCheck.status}`)
+      }
+
+      // If the URL is valid, open it in a new tab
       window.open(fullUrl, "_blank")
 
     } catch (err) {
