@@ -16,43 +16,6 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-  const attemptDownload = async (signedURL: string): Promise<Response> => {
-    // Wait 15 seconds before first attempt
-    console.log("Waiting 15 seconds for file to be ready...")
-    await delay(15000)
-    
-    try {
-      console.log('Attempting download with signed URL:', signedURL)
-      
-      // Construct full URL if needed
-      const fullURL = signedURL.startsWith('http') 
-        ? signedURL 
-        : `https://bacddplyskvckljpmgbe.supabase.co/storage/v1${signedURL}`
-      
-      console.log('Using full URL:', fullURL)
-      
-      const response = await fetch(fullURL, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          'Content-Type': 'application/json'
-        },
-      })
-
-      console.log(`Download response status:`, response.status)
-      
-      if (!response.ok) {
-        throw new Error(`Download failed with status: ${response.status}`)
-      }
-      
-      return response
-    } catch (err) {
-      console.error(`Download error:`, err)
-      throw err
-    }
-  }
-
   const handleDownload = async () => {
     if (!sessionId || !email) {
       setError("Missing required session data")
@@ -63,6 +26,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
+      // Step 1: Just initiate the n8n webhook
       console.log("Starting PDF generation request", { sessionId, email })
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
@@ -76,33 +40,21 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error("Error response:", errorText)
-        throw new Error(`Server error: ${response.status}`)
+        throw new Error(`Failed to initiate PDF generation: ${response.status}`)
       }
 
-      const data = await response.json()
-      console.log("PDF generation response:", data)
+      // Step 2: Wait for n8n to finish processing (15 seconds)
+      console.log("Waiting for PDF generation to complete...")
+      await delay(15000)
 
-      // Check specifically for the signedURL in the response body
-      if (!data.body?.signedURL) {
-        console.error("Response data:", data)
-        throw new Error("No signed URL received from server")
-      }
+      // Step 3: Now construct the expected file URL
+      const filename = `analysis_${sessionId}.pdf`
+      const fileUrl = `https://bacddplyskvckljpmgbe.supabase.co/storage/v1/object/public/policy-pdfs/${email}/${filename}`
       
-      console.log('Received signed URL:', data.body.signedURL)
-
-      const downloadResponse = await attemptDownload(data.body.signedURL)
+      console.log("Attempting to download from:", fileUrl)
       
-      const blob = await downloadResponse.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `insurance_analysis_${sessionId}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
+      // Trigger download in new tab
+      window.open(fileUrl, '_blank')
       
     } catch (err) {
       console.error("PDF generation error:", err)
