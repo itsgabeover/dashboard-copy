@@ -47,14 +47,13 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error(`Server error: ${response.status}`)
       }
 
-      // Wait for the response to ensure PDF generation is complete
-      await response.json()
+      const data = await response.json()
+      console.log("PDF generation response:", data)
 
-      // Construct the direct download URL using the correct Supabase storage URL structure
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1/object/public"
-      const filePath = `policy-pdfs/${email}/analysis_${sessionId}.pdf`
-      const downloadUrl = `${baseUrl}/${filePath}`
-      
+      // Construct the full URL
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      const downloadUrl = baseUrl + data.signedURL
+
       console.log("Opening download URL:", downloadUrl)
       window.open(downloadUrl, "_blank")
       
