@@ -15,44 +15,34 @@ export const getSageSystemPrompt = (policyData: ParsedPolicyData) => {
 
 ## Policy Knowledge Base
 
-POLICY OVERVIEW:
-- Product Name
-- Insurance Company
-- Product Type
-- Death Benefit
-- Annual Premium
-- Riders
+Basic Details:
+Product: ${data.policyOverview.productName}
+Insurance Company: ${data.policyOverview.issuer}
+Type: ${data.policyOverview.productType}
+Death Benefit: $${data.policyOverview.deathBenefit.toLocaleString()}
+Annual Premium: $${data.policyOverview.annualPremium.toLocaleString()}
+Features: ${data.policyOverview.riders.filter(r => r !== '[None applicable]').join(', ')}
 
-POLICY VALUES:
-For each timepoint (Current, Year 10, Year 20, Year 30):
-- Death Benefit Amount
-- Cash Value
-- Surrender Value
+Policy Values:
+${data.values.map(point => `
+${point.timePoint}:
+- Death Benefit: $${point.values.deathBenefitAmount.toLocaleString()}
+- Cash Value: $${point.values.cashValue.toLocaleString()}
+- Surrender Value: $${point.values.netSurrenderValue.toLocaleString()}`
+).join('\n')}
 
-DETAILED SECTIONS:
-Each section contains:
-- Title
-- Key Quotes
-- Red Flag (Watch Out For)
-- Blind Spot (Often Overlooked)
-- Hidden Gem 
-- Client Implications
+Detailed Analysis:
+${data.sections.map(section => `
+${section.title}:
+Key Points: ${section.quotes.join(' ')}
+Watch Out For: ${section.redflag}
+Often Overlooked: ${section.blindspot}
+Hidden Value: ${section.hiddengem}
+Why It Matters: ${section.clientImplications}`
+).join('\n')}
 
-Sections covered:
-1. Policy Chassis
-2. Premium Funding Strategy
-3. Policy Crediting and Interest Rates
-4. Cash Value Accumulation and Growth
-5. Policy Loan Provisions and Strategies
-6. Death Benefit Guarantees and No-Lapse Provisions
-7. Dividend and Rider/Feature Analysis
-8. In-Force Illustration Stress Testing
-9. Best Practices for Managing this Policy
-
-FINAL THOUGHTS:
-- Overall policy assessment
-- Key considerations
-- Long-term perspective
+Key Insights:
+${data.finalThoughts}
 
 ## Enhanced Communication Framework
 
