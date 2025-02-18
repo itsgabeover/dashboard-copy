@@ -3,8 +3,8 @@
 import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Download, Loader2 } from 'lucide-react'
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Download, Loader2 } from "lucide-react"
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -17,7 +17,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
 
   const handleDownload = async () => {
     if (!sessionId || !email) {
-      setError("Missing required data")
+      setError("Missing session ID or email")
       return
     }
 
@@ -25,17 +25,12 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      console.log("Starting PDF generation", { sessionId, email })
-      
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          session_id: sessionId,
-          email: email,
-        }),
+        body: JSON.stringify({ session_id: sessionId, email }),
       })
 
       if (!response.ok) {
@@ -43,33 +38,29 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       }
 
       const data = await response.json()
-      console.log("N8N Response:", data)
+      console.log("N8N Response:", JSON.stringify(data, null, 2))
 
-      // Handle array response from n8n
       const responseData = Array.isArray(data) ? data[0] : data
-      
+
       if (!responseData?.body?.signedURL) {
-        throw new Error("Invalid response from PDF service: Missing signedURL")
+        throw new Error("Invalid response: Missing signed URL")
       }
 
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1";
-      const fullUrl = `${baseUrl}${responseData.body.signedURL}`;
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+      const fullUrl = `${baseUrl}${responseData.body.signedURL}`
+      const encodedUrl = encodeURI(fullUrl)
 
-      console.log("Opening download URL:", fullUrl)
-      
-      // Use fetch to check if the URL is valid before opening it
-      const urlCheck = await fetch(fullUrl, { method: 'HEAD' })
+      console.log("Download URL:", encodedUrl)
+
+      const urlCheck = await fetch(encodedUrl, { method: "HEAD", mode: "cors" })
       if (!urlCheck.ok) {
         throw new Error(`Invalid download URL: ${urlCheck.status}`)
       }
 
-      // If the URL is valid, open it in a new tab
-      window.open(fullUrl, "_blank")
-
+      window.open(encodedUrl, "_blank")
     } catch (err) {
       console.error("Download error:", err)
-      const errorMessage = err instanceof Error ? err.message : "Failed to generate PDF"
-      setError(`${errorMessage}. Please try again.`)
+      setError(err instanceof Error ? err.message : "Failed to generate PDF")
     } finally {
       setIsLoading(false)
     }
@@ -80,7 +71,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       <Button
         onClick={handleDownload}
         disabled={isLoading}
-        className="w-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white"
+        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
       >
         {isLoading ? (
           <>
@@ -96,9 +87,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       </Button>
       {error && (
         <Alert variant="destructive">
-          <AlertDescription>
-            {error}
-          </AlertDescription>
+          <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
     </div>
@@ -106,3 +95,4 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
 }
 
 export default PDFDownloadButton
+
