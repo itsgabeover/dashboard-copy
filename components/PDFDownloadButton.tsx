@@ -16,41 +16,41 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-  const attemptDownload = async (signedURL: string, maxAttempts = 3): Promise<Response> => {
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        console.log(`Download attempt ${attempt} of ${maxAttempts}...`)
-        console.log('Using signed URL:', signedURL)
-        
-        const response = await fetch(signedURL, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-            'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            'Content-Type': 'application/json'
-          },
-        })
+  const attemptDownload = async (signedURL: string): Promise<Response> => {
+    // Wait 15 seconds before first attempt
+    console.log("Waiting 15 seconds for file to be ready...")
+    await delay(15000)
+    
+    try {
+      console.log('Attempting download with signed URL:', signedURL)
+      
+      // Construct full URL if needed
+      const fullURL = signedURL.startsWith('http') 
+        ? signedURL 
+        : `https://bacddplyskvckljpmgbe.supabase.co/storage/v1${signedURL}`
+      
+      console.log('Using full URL:', fullURL)
+      
+      const response = await fetch(fullURL, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+          'Content-Type': 'application/json'
+        },
+      })
 
-        console.log(`Response status:`, response.status)
-        if (response.ok) {
-          return response
-        }
-
-        if (attempt < maxAttempts) {
-          const waitTime = 3000
-          console.log(`Waiting ${waitTime/1000} seconds before retry...`)
-          await delay(waitTime)
-        } else {
-          throw new Error(`Download failed after ${maxAttempts} attempts`)
-        }
-      } catch (err) {
-        console.error(`Attempt ${attempt} error:`, err)
-        if (attempt === maxAttempts) {
-          throw err
-        }
+      console.log(`Download response status:`, response.status)
+      
+      if (!response.ok) {
+        throw new Error(`Download failed with status: ${response.status}`)
       }
+      
+      return response
+    } catch (err) {
+      console.error(`Download error:`, err)
+      throw err
     }
-    throw new Error("Download failed")
   }
 
   const handleDownload = async () => {
@@ -84,16 +84,15 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       const data = await response.json()
       console.log("PDF generation response:", data)
 
-      if (!data.signedURL) {
+      // Check specifically for the signedURL in the response body
+      if (!data.body?.signedURL) {
+        console.error("Response data:", data)
         throw new Error("No signed URL received from server")
       }
-      console.log('Received signed URL:', data.signedURL)
+      
+      console.log('Received signed URL:', data.body.signedURL)
 
-      // Wait initial 3 seconds for n8n processing
-      console.log("Waiting for initial n8n processing...")
-      await delay(3000)
-
-      const downloadResponse = await attemptDownload(data.signedURL)
+      const downloadResponse = await attemptDownload(data.body.signedURL)
       
       const blob = await downloadResponse.blob()
       const url = window.URL.createObjectURL(blob)
