@@ -40,47 +40,74 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error(`PDF generation request failed with status: ${response.status}`)
       }
 
-      // Step 2: Parse the response
-      const rawData = await response.text()
-      console.log("Raw response:", rawData)
+      // Step 2: Parse the initial response
+      const initialData = await response.json()
+      console.log("Initial response:", initialData)
 
-      let data
-      try {
-        data = JSON.parse(rawData)
-        console.log("Parsed response data:", data)
-      } catch {
-        throw new Error(`Failed to parse response: ${rawData}`)
+      if (initialData?.message === "Workflow was started") {
+        // Step 3: Poll for the actual PDF URL
+        let attempts = 0
+        const maxAttempts = 10
+        const pollInterval = 2000 // 2 seconds
+
+        while (attempts < maxAttempts) {
+          await new Promise((resolve) => setTimeout(resolve, pollInterval))
+
+          const pollResponse = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/check-pdf-status", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ session_id: sessionId, email }),
+          })
+
+          if (!pollResponse.ok) {
+            attempts++
+            continue
+          }
+
+          const pollData = await pollResponse.json()
+          console.log("Poll response:", pollData)
+
+          if (pollData?.[0]?.body?.signedURL) {
+            // Step 4: Construct and validate download URL
+            const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+            const fullUrl = `${baseUrl}${pollData[0].body.signedURL}`
+            const encodedUrl = encodeURI(fullUrl)
+
+            console.log("Found download URL:", encodedUrl)
+
+            // Step 5: Validate URL accessibility
+            const urlCheck = await fetch(encodedUrl, {
+              method: "HEAD",
+              mode: "cors",
+              credentials: "omit",
+            })
+
+            if (!urlCheck.ok) {
+              throw new Error(`Download URL validation failed: ${urlCheck.status}`)
+            }
+
+            // Step 6: Trigger download
+            window.open(encodedUrl, "_blank")
+            return
+          }
+
+          attempts++
+        }
+
+        throw new Error("Timeout waiting for PDF generation")
+      } else if (initialData?.[0]?.body?.signedURL) {
+        // Handle immediate response case
+        const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+        const fullUrl = `${baseUrl}${initialData[0].body.signedURL}`
+        const encodedUrl = encodeURI(fullUrl)
+
+        console.log("Immediate download URL:", encodedUrl)
+        window.open(encodedUrl, "_blank")
+      } else {
+        throw new Error("Unexpected response format")
       }
-
-      // Step 3: Extract signed URL
-      const responseData = Array.isArray(data) ? data[0] : data
-      console.log("Processing response data:", responseData)
-
-      if (!responseData?.body?.signedURL) {
-        console.error("Invalid response structure:", responseData)
-        throw new Error("Response missing signed URL")
-      }
-
-      // Step 4: Construct and validate download URL
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-      const fullUrl = `${baseUrl}${responseData.body.signedURL}`
-      const encodedUrl = encodeURI(fullUrl)
-
-      console.log("Attempting to download from URL:", encodedUrl)
-
-      // Step 5: Validate URL accessibility
-      const urlCheck = await fetch(encodedUrl, {
-        method: "HEAD",
-        mode: "cors",
-        credentials: "omit",
-      })
-
-      if (!urlCheck.ok) {
-        throw new Error(`Download URL validation failed: ${urlCheck.status}`)
-      }
-
-      // Step 6: Trigger download
-      window.open(encodedUrl, "_blank")
     } catch (err) {
       console.error("PDF Download Error:", err)
       const errorMessage = err instanceof Error ? err.message : "Failed to generate PDF"
