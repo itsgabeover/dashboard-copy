@@ -1,10 +1,11 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { supabase } from "@/lib/supabase"
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -14,6 +15,34 @@ interface PDFDownloadButtonProps {
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Function to handle PDF generation via n8n
+  const generatePDF = async () => {
+    const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        session_id: sessionId,
+        email: email,
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`PDF generation failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    console.log("N8N Response:", data)
+    return Array.isArray(data) ? data[0] : data
+  }
+
+  // Function to construct and validate Supabase URL
+  const constructStorageUrl = (signedURL: string) => {
+    const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
+    return `${baseUrl}${signedURL}`
+  }
 
   const handleDownload = async () => {
     if (!sessionId || !email) {
@@ -25,46 +54,27 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // Step 1: Call n8n webhook to generate PDF
-      console.log("Calling n8n webhook", { sessionId, email })
-      
-      const n8nResponse = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          session_id: sessionId,
-          email: email,
-        }),
-      })
-
-      if (!n8nResponse.ok) {
-        const errorText = await n8nResponse.text()
-        console.error("N8N Error:", errorText)
-        throw new Error(`PDF generation failed: ${n8nResponse.status}`)
+      // Step 1: Check Supabase session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        throw new Error("Not authenticated")
       }
 
-      // Step 2: Get the response data
-      const responseData = await n8nResponse.json()
-      console.log("N8N Response:", responseData)
+      // Step 2: Generate PDF via n8n
+      console.log("Starting PDF generation", { sessionId, email })
+      const n8nResponse = await generatePDF()
 
-      // Handle array response
-      const data = Array.isArray(responseData) ? responseData[0] : responseData
-      
-      if (!data?.body?.signedURL) {
-        console.error("Invalid response format:", data)
-        throw new Error("Invalid response from PDF generation")
+      // Step 3: Validate n8n response
+      if (!n8nResponse?.body?.signedURL) {
+        console.error("Invalid n8n response:", n8nResponse)
+        throw new Error("Invalid response from PDF generation service")
       }
 
-      // Step 3: Open the signed URL
-      const signedURL = data.body.signedURL
-      const supabaseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-      const fullUrl = `${supabaseUrl}${signedURL}`
-      
-      console.log("Opening URL:", fullUrl)
-      window.open(fullUrl, "_blank")
-      
+      // Step 4: Construct and open URL
+      const downloadUrl = constructStorageUrl(n8nResponse.body.signedURL)
+      console.log("Opening download URL:", downloadUrl)
+      window.open(downloadUrl, "_blank")
+
     } catch (err) {
       console.error("Download error:", err)
       const errorMessage = err instanceof Error ? err.message : "Failed to generate PDF"
@@ -73,6 +83,15 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       setIsLoading(false)
     }
   }
+
+  // Verify auth on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        setError("Please sign in to download documents")
+      }
+    })
+  }, [])
 
   return (
     <div className="space-y-4">
