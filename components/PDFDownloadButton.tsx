@@ -52,7 +52,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error("Invalid response from PDF service")
       }
 
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1/auth";
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1";
       const fullUrl = `${baseUrl}${responseData.body.signedURL}`;
 
       
