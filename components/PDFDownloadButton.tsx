@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { supabase } from '@/lib/supabase'
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -49,39 +50,52 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
 
       // Step 3: Get the actual response data which should contain the signed URL
       const data = await response.json()
-      console.log("Response data:", data)
-
-      if (!data[0]?.body?.signedURL) {
-        throw new Error("No signed URL received")
-      }
-
-      const signedURL = data[0].body.signedURL
-      console.log("Received signed URL:", signedURL)
-
-      // Step 4: Construct the full URL with the base URL and signed URL
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co"
-      const fullURL = signedURL.startsWith('http') ? signedURL : `${baseUrl}${signedURL}`
+      console.log("Raw n8n response:", data)
       
-      console.log("Full URL:", fullURL)
-
-      // Step 5: Make the download request with the signed URL and both authorization headers
-      const downloadResponse = await fetch(fullURL, {
-        headers: {
-          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!downloadResponse.ok) {
-        const errorText = await downloadResponse.text()
-        console.error("Download response error:", errorText)
-        throw new Error(`Download failed: ${downloadResponse.status} - ${errorText}`)
+      // Add more detailed error checking
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        console.error("Invalid response format:", data)
+        throw new Error("Invalid response from server")
       }
 
-      // Step 6: Create and trigger download
-      const blob = await downloadResponse.blob()
-      const url = window.URL.createObjectURL(blob)
+      const firstResponse = data[0]
+      console.log("First response object:", firstResponse)
+
+      if (!firstResponse || !firstResponse.body || typeof firstResponse.body.signedURL !== 'string') {
+        console.error("Missing or invalid signed URL in response:", firstResponse)
+        throw new Error("Invalid response format from server")
+      }
+
+      const signedURL = firstResponse.body.signedURL
+      console.log("Extracted signed URL:", signedURL)
+
+      // Extract the file path from the signed URL
+      const pathMatch = signedURL.match(/\/policy-pdfs\/(.+\.pdf)/)
+      if (!pathMatch) {
+        console.error("Could not extract file path from signed URL:", signedURL)
+        throw new Error("Invalid file path in signed URL")
+      }
+
+      const filePath = pathMatch[1]
+      console.log("Extracted file path:", filePath)
+
+      // Use Supabase client to download
+      const { data: fileData, error: downloadError } = await supabase
+        .storage
+        .from('policy-pdfs')
+        .download(filePath)
+
+      if (downloadError) {
+        console.error("Download error:", downloadError)
+        throw new Error(`Download failed: ${downloadError.message}`)
+      }
+
+      if (!fileData) {
+        throw new Error("No file data received")
+      }
+
+      // Create and trigger download
+      const url = window.URL.createObjectURL(fileData)
       const a = document.createElement('a')
       a.href = url
       a.download = `insurance_analysis_${sessionId}.pdf`
