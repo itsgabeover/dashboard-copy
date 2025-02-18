@@ -24,9 +24,8 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // Log the request
+      // First request to get signed URL
       console.log("Starting PDF generation request", { sessionId, email })
-      
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
         headers: {
@@ -38,9 +37,6 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         }),
       })
 
-      // Log the response status
-      console.log("PDF generation response status:", response.status)
-
       if (!response.ok) {
         const errorText = await response.text()
         console.error("Error response:", errorText)
@@ -50,12 +46,27 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
       const data = await response.json()
       console.log("PDF generation response:", data)
 
-      // Construct the full URL
-      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co/storage/v1"
-      const downloadUrl = baseUrl + data.signedURL
+      // Second request to actually download the file
+      const downloadResponse = await fetch(data.signedURL, {
+        headers: {
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        },
+      })
 
-      console.log("Opening download URL:", downloadUrl)
-      window.open(downloadUrl, "_blank")
+      if (!downloadResponse.ok) {
+        throw new Error(`Download failed: ${downloadResponse.status}`)
+      }
+
+      // Create blob and download
+      const blob = await downloadResponse.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `analysis_${sessionId}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
       
     } catch (err) {
       console.error("PDF generation error:", err)
