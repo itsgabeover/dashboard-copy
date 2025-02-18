@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Download, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { supabase } from '@/lib/supabase' // We need this back!
+import { supabase } from '@/lib/supabase'
 
 interface PDFDownloadButtonProps {
   sessionId: string
@@ -14,6 +14,8 @@ interface PDFDownloadButtonProps {
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
   const handleDownload = async () => {
     if (!sessionId || !email) {
@@ -42,7 +44,11 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error(`Failed to initiate PDF generation: ${response.status}`)
       }
 
-      // Step 2: Get the actual response data which should contain the signed URL
+      // Step 2: Wait for n8n to process (20 seconds)
+      console.log("Waiting for PDF generation to complete...")
+      await delay(20000)
+
+      // Step 3: Get the actual response data which should contain the signed URL
       const data = await response.json()
       console.log("Raw response:", data)
 
@@ -51,14 +57,23 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error("Invalid response format from server")
       }
 
-      // Extract the path from the signed URL
-      const filePath = `${email}/analysis_${sessionId}.pdf`
-      console.log("Attempting to download file:", filePath)
+      const signedURL = data.body.signedURL
+      console.log("Extracted signed URL:", signedURL)
 
-      // Use Supabase client instead of direct fetch to avoid CORS
+      // Extract filename from signedURL
+      const fileNameMatch = signedURL.match(/analysis_[^?]+\.pdf/)
+      if (!fileNameMatch) {
+        throw new Error("Could not extract filename from URL")
+      }
+
+      const fileName = fileNameMatch[0]
+      const filePath = `${email}/${fileName}`
+      console.log("Attempting to download:", filePath)
+
+      // Use Supabase client to download
       const { data: fileData, error: downloadError } = await supabase
         .storage
-        .from('policy-pdfs')
+        .from('policy-pdfs') // Make sure this matches your bucket name exactly
         .download(filePath)
 
       if (downloadError) {
