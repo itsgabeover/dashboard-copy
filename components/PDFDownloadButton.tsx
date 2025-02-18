@@ -26,7 +26,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
     setError(null)
 
     try {
-      // Step 1: Just initiate the n8n webhook
+      // Step 1: Initiate n8n webhook
       console.log("Starting PDF generation request", { sessionId, email })
       const response = await fetch("https://financialplanner-ai.app.n8n.cloud/webhook/generate-pdf", {
         method: "POST",
@@ -43,18 +43,48 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         throw new Error(`Failed to initiate PDF generation: ${response.status}`)
       }
 
-      // Step 2: Wait for n8n to finish processing (15 seconds)
+      // Step 2: Wait for n8n to process
       console.log("Waiting for PDF generation to complete...")
       await delay(15000)
 
-      // Step 3: Now construct the expected file URL
-      const filename = `analysis_${sessionId}.pdf`
-      const fileUrl = `https://bacddplyskvckljpmgbe.supabase.co/storage/v1/object/public/policy-pdfs/${email}/${filename}`
+      // Step 3: Get the actual response data which should contain the signed URL
+      const data = await response.json()
+      console.log("Response data:", data)
+
+      if (!data[0]?.body?.signedURL) {
+        throw new Error("No signed URL received")
+      }
+
+      const signedURL = data[0].body.signedURL
+      console.log("Received signed URL:", signedURL)
+
+      // Step 4: Construct the full URL with the base URL and signed URL
+      const baseUrl = "https://bacddplyskvckljpmgbe.supabase.co"
+      const fullURL = signedURL.startsWith('http') ? signedURL : `${baseUrl}${signedURL}`
       
-      console.log("Attempting to download from:", fileUrl)
-      
-      // Trigger download in new tab
-      window.open(fileUrl, '_blank')
+      console.log("Full URL:", fullURL)
+
+      // Step 5: Make the download request with the signed URL
+      const downloadResponse = await fetch(fullURL, {
+        headers: {
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        }
+      })
+
+      if (!downloadResponse.ok) {
+        throw new Error(`Download failed: ${downloadResponse.status}`)
+      }
+
+      // Step 6: Create and trigger download
+      const blob = await downloadResponse.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `insurance_analysis_${sessionId}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
       
     } catch (err) {
       console.error("PDF generation error:", err)
