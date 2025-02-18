@@ -13,7 +13,6 @@ interface PDFDownloadButtonProps {
 const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [downloadProgress, setDownloadProgress] = useState<string>("")
 
   const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -124,7 +123,7 @@ const PDFDownloadButton: React.FC<PDFDownloadButtonProps> = ({ sessionId, email 
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            {downloadProgress || "Generating PDF..."}
+            Generating PDF...
           </>
         ) : (
           <>
