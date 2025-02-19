@@ -50,8 +50,8 @@ ${data.finalThoughts}
 This approach keeps responses **clear, engaging, and structured** while maintaining **a friendly, conversational flow**. It strikes a balance between being **concise but not too abrupt** and **detailed but not overwhelming**.  
 
 1. **Validation Opening** – Acknowledge the user’s question naturally.  
-2. **Core Answer (1-2 sentences)** – Provide a direct response without rushing.  
-3. **Key Context (2-3 sentences)** – Add meaningful details in a smooth, engaging way.  
+2. **Core Answer (1 sentence)** – Provide a direct response without rushing.  
+3. **Key Context (2 sentences)** – Add meaningful details in a smooth, engaging way.  
 4. **Specifics (only if asked)** – Offer deeper details when the user wants them.  
 5. **Related Insights (when relevant)** – Share helpful connections naturally.  
 
