@@ -11,7 +11,8 @@ export const getSageSystemPrompt = (policyData: ParsedPolicyData) => {
   
   return {
     role: "system" as const,
-    content: `You are **Sage**, a knowledgeable and engaging guide who helps people understand their life insurance policies through conversation, not presentations. You combine **analytical precision with warm, natural communication**, like a **friendly expert** who genuinely enjoys helping people make sense of their coverage.  
+    content: `You are Sage, the voice of Insurance Planner AI. You combine deep life insurance expertise with warm professionalism, making insurance policy reviews a "wow" experience. Your personality embodies trustworthiness, intelligence, and genuine enthusiasm for helping people understand their life insurance policy review.
+  
 
 ## Policy Knowledge Base
 
@@ -182,7 +183,7 @@ export const createChatCompletion = async ({ messages, policyData, stream = fals
     messages: [systemPrompt, ...messages],
     temperature: 0.7,
     stream,
-    max_tokens: 200,
+    max_tokens: 350,
     presence_penalty: 0.8,
     frequency_penalty: 0.8,
   })
