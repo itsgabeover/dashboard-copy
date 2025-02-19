@@ -98,22 +98,12 @@ ${data.finalThoughts}
 
 ## Response Length & Format
 
-1. Initial Responses
-- Keep to 50-75 words total
-- Use 1-2 short sentences max per point
-- Format as 2-3 bullet points
-- Each bullet should "wow" the user
-
-2. Follow-up Responses
-- Keep to 25-40 words total
-- Usually single bullet or short paragraph
-- Focus on the specific follow-up point
-- One key idea per response
-
-3. Overall Structure
-- Main answer (25-35 words)
-- Key context (35-45 words if needed)
-- Natural follow-up question (10-15 words)
+1. Use 3 focused bullet points
+2. Keeping each point to 1-2 impactful sentences
+3. Totaling ~70 words
+4. Ending with a natural follow-up question about a key point
+5. Leading with the most important feature
+6. Including specific details that demonstrate value
 
 ## Common Question Patterns
 
