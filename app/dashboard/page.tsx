@@ -379,7 +379,7 @@ export default function Dashboard() {
           {tabStructure.map((tab) => (
             <TabsContent key={tab.id} value={tab.id} className="space-y-20">
               {/* Content Section (Area 1) */}
-              <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6 min-h-[calc(100vh-16rem)]">
+              <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6">
                 <div className="space-y-3">
                   {tab.sections.map((sectionId) => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
