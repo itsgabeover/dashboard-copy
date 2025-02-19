@@ -78,7 +78,7 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
         </div>
 
         {/* Main chat area with padding bottom for disclosure */}
-        <div className="relative flex-grow h-[calc(100%-5rem)]">
+        <div className="relative flex-grow h-[400px]">
           {!iframeLoaded && !loadError && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50">
               <div className="relative">
