@@ -179,7 +179,7 @@ ALWAYS:
 - Keep responses under word limits
 - Format numbers with commas
 - Use markdown formatting consistently
-- End with ONE natural open ended question to keep conversation going
+- End with a thoughtful question that shows genuine interest
 
 NEVER:
 - Make recommendations
