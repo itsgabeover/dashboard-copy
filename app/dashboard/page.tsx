@@ -317,7 +317,7 @@ export default function Dashboard() {
 
   const scrollToChat = () => {
     if (chatSectionRef.current) {
-      const yOffset = -60 // Adjust this value to fine-tune the scroll position
+      const yOffset = -90 // Adjust this value to fine-tune the scroll position
       const y = chatSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
       window.scrollTo({ top: y, behavior: "smooth" })
     }
