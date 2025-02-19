@@ -202,6 +202,7 @@ export default function Dashboard() {
   const [chatMessages, setChatMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([])
   const [inputMessage, setInputMessage] = useState("")
   const [isTyping, setIsTyping] = useState(false)
+  const [isChatOpen, setIsChatOpen] = useState(false)
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
@@ -312,24 +313,6 @@ export default function Dashboard() {
     }
   }
 
-  const contentSectionRef = useRef<HTMLDivElement>(null)
-  const chatSectionRef = useRef<HTMLDivElement>(null)
-
-  const scrollToChat = () => {
-    if (chatSectionRef.current) {
-      const yOffset = 70 // Adjust this value to fine-tune the scroll position
-      const y = chatSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
-      window.scrollTo({ top: y, behavior: "smooth" })
-    }
-  }
-
-  const scrollToContent = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    })
-  }
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -406,60 +389,52 @@ export default function Dashboard() {
                   })}
                 </div>
 
-                {/* Chat helper text and button inside the white box */}
-                <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center space-x-2 text-gray-600">
-                    <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
-                    <span className="text-sm">{tab.chatSubtext}</span>
-                  </div>
-                  <Button
-                    onClick={scrollToChat}
-                    variant="outline"
-                    className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
-                  >
-                    <span>Start Chat</span>
-                    <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                  </Button>
-                </div>
-              </div>
-              {/* Chat Section (Area 2) */}
-              <div
-                ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-[300px] mt-6 pb-8 pt-6"
-              >
-                <Button
-                  onClick={scrollToContent}
-                  className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
-                  size="icon"
-                >
-                  <ChevronUp className="w-4 h-4" />
-                  <span className="sr-only">Return to top</span>
-                </Button>
+                {/* Expandable Chat Section */}
+<div className="mt-6 pt-6 border-t border-gray-200">
+  <div 
+    className="flex items-center justify-between cursor-pointer" 
+    onClick={() => setIsChatOpen(!isChatOpen)}
+  >
+    <div className="flex items-center space-x-2 text-gray-600">
+      <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
+      <span className="text-sm">{tab.chatSubtext}</span>
+    </div>
+    <Button
+      variant="outline"
+      className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
+    >
+      <span>{isChatOpen ? 'Close Chat' : 'Start Chat'}</span>
+      {isChatOpen ? (
+        <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
+      ) : (
+        <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+      )}
+    </Button>
+  </div>
 
-                <div className="px-4 h-full flex flex-col">
-                  {/* Chat Interface */}
-                  <div className="flex-1">
-                    <ChatInterface
-                      messages={chatMessages}
-                      inputMessage={inputMessage}
-                      isTyping={isTyping}
-                      onInputChange={setInputMessage}
-                      onSendMessage={handleSendMessage}
-                      onStartNewChat={() => setChatMessages([])}
-                      quickPrompts={tab.chatPrompts}
-                      chatTitle={tab.chatTitle}
-                      chatSubtext=""
-                    />
-                  </div>
-
-                  {/* Download Button at bottom */}
-                  {policyData && (
-                    <div className="mt-6 pt-4 border-t border-gray-200">
-                      <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
-                    </div>
-                  )}
-                </div>
-              </div>
+{/* Collapsible Chat Interface */}
+{isChatOpen && (
+  <div className="mt-6">
+    <ChatInterface
+      messages={chatMessages}
+      inputMessage={inputMessage}
+      isTyping={isTyping}
+      onInputChange={setInputMessage}
+      onSendMessage={handleSendMessage}
+      onStartNewChat={() => setChatMessages([])}
+      quickPrompts={tab.chatPrompts}
+      chatTitle={tab.chatTitle}
+      chatSubtext=""
+    />
+    {/* Download Button */}
+    {policyData && (
+      <div className="mt-6 pt-4 border-t border-gray-200">
+        <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
+      </div>
+    )}
+  </div>
+)}
+</div>
             </TabsContent>
           ))}
         </Tabs>
