@@ -204,6 +204,8 @@ export default function Dashboard() {
   const [isTyping, setIsTyping] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(false)
 
+  const contentSectionRef = useRef<HTMLDivElement>(null)
+
   const loadPolicies = useCallback(async (email: string) => {
     try {
       const { data, error: supabaseError } = await supabase
@@ -390,51 +392,52 @@ export default function Dashboard() {
                 </div>
 
                 {/* Expandable Chat Section */}
-<div className="mt-6 pt-6 border-t border-gray-200">
-  <div 
-    className="flex items-center justify-between cursor-pointer" 
-    onClick={() => setIsChatOpen(!isChatOpen)}
-  >
-    <div className="flex items-center space-x-2 text-gray-600">
-      <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
-      <span className="text-sm">{tab.chatSubtext}</span>
-    </div>
-    <Button
-      variant="outline"
-      className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
-    >
-      <span>{isChatOpen ? 'Close Chat' : 'Start Chat'}</span>
-      {isChatOpen ? (
-        <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
-      ) : (
-        <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-      )}
-    </Button>
-  </div>
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <div
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setIsChatOpen(!isChatOpen)}
+                  >
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
+                      <span className="text-sm">{tab.chatSubtext}</span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
+                    >
+                      <span>{isChatOpen ? "Close Chat" : "Start Chat"}</span>
+                      {isChatOpen ? (
+                        <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                      )}
+                    </Button>
+                  </div>
 
-{/* Collapsible Chat Interface */}
-{isChatOpen && (
-  <div className="mt-6">
-    <ChatInterface
-      messages={chatMessages}
-      inputMessage={inputMessage}
-      isTyping={isTyping}
-      onInputChange={setInputMessage}
-      onSendMessage={handleSendMessage}
-      onStartNewChat={() => setChatMessages([])}
-      quickPrompts={tab.chatPrompts}
-      chatTitle={tab.chatTitle}
-      chatSubtext=""
-    />
-    {/* Download Button */}
-    {policyData && (
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
-      </div>
-    )}
-  </div>
-)}
-</div>
+                  {/* Collapsible Chat Interface */}
+                  {isChatOpen && (
+                    <div className="mt-6">
+                      <ChatInterface
+                        messages={chatMessages}
+                        inputMessage={inputMessage}
+                        isTyping={isTyping}
+                        onInputChange={setInputMessage}
+                        onSendMessage={handleSendMessage}
+                        onStartNewChat={() => setChatMessages([])}
+                        quickPrompts={tab.chatPrompts}
+                        chatTitle={tab.chatTitle}
+                        chatSubtext=""
+                      />
+                      {/* Download Button */}
+                      {policyData && (
+                        <div className="mt-6 pt-4 border-t border-gray-200">
+                          <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             </TabsContent>
           ))}
         </Tabs>
