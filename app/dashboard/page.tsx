@@ -317,9 +317,11 @@ export default function Dashboard() {
 
   const scrollToChat = () => {
     if (chatSectionRef.current) {
-      const yOffset = -60 // Adjust this value to fine-tune the scroll position
-      const y = chatSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
-      window.scrollTo({ top: y, behavior: "smooth" })
+      const chatSection = chatSectionRef.current
+      const downloadButton = chatSection.querySelector('[data-testid="pdf-download-button"]')
+      if (downloadButton) {
+        downloadButton.scrollIntoView({ behavior: "smooth", block: "end" })
+      }
     }
   }
 
@@ -425,7 +427,7 @@ export default function Dashboard() {
               {/* Chat Section (Area 2) */}
               <div
                 ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6"
+                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6 flex flex-col"
               >
                 <Button
                   onClick={scrollToContent}
@@ -436,7 +438,7 @@ export default function Dashboard() {
                   <span className="sr-only">Return to top</span>
                 </Button>
 
-                <div className="px-4 h-full flex flex-col">
+                <div className="flex-1 overflow-y-auto px-4">
                   {/* Chat Interface */}
                   <div className="flex-1">
                     <ChatInterface
@@ -454,8 +456,12 @@ export default function Dashboard() {
 
                   {/* Download Button at bottom */}
                   {policyData && (
-                    <div className="mt-6 pt-4 border-t border-gray-200">
-                      <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
+                    <div className="mt-6 pt-4 border-t border-gray-200 px-4">
+                      <PDFDownloadButton
+                        sessionId={policyData.session_id}
+                        email={userEmail}
+                        data-testid="pdf-download-button"
+                      />
                     </div>
                   )}
                 </div>
@@ -542,3 +548,4 @@ const renderSkeletonContent = () => (
     </CardContent>
   </Card>
 )
+
