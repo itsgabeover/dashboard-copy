@@ -425,7 +425,7 @@ export default function Dashboard() {
               {/* Chat Section (Area 2) */}
               <div
                 ref={chatSectionRef}
-                className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6"
+                className="relative bg-white rounded-xl shadow-sm min-h-[500px] mt-6 pb-8 pt-6"
               >
                 <Button
                   onClick={scrollToContent}
