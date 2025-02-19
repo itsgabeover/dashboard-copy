@@ -317,7 +317,7 @@ export default function Dashboard() {
 
   const scrollToChat = () => {
     if (chatSectionRef.current) {
-      const yOffset = 50 // Adjust this value to fine-tune the scroll position
+      const yOffset = 70 // Adjust this value to fine-tune the scroll position
       const y = chatSectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset
       window.scrollTo({ top: y, behavior: "smooth" })
     }
@@ -392,7 +392,7 @@ export default function Dashboard() {
           </TabsList>
 
           {tabStructure.map((tab) => (
-            <TabsContent key={tab.id} value={tab.id} className="space-y-12">
+            <TabsContent key={tab.id} value={tab.id} className="space-y-20">
               {/* Content Section (Area 1) */}
               <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6 min-h-[calc(100vh-16rem)]">
                 <div className="space-y-3">
