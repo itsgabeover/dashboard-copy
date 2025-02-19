@@ -394,9 +394,21 @@ export default function Dashboard() {
                 {/* Expandable Chat Section */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => setIsChatOpen(!isChatOpen)}
-                  >
+  className="flex items-center justify-between cursor-pointer"
+  onClick={() => {
+    setIsChatOpen(!isChatOpen);  // Toggle chat open/closed
+    
+    // Only scroll when opening the chat
+    if (!isChatOpen) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 100);
+    }
+  }}
+>
                     <div className="flex items-center space-x-2 text-gray-600">
                       <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
                       <span className="text-sm">{tab.chatSubtext}</span>
