@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import PDFDownloadButton from "@/components/PDFDownloadButton"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle, ArrowUp } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import { ChatInterface } from "@/components/chat-interface"
@@ -438,6 +438,10 @@ export default function Dashboard() {
     )
   }
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
@@ -486,46 +490,48 @@ export default function Dashboard() {
 
                 {/* Expandable Chat Section */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => {
-                      setIsChatOpen(!isChatOpen)
-                      if (!isChatOpen) {
-                        setTimeout(() => {
-                          const chatElement = document.querySelector(".mt-6.pt-6.border-t")
-                          if (chatElement) {
-                            const elementPosition = chatElement.getBoundingClientRect().top
-                            const offsetPosition = elementPosition + window.pageYOffset - 100
-                            window.scrollTo({
-                              top: offsetPosition,
-                              behavior: "smooth",
-                            })
-                          }
-                        }, 100)
-                      }
-                    }}
-                  >
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-gray-600">
                       <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
                       <span className="text-sm">{tab.chatSubtext}</span>
                     </div>
-                    <Button
-                      variant="outline"
-                      className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation() // Prevent the click from triggering the parent div's onClick
-                        setIsChatOpen(false)
-                        // Scroll to the top of the page smoothly
-                        window.scrollTo({ top: 0, behavior: "smooth" })
-                      }}
-                    >
-                      <span>{isChatOpen ? "Close Chat" : "Start Chat"}</span>
-                      {isChatOpen ? (
-                        <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
-                      ) : (
-                        <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                      )}
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="outline"
+                        className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
+                        onClick={() => {
+                          setIsChatOpen(!isChatOpen)
+                          if (!isChatOpen) {
+                            setTimeout(() => {
+                              const chatElement = document.querySelector(".mt-6.pt-6.border-t")
+                              if (chatElement) {
+                                const elementPosition = chatElement.getBoundingClientRect().top
+                                const offsetPosition = elementPosition + window.pageYOffset - 100
+                                window.scrollTo({
+                                  top: offsetPosition,
+                                  behavior: "smooth",
+                                })
+                              }
+                            }, 100)
+                          }
+                        }}
+                      >
+                        <span>{isChatOpen ? "Close Chat" : "Start Chat"}</span>
+                        {isChatOpen ? (
+                          <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
+                        onClick={scrollToTop}
+                      >
+                        <ArrowUp className="w-4 h-4" />
+                        <span className="sr-only">Scroll to Top</span>
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Collapsible Chat Interface */}
