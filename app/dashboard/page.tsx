@@ -397,6 +397,9 @@ export default function Dashboard() {
               <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6 min-h-[calc(100vh-16rem)]">
                 <div className="space-y-3">
                   {tab.sections.map((sectionId) => {
+                    const section = policyData?.analysis_data.data.sections[sectionId as
+\
+ => {
                     const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
                     return (
                       <div key={sectionId}>
@@ -423,45 +426,43 @@ export default function Dashboard() {
                 </div>
               </div>
               {/* Chat Section (Area 2) */}
-              <div
-              // Update the chat section div to include the download button at the bottom:
-<div ref={chatSectionRef} className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6">
-  <Button
-    onClick={scrollToContent}
-    className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
-    size="icon"
-  >
-    <ChevronUp className="w-4 h-4" />
-    <span className="sr-only">Return to top</span>
-  </Button>
-  
-  <div className="px-4 h-full flex flex-col">
-    {/* Chat Interface */}
-    <div className="flex-1">
-      <ChatInterface
-        messages={chatMessages}
-        inputMessage={inputMessage}
-        isTyping={isTyping}
-        onInputChange={setInputMessage}
-        onSendMessage={handleSendMessage}
-        onStartNewChat={() => setChatMessages([])}
-        quickPrompts={tab.chatPrompts}
-        chatTitle={tab.chatTitle}
-        chatSubtext=""
-      />
-    </div>
-    
-    {/* Download Button at bottom */}
-    {policyData && (
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
-      </div>
-    )}
-  </div>
-</div>            </TabsContent>
+              <div ref={chatSectionRef} className="relative bg-white rounded-xl shadow-sm min-h-[calc(100vh-4rem)] mt-6 pb-8 pt-6">
+                <Button
+                  onClick={scrollToContent}
+                  className="absolute top-3 right-3 z-10 bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90 rounded-full shadow-md"
+                  size="icon"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                  <span className="sr-only">Return to top</span>
+                </Button>
+                
+                <div className="px-4 h-full flex flex-col">
+                  {/* Chat Interface */}
+                  <div className="flex-1">
+                    <ChatInterface
+                      messages={chatMessages}
+                      inputMessage={inputMessage}
+                      isTyping={isTyping}
+                      onInputChange={setInputMessage}
+                      onSendMessage={handleSendMessage}
+                      onStartNewChat={() => setChatMessages([])}
+                      quickPrompts={tab.chatPrompts}
+                      chatTitle={tab.chatTitle}
+                      chatSubtext=""
+                    />
+                  </div>
+                  
+                  {/* Download Button at bottom */}
+                  {policyData && (
+                    <div className="mt-6 pt-4 border-t border-gray-200">
+                      <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
           ))}
         </Tabs>
-
       </div>
     </div>
   )
@@ -541,3 +542,4 @@ const renderSkeletonContent = () => (
     </CardContent>
   </Card>
 )
+
