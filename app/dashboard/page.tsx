@@ -512,6 +512,12 @@ export default function Dashboard() {
                     <Button
                       variant="outline"
                       className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
+                      onClick={(e) => {
+                        e.stopPropagation() // Prevent the click from triggering the parent div's onClick
+                        setIsChatOpen(false)
+                        // Scroll to the top of the page smoothly
+                        window.scrollTo({ top: 0, behavior: "smooth" })
+                      }}
                     >
                       <span>{isChatOpen ? "Close Chat" : "Start Chat"}</span>
                       {isChatOpen ? (
