@@ -10,118 +10,41 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
-import type { PolicyDashboard, PolicySection, PolicySections } from "@/types/policy-dashboard"
 import { ChatInterface } from "@/components/chat-interface"
 import { MobileTabsNavigation } from "@/components/MobileTabsNavigation"
 import { MobileCardGrid } from "@/components/MobileCardGrid"
 
-// Email verification component
-function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
-  const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) {
-      setError("Please enter your email")
-      return
-    }
-
-    console.log("Attempting query with email:", email)
-    try {
-      const { data, error: supabaseError } = await supabase
-        .from("policy_dashboards")
-        .select("*")
-        .ilike("email", email.toLowerCase().trim())
-        .order("created_at", { ascending: false })
-
-      if (supabaseError) throw supabaseError
-      if (!data?.length) {
-        setError("No policy analysis found for this email")
-        return
+interface PolicyDashboard {
+  id: string
+  policy_name: string
+  created_at: string
+  session_id: string
+  analysis_data: {
+    data: {
+      policyOverview: {
+        productName: string
+        issuer: string
       }
-
-      localStorage.setItem("userEmail", email.toLowerCase().trim())
-      onVerify(email.toLowerCase().trim())
-    } catch (err) {
-      setError("Error verifying email. Please try again.")
-      console.error("Email verification error:", err)
+      sections: {
+        [key: string]: PolicySection
+      }
     }
   }
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>View Your Policy Analysis</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full p-2 border rounded"
-              />
-            </div>
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <Button type="submit" className="w-full">
-              View My Policy Review(s)
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  )
 }
 
-// Policy selection component
-function PolicySelection({
-  policies,
-  onSelect,
-}: {
-  policies: PolicyDashboard[]
-  onSelect: (policy: PolicyDashboard) => void
-}) {
-  return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-2xl mx-auto space-y-4">
-        <h2 className="text-2xl font-bold text-center mb-6">Select a Policy to Review</h2>
-        {policies.map((policy) => (
-          <Card
-            key={policy.id}
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => onSelect(policy)}
-          >
-            <CardHeader>
-              <CardTitle>{policy.policy_name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Created: {new Date(policy.created_at).toLocaleDateString()}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  )
+interface PolicySection {
+  opening: string
+  bullets: Array<{
+    title: string
+    content: string
+  }>
 }
 
-const tabStructure: Array<{
-  id: string
-  label: string
-  sections: string[]
-  chatPrompts: string[]
-  chatTitle: string
-  chatSubtext: string
-  title: string
-}> = [
+interface PolicySections {
+  [key: string]: PolicySection
+}
+
+const tabStructure = [
   {
     id: "policyOverview",
     label: "Your Quick Look",
@@ -189,6 +112,101 @@ const tabStructure: Array<{
     title: "Keeping Your Policy on Track",
   },
 ]
+
+function EmailVerification({ onVerify }: { onVerify: (email: string) => void }) {
+  const [email, setEmail] = useState("")
+  const [error, setError] = useState("")
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!email) {
+      setError("Please enter your email")
+      return
+    }
+
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from("policy_dashboards")
+        .select("*")
+        .ilike("email", email.toLowerCase().trim())
+        .order("created_at", { ascending: false })
+
+      if (supabaseError) throw supabaseError
+      if (!data?.length) {
+        setError("No policy analysis found for this email")
+        return
+      }
+
+      localStorage.setItem("userEmail", email.toLowerCase().trim())
+      onVerify(email.toLowerCase().trim())
+    } catch (err) {
+      setError("Error verifying email. Please try again.")
+      console.error("Email verification error:", err)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>View Your Policy Analysis</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            <Button type="submit" className="w-full">
+              View My Policy Review(s)
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+function PolicySelection({
+  policies,
+  onSelect,
+}: {
+  policies: PolicyDashboard[]
+  onSelect: (policy: PolicyDashboard) => void
+}) {
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      <div className="max-w-2xl mx-auto space-y-4">
+        <h2 className="text-2xl font-bold text-center mb-6">Select a Policy to Review</h2>
+        {policies.map((policy) => (
+          <Card
+            key={policy.id}
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => onSelect(policy)}
+          >
+            <CardHeader>
+              <CardTitle>{policy.policy_name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>Created: {new Date(policy.created_at).toLocaleDateString()}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const [isVerified, setIsVerified] = useState(false)
@@ -315,6 +333,81 @@ export default function Dashboard() {
     }
   }
 
+  const renderSectionContent = (section: PolicySection, tab: (typeof tabStructure)[0]) => (
+    <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-3">
+      <CardHeader className="pb-2 border-b">
+        <CardTitle className="text-xl font-semibold text-gray-900">{tab.title}</CardTitle>
+      </CardHeader>
+      <CardContent className="p-3">
+        <div className="space-y-3">
+          {section.opening && (
+            <p className="text-gray-700 pl-4">
+              {tab.id === "policyOverview"
+                ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
+                : tab.id === "policyPower"
+                  ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
+                  : tab.id === "builtInAdvantages"
+                    ? "Your life insurance comes with valuable extras built right in. Here's how these features work for you and your family when you need them."
+                    : tab.id === "protectionInsights"
+                      ? "Let's look at what keeps your life insurance solid and dependable. Understanding these points helps you get the most from your coverage."
+                      : tab.id === "advisorTopics"
+                        ? "Your advisor helps make sure your life insurance stays aligned with your goals. Here are key points to discuss at your next meeting."
+                        : tab.id === "pathForward"
+                          ? "Let's make sure your life insurance stays strong. Here are simple steps you can take to keep everything running smoothly."
+                          : section.opening}
+            </p>
+          )}
+          <div className="md:hidden">
+            <MobileCardGrid
+              items={section.bullets.filter(
+                (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
+              )}
+            />
+          </div>
+          <div className="hidden md:grid md:grid-cols-2 gap-3">
+            {section.bullets
+              .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
+              .map((bullet, index) => (
+                <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-start space-x-4">
+                      <div className="mt-1 flex-shrink-0">
+                        <div className="rounded-full bg-[rgb(82,102,255)]/10 p-2">
+                          <ArrowRight className="h-4 w-4 text-[rgb(82,102,255)]" />
+                        </div>
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <h3 className="font-medium text-gray-900">{bullet.title.replace(":", "")}</h3>
+                        <p className="text-sm text-gray-600">{bullet.content}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
+  const renderSkeletonContent = () => (
+    <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
+      <CardHeader className="pb-2 border-b">
+        <Skeleton className="h-6 w-2/3" />
+      </CardHeader>
+      <CardContent className="p-6">
+        <div className="space-y-6">
+          <Skeleton className="h-24 w-full" />
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-4 w-full" />
+            ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -394,26 +487,24 @@ export default function Dashboard() {
                 {/* Expandable Chat Section */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div
-  className="flex items-center justify-between cursor-pointer"
-  onClick={() => {
-    setIsChatOpen(!isChatOpen);  // Toggle chat open/closed
-    
-    // Only scroll when opening the chat
-    if (!isChatOpen) {
-      setTimeout(() => {
- const chatElement = document.querySelector('.mt-6.pt-6.border-t');
-        if (chatElement) {
-          const elementPosition = chatElement.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset from top
-          
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-        });
-      }, 100);
-    }
-  }}
->
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => {
+                      setIsChatOpen(!isChatOpen)
+                      if (!isChatOpen) {
+                        setTimeout(() => {
+                          const chatElement = document.querySelector(".mt-6.pt-6.border-t")
+                          if (chatElement) {
+                            const elementPosition = chatElement.getBoundingClientRect().top
+                            const offsetPosition = elementPosition + window.pageYOffset - 100
+                            window.scrollTo({
+                              top: offsetPosition,
+                              behavior: "smooth",
+                            })
+                          }
+                        }, 100)
+                      }
+                    }}
+                  >
                     <div className="flex items-center space-x-2 text-gray-600">
                       <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
                       <span className="text-sm">{tab.chatSubtext}</span>
@@ -462,79 +553,4 @@ export default function Dashboard() {
     </div>
   )
 }
-
-const renderSectionContent = (section: PolicySection, tabData: (typeof tabStructure)[0]) => (
-  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-3">
-    <CardHeader className="pb-2 border-b">
-      <CardTitle className="text-xl font-semibold text-gray-900">{tabData.title}</CardTitle>
-    </CardHeader>
-    <CardContent className="p-3">
-      <div className="space-y-3">
-        {section.opening && (
-          <p className="text-gray-700 pl-4">
-            {tabData.id === "policyOverview"
-              ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
-              : tabData.id === "policyPower"
-                ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
-                : tabData.id === "builtInAdvantages"
-                  ? "Your life insurance comes with valuable extras built right in. Here's how these features work for you and your family when you need them."
-                  : tabData.id === "protectionInsights"
-                    ? "Let's look at what keeps your life insurance solid and dependable. Understanding these points helps you get the most from your coverage."
-                    : tabData.id === "advisorTopics"
-                      ? "Your advisor helps make sure your life insurance stays aligned with your goals. Here are key points to discuss at your next meeting."
-                      : tabData.id === "pathForward"
-                        ? "Let's make sure your life insurance stays strong. Here are simple steps you can take to keep everything running smoothly."
-                        : section.opening}
-          </p>
-        )}
-        <div className="md:hidden">
-          <MobileCardGrid
-            items={section.bullets.filter(
-              (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
-            )}
-          />
-        </div>
-        <div className="hidden md:grid md:grid-cols-2 gap-3">
-          {section.bullets
-            .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
-            .map((bullet, index) => (
-              <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-4">
-                    <div className="mt-1 flex-shrink-0">
-                      <div className="rounded-full bg-[rgb(82,102,255)]/10 p-2">
-                        <ArrowRight className="h-4 w-4 text-[rgb(82,102,255)]" />
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <h3 className="font-medium text-gray-900">{bullet.title.replace(":", "")}</h3>
-                      <p className="text-sm text-gray-600">{bullet.content}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-)
-
-const renderSkeletonContent = () => (
-  <Card className="bg-white rounded-xl shadow-sm border-0 ring-1 ring-gray-200 mb-6">
-    <CardHeader className="pb-2 border-b">
-      <Skeleton className="h-6 w-2/3" />
-    </CardHeader>
-    <CardContent className="p-6">
-      <div className="space-y-6">
-        <Skeleton className="h-24 w-full" />
-        <div className="space-y-2">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-4 w-full" />
-          ))}
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-)
 
