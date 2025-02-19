@@ -401,9 +401,14 @@ export default function Dashboard() {
     // Only scroll when opening the chat
     if (!isChatOpen) {
       setTimeout(() => {
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth'
+ const chatElement = document.querySelector('.mt-6.pt-6.border-t');
+        if (chatElement) {
+          const elementPosition = chatElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - 100; // 100px offset from top
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
         });
       }, 100);
     }
