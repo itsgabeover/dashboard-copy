@@ -49,67 +49,69 @@ const tabStructure = [
     id: "policyOverview",
     label: "Your Quick Look",
     sections: ["policyOverview"],
-    chatPrompts: [
-      "Break down my policy in simple words",
-      "What makes my policy special?",
-      "How much protection do I have?",
-    ],
-    chatTitle: "Hi! I'm here to help explain anything you'd like to know more about.",
-    chatSubtext: "Have questions about your policy? I'm here to help!",
+    chatPrompts: ["Break down my policy in simple words", "What am I paying for?", "How does my protection work?"],
+    chatTitle: "Quick Policy Explainer",
+    chatSubtext: "Get straight answers about your coverage",
     title: "Understanding Your Policy",
+    question: "Want a simple explanation of your policy?",
   },
   {
     id: "policyPower",
     label: "How Your Policy Works",
     sections: ["policyPower"],
-    chatPrompts: ["How do my payments grow?", "What if I need to skip a payment?", "Tell me about my guarantees"],
-    chatTitle: "Let me explain any part of your policy in more detail.",
-    chatSubtext: "Would you like me to explain how your policy works?",
+    chatPrompts: [
+      "How do my payments work?",
+      "Explain my policy's growth features",
+      "What happens if I miss a payment?",
+    ],
+    chatTitle: "Policy Mechanics Helper",
+    chatSubtext: "Understanding your policy's moving parts",
     title: "Making Sense of Your Coverage",
+    question: "Need help understanding how your policy functions?",
   },
   {
     id: "builtInAdvantages",
     label: "What Your Policy Includes",
     sections: ["builtInAdvantages"],
-    chatPrompts: ["What if I need money early?", "How safe is my money?", "What's this cash value about?"],
-    chatTitle: "I can help you understand all the ways your policy helps protect you.",
-    chatSubtext: "Want to learn more about your policy benefits?",
+    chatPrompts: ["What makes my policy special?", "Explain my policy's benefits", "What protection do I have?"],
+    chatTitle: "Benefits & Features Guide",
+    chatSubtext: "Discover what's included in your coverage",
     title: "Your Policy's Special Features",
+    question: "Want to know more about your policy features?",
   },
   {
     id: "protectionInsights",
     label: "Smart Policy Care",
     sections: ["protectionInsights"],
-    chatPrompts: [
-      "Help me understand my illness benefits",
-      "Tell me about policy loans",
-      "What happens as I get older?",
-    ],
-    chatTitle: "I can explain how to keep your protection strong.",
-    chatSubtext: "Need help understanding how your coverage stays strong?",
+    chatPrompts: ["How do I keep my policy healthy?", "What should I watch for?", "When should I review my policy?"],
+    chatTitle: "Policy Care Assistant",
+    chatSubtext: "Keep your coverage strong and effective",
     title: "Keeping Your Policy Strong",
+    question: "Looking for tips to maintain your policy?",
   },
   {
     id: "advisorTopics",
     label: "Talk With Your Advisor",
     sections: ["keyTopics"],
-    chatPrompts: ["What should worry me?", "What needs watching?", "When do I call my advisor?"],
-    chatTitle: "I can help you get ready for your next advisor conversation.",
-    chatSubtext: "Would you like help preparing for your advisor meeting?",
+    chatPrompts: [
+      "What should I ask my advisor?",
+      "What topics should we discuss?",
+      "How can I prepare for my meeting?",
+    ],
+    chatTitle: "Advisor Meeting Prep",
+    chatSubtext: "Get ready for a productive conversation",
     title: "Topics For Your Next Review",
+    question: "Want to prepare for your advisor meeting?",
   },
   {
     id: "pathForward",
     label: "Your Next Steps",
     sections: ["pathForward"],
-    chatPrompts: [
-      "How do I keep my policy healthy?",
-      "What changes should I expect?",
-      "Policy management best practices?",
-    ],
-    chatTitle: "I can walk you through exactly what to do next.",
-    chatSubtext: "Ready to get started? Let me show you what to do next!",
+    chatPrompts: ["What should I do next?", "How do I get started?", "What are my priorities?"],
+    chatTitle: "Action Plan Guide",
+    chatSubtext: "Your next moves made clear",
     title: "Keeping Your Policy on Track",
+    question: "Ready to take action with your policy?",
   },
 ]
 
@@ -343,7 +345,7 @@ export default function Dashboard() {
           {section.opening && (
             <p className="text-gray-700 pl-4">
               {tab.id === "policyOverview"
-                ? `${section.opening}`
+                ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
                 : tab.id === "policyPower"
                   ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
                   : tab.id === "builtInAdvantages"
@@ -360,13 +362,13 @@ export default function Dashboard() {
           <div className="md:hidden">
             <MobileCardGrid
               items={section.bullets.filter(
-                (bullet) => !["Product name", "Carrier name", "Value Growth"].includes(bullet.title),
+                (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
               )}
             />
           </div>
           <div className="hidden md:grid md:grid-cols-2 gap-3">
             {section.bullets
-              .filter((bullet) => !["Product name", "Carrier name", "Value Growth"].includes(bullet.title))
+              .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
               .map((bullet, index) => (
                 <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
