@@ -5,9 +5,6 @@ import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import { useEffect, useRef } from "react"
 
-// Add message limit constant
-const USER_MESSAGE_LIMIT = 500
-
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
   inputMessage: string
@@ -29,6 +26,7 @@ export function ChatInterface({
   onStartNewChat,
   quickPrompts,
   chatTitle,
+  chatSubtext,
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -43,22 +41,12 @@ export function ChatInterface({
     prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
 
-  // Updated handleQuickPrompt with length check
   const handleQuickPrompt = (prompt: string) => {
-    if (prompt.length <= USER_MESSAGE_LIMIT) {
-      onSendMessage(prompt)
-    }
+    onSendMessage(prompt)
   }
 
-  // Updated handleInputChange with length limit
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const truncatedValue = e.target.value.slice(0, USER_MESSAGE_LIMIT)
-    onInputChange(truncatedValue)
-  }
-
-  // Updated handleSendMessage with length check
   const handleSendMessage = () => {
-    if (inputMessage.trim() && inputMessage.length <= USER_MESSAGE_LIMIT) {
+    if (inputMessage.trim()) {
       onSendMessage()
     }
   }
@@ -70,7 +58,7 @@ export function ChatInterface({
           <MessageCircle className="w-6 h-6 text-[rgb(82,102,255)]" />
           <div>
             <h2 className="text-lg font-semibold text-gray-800">{chatTitle}</h2>
-            <p className="text-sm text-gray-600">Ask me anything about your policy</p>
+            <p className="text-sm text-gray-600">{chatSubtext}</p>
           </div>
         </div>
         <Button
@@ -110,7 +98,7 @@ export function ChatInterface({
           <input
             type="text"
             value={inputMessage}
-            onChange={handleInputChange}
+            onChange={(e) => onInputChange(e.target.value)}
             placeholder="Type your message..."
             className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white"
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
@@ -190,3 +178,4 @@ function ChatMessage({ role, content }: ChatMessageProps) {
 }
 
 export { ChatMessage }
+
