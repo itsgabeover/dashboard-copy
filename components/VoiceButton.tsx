@@ -2,7 +2,7 @@
 
 import { Mic, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList
@@ -65,26 +65,8 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
   const [isListening, setIsListening] = useState(false)
   const [isPulsing, setIsPulsing] = useState(false)
   const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
-  const [currentTranscript, setCurrentTranscript] = useState("")
 
-  // First useEffect for pulsing animation
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout | undefined
-
-    if (isListening) {
-      setIsPulsing(true)
-    } else {
-      timeoutId = setTimeout(() => setIsPulsing(false), 200)
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-    }
-  }, [isListening])
-
-  // Second useEffect for speech recognition setup
+  // Setup recognition
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -93,65 +75,92 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
         recognitionInstance.continuous = false
         recognitionInstance.interimResults = true
         recognitionInstance.lang = "en-US"
-
-        recognitionInstance.onstart = () => {
-          setIsListening(true)
-          setCurrentTranscript("")
-        }
-
-        recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
-          const transcript = event.results[0][0].transcript
-          setCurrentTranscript(transcript)
-          
-          if (event.results[0].isFinal) {
-            setTimeout(() => {
-              onTranscript(transcript)
-              setIsListening(false)
-            }, 800)
-          }
-        }
-
-        recognitionInstance.onerror = () => {
-          setIsListening(false)
-        }
-
-        recognitionInstance.onend = () => {
-          if (currentTranscript && currentTranscript.trim()) {
-            setTimeout(() => {
-              onTranscript(currentTranscript)
-            }, 800)
-          }
-          setIsListening(false)
-        }
-
         setRecognition(recognitionInstance)
       }
     }
 
     return () => {
-      // Cleanup function
       if (recognition) {
-        recognition.onstart = null
-        recognition.onend = null
-        recognition.onerror = null
-        recognition.onresult = null
+        try {
+          recognition.stop()
+        } catch (e) {
+          console.error("Error stopping recognition:", e)
+        }
       }
     }
-  }, [onTranscript, currentTranscript])
+  }, [])
 
-  const toggleListening = () => {
+  // Handle recognition events
+  useEffect(() => {
+    if (!recognition) return
+
+    const handleStart = () => {
+      console.log("Recognition started")
+      setIsListening(true)
+      setIsPulsing(true)
+    }
+
+    const handleEnd = () => {
+      console.log("Recognition ended")
+      setIsListening(false)
+      setIsPulsing(false)
+    }
+
+    const handleError = (event: Event) => {
+      console.error("Recognition error:", event)
+      setIsListening(false)
+      setIsPulsing(false)
+    }
+
+    const handleResult = (event: SpeechRecognitionEvent) => {
+      const transcript = event.results[0][0].transcript
+      console.log("Got transcript:", transcript)
+      
+      if (event.results[0].isFinal) {
+        console.log("Final transcript:", transcript)
+        onTranscript(transcript)
+        recognition.stop()
+      }
+    }
+
+    recognition.onstart = handleStart
+    recognition.onend = handleEnd
+    recognition.onerror = handleError
+    recognition.onresult = handleResult
+
+    return () => {
+      recognition.onstart = null
+      recognition.onend = null
+      recognition.onerror = null
+      recognition.onresult = null
+    }
+  }, [recognition, onTranscript])
+
+  const toggleListening = useCallback(() => {
     if (!recognition) return
 
     if (isListening) {
-      recognition.stop()
+      console.log("Stopping recognition")
+      try {
+        recognition.stop()
+        setIsListening(false)
+        setIsPulsing(false)
+      } catch (e) {
+        console.error("Error stopping recognition:", e)
+        setIsListening(false)
+        setIsPulsing(false)
+      }
     } else {
+      console.log("Starting recognition")
       try {
         recognition.start()
-      } catch (error) {
-        console.error("Error starting speech recognition:", error)
+      } catch (e) {
+        console.error("Error starting recognition:", e)
+        setIsListening(false)
+        setIsPulsing(false)
       }
     }
-  }
+  }, [recognition, isListening])
 
   if (!recognition) {
     return null
