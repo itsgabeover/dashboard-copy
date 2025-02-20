@@ -501,22 +501,7 @@ export default function Dashboard() {
                       <Button
                         variant="outline"
                         className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
-                        onClick={() => {
-                          setIsChatOpen(!isChatOpen)
-                          if (!isChatOpen) {
-                            setTimeout(() => {
-                              const chatElement = document.querySelector(".mt-6.pt-6.border-t")
-                              if (chatElement) {
-                                const elementPosition = chatElement.getBoundingClientRect().top
-                                const offsetPosition = elementPosition + window.pageYOffset - 100
-                                window.scrollTo({
-                                  top: offsetPosition,
-                                  behavior: "smooth",
-                                })
-                              }
-                            }, 100)
-                          }
-                        }}
+                        onClick={() => setIsChatOpen(!isChatOpen)}
                       >
                         <span>{isChatOpen ? "Close Chat" : "Start Chat"}</span>
                         {isChatOpen ? (
@@ -540,6 +525,9 @@ export default function Dashboard() {
                   {isChatOpen && (
                     <div className="mt-6">
                       <ChatInterface
+                        onClose={() => setIsChatOpen(false)}
+                        chatTitle={tab.chatTitle}
+                        chatSubtext={tab.chatSubtext}
                         messages={chatMessages}
                         inputMessage={inputMessage}
                         isTyping={isTyping}
@@ -547,10 +535,7 @@ export default function Dashboard() {
                         onSendMessage={handleSendMessage}
                         onStartNewChat={() => setChatMessages([])}
                         quickPrompts={tab.chatPrompts}
-                        chatTitle={tab.chatTitle}
-                        chatSubtext={tab.chatSubtext}
                       />
-                      {/* Download Button */}
                       {policyData && (
                         <div className="mt-6 pt-4 border-t border-gray-200">
                           <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
