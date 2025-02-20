@@ -3,7 +3,7 @@
 import { Send, RefreshCw, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import VoiceButton from "./VoiceButton"
 
 interface ChatInterfaceProps {
