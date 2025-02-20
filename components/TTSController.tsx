@@ -34,10 +34,17 @@ export function useTTS() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       synthRef.current = window.speechSynthesis
+      console.log("TTS Debug - Initialization:", {
+        synthAvailable: !!synthRef.current
+      });
       
       if (!voicesLoadedRef.current) {
         const loadVoices = () => {
           const voices = synthRef.current?.getVoices() || []
+          console.log("TTS Debug - Voices loaded:", {
+            voiceCount: voices.length,
+            voices: voices.map(v => ({name: v.name, lang: v.lang}))
+          });
           voicesLoadedRef.current = voices.length > 0
         }
         
@@ -58,34 +65,54 @@ export function useTTS() {
   }, [isSpeaking])
 
   const speak = (text: string) => {
-    if (!synthRef.current || !isEnabled || !text.trim()) return
+    console.log("TTS Debug - speak called:", {
+      synthExists: !!synthRef.current,
+      isEnabled,
+      textLength: text?.length,
+      isTextEmpty: !text?.trim()
+    });
 
-    if (isSpeaking) {
-      synthRef.current.cancel()
+    if (!synthRef.current || !isEnabled || !text?.trim()) return
+
+    try {
+      if (isSpeaking) {
+        console.log("TTS Debug - Cancelling previous speech");
+        synthRef.current.cancel()
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = "en-US"
+      utterance.rate = 1.0
+      utterance.pitch = 1.0
+      utterance.volume = 1.0
+
+      const voices = synthRef.current.getVoices()
+      const preferredVoice = voices.find(
+        voice => voice.name.includes("Female") && voice.lang.includes("en-US")
+      )
+      if (preferredVoice) {
+        utterance.voice = preferredVoice
+      }
+
+      utterance.onstart = () => {
+        console.log("TTS Debug - Speech started");
+        setIsSpeaking(true)
+      }
+      utterance.onend = () => {
+        console.log("TTS Debug - Speech ended");
+        setIsSpeaking(false)
+      }
+      utterance.onerror = (event) => {
+        console.error("TTS Debug - Speech error:", event);
+        setIsSpeaking(false)
+        synthRef.current?.cancel()
+      }
+
+      console.log("TTS Debug - Speaking text:", text.slice(0, 50) + "...");
+      synthRef.current.speak(utterance)
+    } catch (error) {
+      console.error("TTS Debug - Speech error:", error)
     }
-
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = "en-US"
-    utterance.rate = 1.0
-    utterance.pitch = 1.0
-    utterance.volume = 1.0
-
-    const voices = synthRef.current.getVoices()
-    const preferredVoice = voices.find(
-      voice => voice.name.includes("Female") && voice.lang.includes("en-US")
-    )
-    if (preferredVoice) {
-      utterance.voice = preferredVoice
-    }
-
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => {
-      setIsSpeaking(false)
-      synthRef.current?.cancel()
-    }
-
-    synthRef.current.speak(utterance)
   }
 
   return {
