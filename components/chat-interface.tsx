@@ -16,13 +16,13 @@ interface ChatInterfaceProps {
   inputMessage: string
   isTyping: boolean
   onInputChange: (value: string) => void
-  onSendMessage: (directMessage?: string) => void
+  onSendMessage: (userMessage?: string, assistantMessage?: string) => void // Updated type definition
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
   chatSubtext?: string
-  policyData?: PolicyData  // Made optional
-  userEmail?: string      // Made optional
+  policyData?: PolicyData
+  userEmail?: string
 }
 
 export function ChatInterface({
@@ -35,8 +35,8 @@ export function ChatInterface({
   quickPrompts,
   chatTitle,
   chatSubtext,
-  policyData = { session_id: 'default' },  // Added default value
-  userEmail = 'default@user.com'           // Added default value
+  policyData = { session_id: 'default' },
+  userEmail = 'default@user.com'
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
