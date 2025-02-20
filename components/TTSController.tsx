@@ -1,29 +1,4 @@
-"use client"
-
-import { Volume2, VolumeX } from "lucide-react"
-import { useEffect, useState, useRef } from "react"
-
-interface TTSControllerProps {
-  isEnabled?: boolean
-  onToggle?: (enabled: boolean) => void
-  className?: string
-}
-
-export function TTSController({ isEnabled = false, onToggle, className = "" }: TTSControllerProps) {
-  return (
-    <button
-      onClick={() => onToggle?.(!isEnabled)}
-      className={`text-gray-500 hover:text-gray-700 transition-colors ${className}`}
-      aria-label={isEnabled ? "Disable voice response" : "Enable voice response"}
-    >
-      {isEnabled ? (
-        <Volume2 className="h-4 w-4" />
-      ) : (
-        <VolumeX className="h-4 w-4" />
-      )}
-    </button>
-  )
-}
+// In your TTSController.tsx, modify the useTTS function:
 
 export function useTTS() {
   const [isEnabled, setIsEnabled] = useState(false)
@@ -31,94 +6,82 @@ export function useTTS() {
   const synthRef = useRef<SpeechSynthesis | null>(null)
   const voicesLoadedRef = useRef(false)
 
+  // Separate useEffect for initialization
   useEffect(() => {
     if (typeof window !== "undefined") {
-      synthRef.current = window.speechSynthesis
-      console.log("TTS Debug - Initialization:", {
-        synthAvailable: !!synthRef.current
-      });
-      
-      if (!voicesLoadedRef.current) {
-        const loadVoices = () => {
-          const voices = synthRef.current?.getVoices() || []
-          console.log("TTS Debug - Voices loaded:", {
-            voiceCount: voices.length,
-            voices: voices.map(v => ({name: v.name, lang: v.lang}))
-          });
-          voicesLoadedRef.current = voices.length > 0
-        }
-        
-        loadVoices()
-        synthRef.current?.addEventListener('voiceschanged', loadVoices)
-        
-        return () => {
-          synthRef.current?.removeEventListener('voiceschanged', loadVoices)
-        }
-      }
+      synthRef.current = window.speechSynthesis;
+      console.log("Speech synthesis initialized:", window.speechSynthesis);
     }
+  }, []);
 
+  // Separate useEffect for voice loading
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      console.log("Available voices:", voices);
+      voicesLoadedRef.current = voices.length > 0;
+    };
+
+    loadVoices(); // Initial load
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    
     return () => {
-      if (synthRef.current && isSpeaking) {
-        synthRef.current.cancel()
-      }
-    }
-  }, [isSpeaking])
+      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+    };
+  }, []);
 
   const speak = (text: string) => {
-    console.log("TTS Debug - speak called:", {
-      synthExists: !!synthRef.current,
-      isEnabled,
-      textLength: text?.length,
-      isTextEmpty: !text?.trim()
-    });
-
-    if (!synthRef.current || !isEnabled || !text?.trim()) return
+    console.log("Speak function called with:", {text, isEnabled});
+    
+    if (!window.speechSynthesis || !isEnabled || !text?.trim()) {
+      console.log("Speech conditions not met:", {
+        synthExists: !!window.speechSynthesis,
+        isEnabled,
+        hasText: !!text?.trim()
+      });
+      return;
+    }
 
     try {
-      if (isSpeaking) {
-        console.log("TTS Debug - Cancelling previous speech");
-        synthRef.current.cancel()
-      }
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
 
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = "en-US"
-      utterance.rate = 1.0
-      utterance.pitch = 1.0
-      utterance.volume = 1.0
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
 
-      const voices = synthRef.current.getVoices()
-      const preferredVoice = voices.find(
-        voice => voice.name.includes("Female") && voice.lang.includes("en-US")
-      )
-      if (preferredVoice) {
-        utterance.voice = preferredVoice
-      }
+      // Get voices synchronously
+      const voices = window.speechSynthesis.getVoices();
+      console.log("Available voices for speech:", voices);
 
       utterance.onstart = () => {
-        console.log("TTS Debug - Speech started");
-        setIsSpeaking(true)
-      }
-      utterance.onend = () => {
-        console.log("TTS Debug - Speech ended");
-        setIsSpeaking(false)
-      }
-      utterance.onerror = (event) => {
-        console.error("TTS Debug - Speech error:", event);
-        setIsSpeaking(false)
-        synthRef.current?.cancel()
-      }
+        console.log("Speech started");
+        setIsSpeaking(true);
+      };
 
-      console.log("TTS Debug - Speaking text:", text.slice(0, 50) + "...");
-      synthRef.current.speak(utterance)
+      utterance.onend = () => {
+        console.log("Speech ended");
+        setIsSpeaking(false);
+      };
+
+      utterance.onerror = (event) => {
+        console.error("Speech error:", event);
+        setIsSpeaking(false);
+      };
+
+      console.log("Attempting to speak:", text.slice(0, 50));
+      window.speechSynthesis.speak(utterance);
     } catch (error) {
-      console.error("TTS Debug - Speech error:", error)
+      console.error("Error in speak function:", error);
     }
-  }
+  };
 
   return {
     isEnabled,
     isSpeaking,
     setEnabled: setIsEnabled,
     speak
-  }
+  };
 }
