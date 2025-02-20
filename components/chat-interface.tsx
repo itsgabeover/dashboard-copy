@@ -52,6 +52,17 @@ export function ChatInterface({
     }
   }
 
+  const handleVoiceTranscript = (text: string) => {
+    onInputChange(text)
+    // Automatically send message after voice input with a small delay
+    setTimeout(() => {
+      if (text.trim()) {
+        onSendMessage(text)
+        onInputChange("") // Clear input after sending
+      }
+    }, 500)
+  }
+
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
       <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgba(82,102,255,0.15)] to-[rgba(82,102,255,0.05)] rounded-t-xl border-b border-[rgba(82,102,255,0.1)]">
@@ -105,9 +116,7 @@ export function ChatInterface({
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
           />
           <VoiceButton 
-            onTranscript={(text) => {
-              onInputChange(text)
-            }}
+            onTranscript={handleVoiceTranscript}
             disabled={isTyping}
           />
           <Button
