@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import PDFDownloadButton from "@/components/PDFDownloadButton"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, ChevronDown, HelpCircle, ArrowUp } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle, ArrowUp } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import { ChatInterface } from "@/components/chat-interface"
@@ -444,17 +444,6 @@ export default function Dashboard() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const handleStartChat = () => {
-    setIsChatOpen(true)
-    // Scroll to the chat interface
-    setTimeout(() => {
-      const chatElement = document.querySelector(".chat-interface")
-      if (chatElement) {
-        chatElement.scrollIntoView({ behavior: "smooth", block: "start" })
-      }
-    }, 100)
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
@@ -501,7 +490,7 @@ export default function Dashboard() {
                   })}
                 </div>
 
-                {/* Chat Section */}
+                {/* Expandable Chat Section */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-gray-600">
@@ -512,10 +501,29 @@ export default function Dashboard() {
                       <Button
                         variant="outline"
                         className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
-                        onClick={handleStartChat}
+                        onClick={() => {
+                          setIsChatOpen(!isChatOpen)
+                          if (!isChatOpen) {
+                            setTimeout(() => {
+                              const chatElement = document.querySelector(".mt-6.pt-6.border-t")
+                              if (chatElement) {
+                                const elementPosition = chatElement.getBoundingClientRect().top
+                                const offsetPosition = elementPosition + window.pageYOffset - 100
+                                window.scrollTo({
+                                  top: offsetPosition,
+                                  behavior: "smooth",
+                                })
+                              }
+                            }, 100)
+                          }
+                        }}
                       >
-                        <span>Start Chat</span>
-                        <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                        <span>{isChatOpen ? "Close Chat" : "Start Chat"}</span>
+                        {isChatOpen ? (
+                          <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
+                        )}
                       </Button>
                       <Button
                         variant="outline"
@@ -528,12 +536,10 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Chat Interface */}
+                  {/* Collapsible Chat Interface */}
                   {isChatOpen && (
-                    <div className="mt-6 chat-interface">
+                    <div className="mt-6">
                       <ChatInterface
-                        chatTitle={tab.chatTitle}
-                        chatSubtext={tab.chatSubtext}
                         messages={chatMessages}
                         inputMessage={inputMessage}
                         isTyping={isTyping}
@@ -541,7 +547,10 @@ export default function Dashboard() {
                         onSendMessage={handleSendMessage}
                         onStartNewChat={() => setChatMessages([])}
                         quickPrompts={tab.chatPrompts}
+                        chatTitle={tab.chatTitle}
+                        chatSubtext={tab.chatSubtext}
                       />
+                      {/* Download Button */}
                       {policyData && (
                         <div className="mt-6 pt-4 border-t border-gray-200">
                           <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
