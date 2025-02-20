@@ -113,15 +113,18 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
     }
 
     const handleResult = (event: SpeechRecognitionEvent) => {
-      const transcript = event.results[0][0].transcript
-      console.log("Got transcript:", transcript)
-      
-      if (event.results[0].isFinal) {
-        console.log("Final transcript:", transcript)
-        onTranscript(transcript)
-        recognition.stop()
-      }
-    }
+  const transcript = event.results[0][0].transcript
+  console.log("Got transcript:", transcript)
+  
+  if (event.results[0].isFinal) {
+    console.log("Final transcript:", transcript)
+    // Add a delay before stopping recognition to allow for natural pauses
+    setTimeout(() => {
+      onTranscript(transcript)
+      recognition.stop()
+    }, 1500) // 1.5 second delay before stopping recognition
+  }
+}
 
     recognition.onstart = handleStart
     recognition.onend = handleEnd
