@@ -49,7 +49,13 @@ export function useTTS() {
         }
       }
     }
-  }, [])
+
+    return () => {
+      if (synthRef.current && isSpeaking) {
+        synthRef.current.cancel()
+      }
+    }
+  }, [isSpeaking])
 
   const speak = (text: string) => {
     if (!synthRef.current || !isEnabled || !text.trim()) return
@@ -82,18 +88,10 @@ export function useTTS() {
     synthRef.current.speak(utterance)
   }
 
-  const stop = () => {
-    if (synthRef.current) {
-      synthRef.current.cancel()
-      setIsSpeaking(false)
-    }
-  }
-
   return {
     isEnabled,
     isSpeaking,
     setEnabled: setIsEnabled,
-    speak,
-    stop
+    speak
   }
 }
