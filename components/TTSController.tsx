@@ -1,4 +1,29 @@
-// In your TTSController.tsx, modify the useTTS function:
+"use client"
+
+import { Volume2, VolumeX } from "lucide-react"
+import { useEffect, useState, useRef } from "react"
+
+interface TTSControllerProps {
+  isEnabled?: boolean
+  onToggle?: (enabled: boolean) => void
+  className?: string
+}
+
+export function TTSController({ isEnabled = false, onToggle, className = "" }: TTSControllerProps) {
+  return (
+    <button
+      onClick={() => onToggle?.(!isEnabled)}
+      className={`text-gray-500 hover:text-gray-700 transition-colors ${className}`}
+      aria-label={isEnabled ? "Disable voice response" : "Enable voice response"}
+    >
+      {isEnabled ? (
+        <Volume2 className="h-4 w-4" />
+      ) : (
+        <VolumeX className="h-4 w-4" />
+      )}
+    </button>
+  )
+}
 
 export function useTTS() {
   const [isEnabled, setIsEnabled] = useState(false)
@@ -85,3 +110,5 @@ export function useTTS() {
     speak
   };
 }
+
+export type { TTSControllerProps };
