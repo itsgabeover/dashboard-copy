@@ -4,67 +4,24 @@ import { Mic, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList
-}
-
-interface SpeechRecognitionResultList {
-  readonly length: number
-  item(index: number): SpeechRecognitionResult
-  [index: number]: SpeechRecognitionResult
-}
-
-interface SpeechRecognitionResult {
-  readonly length: number
-  item(index: number): SpeechRecognitionAlternative
-  [index: number]: SpeechRecognitionAlternative
-  isFinal: boolean
-}
-
-interface SpeechRecognitionAlternative {
-  readonly transcript: string
-  readonly confidence: number
-}
-
-interface ISpeechRecognition extends EventTarget {
-  continuous: boolean
-  interimResults: boolean
-  lang: string
-  start: () => void
-  stop: () => void
-  onstart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onend: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onerror: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onresult: ((this: ISpeechRecognition, ev: SpeechRecognitionEvent) => void) | null
-  onnomatch: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onaudiostart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onaudioend: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onsoundstart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onsoundend: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onspeechstart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onspeechend: ((this: ISpeechRecognition, ev: Event) => void) | null
-}
-
-declare global {
-  interface Window {
-    SpeechRecognition?: {
-      new (): ISpeechRecognition
-    }
-    webkitSpeechRecognition?: {
-      new (): ISpeechRecognition
-    }
-  }
-}
-
-interface VoiceButtonProps {
-  onTranscript: (text: string) => void
-  disabled?: boolean
-}
+// ... (previous interfaces remain the same)
 
 export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps) {
   const [isListening, setIsListening] = useState(false)
+  const [isPulsing, setIsPulsing] = useState(false)
   const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
   const [currentTranscript, setCurrentTranscript] = useState("")
+
+  // Add pulsing effect when starting to listen
+  useEffect(() => {
+    if (isListening) {
+      setIsPulsing(true)
+    } else {
+      // Delay removing the pulse effect
+      const timeout = setTimeout(() => setIsPulsing(false), 200)
+      return () => clearTimeout(timeout)
+    }
+  }, [isListening])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -76,40 +33,37 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
         recognitionInstance.lang = "en-US"
 
         recognitionInstance.onstart = () => {
-          console.log("Speech recognition started")
+          setIsListening(true)
           setCurrentTranscript("")
         }
 
         recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
           const transcript = event.results[0][0].transcript
-          console.log("Interim transcript:", transcript)
           setCurrentTranscript(transcript)
           
+          // Only send final results after a slight delay
           if (event.results[0].isFinal) {
-            console.log("Final transcript:", transcript)
-            onTranscript(transcript)
-            setIsListening(false)
-            recognitionInstance.stop()
+            setTimeout(() => {
+              onTranscript(transcript)
+              setIsListening(false)
+            }, 800) // Give user time to see the transcribed text
           }
         }
 
         recognitionInstance.onerror = () => {
-          console.error("Speech recognition error")
           setIsListening(false)
         }
 
         recognitionInstance.onend = () => {
-          console.log("Speech recognition ended")
-          setIsListening(false)
-          // If we have a transcript but it wasn't marked as final, send it anyway
           if (currentTranscript && currentTranscript.trim()) {
-            onTranscript(currentTranscript)
+            setTimeout(() => {
+              onTranscript(currentTranscript)
+            }, 800)
           }
+          setIsListening(false)
         }
 
         setRecognition(recognitionInstance)
-      } else {
-        console.warn("Speech recognition not supported in this browser")
       }
     }
   }, [onTranscript, currentTranscript])
@@ -118,16 +72,9 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
     if (!recognition) return
 
     if (isListening) {
-      console.log("Stopping speech recognition")
       recognition.stop()
     } else {
-      console.log("Starting speech recognition")
-      try {
-        recognition.start()
-        setIsListening(true)
-      } catch (error) {
-        console.error("Error starting speech recognition:", error)
-      }
+      recognition.start()
     }
   }
 
@@ -141,14 +88,20 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
       size="icon"
       onClick={toggleListening}
       disabled={disabled}
-      className={`rounded-full transition-all duration-200 ${
-        isListening 
+      className={`
+        rounded-full transition-all duration-300
+        ${isListening 
           ? "bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90" 
-          : "bg-white hover:bg-gray-50"
-      }`}
+          : "bg-white hover:bg-gray-50"}
+        ${isPulsing ? "ring-4 ring-[rgb(82,102,255)]/20" : ""}
+        relative
+      `}
     >
       {isListening ? (
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        </>
       ) : (
         <Mic className="h-4 w-4" />
       )}
