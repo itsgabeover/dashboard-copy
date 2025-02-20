@@ -360,13 +360,13 @@ export default function Dashboard() {
           <div className="md:hidden">
             <MobileCardGrid
               items={section.bullets.filter(
-                (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
+                (bullet) => !["productName", "issuer", "Value Growth"].includes(bullet.title),
               )}
             />
           </div>
           <div className="hidden md:grid md:grid-cols-2 gap-3">
             {section.bullets
-              .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
+              .filter((bullet) => !["productName", "issuer", "Value Growth"].includes(bullet.title))
               .map((bullet, index) => (
                 <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
