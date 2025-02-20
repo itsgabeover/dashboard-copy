@@ -4,7 +4,6 @@ import { Mic, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
 
-// Type definitions for Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList
 }
@@ -38,7 +37,6 @@ interface ISpeechRecognition extends EventTarget {
   onend: () => void
 }
 
-// Extend Window interface
 declare global {
   interface Window {
     SpeechRecognition?: {
@@ -58,6 +56,7 @@ interface VoiceButtonProps {
 export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps) {
   const [isListening, setIsListening] = useState(false)
   const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
+  const [currentTranscript, setCurrentTranscript] = useState("")
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -68,36 +67,59 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
         recognitionInstance.interimResults = true
         recognitionInstance.lang = "en-US"
 
+        recognitionInstance.onstart = () => {
+          console.log("Speech recognition started")
+          setCurrentTranscript("")
+        }
+
         recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
           const transcript = event.results[0][0].transcript
+          console.log("Interim transcript:", transcript)
+          setCurrentTranscript(transcript)
+          
           if (event.results[0].isFinal) {
+            console.log("Final transcript:", transcript)
             onTranscript(transcript)
             setIsListening(false)
             recognitionInstance.stop()
           }
         }
 
-        recognitionInstance.onerror = () => {
+        recognitionInstance.onerror = (event) => {
+          console.error("Speech recognition error:", event)
           setIsListening(false)
         }
 
         recognitionInstance.onend = () => {
+          console.log("Speech recognition ended")
           setIsListening(false)
+          // If we have a transcript but it wasn't marked as final, send it anyway
+          if (currentTranscript && currentTranscript.trim()) {
+            onTranscript(currentTranscript)
+          }
         }
 
         setRecognition(recognitionInstance)
+      } else {
+        console.warn("Speech recognition not supported in this browser")
       }
     }
-  }, [onTranscript])
+  }, [onTranscript, currentTranscript])
 
   const toggleListening = () => {
     if (!recognition) return
 
     if (isListening) {
+      console.log("Stopping speech recognition")
       recognition.stop()
     } else {
-      recognition.start()
-      setIsListening(true)
+      console.log("Starting speech recognition")
+      try {
+        recognition.start()
+        setIsListening(true)
+      } catch (error) {
+        console.error("Error starting speech recognition:", error)
+      }
     }
   }
 
