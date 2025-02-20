@@ -32,9 +32,17 @@ interface ISpeechRecognition extends EventTarget {
   lang: string
   start: () => void
   stop: () => void
-  onresult: (event: SpeechRecognitionEvent) => void
-  onerror: (event: Event) => void
-  onend: () => void
+  onstart: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onend: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onerror: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onresult: ((this: ISpeechRecognition, ev: SpeechRecognitionEvent) => void) | null
+  onnomatch: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onaudiostart: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onaudioend: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onsoundstart: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onsoundend: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onspeechstart: ((this: ISpeechRecognition, ev: Event) => void) | null
+  onspeechend: ((this: ISpeechRecognition, ev: Event) => void) | null
 }
 
 declare global {
@@ -85,8 +93,8 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
           }
         }
 
-        recognitionInstance.onerror = (event) => {
-          console.error("Speech recognition error:", event)
+        recognitionInstance.onerror = () => {
+          console.error("Speech recognition error")
           setIsListening(false)
         }
 
