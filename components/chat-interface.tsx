@@ -65,7 +65,7 @@ export function ChatInterface({
           onInputChange("")
         }, 300)
       }
-    }, 1000)
+    }, 2000)
   }
 
   return (
