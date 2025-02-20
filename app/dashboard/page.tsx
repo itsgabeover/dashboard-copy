@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import PDFDownloadButton from "@/components/PDFDownloadButton"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle, ArrowUp } from "lucide-react"
+import { AlertCircle, ArrowRight, ChevronDown, HelpCircle, ArrowUp } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
 import { ChatInterface } from "@/components/chat-interface"
@@ -444,6 +444,17 @@ export default function Dashboard() {
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
+  const handleStartChat = () => {
+    setIsChatOpen(true)
+    // Scroll to the chat interface
+    setTimeout(() => {
+      const chatElement = document.querySelector(".chat-interface")
+      if (chatElement) {
+        chatElement.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    }, 100)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto p-4 space-y-8 max-w-7xl">
@@ -490,7 +501,7 @@ export default function Dashboard() {
                   })}
                 </div>
 
-                {/* Expandable Chat Section */}
+                {/* Chat Section */}
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-gray-600">
@@ -501,14 +512,10 @@ export default function Dashboard() {
                       <Button
                         variant="outline"
                         className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
-                        onClick={() => setIsChatOpen(!isChatOpen)}
+                        onClick={handleStartChat}
                       >
-                        <span>{isChatOpen ? "Close Chat" : "Start Chat"}</span>
-                        {isChatOpen ? (
-                          <ChevronUp className="w-4 h-4 transition-transform group-hover:-translate-y-1" />
-                        ) : (
-                          <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
-                        )}
+                        <span>Start Chat</span>
+                        <ChevronDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
                       </Button>
                       <Button
                         variant="outline"
@@ -521,11 +528,10 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Collapsible Chat Interface */}
+                  {/* Chat Interface */}
                   {isChatOpen && (
-                    <div className="mt-6">
+                    <div className="mt-6 chat-interface">
                       <ChatInterface
-                        onClose={() => setIsChatOpen(false)}
                         chatTitle={tab.chatTitle}
                         chatSubtext={tab.chatSubtext}
                         messages={chatMessages}
