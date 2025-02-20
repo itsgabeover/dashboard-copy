@@ -67,15 +67,24 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
   const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
   const [currentTranscript, setCurrentTranscript] = useState("")
 
+  // First useEffect for pulsing animation
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout | undefined
+
     if (isListening) {
       setIsPulsing(true)
     } else {
-      const timeout = setTimeout(() => setIsPulsing(false), 200)
-      return () => clearTimeout(timeout)
+      timeoutId = setTimeout(() => setIsPulsing(false), 200)
+    }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
     }
   }, [isListening])
 
+  // Second useEffect for speech recognition setup
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -116,6 +125,16 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
         }
 
         setRecognition(recognitionInstance)
+      }
+    }
+
+    return () => {
+      // Cleanup function
+      if (recognition) {
+        recognition.onstart = null
+        recognition.onend = null
+        recognition.onerror = null
+        recognition.onresult = null
       }
     }
   }, [onTranscript, currentTranscript])
