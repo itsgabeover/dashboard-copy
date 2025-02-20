@@ -495,7 +495,7 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2 text-gray-600">
                       <HelpCircle className="w-5 h-5 text-[rgb(82,102,255)]" />
-                      <span className="text-sm">{tab.chatSubtext}</span>
+                      <span className="text-sm">{tab.question}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button
@@ -548,7 +548,7 @@ export default function Dashboard() {
                         onStartNewChat={() => setChatMessages([])}
                         quickPrompts={tab.chatPrompts}
                         chatTitle={tab.chatTitle}
-                        chatSubtext=""
+                        chatSubtext={tab.chatSubtext}
                       />
                       {/* Download Button */}
                       {policyData && (
