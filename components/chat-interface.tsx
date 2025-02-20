@@ -17,6 +17,7 @@ interface ChatInterfaceProps {
   quickPrompts: string[]
   chatTitle: string
   chatSubtext?: string
+  policyData?: any // Update this type based on your data structure
 }
 
 export function ChatInterface({
@@ -24,11 +25,12 @@ export function ChatInterface({
   inputMessage,
   isTyping,
   onInputChange,
-  onSendMessage,
+  onSendMessage: parentOnSendMessage, // Rename to avoid confusion
   onStartNewChat,
   quickPrompts,
   chatTitle,
   chatSubtext,
+  policyData
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -48,12 +50,72 @@ export function ChatInterface({
   }, [messages, isTyping])
 
   const handleQuickPrompt = (prompt: string) => {
-    onSendMessage(prompt)
+    handleSendMessage(prompt)
   }
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      onSendMessage()
+  const handleSendMessage = async (directMessage?: string) => {
+    const messageToSend = directMessage || inputMessage.trim()
+    if (!messageToSend || !policyData) return
+
+    const newMessages = [...messages, { role: "user" as const, content: messageToSend }]
+
+    if (!directMessage) {
+      onInputChange("")
+    }
+
+    setIsTyping(true)
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Email": userEmail,
+        },
+        body: JSON.stringify({
+          content: messageToSend,
+          session_id: policyData.session_id,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const reader = response.body?.getReader()
+      let assistantMessage = ""
+      let lastSpokenChunk = ""
+
+      if (reader) {
+        parentOnSendMessage(messageToSend)
+        
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          // Decode the stream chunk and append to message
+          const text = new TextDecoder().decode(value)
+          assistantMessage += text
+
+          // Get the new chunk of text to speak
+          const newChunk = assistantMessage.slice(lastSpokenChunk.length)
+          
+          // Only speak if there's new content and it ends with punctuation or space
+          if (isEnabled && newChunk.trim() && 
+              (newChunk.match(/[.!?,\s]$/) || done)) {
+            speak(newChunk)
+            lastSpokenChunk = assistantMessage
+          }
+
+          // Update the message in the parent component
+          parentOnSendMessage(undefined, assistantMessage)
+        }
+      }
+    } catch (error) {
+      console.error("Chat error:", error)
+      parentOnSendMessage(messageToSend, "Sorry, I couldn't process your request.")
+    } finally {
+      setIsTyping(false)
     }
   }
 
@@ -62,26 +124,13 @@ export function ChatInterface({
     
     setTimeout(() => {
       if (text.trim()) {
-        onSendMessage(text)
+        handleSendMessage(text)
         setTimeout(() => {
           onInputChange("")
         }, 300)
       }
     }, 2000)
   }
-
-  useEffect(() => {
-    const handleNewMessage = () => {
-      if (isEnabled && messages.length > 0) {
-        const lastMessage = messages[messages.length - 1]
-        if (lastMessage.role === "assistant") {
-          speak(lastMessage.content)
-        }
-      }
-    }
-
-    handleNewMessage()
-  }, [messages, isEnabled, speak])
 
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
@@ -157,7 +206,7 @@ export function ChatInterface({
             disabled={isTyping}
           />
           <Button
-            onClick={handleSendMessage}
+            onClick={() => handleSendMessage()}
             className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
             <Send className="h-4 w-4" />
