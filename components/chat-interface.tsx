@@ -7,6 +7,11 @@ import { useEffect, useRef } from "react"
 import VoiceButton from "./VoiceButton"
 import { TTSController, useTTS } from "./TTSController"
 
+interface PolicyData {
+  session_id: string
+  // Add other fields as needed
+}
+
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
   inputMessage: string
@@ -17,7 +22,8 @@ interface ChatInterfaceProps {
   quickPrompts: string[]
   chatTitle: string
   chatSubtext?: string
-  policyData?: any // Update this type based on your data structure
+  policyData: PolicyData
+  userEmail: string
 }
 
 export function ChatInterface({
@@ -25,12 +31,13 @@ export function ChatInterface({
   inputMessage,
   isTyping,
   onInputChange,
-  onSendMessage: parentOnSendMessage, // Rename to avoid confusion
+  onSendMessage: parentOnSendMessage,
   onStartNewChat,
   quickPrompts,
   chatTitle,
   chatSubtext,
-  policyData
+  policyData,
+  userEmail
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -56,8 +63,6 @@ export function ChatInterface({
   const handleSendMessage = async (directMessage?: string) => {
     const messageToSend = directMessage || inputMessage.trim()
     if (!messageToSend || !policyData) return
-
-    const newMessages = [...messages, { role: "user" as const, content: messageToSend }]
 
     if (!directMessage) {
       onInputChange("")
