@@ -66,7 +66,6 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
   const [isPulsing, setIsPulsing] = useState(false)
   const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
 
-  // Setup recognition
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -90,7 +89,6 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
     }
   }, [])
 
-  // Handle recognition events
   useEffect(() => {
     if (!recognition) return
 
@@ -113,18 +111,15 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
     }
 
     const handleResult = (event: SpeechRecognitionEvent) => {
-  const transcript = event.results[0][0].transcript
-  console.log("Got transcript:", transcript)
-  
-  if (event.results[0].isFinal) {
-    console.log("Final transcript:", transcript)
-    // Add a delay before stopping recognition to allow for natural pauses
-    setTimeout(() => {
-      onTranscript(transcript)
-      recognition.stop()
-    }, 1500) // 1.5 second delay before stopping recognition
-  }
-}
+      const transcript = event.results[0][0].transcript
+      console.log("Got transcript:", transcript)
+      
+      if (event.results[0].isFinal) {
+        console.log("Final transcript:", transcript)
+        onTranscript(transcript)
+        recognition.stop()
+      }
+    }
 
     recognition.onstart = handleStart
     recognition.onend = handleEnd
