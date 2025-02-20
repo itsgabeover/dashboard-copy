@@ -36,7 +36,10 @@ export function ChatInterface({
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
       if (messagesContainerRef.current && messagesEndRef.current) {
-        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight
+        messagesContainerRef.current.scrollTo({
+          top: messagesContainerRef.current.scrollHeight,
+          behavior: "smooth"
+        })
       }
     }
     prevMessagesLengthRef.current = messages.length
@@ -54,13 +57,15 @@ export function ChatInterface({
 
   const handleVoiceTranscript = (text: string) => {
     onInputChange(text)
-    // Automatically send message after voice input with a small delay
+    
     setTimeout(() => {
       if (text.trim()) {
         onSendMessage(text)
-        onInputChange("") // Clear input after sending
+        setTimeout(() => {
+          onInputChange("")
+        }, 300)
       }
-    }, 500)
+    }, 1000)
   }
 
   return (
@@ -84,9 +89,20 @@ export function ChatInterface({
         </Button>
       </div>
 
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px]">
+      <div 
+        ref={messagesContainerRef} 
+        className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px] transition-all duration-300"
+      >
         {messages.map((message, index) => (
-          <ChatMessage key={index} role={message.role} content={message.content} />
+          <div
+            key={index}
+            className="transition-all duration-300 transform"
+            style={{
+              opacity: isTyping && index === messages.length - 1 ? 0.7 : 1,
+            }}
+          >
+            <ChatMessage role={message.role} content={message.content} />
+          </div>
         ))}
         {isTyping && <TypingIndicator />}
         <div ref={messagesEndRef} />
@@ -112,7 +128,7 @@ export function ChatInterface({
             value={inputMessage}
             onChange={(e) => onInputChange(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white"
+            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white transition-all duration-200"
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
           />
           <VoiceButton 
@@ -123,7 +139,7 @@ export function ChatInterface({
             onClick={handleSendMessage}
             className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
-            <Send className="w-4 h-4" />
+            <Send className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -164,6 +180,7 @@ function ChatMessage({ role, content }: ChatMessageProps) {
         className={`
           max-w-[85%] rounded-2xl px-4 py-2.5
           ${isUser ? "bg-[rgb(82,102,255)] text-white" : "bg-gray-100 text-gray-800"}
+          transition-all duration-200 transform
         `}
       >
         <div className="text-sm leading-relaxed">
