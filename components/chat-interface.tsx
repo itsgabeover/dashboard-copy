@@ -16,7 +16,7 @@ interface ChatInterfaceProps {
   inputMessage: string
   isTyping: boolean
   onInputChange: (value: string) => void
-  onSendMessage: (userMessage?: string, assistantMessage?: string) => void // Updated type definition
+  onSendMessage: (userMessage?: string, assistantMessage?: string) => void
   onStartNewChat: () => void
   quickPrompts: string[]
   chatTitle: string
@@ -68,6 +68,11 @@ export function ChatInterface({
     }
 
     try {
+      console.log("TTS Debug - Starting message send:", { 
+        hasDirectMessage: !!directMessage,
+        isTTSEnabled: isEnabled 
+      });
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -90,10 +95,14 @@ export function ChatInterface({
 
       if (reader) {
         parentOnSendMessage(messageToSend)
+        console.log("TTS Debug - Stream started");
         
         while (true) {
           const { done, value } = await reader.read()
-          if (done) break
+          if (done) {
+            console.log("TTS Debug - Stream completed");
+            break;
+          }
 
           // Decode the stream chunk and append to message
           const text = new TextDecoder().decode(value)
@@ -102,9 +111,23 @@ export function ChatInterface({
           // Get the new chunk of text to speak
           const newChunk = assistantMessage.slice(lastSpokenChunk.length)
           
+          console.log("TTS Basic Debug:", { 
+            isEnabled, 
+            hasChunk: !!newChunk.trim(),
+            chunkLength: newChunk.length
+          });
+
           // Only speak if there's new content and it ends with punctuation or space
           if (isEnabled && newChunk.trim() && 
               (newChunk.match(/[.!?,\s]$/) || done)) {
+            console.log("TTS Debug - Chunk:", {
+              isEnabled,
+              chunkLength: newChunk.length,
+              chunk: newChunk.slice(0, 50) + "...",
+              matchTest: newChunk.match(/[.!?,\s]$/),
+              isDone: done,
+              totalMessageLength: assistantMessage.length
+            });
             speak(newChunk)
             lastSpokenChunk = assistantMessage
           }
