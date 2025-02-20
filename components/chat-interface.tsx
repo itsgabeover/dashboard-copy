@@ -9,7 +9,6 @@ import { TTSController, useTTS } from "./TTSController"
 
 interface PolicyData {
   session_id: string
-  // Add other fields as needed
 }
 
 interface ChatInterfaceProps {
@@ -22,8 +21,8 @@ interface ChatInterfaceProps {
   quickPrompts: string[]
   chatTitle: string
   chatSubtext?: string
-  policyData: PolicyData
-  userEmail: string
+  policyData?: PolicyData  // Made optional
+  userEmail?: string      // Made optional
 }
 
 export function ChatInterface({
@@ -36,8 +35,8 @@ export function ChatInterface({
   quickPrompts,
   chatTitle,
   chatSubtext,
-  policyData,
-  userEmail
+  policyData = { session_id: 'default' },  // Added default value
+  userEmail = 'default@user.com'           // Added default value
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -62,13 +61,11 @@ export function ChatInterface({
 
   const handleSendMessage = async (directMessage?: string) => {
     const messageToSend = directMessage || inputMessage.trim()
-    if (!messageToSend || !policyData) return
+    if (!messageToSend) return
 
     if (!directMessage) {
       onInputChange("")
     }
-
-    setIsTyping(true)
 
     try {
       const response = await fetch("/api/chat", {
@@ -119,8 +116,6 @@ export function ChatInterface({
     } catch (error) {
       console.error("Chat error:", error)
       parentOnSendMessage(messageToSend, "Sorry, I couldn't process your request.")
-    } finally {
-      setIsTyping(false)
     }
   }
 
