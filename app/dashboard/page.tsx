@@ -366,7 +366,7 @@ export default function Dashboard() {
           </div>
           <div className="hidden md:grid md:grid-cols-2 gap-3">
             {section.bullets
-              .filter((bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title))
+              .filter((bullet) => !["Value Growth"].includes(bullet.title))
               .map((bullet, index) => (
                 <Card key={index} className="bg-white shadow-sm hover:shadow-md transition-shadow">
                   <CardContent className="p-4">
@@ -449,7 +449,7 @@ export default function Dashboard() {
           {policyData && policyData.analysis_data.data.policyOverview && (
             <>
               <h1 className="text-3xl font-bold mb-2 text-[rgb(82,102,255)]">
-                {policyData.analysis_data.data.policyOverview.productName || "Policy Overview"}
+                Your {policyData.analysis_data.data.policyOverview.productName || "Policy Overview"} Policy
               </h1>
               <h2 className="text-xl text-gray-600">{policyData.analysis_data.data.policyOverview.issuer || ""}</h2>
             </>
