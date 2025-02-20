@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import { useEffect, useRef } from "react"
 import VoiceButton from "./VoiceButton"
+import { TTSController, useTTS } from "./TTSController"
 
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
@@ -32,6 +33,7 @@ export function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
+  const { isEnabled, speak, stop, setEnabled } = useTTS()
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -68,6 +70,16 @@ export function ChatInterface({
     }, 2000)
   }
 
+  // Handle speaking new messages
+  useEffect(() => {
+    if (isEnabled && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1]
+      if (lastMessage.role === "assistant") {
+        speak(lastMessage.content)
+      }
+    }
+  }, [messages, isEnabled])
+
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
       <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgba(82,102,255,0.15)] to-[rgba(82,102,255,0.05)] rounded-t-xl border-b border-[rgba(82,102,255,0.1)]">
@@ -78,15 +90,21 @@ export function ChatInterface({
             <p className="text-sm text-gray-600">{chatSubtext}</p>
           </div>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onStartNewChat}
-          className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          New Chat
-        </Button>
+        <div className="flex items-center gap-3">
+          <TTSController 
+            isEnabled={isEnabled}
+            onToggle={setEnabled}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onStartNewChat}
+            className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            New Chat
+          </Button>
+        </div>
       </div>
 
       <div 
@@ -180,7 +198,7 @@ function ChatMessage({ role, content }: ChatMessageProps) {
         className={`
           max-w-[85%] rounded-2xl px-4 py-2.5
           ${isUser ? "bg-[rgb(82,102,255)] text-white" : "bg-gray-100 text-gray-800"}
-          transition-all duration-200 transform
+          transition-all duration-200
         `}
       >
         <div className="text-sm leading-relaxed">
