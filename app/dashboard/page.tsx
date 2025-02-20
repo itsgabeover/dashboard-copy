@@ -362,7 +362,7 @@ export default function Dashboard() {
           <div className="md:hidden">
             <MobileCardGrid
               items={section.bullets.filter(
-                (bullet) => !["Product Name", "Carrier Name", "Value Growth"].includes(bullet.title),
+                (bullet) => !["Product name", "Carrier name", "Value Growth"].includes(bullet.title),
               )}
             />
           </div>
