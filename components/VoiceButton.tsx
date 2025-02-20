@@ -66,6 +66,7 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
   const [isPulsing, setIsPulsing] = useState(false)
   const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
 
+  // Setup recognition
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -87,8 +88,9 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
         }
       }
     }
-  }, [])
+  }, []) // Empty dependency array as this should only run once
 
+  // Handle recognition events
   useEffect(() => {
     if (!recognition) return
 
@@ -132,7 +134,7 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
       recognition.onerror = null
       recognition.onresult = null
     }
-  }, [recognition, onTranscript])
+  }, [recognition, onTranscript]) // Added recognition to dependency array
 
   const toggleListening = useCallback(() => {
     if (!recognition) return
