@@ -33,7 +33,7 @@ export function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
-  const { isEnabled, speak, stop, setEnabled } = useTTS()
+  const { isEnabled, speak, setEnabled } = useTTS()
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -70,15 +70,18 @@ export function ChatInterface({
     }, 2000)
   }
 
-  // Handle speaking new messages
   useEffect(() => {
-    if (isEnabled && messages.length > 0) {
-      const lastMessage = messages[messages.length - 1]
-      if (lastMessage.role === "assistant") {
-        speak(lastMessage.content)
+    const handleNewMessage = () => {
+      if (isEnabled && messages.length > 0) {
+        const lastMessage = messages[messages.length - 1]
+        if (lastMessage.role === "assistant") {
+          speak(lastMessage.content)
+        }
       }
     }
-  }, [messages, isEnabled])
+
+    handleNewMessage()
+  }, [messages, isEnabled, speak])
 
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
