@@ -1,60 +1,108 @@
-import React, { useState, useEffect } from 'react';
-import { Mic, MicOff, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+"use client"
 
-interface VoiceButtonProps {
-  onTranscript: (text: string) => void;
-  disabled?: boolean;
+import { Mic, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+
+// Type definitions for Web Speech API
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList
 }
 
-const VoiceButton = ({ onTranscript, disabled }: VoiceButtonProps) => {
-  const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState<any>(null);
+interface SpeechRecognitionResultList {
+  readonly length: number
+  item(index: number): SpeechRecognitionResult
+  [index: number]: SpeechRecognitionResult
+}
+
+interface SpeechRecognitionResult {
+  readonly length: number
+  item(index: number): SpeechRecognitionAlternative
+  [index: number]: SpeechRecognitionAlternative
+  isFinal: boolean
+}
+
+interface SpeechRecognitionAlternative {
+  readonly transcript: string
+  readonly confidence: number
+}
+
+interface ISpeechRecognition extends EventTarget {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  start: () => void
+  stop: () => void
+  onresult: (event: SpeechRecognitionEvent) => void
+  onerror: (event: Event) => void
+  onend: () => void
+}
+
+// Extend Window interface
+declare global {
+  interface Window {
+    SpeechRecognition?: {
+      new (): ISpeechRecognition
+    }
+    webkitSpeechRecognition?: {
+      new (): ISpeechRecognition
+    }
+  }
+}
+
+interface VoiceButtonProps {
+  onTranscript: (text: string) => void
+  disabled?: boolean
+}
+
+export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps) {
+  const [isListening, setIsListening] = useState(false)
+  const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
       if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = true;
-        recognition.lang = 'en-US';
+        const recognitionInstance = new SpeechRecognition()
+        recognitionInstance.continuous = false
+        recognitionInstance.interimResults = true
+        recognitionInstance.lang = "en-US"
 
-        recognition.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
+        recognitionInstance.onresult = (event: SpeechRecognitionEvent) => {
+          const transcript = event.results[0][0].transcript
           if (event.results[0].isFinal) {
-            onTranscript(transcript);
-            setIsListening(false);
-            recognition.stop();
+            onTranscript(transcript)
+            setIsListening(false)
+            recognitionInstance.stop()
           }
-        };
+        }
 
-        recognition.onerror = () => {
-          setIsListening(false);
-        };
+        recognitionInstance.onerror = () => {
+          setIsListening(false)
+        }
 
-        recognition.onend = () => {
-          setIsListening(false);
-        };
+        recognitionInstance.onend = () => {
+          setIsListening(false)
+        }
 
-        setRecognition(recognition);
+        setRecognition(recognitionInstance)
       }
     }
-  }, [onTranscript]);
+  }, [onTranscript])
 
   const toggleListening = () => {
-    if (!recognition) return;
-    
+    if (!recognition) return
+
     if (isListening) {
-      recognition.stop();
+      recognition.stop()
     } else {
-      recognition.start();
-      setIsListening(true);
+      recognition.start()
+      setIsListening(true)
     }
-  };
+  }
 
   if (!recognition) {
-    return null;
+    return null
   }
 
   return (
@@ -65,8 +113,8 @@ const VoiceButton = ({ onTranscript, disabled }: VoiceButtonProps) => {
       disabled={disabled}
       className={`rounded-full transition-all duration-200 ${
         isListening 
-          ? 'bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90' 
-          : 'bg-white hover:bg-gray-50'
+          ? "bg-[rgb(82,102,255)] text-white hover:bg-[rgb(82,102,255)]/90" 
+          : "bg-white hover:bg-gray-50"
       }`}
     >
       {isListening ? (
@@ -75,10 +123,8 @@ const VoiceButton = ({ onTranscript, disabled }: VoiceButtonProps) => {
         <Mic className="h-4 w-4" />
       )}
       <span className="sr-only">
-        {isListening ? 'Stop recording' : 'Start recording'}
+        {isListening ? "Stop recording" : "Start recording"}
       </span>
     </Button>
-  );
-};
-
-export default VoiceButton;
+  )
+}
