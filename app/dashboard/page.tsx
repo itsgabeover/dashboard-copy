@@ -345,7 +345,7 @@ export default function Dashboard() {
           {section.opening && (
             <p className="text-gray-700 pl-4">
               {tab.id === "policyOverview"
-                ? `Let's walk through your life insurance policy in simple terms. ${section.opening}`
+                ? `${section.opening}`
                 : tab.id === "policyPower"
                   ? "Your life insurance policy works for you in several important ways. Let's break down how it protects your family while giving you flexibility for the future."
                   : tab.id === "builtInAdvantages"
