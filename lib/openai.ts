@@ -176,7 +176,7 @@ ALWAYS:
 - Reference specific policy details
 - Use actual values in examples
 - Ground discussions in their policy
-- Keep responses under word limits
+- Keep responses under 100 word limit (IMPORTANT)
 - Format numbers with commas
 - Use markdown formatting consistently
 - End with a thoughtful question that shows genuine interest
