@@ -24,14 +24,18 @@ interface ChatInterfaceProps {
   userEmail?: string
 }
 
-// Add interface for word timing
 interface WordTiming {
   word: string
   start: number
   duration: number
 }
 
-export function ChatInterface({
+interface ChatMessageProps {
+  role: "user" | "assistant"
+  content: string
+}
+
+function ChatInterface({
   messages,
   inputMessage,
   isTyping,
@@ -52,7 +56,7 @@ export function ChatInterface({
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
   
-  // New state for synchronized text display
+  // State for synchronized text display
   const [displayText, setDisplayText] = useState<string>("")
   const [wordTimings, setWordTimings] = useState<WordTiming[]>([])
   const timeoutRefs = useRef<NodeJS.Timeout[]>([])
@@ -250,7 +254,7 @@ export function ChatInterface({
   }
 
   // Enhanced ChatMessage component with sync support
-  const SyncedChatMessage = ({ role, content }: { role: "user" | "assistant", content: string }) => {
+  const SyncedChatMessage = ({ role, content }: ChatMessageProps) => {
     const isUser = role === "user"
     const shouldSync = !isUser && isSpeaking && content === currentSpeakingText && isTTSEnabled
 
@@ -398,9 +402,5 @@ function TypingIndicator() {
   )
 }
 
-interface ChatMessageProps {
-  role: "user" | "assistant"
-  content: string
-}
-
-export { ChatMessage, ChatInterface }
+export type { ChatInterfaceProps }
+export { ChatInterface }
