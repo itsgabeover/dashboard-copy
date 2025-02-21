@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useRef, useState, FormEvent } from "react";
 
+// Update to match your real policy structure
 export interface PolicyDashboard {
   id: string;
   policy_name: string;
   created_at: string;
   session_id: string;
-  // analysis_data contains detailed analysis in its data property.
   analysis_data: {
     data: {
       email: string;
@@ -22,7 +22,6 @@ export interface PolicyDashboard {
         };
         timePoint: string;
       }>;
-      // In your sample, sections is an object with keys like "keyTopics", etc.
       sections: {
         [key: string]: {
           title: string;
@@ -35,7 +34,6 @@ export interface PolicyDashboard {
       };
     };
   };
-  // Sometimes the outer analysis also includes a policyOverview summary.
   policyOverview?: {
     issuer: string;
     productName: string;
@@ -52,17 +50,25 @@ interface RealtimeVoiceChatProps {
 export default function RealtimeVoiceChat({
   policyData,
 }: RealtimeVoiceChatProps) {
-  const [connected, setConnected] = useState(false);
-  const [captions, setCaptions] = useState("");
+  // -- State --
+  const [isSessionActive, setIsSessionActive] = useState(false);
   const [connectionError, setConnectionError] = useState("");
-  const pcRef = useRef<RTCPeerConnection | null>(null);
-  const dataChannelRef = useRef<RTCDataChannel | null>(null);
+  const [captions, setCaptions] = useState("Waiting for AI response...");
+  const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
 
-  // Updated helper to generate detailed instructions.
-  const generateInstructionsFromPolicy = (policy: PolicyDashboard): string => {
+  const [userInput, setUserInput] = useState(""); // user text input
+
+  // We'll track the peer connection in a ref
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+
+  // ------------- FULL generateInstructionsFromPolicy -------------
+  // This function enumerates the entire policy analysis (values, sections, etc.)
+  function generateInstructionsFromPolicy(policy: PolicyDashboard): string {
     const data = policy.analysis_data.data;
     let instructions = "";
-    // Use the outer policyOverview if available; otherwise fall back to data.policyOverview.
+
+    // Possibly use the outer policyOverview if available
     if (policy.policyOverview) {
       instructions += `Policy Overview:\n`;
       instructions += `- Product: ${policy.policyOverview.productName}\n`;
@@ -88,7 +94,8 @@ export default function RealtimeVoiceChat({
 
     if (data.sections && typeof data.sections === "object") {
       instructions += "Sections Analysis:\n";
-      Object.keys(data.sections).forEach((key, index) => {
+      const sectionKeys = Object.keys(data.sections);
+      sectionKeys.forEach((key, index) => {
         const section = data.sections[key];
         instructions += `Section ${index + 1}: ${section.title}\n`;
         instructions += `Opening: ${section.opening}\n`;
@@ -103,127 +110,230 @@ export default function RealtimeVoiceChat({
     }
 
     return instructions;
-  };
+  }
+  // ---------------------------------------------------------------
 
-  useEffect(() => {
-    if (pcRef.current) return; // Prevent duplicate initialization
+  // --- Start Session ---
+  async function startSession() {
+    try {
+      // 1. Get ephemeral token
+      const tokenRes = await fetch("/api/session");
+      if (!tokenRes.ok) throw new Error("Failed to fetch token");
+      const tokenData = await tokenRes.json();
+      const ephemeralKey = tokenData.client_secret.value;
 
-    async function init() {
-      try {
-        // 1. Get ephemeral token from your API route.
-        const tokenRes = await fetch("/api/session");
-        if (!tokenRes.ok) throw new Error("Failed to fetch token");
-        const tokenData = await tokenRes.json();
-        const ephemeralKey = tokenData.client_secret.value;
+      // 2. Create RTCPeerConnection
+      const pc = new RTCPeerConnection();
+      pcRef.current = pc;
 
-        // 2. Create an RTCPeerConnection and set up remote audio playback.
-        const pc = new RTCPeerConnection();
-        pcRef.current = pc;
-        const audioEl = document.createElement("audio");
-        audioEl.autoplay = true;
-        pc.ontrack = (event) => {
-          audioEl.srcObject = event.streams[0];
-        };
-
-        // 3. Get local audio (microphone) stream and add its tracks.
-        const localStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        });
-        localStream
-          .getTracks()
-          .forEach((track) => pc.addTrack(track, localStream));
-
-        // 4. Create a data channel for realtime events.
-        const dc = pc.createDataChannel("oai-events");
-        dataChannelRef.current = dc;
-
-        // Wait for the data channel to open before sending the session update.
-        dc.onopen = () => {
-          console.log("Data channel open");
-          if (policyData) {
-            const instructions = generateInstructionsFromPolicy(policyData);
-            console.log("Sending instructions:", instructions);
-            const sessionUpdateEvent = {
-              type: "session.update",
-              session: {
-                instructions,
-              },
-            };
-            dc.send(JSON.stringify(sessionUpdateEvent));
-          }
-        };
-
-        dc.onmessage = (event) => {
-          try {
-            const evtData = JSON.parse(event.data);
-            if (evtData.type === "response.text.delta") {
-              setCaptions((prev) => prev + evtData.delta);
-            }
-          } catch (error) {
-            console.error("Error parsing data channel message:", error);
-          }
-        };
-
-        // 5. Create and set the local SDP offer.
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-
-        // 6. Exchange the SDP with the realtime API endpoint using the ephemeral token.
-        const sdpRes = await fetch(
-          `https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17`,
-          {
-            method: "POST",
-            body: offer.sdp,
-            headers: {
-              Authorization: `Bearer ${ephemeralKey}`,
-              "Content-Type": "application/sdp",
-            },
-          }
-        );
-        if (!sdpRes.ok) throw new Error("Failed to exchange SDP");
-        const answerSDP = await sdpRes.text();
-        await pc.setRemoteDescription({ type: "answer", sdp: answerSDP });
-        setConnected(true);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error("Error initializing realtime chat:", err);
-          setConnectionError(err.message);
-        } else {
-          console.error("Error initializing realtime chat:", err);
-          setConnectionError("Connection error");
+      // 3. Create audio element for remote audio
+      audioElementRef.current = document.createElement("audio");
+      audioElementRef.current.autoplay = true;
+      pc.ontrack = (event) => {
+        if (audioElementRef.current) {
+          audioElementRef.current.srcObject = event.streams[0];
         }
+      };
+
+      // 4. Get local mic track
+      const localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      localStream
+        .getTracks()
+        .forEach((track) => pc.addTrack(track, localStream));
+
+      // 5. Create data channel
+      const dc = pc.createDataChannel("oai-events");
+      setDataChannel(dc);
+
+      // 6. Data channel event handlers
+      dc.onopen = () => {
+        setIsSessionActive(true);
+        console.log("Data channel open");
+        // Send session.update with audio+text + instructions
+        if (policyData) {
+          const instructions = generateInstructionsFromPolicy(policyData);
+          const sessionUpdateEvent = {
+            type: "session.update",
+            session: {
+              modalities: ["audio", "text"], // important for text deltas
+              instructions,
+            },
+          };
+          dc.send(JSON.stringify(sessionUpdateEvent));
+        }
+      };
+
+      dc.onmessage = (e) => {
+        try {
+          const evtData = JSON.parse(e.data);
+          if (evtData.type === "response.text.delta") {
+            setCaptions((prev) => {
+              if (prev === "Waiting for AI response...") {
+                return evtData.delta; // start fresh if we haven't begun
+              } else {
+                return prev + evtData.delta;
+              }
+            });
+          }
+        } catch (error) {
+          console.error("Error parsing data channel message:", error);
+        }
+      };
+
+      // 7. Create and set local SDP offer
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+      // 8. Exchange SDP with the realtime API
+      const baseUrl = "https://api.openai.com/v1/realtime";
+      const model = "gpt-4o-realtime-preview-2024-12-17";
+      const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
+        method: "POST",
+        body: offer.sdp,
+        headers: {
+          Authorization: `Bearer ${ephemeralKey}`,
+          "Content-Type": "application/sdp",
+        },
+      });
+      if (!sdpResponse.ok) {
+        throw new Error(
+          `Failed to exchange SDP, status: ${sdpResponse.status}`
+        );
+      }
+      const answerSDP = await sdpResponse.text();
+      await pc.setRemoteDescription({ type: "answer", sdp: answerSDP });
+    } catch (err) {
+      console.error("Error initializing realtime chat:", err);
+      if (err instanceof Error) {
+        setConnectionError(err.message);
+      } else {
+        setConnectionError("Connection error");
       }
     }
-    init();
+  }
 
-    return () => {
-      if (pcRef.current) {
-        pcRef.current.close();
-        pcRef.current = null;
-      }
+  // --- Stop Session ---
+  function stopSession() {
+    if (dataChannel) {
+      dataChannel.close();
+    }
+    if (pcRef.current) {
+      pcRef.current.getSenders().forEach((sender) => {
+        if (sender.track) {
+          sender.track.stop();
+        }
+      });
+      pcRef.current.close();
+      pcRef.current = null;
+    }
+    setDataChannel(null);
+    setIsSessionActive(false);
+    setConnectionError("");
+    setCaptions("Waiting for AI response...");
+  }
+
+  // Send user text message to the model
+  function sendTextMessage(e: FormEvent) {
+    e.preventDefault();
+    if (!dataChannel || !isSessionActive || !userInput.trim()) return;
+
+    // 1. Create conversation.item.create event
+    const conversationEvent = {
+      type: "conversation.item.create",
+      item: {
+        type: "message",
+        role: "user",
+        content: [
+          {
+            type: "input_text",
+            text: userInput.trim(),
+          },
+        ],
+      },
     };
-  }, [policyData]);
+
+    // 2. Send the conversation event
+    dataChannel.send(JSON.stringify(conversationEvent));
+
+    // 3. Then request a response
+    dataChannel.send(JSON.stringify({ type: "response.create" }));
+
+    // Clear local input
+    setUserInput("");
+  }
 
   return (
-    <div className="p-4 border rounded-md bg-white shadow-md">
-      <h2 className="text-xl font-bold">Realtime Voice Chat</h2>
+    <div className="p-6 border rounded-xl bg-white shadow-md">
+      {/* Session Controls */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-[rgb(82,102,255)]">
+          Realtime Voice Chat
+        </h2>
+        <div className="space-x-2">
+          {!isSessionActive ? (
+            <button
+              onClick={startSession}
+              className="px-4 py-2 rounded-md bg-[rgb(82,102,255)] text-white"
+            >
+              Start Session
+            </button>
+          ) : (
+            <button
+              onClick={stopSession}
+              className="px-4 py-2 rounded-md bg-red-500 text-white"
+            >
+              Stop Session
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Error Display */}
       {connectionError && (
-        <p className="text-red-600 mt-2">Error: {connectionError}</p>
+        <p className="text-red-600 mb-2">Error: {connectionError}</p>
       )}
-      {connected ? (
+
+      {/* Session Active UI */}
+      {isSessionActive ? (
         <>
-          <p className="mt-2 text-green-600">Connected to realtime API</p>
-          <div className="mt-4 flex items-center">
+          <p className="mb-2 text-green-600">Connected to realtime API</p>
+          <div className="mb-4 flex items-center">
             <div className="w-4 h-4 rounded-full bg-[rgb(82,102,255)] animate-pulse mr-2"></div>
-            <span className="text-sm">AI is speaking...</span>
+            <span className="text-sm text-gray-800">AI is speaking...</span>
           </div>
-          <div className="mt-4 p-2 bg-gray-100 rounded-md">
-            <h3 className="text-sm font-semibold">AI Closed Captions:</h3>
-            <p className="text-sm">{captions}</p>
+          <div className="p-4 bg-gray-50 rounded-lg border mb-4">
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              AI Closed Captions:
+            </h3>
+            <p className="text-gray-800 whitespace-pre-wrap">{captions}</p>
           </div>
+
+          {/* Simple user input area for text messages */}
+          <form
+            onSubmit={sendTextMessage}
+            className="flex items-center space-x-2"
+          >
+            <input
+              className="flex-1 p-2 border rounded-md"
+              type="text"
+              placeholder="Type a message..."
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-md bg-[rgb(82,102,255)] text-white"
+            >
+              Send
+            </button>
+          </form>
         </>
       ) : (
-        <p className="mt-2">Connecting...</p>
+        <p className="text-gray-600">
+          Session inactive. Click &quot;Start Session&quot; to begin.
+        </p>
       )}
     </div>
   );

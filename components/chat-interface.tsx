@@ -1,40 +1,38 @@
-"use client"
+"use client";
 
-import { Send, RefreshCw, MessageCircle, Volume2, VolumeX } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import ReactMarkdown from "react-markdown"
-import { useEffect, useRef, useState, useCallback } from "react"
-import VoiceButton from "./VoiceButton"
-import RealtimeVoiceChat from "./RealtimeVoiceChat"; // Import the new component
+import { Send, RefreshCw, MessageCircle, Volume2, VolumeX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ReactMarkdown from "react-markdown";
+import { useEffect, useRef, useState, useCallback } from "react";
+import VoiceButton from "./VoiceButton";
+import RealtimeVoiceChat from "./RealtimeVoiceChat"; // Import the realtime component
 import {
   WordTiming,
   TTSResponse,
   TTS_CONSTANTS,
-  // TTSError,
   AudioPlaybackState,
   TTSMetadata,
 } from "@/types/tts";
-import { PolicyDashboard } from "@/app/dashboard/page"
-
+import { PolicyDashboard } from "@/app/dashboard/page";
 
 interface ChatInterfaceProps {
-  messages: Array<{ role: "user" | "assistant"; content: string }>
-  inputMessage: string
-  isTyping: boolean
-  onInputChange: (value: string) => void
-  onSendMessage: (userMessage?: string, assistantMessage?: string) => void
-  onStartNewChat: () => void
-  quickPrompts: string[]
-  chatTitle: string
-  chatSubtext?: string
+  messages: Array<{ role: "user" | "assistant"; content: string }>;
+  inputMessage: string;
+  isTyping: boolean;
+  onInputChange: (value: string) => void;
+  onSendMessage: (userMessage?: string, assistantMessage?: string) => void;
+  onStartNewChat: () => void;
+  quickPrompts: string[];
+  chatTitle: string;
+  chatSubtext?: string;
   policyData?: PolicyDashboard | null;
-  userEmail?: string
+  userEmail?: string;
 }
 
 interface ChatMessageProps {
-  role: "user" | "assistant"
-  content: string
-  isCurrentlyPlaying?: boolean
+  role: "user" | "assistant";
+  content: string;
+  isCurrentlyPlaying?: boolean;
 }
 
 const ChatInterface = ({
@@ -92,7 +90,6 @@ const ChatInterface = ({
         const timing = timings[i];
         const adjustedStart =
           timing.start + TTS_CONSTANTS.WORD_TRANSITION_BUFFER;
-
         if (elapsedTime >= adjustedStart) {
           text += (i > 0 ? " " : "") + timing.word;
           updatedLastIndex = i;
@@ -252,7 +249,6 @@ const ChatInterface = ({
       audio.removeEventListener("timeupdate", handleTimeUpdate);
     };
   }, [currentSpeakingText, updateDisplayText]);
-  // Continue from Part 1...
 
   // Message scroll handling
   useEffect(() => {
@@ -503,7 +499,6 @@ const ChatInterface = ({
     );
   };
 
-  // Main render
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
       {/* Header */}
@@ -568,12 +563,18 @@ const ChatInterface = ({
         </div>
       </div>
 
+      {/* Realtime Voice Chat Panel */}
+      {showRealtimeChat && (
+        <div className="px-6 py-4 border-b border-gray-200">
+          <RealtimeVoiceChat policyData={policyData ?? null} />
+        </div>
+      )}
+
       {/* Messages Container */}
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px] transition-all duration-300"
       >
-        {showRealtimeChat && <RealtimeVoiceChat policyData={policyData ?? null} />}
         {messages.map((message, index) => (
           <div
             key={index}
@@ -647,7 +648,7 @@ const ChatInterface = ({
       />
     </div>
   );
-}
+};
 
-export type { ChatInterfaceProps }
-export { ChatInterface }
+export type { ChatInterfaceProps };
+export { ChatInterface };
