@@ -44,6 +44,8 @@ export function ChatInterface({
   const [isTTSEnabled, setIsTTSEnabled] = useState(true) // TTS enabled by default
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
+  const [ttsBuffer, setTtsBuffer] = useState("")
+  const ttsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -107,6 +109,11 @@ export function ChatInterface({
           const { done, value } = await reader.read()
           if (done) {
             console.log("Stream complete, last message length:", assistantMessage.length)
+            // Speak any remaining buffered text
+            if (ttsBuffer.trim()) {
+              await handleTextToSpeech(ttsBuffer.trim())
+              setTtsBuffer("")
+            }
             break
           }
 
@@ -116,12 +123,34 @@ export function ChatInterface({
 
           // Update the message in the parent component
           parentOnSendMessage(undefined, assistantMessage)
+
+          // Buffer the text for TTS
+          if (isTTSEnabled) {
+            bufferTextForTTS(text)
+          }
         }
       }
     } catch (error) {
       console.error("Chat error:", error)
       parentOnSendMessage(messageToSend, "Sorry, I couldn't process your request.")
     }
+  }
+
+  const bufferTextForTTS = (text: string) => {
+    setTtsBuffer((prev) => prev + text)
+
+    // Clear any existing timeout
+    if (ttsTimeoutRef.current) {
+      clearTimeout(ttsTimeoutRef.current)
+    }
+
+    // Set a new timeout to process the buffer
+    ttsTimeoutRef.current = setTimeout(async () => {
+      if (ttsBuffer.trim()) {
+        await handleTextToSpeech(ttsBuffer.trim())
+        setTtsBuffer("")
+      }
+    }, 1000) // Wait for 1 second of inactivity before processing
   }
 
   const handleTextToSpeech = async (text: string) => {
@@ -143,9 +172,18 @@ export function ChatInterface({
       const audioUrl = URL.createObjectURL(audioBlob)
 
       if (audioRef.current) {
-        audioRef.current.src = audioUrl
-        audioRef.current.play()
-        setIsSpeaking(true)
+        if (!isSpeaking) {
+          audioRef.current.src = audioUrl
+          await audioRef.current.play()
+          setIsSpeaking(true)
+        } else {
+          // If already speaking, queue the new audio
+          const existingAudio = audioRef.current
+          existingAudio.onended = async () => {
+            audioRef.current!.src = audioUrl
+            await audioRef.current!.play()
+          }
+        }
       }
     } catch (error) {
       console.error("Error in text-to-speech:", error)
