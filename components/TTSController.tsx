@@ -9,7 +9,6 @@ export function useTTS() {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const synthRef = useRef<SpeechSynthesis | null>(null);
-  const [voicesLoaded, setVoicesLoaded] = useState(false);
 
   // Buffer and queue for streaming text
   const bufferRef = useRef<string>("");
@@ -29,7 +28,7 @@ export function useTTS() {
     }
   }, []);
 
-  // Load voices and update state when voices are available
+  // Load voices
   useEffect(() => {
     if (!synthRef.current) return;
 
@@ -37,7 +36,6 @@ export function useTTS() {
       try {
         const voices = synthRef.current?.getVoices() || [];
         console.log("Voices loaded:", voices.length);
-        setVoicesLoaded(voices.length > 0);
       } catch (error) {
         console.error("Error loading voices:", error);
       }
@@ -137,14 +135,15 @@ export function useTTS() {
   return {
     isEnabled,
     isSpeaking,
-    setEnabled: setIsEnabled,
+    setEnabled,
     speak,
   };
 }
 
 // TTS Controller component that uses the above hook
 export function TTSController({ className = "" }: { className?: string }) {
-  const { isEnabled, setEnabled, speak } = useTTS();
+  // Only destructuring the variables that are used.
+  const { isEnabled, setEnabled } = useTTS();
 
   const toggleTTS = () => {
     try {
