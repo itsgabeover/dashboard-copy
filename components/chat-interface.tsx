@@ -24,12 +24,6 @@ interface ChatInterfaceProps {
   userEmail?: string
 }
 
-interface WordTiming {
-  word: string
-  start: number
-  duration: number
-}
-
 interface ChatMessageProps {
   role: "user" | "assistant"
   content: string
@@ -58,99 +52,6 @@ function ChatInterface({
   const [displayText, setDisplayText] = useState<string>("")
   const timeoutRefs = useRef<NodeJS.Timeout[]>([])
   const animationFrameRef = useRef<number | null>(null)
-
-  useEffect(() => {
-    if (messages.length > prevMessagesLengthRef.current || isTyping) {
-      if (messagesContainerRef.current && messagesEndRef.current) {
-        messagesContainerRef.current.scrollTo({
-          top: messagesContainerRef.current.scrollHeight,
-          behavior: "smooth",
-        })
-      }
-    }
-    prevMessagesLengthRef.current = messages.length
-  }, [messages, isTyping])
-
-  useEffect(() => {
-    // Automatically speak the last assistant message when it's added
-    const lastMessage = messages[messages.length - 1]
-    if (lastMessage && lastMessage.role === "assistant" && isTTSEnabled) {
-      handleTextToSpeech(lastMessage.content)
-    }
-  }, [messages, isTTSEnabled])
-
-  // Cleanup effect for audio and timeouts
-  useEffect(() => {
-    return () => {
-      const currentAudioRef = audioRef.current
-      if (currentAudioRef) {
-        currentAudioRef.pause()
-        if (currentAudioRef.src) {
-          URL.revokeObjectURL(currentAudioRef.src)
-        }
-      }
-      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
-    }
-  }, [])
-
-  const handleQuickPrompt = (prompt: string) => {
-    handleSendMessage(prompt)
-  }
-
-  const handleSendMessage = async (directMessage?: string) => {
-    const messageToSend = directMessage || inputMessage.trim()
-    if (!messageToSend) return
-
-    if (!directMessage) {
-      onInputChange("")
-    }
-
-    try {
-      console.log("Message send starting, TTS enabled:", isTTSEnabled)
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-User-Email": userEmail,
-        },
-        body: JSON.stringify({
-          content: messageToSend,
-          session_id: policyData.session_id,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`)
-      }
-
-      const reader = response.body?.getReader()
-      let assistantMessage = ""
-
-      if (reader) {
-        parentOnSendMessage(messageToSend)
-        console.log("Stream starting, TTS status:", { isTTSEnabled })
-
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) {
-            console.log("Stream complete, last message length:", assistantMessage.length)
-            break
-          }
-
-          // Decode the stream chunk and append to message
-          const text = new TextDecoder().decode(value)
-          assistantMessage += text
-
-          // Update the message in the parent component
-          parentOnSendMessage(undefined, assistantMessage)
-        }
-      }
-    } catch (error) {
-      console.error("Chat error:", error)
-      parentOnSendMessage(messageToSend, "Sorry, I couldn't process your request.")
-    }
-  }
 
   const handleTextToSpeech = useCallback(async (text: string) => {
     try {
@@ -221,6 +122,102 @@ function ChatInterface({
       setDisplayText(text)
     }
   }, [])
+
+  useEffect(() => {
+    if (messages.length > prevMessagesLengthRef.current || isTyping) {
+      if (messagesContainerRef.current && messagesEndRef.current) {
+        messagesContainerRef.current.scrollTo({
+          top: messagesContainerRef.current.scrollHeight,
+          behavior: "smooth",
+        })
+      }
+    }
+    prevMessagesLengthRef.current = messages.length
+  }, [messages, isTyping])
+
+  useEffect(() => {
+    // Automatically speak the last assistant message when it's added
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage && lastMessage.role === "assistant" && isTTSEnabled) {
+      handleTextToSpeech(lastMessage.content)
+    }
+  }, [messages, isTTSEnabled, handleTextToSpeech])
+
+  // Cleanup effect for audio and timeouts
+  useEffect(() => {
+    return () => {
+      const currentAudioRef = audioRef.current
+      if (currentAudioRef) {
+        currentAudioRef.pause()
+        if (currentAudioRef.src) {
+          URL.revokeObjectURL(currentAudioRef.src)
+        }
+      }
+      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    }
+  }, [])
+
+  const handleQuickPrompt = (prompt: string) => {
+    handleSendMessage(prompt)
+  }
+
+  const handleSendMessage = async (directMessage?: string) => {
+    const messageToSend = directMessage || inputMessage.trim()
+    if (!messageToSend) return
+
+    if (!directMessage) {
+      onInputChange("")
+    }
+
+    try {
+      console.log("Message send starting, TTS enabled:", isTTSEnabled)
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Email": userEmail,
+        },
+        body: JSON.stringify({
+          content: messageToSend,
+          session_id: policyData.session_id,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`)
+      }
+
+      const reader = response.body?.getReader()
+      let assistantMessage = ""
+
+      if (reader) {
+        parentOnSendMessage(messageToSend)
+        console.log("Stream starting, TTS status:", { isTTSEnabled })
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            console.log("Stream complete, last message length:", assistantMessage.length)
+            break
+          }
+
+          // Decode the stream chunk and append to message
+          const text = new TextDecoder().decode(value)
+          assistantMessage += text
+
+          // Update the message in the parent component
+          parentOnSendMessage(undefined, assistantMessage)
+        }
+      }
+    } catch (error) {
+      console.error("Chat error:", error)
+      parentOnSendMessage(messageToSend, "Sorry, I couldn't process your request.")
+    }
+  }
 
   const toggleSpeech = useCallback(() => {
     if (isSpeaking && audioRef.current) {
