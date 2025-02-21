@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import { useEffect, useRef, useState, useCallback } from "react"
 import VoiceButton from "./VoiceButton"
-import { WordTiming, TTSResponse, TTS_CONSTANTS } from "@/types/tts"
+import { 
+  WordTiming, 
+  TTSResponse, 
+  TTS_CONSTANTS, 
+  TTSError, 
+  AudioPlaybackState,
+  TTSMetadata 
+} from "@/types/tts"
 
 interface PolicyData {
   session_id: string
@@ -28,9 +35,10 @@ interface ChatInterfaceProps {
 interface ChatMessageProps {
   role: "user" | "assistant"
   content: string
+  isCurrentlyPlaying?: boolean
 }
 
-function ChatInterface({
+const ChatInterface = ({
   messages,
   inputMessage,
   isTyping,
@@ -42,32 +50,46 @@ function ChatInterface({
   chatSubtext,
   policyData = { session_id: "default" },
   userEmail = "default@user.com",
-}: ChatInterfaceProps) {
+}: ChatInterfaceProps) => {
+  // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
-  const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isTTSEnabled, setIsTTSEnabled] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [currentSpeakingText, setCurrentSpeakingText] = useState("")
-  const [displayText, setDisplayText] = useState("")
-  const animationFrameRef = useRef<number | null>(null)
   const wordTimingsRef = useRef<WordTiming[]>([])
   const startTimeRef = useRef(0)
   const lastWordIndexRef = useRef(0)
+  const animationFrameRef = useRef<number | null>(null)
+  const audioPositionRef = useRef(0)
 
+  // State
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isAudioPaused, setIsAudioPaused] = useState(false)
+  const [isTTSEnabled, setIsTTSEnabled] = useState(true)
+  const [currentSpeakingText, setCurrentSpeakingText] = useState("")
+  const [displayText, setDisplayText] = useState("")
+  const [audioMetadata, setAudioMetadata] = useState<TTSMetadata | null>(null)
+  const [playbackState, setPlaybackState] = useState<AudioPlaybackState>({
+    isPlaying: false,
+    isPaused: false,
+    currentTime: 0,
+    duration: 0
+  })
+
+  // Text display update function
   const updateDisplayText = useCallback((currentTime: number) => {
     const timings = wordTimingsRef.current
     if (!timings.length) return
 
     let text = ""
     let updatedLastIndex = lastWordIndexRef.current
+    const elapsedTime = currentTime - startTimeRef.current
 
     for (let i = 0; i < timings.length; i++) {
       const timing = timings[i]
       const adjustedStart = timing.start + TTS_CONSTANTS.WORD_TRANSITION_BUFFER
       
-      if (currentTime - startTimeRef.current >= adjustedStart) {
+      if (elapsedTime >= adjustedStart) {
         text += (i > 0 ? " " : "") + timing.word
         updatedLastIndex = i
       } else {
@@ -81,21 +103,31 @@ function ChatInterface({
     }
 
     const lastTiming = timings[timings.length - 1]
-    if (currentTime - startTimeRef.current < lastTiming.start + lastTiming.duration) {
+    if (elapsedTime < lastTiming.start + lastTiming.duration + TTS_CONSTANTS.WORD_TRANSITION_BUFFER) {
       animationFrameRef.current = requestAnimationFrame(() => updateDisplayText(performance.now()))
+    } else {
+      setDisplayText(currentSpeakingText) // Show full text when complete
     }
-  }, [])
+  }, [currentSpeakingText])
 
+  // TTS handling
   const handleTextToSpeech = useCallback(async (text: string) => {
     try {
       if (!text.trim()) return
 
+      // Reset state
       setCurrentSpeakingText(text)
       setDisplayText("")
       lastWordIndexRef.current = 0
 
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
+      }
+
+      // Clear existing audio
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.currentTime = 0
       }
 
       const response = await fetch("/api/text-to-speech", {
@@ -109,9 +141,13 @@ function ChatInterface({
       }
 
       const data: TTSResponse = await response.json()
-      const { audio: audioBase64, timings } = data
+      const { audio: audioBase64, timings, metadata } = data
 
-      const audioBlob = new Blob([Buffer.from(audioBase64, "base64")], { type: "audio/mp3" })
+      setAudioMetadata(metadata)
+
+      const audioBlob = new Blob([Buffer.from(audioBase64, "base64")], { 
+        type: "audio/mp3" 
+      })
       const audioUrl = URL.createObjectURL(audioBlob)
 
       const currentAudioRef = audioRef.current
@@ -119,28 +155,89 @@ function ChatInterface({
         currentAudioRef.src = audioUrl
         wordTimingsRef.current = timings
 
-        currentAudioRef.onplay = () => {
-          setIsSpeaking(true)
-          startTimeRef.current = performance.now()
-          animationFrameRef.current = requestAnimationFrame(() => updateDisplayText(performance.now()))
-        }
+        // Add preload delay
+        await new Promise(resolve => setTimeout(resolve, TTS_CONSTANTS.AUDIO_PRELOAD_DELAY))
 
-        currentAudioRef.onended = () => {
-          setIsSpeaking(false)
+        try {
+          await currentAudioRef.play()
+          setPlaybackState(prev => ({
+            ...prev,
+            isPlaying: true,
+            isPaused: false,
+            currentTime: 0,
+            duration: data.totalDuration
+          }))
+        } catch (playError) {
+          console.error("Audio playback error:", playError)
           setDisplayText(text)
-          if (animationFrameRef.current) {
-            cancelAnimationFrame(animationFrameRef.current)
-          }
         }
-
-        await currentAudioRef.play()
       }
     } catch (error) {
       console.error("Error in text-to-speech:", error)
       setDisplayText(text)
     }
-  }, [updateDisplayText])
+  }, [])
 
+  // Audio event handlers
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+
+    const handlePlay = () => {
+      setIsSpeaking(true)
+      setIsAudioPaused(false)
+      startTimeRef.current = performance.now() - (audio.currentTime * 1000)
+      animationFrameRef.current = requestAnimationFrame(() => updateDisplayText(performance.now()))
+    }
+
+    const handlePause = () => {
+      if (!audio.ended) {
+        setIsAudioPaused(true)
+        audioPositionRef.current = audio.currentTime
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current)
+        }
+      }
+    }
+
+    const handleEnded = () => {
+      setIsSpeaking(false)
+      setIsAudioPaused(false)
+      audioPositionRef.current = 0
+      setDisplayText(currentSpeakingText)
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      setPlaybackState(prev => ({
+        ...prev,
+        isPlaying: false,
+        isPaused: false,
+        currentTime: 0
+      }))
+    }
+
+    const handleTimeUpdate = () => {
+      setPlaybackState(prev => ({
+        ...prev,
+        currentTime: audio.currentTime
+      }))
+    }
+
+    audio.addEventListener('play', handlePlay)
+    audio.addEventListener('pause', handlePause)
+    audio.addEventListener('ended', handleEnded)
+    audio.addEventListener('timeupdate', handleTimeUpdate)
+
+    return () => {
+      audio.removeEventListener('play', handlePlay)
+      audio.removeEventListener('pause', handlePause)
+      audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('timeupdate', handleTimeUpdate)
+    }
+  }, [currentSpeakingText, updateDisplayText])
+  // Continue from Part 1...
+
+  // Message scroll handling
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
       if (messagesContainerRef.current && messagesEndRef.current) {
@@ -153,15 +250,17 @@ function ChatInterface({
     prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
 
+  // Auto-play handling for new messages
   useEffect(() => {
     const lastMessage = messages[messages.length - 1]
-    if (lastMessage && lastMessage.role === "assistant" && isTTSEnabled) {
+    if (lastMessage && lastMessage.role === "assistant" && isTTSEnabled && !isTyping) {
       handleTextToSpeech(lastMessage.content)
     }
-  }, [messages, isTTSEnabled, handleTextToSpeech])
+  }, [messages, isTTSEnabled, handleTextToSpeech, isTyping])
 
+  // Cleanup effect
   useEffect(() => {
-    const cleanupAudio = () => {
+    return () => {
       const currentAudioRef = audioRef.current
       if (currentAudioRef) {
         currentAudioRef.pause()
@@ -172,14 +271,47 @@ function ChatInterface({
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
+      setIsAudioPaused(false)
+      audioPositionRef.current = 0
+      setAudioMetadata(null)
     }
-    return cleanupAudio
   }, [])
 
-  const handleQuickPrompt = (prompt: string) => {
-    handleSendMessage(prompt)
-  }
+  // Speech toggle handler
+  const toggleSpeech = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio || !isTTSEnabled) return
 
+    if (isSpeaking) {
+      audio.pause()
+    } else if (isAudioPaused && currentSpeakingText) {
+      audio.currentTime = audioPositionRef.current
+      audio.play().catch(console.error)
+    } else if (currentSpeakingText) {
+      handleTextToSpeech(currentSpeakingText)
+    }
+  }, [isSpeaking, isAudioPaused, currentSpeakingText, isTTSEnabled, handleTextToSpeech])
+
+  // TTS toggle handler
+  const handleTTSToggle = useCallback(() => {
+    if (isTTSEnabled && isSpeaking) {
+      const audio = audioRef.current
+      if (audio) {
+        audio.pause()
+        audio.currentTime = 0
+      }
+      setIsSpeaking(false)
+      setIsAudioPaused(false)
+      audioPositionRef.current = 0
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+      setDisplayText(currentSpeakingText)
+    }
+    setIsTTSEnabled(!isTTSEnabled)
+  }, [isTTSEnabled, isSpeaking, currentSpeakingText])
+
+  // Message handling
   const handleSendMessage = async (directMessage?: string) => {
     const messageToSend = directMessage || inputMessage.trim()
     if (!messageToSend) return
@@ -226,18 +358,9 @@ function ChatInterface({
     }
   }
 
-  const toggleSpeech = useCallback(() => {
-    if (isSpeaking && audioRef.current) {
-      audioRef.current.pause()
-      setIsSpeaking(false)
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
-      setDisplayText(currentSpeakingText)
-    } else if (currentSpeakingText) {
-      handleTextToSpeech(currentSpeakingText)
-    }
-  }, [isSpeaking, currentSpeakingText, handleTextToSpeech])
+  const handleQuickPrompt = (prompt: string) => {
+    handleSendMessage(prompt)
+  }
 
   const handleVoiceTranscript = (text: string) => {
     onInputChange(text)
@@ -249,6 +372,7 @@ function ChatInterface({
     }
   }
 
+  // Text formatting
   const formatContent = (text: string) => {
     return text
       .replace(/^-(?=\S)/gm, "- ")
@@ -258,9 +382,10 @@ function ChatInterface({
       .trim()
   }
 
-  const SyncedChatMessage = ({ role, content }: ChatMessageProps) => {
+  // Chat message component
+  const SyncedChatMessage = ({ role, content, isCurrentlyPlaying }: ChatMessageProps) => {
     const isUser = role === "user"
-    const shouldSync = !isUser && isSpeaking && content === currentSpeakingText && isTTSEnabled
+    const shouldSync = !isUser && isCurrentlyPlaying && content === currentSpeakingText && isTTSEnabled
     const [stableDisplayText, setStableDisplayText] = useState(content)
     const previousTextRef = useRef(content)
 
@@ -277,7 +402,7 @@ function ChatInterface({
         setStableDisplayText(displayText || content)
         previousTextRef.current = displayText || content
       }
-    }, [shouldSync, content, stableDisplayText])
+    }, [shouldSync, content, stableDisplayText, displayText])
 
     return (
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -304,6 +429,7 @@ function ChatInterface({
                 [&_li]:pl-1
                 [&_strong]:font-semibold
                 ${isUser ? "[&_strong]:text-white" : "[&_strong]:text-gray-900"}
+                transition-all duration-200
               `}
             >
               {shouldSync ? stableDisplayText || "..." : formatContent(content)}
@@ -314,7 +440,8 @@ function ChatInterface({
     )
   }
 
-  function TypingIndicator() {
+  // Typing indicator component
+  const TypingIndicator = () => {
     return (
       <div className="flex items-center gap-1 text-gray-400 h-8 px-3">
         <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" />
@@ -324,8 +451,10 @@ function ChatInterface({
     )
   }
 
+  // Main render
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
+      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[rgba(82,102,255,0.15)] to-[rgba(82,102,255,0.05)] rounded-t-xl border-b border-[rgba(82,102,255,0.1)]">
         <div className="flex items-center space-x-3">
           <MessageCircle className="w-6 h-6 text-[rgb(82,102,255)]" />
@@ -338,8 +467,12 @@ function ChatInterface({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setIsTTSEnabled(!isTTSEnabled)}
-            className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
+            onClick={handleTTSToggle}
+            className={`
+              bg-white border-[rgb(82,102,255)] 
+              hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200
+              ${isTTSEnabled ? 'text-[rgb(82,102,255)]' : 'text-gray-500'}
+            `}
           >
             {isTTSEnabled ? "TTS On" : "TTS Off"}
           </Button>
@@ -347,7 +480,12 @@ function ChatInterface({
             variant="outline"
             size="sm"
             onClick={toggleSpeech}
-            className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
+            disabled={!currentSpeakingText || !isTTSEnabled}
+            className={`
+              bg-white border-[rgb(82,102,255)]
+              hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200
+              ${(!currentSpeakingText || !isTTSEnabled) ? 'opacity-50 cursor-not-allowed' : 'text-[rgb(82,102,255)]'}
+            `}
           >
             {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </Button>
@@ -363,6 +501,7 @@ function ChatInterface({
         </div>
       </div>
 
+      {/* Messages Container */}
       <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px] transition-all duration-300"
@@ -375,13 +514,22 @@ function ChatInterface({
               opacity: isTyping && index === messages.length - 1 ? 0.7 : 1,
             }}
           >
-            <SyncedChatMessage role={message.role} content={message.content} />
+            <SyncedChatMessage 
+              role={message.role} 
+              content={message.content}
+              isCurrentlyPlaying={
+                message.role === "assistant" &&
+                message.content === currentSpeakingText &&
+                isSpeaking
+              }
+            />
           </div>
         ))}
         {isTyping && <TypingIndicator />}
         <div ref={messagesEndRef} />
       </div>
 
+      {/* Input Area */}
       <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto rounded-b-xl">
         <div className="flex flex-wrap gap-2 mb-3">
           {quickPrompts.map((prompt, index) => (
@@ -405,16 +553,30 @@ function ChatInterface({
             className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white transition-all duration-200"
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
           />
-          <VoiceButton onTranscript={handleVoiceTranscript} disabled={isTyping} />
+          <VoiceButton 
+            onTranscript={handleVoiceTranscript} 
+            disabled={isTyping} 
+          />
           <Button
             onClick={() => handleSendMessage()}
-            className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
+            disabled={isTyping}
+            className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
       </div>
-      <audio ref={audioRef} onEnded={() => setIsSpeaking(false)} />
+
+      {/* Hidden audio element */}
+      <audio 
+        ref={audioRef} 
+        onEnded={() => setIsSpeaking(false)}
+        onError={(e) => {
+          console.error("Audio error:", e);
+          setIsSpeaking(false);
+          setDisplayText(currentSpeakingText);
+        }}
+      />
     </div>
   )
 }
