@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
 import { useEffect, useRef, useState, useCallback } from "react"
 import VoiceButton from "./VoiceButton"
-
-// Constants for TTS timing control
-const WORD_TRANSITION_BUFFER = 50
-const MIN_WORD_DISPLAY_TIME = 200
+import { WordTiming, TTSResponse, TTS_CONSTANTS } from "@/types/tts"
 
 interface PolicyData {
   session_id: string
@@ -31,12 +28,6 @@ interface ChatInterfaceProps {
 interface ChatMessageProps {
   role: "user" | "assistant"
   content: string
-}
-
-interface WordTiming {
-  word: string
-  start: number
-  duration: number
 }
 
 function ChatInterface({
@@ -74,7 +65,7 @@ function ChatInterface({
 
     for (let i = 0; i < timings.length; i++) {
       const timing = timings[i]
-      const adjustedStart = timing.start + WORD_TRANSITION_BUFFER
+      const adjustedStart = timing.start + TTS_CONSTANTS.WORD_TRANSITION_BUFFER
       
       if (currentTime - startTimeRef.current >= adjustedStart) {
         text += (i > 0 ? " " : "") + timing.word
@@ -89,7 +80,8 @@ function ChatInterface({
       setDisplayText(text)
     }
 
-    if (currentTime - startTimeRef.current < timings[timings.length - 1].start + timings[timings.length - 1].duration) {
+    const lastTiming = timings[timings.length - 1]
+    if (currentTime - startTimeRef.current < lastTiming.start + lastTiming.duration) {
       animationFrameRef.current = requestAnimationFrame(() => updateDisplayText(performance.now()))
     }
   }, [])
@@ -116,7 +108,7 @@ function ChatInterface({
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json()
+      const data: TTSResponse = await response.json()
       const { audio: audioBase64, timings } = data
 
       const audioBlob = new Blob([Buffer.from(audioBase64, "base64")], { type: "audio/mp3" })
@@ -249,15 +241,12 @@ function ChatInterface({
 
   const handleVoiceTranscript = (text: string) => {
     onInputChange(text)
-
-    setTimeout(() => {
-      if (text.trim()) {
+    if (text.trim()) {
+      setTimeout(() => {
         handleSendMessage(text)
-        setTimeout(() => {
-          onInputChange("")
-        }, 300)
-      }
-    }, 2000)
+        onInputChange("")
+      }, 300)
+    }
   }
 
   const formatContent = (text: string) => {
@@ -273,21 +262,22 @@ function ChatInterface({
     const isUser = role === "user"
     const shouldSync = !isUser && isSpeaking && content === currentSpeakingText && isTTSEnabled
     const [stableDisplayText, setStableDisplayText] = useState(content)
-    const previousDisplayTextRef = useRef(content)
+    const previousTextRef = useRef(content)
 
     useEffect(() => {
-      if (shouldSync && displayText) {
-        const currentLength = displayText.length
-        const prevLength = previousDisplayTextRef.current.length
-        
-        if (currentLength > prevLength || Math.abs(currentLength - prevLength) > 10) {
-          setStableDisplayText(displayText)
-          previousDisplayTextRef.current = displayText
-        }
-      } else {
+      if (!shouldSync) {
         setStableDisplayText(content)
+        return
       }
-    }, [shouldSync, content, displayText])
+
+      const currentLength = stableDisplayText.length
+      const prevLength = previousTextRef.current.length
+        
+      if (currentLength > prevLength || Math.abs(currentLength - prevLength) > 10) {
+        setStableDisplayText(displayText || content)
+        previousTextRef.current = displayText || content
+      }
+    }, [shouldSync, content, stableDisplayText])
 
     return (
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -420,7 +410,7 @@ function ChatInterface({
             onClick={() => handleSendMessage()}
             className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
           >
-            <Send className="h-4 w-4" />
+            <Send className="w-4 h-4" />
           </Button>
         </div>
       </div>
