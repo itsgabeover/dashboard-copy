@@ -6,12 +6,10 @@ import {
   WordTiming, 
   TTSResponse, 
   TTS_CONSTANTS, 
-  TTSError, 
   TTSRequestOptions,
   TTSMetadata 
 } from "@/types/tts"
 
-// Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -47,7 +45,7 @@ function prepareText(text: string): string[] {
   })
 }
 
-function estimateWordDuration(word: string, position: number, totalWords: number): number {
+function estimateWordDuration(word: string, position: number, totalWords: number, speed: number = 1.0): number {
   let duration = TTS_CONSTANTS.BASE_DURATION
 
   // Enhanced word length adjustment
@@ -90,16 +88,19 @@ function estimateWordDuration(word: string, position: number, totalWords: number
   // Natural rhythm variations
   duration += Math.sin(position * 0.5) * 30
 
+  // Apply speed adjustment
+  duration = duration / speed
+
   return Math.max(duration, TTS_CONSTANTS.MIN_WORD_DURATION)
 }
 
-function calculateSpeechRhythm(words: string[]): WordTiming[] {
+function calculateSpeechRhythm(words: string[], speed: number = 1.0): WordTiming[] {
   let currentTime = 0
   const timings: WordTiming[] = []
   const totalWords = words.length
 
   words.forEach((word, index) => {
-    const duration = estimateWordDuration(word, index, totalWords)
+    const duration = estimateWordDuration(word, index, totalWords, speed)
     
     timings.push({
       word,
@@ -107,7 +108,7 @@ function calculateSpeechRhythm(words: string[]): WordTiming[] {
       duration
     })
 
-    currentTime += duration + TTS_CONSTANTS.WORD_TRANSITION_BUFFER
+    currentTime += duration + (TTS_CONSTANTS.WORD_TRANSITION_BUFFER / speed)
   })
 
   return timings
@@ -121,13 +122,18 @@ function processTextChunks(text: string): string[] {
     .map(chunk => chunk.trim())
 }
 
-async function generateSpeech(text: string, retryCount = 0): Promise<Buffer> {
+async function generateSpeech(
+  text: string, 
+  voice: TTSRequestOptions['voice'] = 'alloy',
+  speed: number = 1.0,
+  retryCount = 0
+): Promise<Buffer> {
   try {
     const mp3 = await openai.audio.speech.create({
       model: "tts-1",
-      voice: "alloy",
+      voice: voice,
       input: text,
-      speed: 1.0,
+      speed: speed,
       response_format: "mp3",
     })
 
@@ -135,7 +141,7 @@ async function generateSpeech(text: string, retryCount = 0): Promise<Buffer> {
   } catch (error) {
     if (retryCount < TTS_CONSTANTS.MAX_RETRIES) {
       await new Promise(resolve => setTimeout(resolve, TTS_CONSTANTS.RETRY_DELAY))
-      return generateSpeech(text, retryCount + 1)
+      return generateSpeech(text, voice, speed, retryCount + 1)
     }
     throw error
   }
@@ -145,7 +151,8 @@ export async function POST(req: Request) {
   const startTime = performance.now()
   
   try {
-    const { text, voice = 'alloy', speed = 1.0 }: TTSRequestOptions = await req.json()
+    const requestData: TTSRequestOptions = await req.json()
+    const { text, voice = 'alloy', speed = 1.0 } = requestData
 
     if (!text?.trim()) {
       throw new Error("Text is required")
@@ -153,14 +160,14 @@ export async function POST(req: Request) {
 
     // Prepare and process text
     const words = prepareText(text)
-    const timings = calculateSpeechRhythm(words)
+    const timings = calculateSpeechRhythm(words, speed)
 
     // Calculate total duration including all pauses and buffers
     const totalDuration = timings.reduce((sum, timing) => 
-      Math.max(sum, timing.start + timing.duration + TTS_CONSTANTS.WORD_TRANSITION_BUFFER), 0)
+      Math.max(sum, timing.start + timing.duration + (TTS_CONSTANTS.WORD_TRANSITION_BUFFER / speed)), 0)
 
-    // Generate speech
-    const buffer = await generateSpeech(text)
+    // Generate speech with specified voice and speed
+    const buffer = await generateSpeech(text, voice, speed)
     const audioBase64 = buffer.toString('base64')
 
     // Prepare metadata
@@ -182,7 +189,6 @@ export async function POST(req: Request) {
       metadata
     }
 
-    // Return response with caching headers
     return new NextResponse(JSON.stringify(response), {
       headers: {
         "Content-Type": "application/json",
@@ -201,7 +207,7 @@ export async function POST(req: Request) {
         code: error.code,
         type: error.type,
         params: error.param
-      } satisfies TTSError, {
+      }, {
         status: error.status || 500
       })
     }
@@ -212,7 +218,7 @@ export async function POST(req: Request) {
       message: error instanceof Error ? error.message : "Unknown error",
       code: "INTERNAL_ERROR",
       timestamp: new Date().toISOString()
-    } satisfies TTSError, {
+    }, {
       status: 500
     })
   }
