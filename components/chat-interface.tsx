@@ -83,10 +83,11 @@ function ChatInterface({
   // Cleanup effect for audio and timeouts
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause()
-        if (audioRef.current.src) {
-          URL.revokeObjectURL(audioRef.current.src)
+      const currentAudioRef = audioRef.current
+      if (currentAudioRef) {
+        currentAudioRef.pause()
+        if (currentAudioRef.src) {
+          URL.revokeObjectURL(currentAudioRef.src)
         }
       }
       timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
@@ -198,7 +199,7 @@ function ChatInterface({
             // Schedule word displays
             timings.forEach((timing: WordTiming, index: number) => {
               const timeout = setTimeout(() => {
-                setDisplayText((prevText) => {
+                setDisplayText(() => {
                   const words = timings.slice(0, index + 1).map((t: WordTiming) => t.word)
                   return words.join(" ")
                 })
