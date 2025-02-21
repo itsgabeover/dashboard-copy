@@ -30,6 +30,7 @@
     "@vercel/analytics": "latest",
     "@vercel/kv": "^3.0.0",
     "ai": "^2.2.31",
+    "buffer": "^6.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^10.16.4",
