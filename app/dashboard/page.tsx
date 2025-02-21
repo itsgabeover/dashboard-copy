@@ -15,21 +15,47 @@ import { MobileTabsNavigation } from "@/components/MobileTabsNavigation"
 import { MobileCardGrid } from "@/components/MobileCardGrid"
 
 export interface PolicyDashboard {
-  id: string
-  policy_name: string
-  created_at: string
-  session_id: string
+  id: string;
+  policy_name: string;
+  created_at: string;
+  session_id: string;
+  // analysis_data contains detailed analysis in its data property.
   analysis_data: {
     data: {
+      email: string;
       policyOverview: {
-        productName: string
-        issuer: string
-      }
+        productName: string;
+        issuer: string;
+      };
+      values: Array<{
+        values: {
+          cashValue: number;
+          netSurrenderValue: number;
+          deathBenefitAmount: number;
+        };
+        timePoint: string;
+      }>;
+      // In your sample, sections is an object with keys like "keyTopics", etc.
       sections: {
-        [key: string]: PolicySection
-      }
-    }
-  }
+        [key: string]: {
+          title: string;
+          opening: string;
+          bullets: Array<{
+            title: string;
+            content: string;
+          }>;
+        };
+      };
+    };
+  };
+  // Sometimes the outer analysis also includes a policyOverview summary.
+  policyOverview?: {
+    issuer: string;
+    productName: string;
+    productType: string;
+    deathBenefit: string;
+    annualPremium: string;
+  };
 }
 
 interface PolicySection {

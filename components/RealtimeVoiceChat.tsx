@@ -6,26 +6,43 @@ export interface PolicyDashboard {
   policy_name: string;
   created_at: string;
   session_id: string;
+  // analysis_data contains detailed analysis in its data property.
   analysis_data: {
     data: {
+      email: string;
       policyOverview: {
         productName: string;
         issuer: string;
       };
+      values: Array<{
+        values: {
+          cashValue: number;
+          netSurrenderValue: number;
+          deathBenefitAmount: number;
+        };
+        timePoint: string;
+      }>;
+      // In your sample, sections is an object with keys like "keyTopics", etc.
       sections: {
-        [key: string]: PolicySection;
+        [key: string]: {
+          title: string;
+          opening: string;
+          bullets: Array<{
+            title: string;
+            content: string;
+          }>;
+        };
       };
-      // Additional fields like "email" or "values" may be present.
     };
   };
-}
-
-export interface PolicySection {
-  opening: string;
-  bullets: Array<{
-    title: string;
-    content: string;
-  }>;
+  // Sometimes the outer analysis also includes a policyOverview summary.
+  policyOverview?: {
+    issuer: string;
+    productName: string;
+    productType: string;
+    deathBenefit: string;
+    annualPremium: string;
+  };
 }
 
 interface RealtimeVoiceChatProps {
@@ -41,18 +58,51 @@ export default function RealtimeVoiceChat({
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dataChannelRef = useRef<RTCDataChannel | null>(null);
 
-  // Helper: Generate instructions from the policyData.
+  // Updated helper to generate detailed instructions.
   const generateInstructionsFromPolicy = (policy: PolicyDashboard): string => {
-    const { analysis_data } = policy;
-    const overview = analysis_data.data.policyOverview;
-    // For example, include product name, issuer, and section titles.
-    const sectionTitles = Object.values(analysis_data.data.sections)
-      .map((section) => section.opening)
-      .join(", ");
-    return `Policy Analysis Instructions:
-Product: ${overview.productName}
-Issuer: ${overview.issuer}
-Sections: ${sectionTitles}`;
+    const data = policy.analysis_data.data;
+    let instructions = "";
+    // Use the outer policyOverview if available; otherwise fall back to data.policyOverview.
+    if (policy.policyOverview) {
+      instructions += `Policy Overview:\n`;
+      instructions += `- Product: ${policy.policyOverview.productName}\n`;
+      instructions += `- Issuer: ${policy.policyOverview.issuer}\n`;
+      instructions += `- Product Type: ${policy.policyOverview.productType}\n`;
+      instructions += `- Death Benefit: ${policy.policyOverview.deathBenefit}\n`;
+      instructions += `- Annual Premium: ${policy.policyOverview.annualPremium}\n\n`;
+    } else {
+      instructions += `Policy Overview:\n`;
+      instructions += `- Product: ${data.policyOverview.productName}\n`;
+      instructions += `- Issuer: ${data.policyOverview.issuer}\n\n`;
+    }
+
+    instructions += `Email: ${data.email}\n\n`;
+
+    if (data.values && data.values.length > 0) {
+      instructions += "Value Projections:\n";
+      data.values.forEach((entry) => {
+        instructions += `- ${entry.timePoint}: Cash Value = ${entry.values.cashValue}, Net Surrender Value = ${entry.values.netSurrenderValue}, Death Benefit = ${entry.values.deathBenefitAmount}\n`;
+      });
+      instructions += "\n";
+    }
+
+    if (data.sections && typeof data.sections === "object") {
+      instructions += "Sections Analysis:\n";
+      Object.keys(data.sections).forEach((key, index) => {
+        const section = data.sections[key];
+        instructions += `Section ${index + 1}: ${section.title}\n`;
+        instructions += `Opening: ${section.opening}\n`;
+        if (section.bullets && section.bullets.length > 0) {
+          instructions += "Bullets:\n";
+          section.bullets.forEach((bullet) => {
+            instructions += `  - ${bullet.title}: ${bullet.content}\n`;
+          });
+        }
+        instructions += "\n";
+      });
+    }
+
+    return instructions;
   };
 
   useEffect(() => {
@@ -87,11 +137,12 @@ Sections: ${sectionTitles}`;
         const dc = pc.createDataChannel("oai-events");
         dataChannelRef.current = dc;
 
-        // Set the onopen handler so we send the session.update only when the channel is ready.
+        // Wait for the data channel to open before sending the session update.
         dc.onopen = () => {
           console.log("Data channel open");
           if (policyData) {
             const instructions = generateInstructionsFromPolicy(policyData);
+            console.log("Sending instructions:", instructions);
             const sessionUpdateEvent = {
               type: "session.update",
               session: {
@@ -102,7 +153,6 @@ Sections: ${sectionTitles}`;
           }
         };
 
-        // Set the onmessage handler.
         dc.onmessage = (event) => {
           try {
             const evtData = JSON.parse(event.data);
