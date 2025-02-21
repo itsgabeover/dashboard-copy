@@ -68,7 +68,7 @@ export function ChatInterface({
     }
 
     try {
-      console.log("Starting message send, TTS enabled:", isEnabled);
+      console.log("Message send starting, TTS enabled:", isEnabled);
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -92,30 +92,34 @@ export function ChatInterface({
 
       if (reader) {
         parentOnSendMessage(messageToSend)
-        console.log("Starting stream processing");
+        console.log("Stream starting, TTS status:", { isEnabled });
         
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
-            console.log("Stream completed");
+            console.log("Stream complete, last message length:", assistantMessage.length);
+            // Try to speak the final message if needed
+            if (isEnabled && assistantMessage.trim()) {
+              console.log("Attempting to speak final message");
+              speak(assistantMessage);
+            }
             break;
           }
 
           // Decode the stream chunk and append to message
           const text = new TextDecoder().decode(value)
           assistantMessage += text
-
-          // Get the new chunk of text to speak
           const newChunk = assistantMessage.slice(lastSpokenChunk.length)
           
-          // Modified chunk processing for TTS
+          console.log("Processing chunk:", { 
+            isEnabled,
+            chunkLength: newChunk.length,
+            hasContent: !!newChunk.trim()
+          });
+
           if (isEnabled && newChunk.trim()) {
-            console.log("Processing chunk for TTS:", newChunk.slice(0, 50));
-            // Try speaking complete sentences
-            const sentences = newChunk.match(/[^.!?]+[.!?]+/g);
-            if (sentences) {
-              speak(sentences.join(' '));
-            }
+            // Speak this chunk
+            speak(newChunk);
             lastSpokenChunk = assistantMessage;
           }
 
