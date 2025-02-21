@@ -1,11 +1,13 @@
 "use client"
 
-import { Send, RefreshCw, MessageCircle } from "lucide-react"
+import { Send, RefreshCw, MessageCircle, Volume2, VolumeX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import VoiceButton from "./VoiceButton"
-import { TTSController, useTTS } from "./TTSController"
+
+// Remove these imports if they're not used elsewhere
+// import { TTSController, useTTS } from "./TTSController"
 
 interface PolicyData {
   session_id: string
@@ -35,20 +37,24 @@ export function ChatInterface({
   quickPrompts,
   chatTitle,
   chatSubtext,
-  policyData = { session_id: 'default' },
-  userEmail = 'default@user.com'
+  policyData = { session_id: "default" },
+  userEmail = "default@user.com",
 }: ChatInterfaceProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
-  const { isEnabled, speak, setEnabled } = useTTS()
+  // Remove this line if useTTS is not needed
+  // const { isEnabled, speak, setEnabled } = useTTS()
+  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isTTSEnabled, setIsTTSEnabled] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
       if (messagesContainerRef.current && messagesEndRef.current) {
         messagesContainerRef.current.scrollTo({
           top: messagesContainerRef.current.scrollHeight,
-          behavior: "smooth"
+          behavior: "smooth",
         })
       }
     }
@@ -68,7 +74,7 @@ export function ChatInterface({
     }
 
     try {
-      console.log("Message send starting, TTS enabled:", isEnabled);
+      console.log("Message send starting, TTS enabled:", isTTSEnabled)
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -92,35 +98,35 @@ export function ChatInterface({
 
       if (reader) {
         parentOnSendMessage(messageToSend)
-        console.log("Stream starting, TTS status:", { isEnabled });
-        
+        console.log("Stream starting, TTS status:", { isTTSEnabled })
+
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
-            console.log("Stream complete, last message length:", assistantMessage.length);
+            console.log("Stream complete, last message length:", assistantMessage.length)
             // Try to speak the final message if needed
-            if (isEnabled && assistantMessage.trim()) {
-              console.log("Attempting to speak final message");
-              speak(assistantMessage);
+            if (isTTSEnabled && assistantMessage.trim()) {
+              console.log("Attempting to speak final message")
+              await handleTextToSpeech(assistantMessage)
             }
-            break;
+            break
           }
 
           // Decode the stream chunk and append to message
           const text = new TextDecoder().decode(value)
           assistantMessage += text
           const newChunk = assistantMessage.slice(lastSpokenChunk.length)
-          
-          console.log("Processing chunk:", { 
-            isEnabled,
-            chunkLength: newChunk.length,
-            hasContent: !!newChunk.trim()
-          });
 
-          if (isEnabled && newChunk.trim()) {
+          console.log("Processing chunk:", {
+            isTTSEnabled,
+            chunkLength: newChunk.length,
+            hasContent: !!newChunk.trim(),
+          })
+
+          if (isTTSEnabled && newChunk.trim()) {
             // Speak this chunk
-            speak(newChunk);
-            lastSpokenChunk = assistantMessage;
+            await handleTextToSpeech(newChunk)
+            lastSpokenChunk = assistantMessage
           }
 
           // Update the message in the parent component
@@ -133,9 +139,48 @@ export function ChatInterface({
     }
   }
 
+  const handleTextToSpeech = async (text: string) => {
+    try {
+      const response = await fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const audioBlob = await response.blob()
+      const audioUrl = URL.createObjectURL(audioBlob)
+
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl
+        audioRef.current.play()
+        setIsSpeaking(true)
+      }
+    } catch (error) {
+      console.error("Error in text-to-speech:", error)
+    }
+  }
+
+  const toggleSpeech = () => {
+    if (isSpeaking && audioRef.current) {
+      audioRef.current.pause()
+      setIsSpeaking(false)
+    } else if (messages.length > 0) {
+      const lastAssistantMessage = messages.filter((msg) => msg.role === "assistant").pop()
+      if (lastAssistantMessage) {
+        handleTextToSpeech(lastAssistantMessage.content)
+      }
+    }
+  }
+
   const handleVoiceTranscript = (text: string) => {
     onInputChange(text)
-    
+
     setTimeout(() => {
       if (text.trim()) {
         handleSendMessage(text)
@@ -157,10 +202,23 @@ export function ChatInterface({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <TTSController 
-            isEnabled={isEnabled}
-            onToggle={setEnabled}
-          />
+          {/* Replace TTSController with a simple toggle button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsTTSEnabled(!isTTSEnabled)}
+            className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
+          >
+            {isTTSEnabled ? "TTS On" : "TTS Off"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleSpeech}
+            className="bg-white text-[rgb(82,102,255)] border-[rgb(82,102,255)] hover:bg-[rgba(82,102,255,0.1)] transition-colors duration-200"
+          >
+            {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -173,8 +231,8 @@ export function ChatInterface({
         </div>
       </div>
 
-      <div 
-        ref={messagesContainerRef} 
+      <div
+        ref={messagesContainerRef}
         className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px] transition-all duration-300"
       >
         {messages.map((message, index) => (
@@ -215,10 +273,7 @@ export function ChatInterface({
             className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white transition-all duration-200"
             onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
           />
-          <VoiceButton 
-            onTranscript={handleVoiceTranscript}
-            disabled={isTyping}
-          />
+          <VoiceButton onTranscript={handleVoiceTranscript} disabled={isTyping} />
           <Button
             onClick={() => handleSendMessage()}
             className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4"
@@ -227,6 +282,7 @@ export function ChatInterface({
           </Button>
         </div>
       </div>
+      <audio ref={audioRef} onEnded={() => setIsSpeaking(false)} />
     </div>
   )
 }
@@ -264,7 +320,6 @@ function ChatMessage({ role, content }: ChatMessageProps) {
         className={`
           max-w-[85%] rounded-2xl px-4 py-2.5
           ${isUser ? "bg-[rgb(82,102,255)] text-white" : "bg-gray-100 text-gray-800"}
-          transition-all duration-200
         `}
       >
         <div className="text-sm leading-relaxed">
@@ -295,3 +350,4 @@ function ChatMessage({ role, content }: ChatMessageProps) {
 }
 
 export { ChatMessage }
+
