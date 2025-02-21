@@ -3,7 +3,7 @@
 import { Send, RefreshCw, MessageCircle, Volume2, VolumeX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState } from "react"
 import VoiceButton from "./VoiceButton"
 
 interface PolicyData {
@@ -41,13 +41,9 @@ export function ChatInterface({
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isTTSEnabled, setIsTTSEnabled] = useState(true)
+  const [isTTSEnabled, setIsTTSEnabled] = useState(true) // TTS enabled by default
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
-  const [ttsBuffer, setTtsBuffer] = useState("")
-  const ttsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const [audioQueue, setAudioQueue] = useState<string[]>([])
-  const isPlayingRef = useRef(false)
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -60,6 +56,14 @@ export function ChatInterface({
     }
     prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
+
+  useEffect(() => {
+    // Automatically speak the last assistant message when it's added
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage && lastMessage.role === "assistant" && isTTSEnabled) {
+      handleTextToSpeech(lastMessage.content)
+    }
+  }, [messages, isTTSEnabled])
 
   const handleQuickPrompt = (prompt: string) => {
     handleSendMessage(prompt)
@@ -103,11 +107,6 @@ export function ChatInterface({
           const { done, value } = await reader.read()
           if (done) {
             console.log("Stream complete, last message length:", assistantMessage.length)
-            // Process any remaining buffered text
-            if (ttsBuffer.trim()) {
-              processTextForTTS(ttsBuffer.trim())
-              setTtsBuffer("")
-            }
             break
           }
 
@@ -117,11 +116,6 @@ export function ChatInterface({
 
           // Update the message in the parent component
           parentOnSendMessage(undefined, assistantMessage)
-
-          // Buffer the text for TTS
-          if (isTTSEnabled) {
-            bufferTextForTTS(text)
-          }
         }
       }
     } catch (error) {
@@ -129,50 +123,6 @@ export function ChatInterface({
       parentOnSendMessage(messageToSend, "Sorry, I couldn't process your request.")
     }
   }
-
-  const bufferTextForTTS = useCallback(
-    (text: string) => {
-      setTtsBuffer((prev) => prev + text)
-
-      // Clear any existing timeout
-      if (ttsTimeoutRef.current) {
-        clearTimeout(ttsTimeoutRef.current)
-      }
-
-      // Set a new timeout to process the buffer
-      ttsTimeoutRef.current = setTimeout(() => {
-        if (ttsBuffer.trim()) {
-          processTextForTTS(ttsBuffer.trim())
-          setTtsBuffer("")
-        }
-      }, 500) // Reduced to 500ms for faster response
-    },
-    [ttsBuffer],
-  )
-
-  const processTextForTTS = useCallback((text: string) => {
-    // Split text into sentences
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text]
-    setAudioQueue((prev) => [...prev, ...sentences])
-    playNextInQueue()
-  }, [])
-
-  const playNextInQueue = useCallback(async () => {
-    if (audioQueue.length > 0 && !isPlayingRef.current) {
-      isPlayingRef.current = true
-      const textToSpeak = audioQueue[0]
-      setAudioQueue((prev) => prev.slice(1))
-
-      try {
-        await handleTextToSpeech(textToSpeak)
-      } catch (error) {
-        console.error("Error in text-to-speech:", error)
-      } finally {
-        isPlayingRef.current = false
-        playNextInQueue() // Try to play the next item in the queue
-      }
-    }
-  }, [audioQueue])
 
   const handleTextToSpeech = async (text: string) => {
     try {
@@ -194,7 +144,7 @@ export function ChatInterface({
 
       if (audioRef.current) {
         audioRef.current.src = audioUrl
-        await audioRef.current.play()
+        audioRef.current.play()
         setIsSpeaking(true)
       }
     } catch (error) {
@@ -202,17 +152,14 @@ export function ChatInterface({
     }
   }
 
-  const toggleSpeech = useCallback(() => {
+  const toggleSpeech = () => {
     if (isSpeaking && audioRef.current) {
       audioRef.current.pause()
       setIsSpeaking(false)
-      isPlayingRef.current = false
-    } else if (audioQueue.length > 0) {
-      playNextInQueue()
     } else if (currentSpeakingText) {
-      processTextForTTS(currentSpeakingText)
+      handleTextToSpeech(currentSpeakingText)
     }
-  }, [isSpeaking, audioQueue, currentSpeakingText, playNextInQueue, processTextForTTS])
+  }
 
   const handleVoiceTranscript = (text: string) => {
     onInputChange(text)
@@ -317,14 +264,7 @@ export function ChatInterface({
           </Button>
         </div>
       </div>
-      <audio
-        ref={audioRef}
-        onEnded={() => {
-          setIsSpeaking(false)
-          isPlayingRef.current = false
-          playNextInQueue()
-        }}
-      />
+      <audio ref={audioRef} onEnded={() => setIsSpeaking(false)} />
     </div>
   )
 }
@@ -392,4 +332,3 @@ function ChatMessage({ role, content }: ChatMessageProps) {
 }
 
 export { ChatMessage }
-
