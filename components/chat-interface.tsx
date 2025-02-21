@@ -6,6 +6,10 @@ import ReactMarkdown from "react-markdown"
 import { useEffect, useRef, useState, useCallback } from "react"
 import VoiceButton from "./VoiceButton"
 
+// Add constants for TTS timing control
+const WORD_TRANSITION_BUFFER = 50
+const MIN_WORD_DISPLAY_TIME = 200
+
 interface PolicyData {
   session_id: string
 }
@@ -27,6 +31,9 @@ interface ChatInterfaceProps {
 interface ChatMessageProps {
   role: "user" | "assistant"
   content: string
+  isSpeaking?: boolean
+  currentSpeakingText?: string
+  displayText?: string
 }
 
 interface WordTiming {
@@ -56,16 +63,49 @@ function ChatInterface({
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
   const [displayText, setDisplayText] = useState<string>("")
-  const timeoutRefs = useRef<NodeJS.Timeout[]>([])
   const animationFrameRef = useRef<number | null>(null)
+  const wordTimingsRef = useRef<WordTiming[]>([])
+  const startTimeRef = useRef(0)
+  const lastWordIndexRef = useRef(0)
+
+  const updateDisplayText = useCallback((currentTime: number) => {
+    const timings = wordTimingsRef.current
+    if (!timings.length) return
+
+    let text = ""
+    let updatedLastIndex = lastWordIndexRef.current
+
+    for (let i = 0; i < timings.length; i++) {
+      const timing = timings[i]
+      const adjustedStart = timing.start + WORD_TRANSITION_BUFFER
+      const adjustedDuration = Math.max(timing.duration, MIN_WORD_DISPLAY_TIME)
+      
+      if (currentTime - startTimeRef.current >= adjustedStart) {
+        text += (i > 0 ? " " : "") + timing.word
+        updatedLastIndex = i
+      } else {
+        break
+      }
+    }
+
+    if (updatedLastIndex > lastWordIndexRef.current) {
+      lastWordIndexRef.current = updatedLastIndex
+      setDisplayText(text)
+    }
+
+    if (currentTime - startTimeRef.current < timings[timings.length - 1].start + timings[timings.length - 1].duration) {
+      animationFrameRef.current = requestAnimationFrame(() => updateDisplayText(performance.now()))
+    }
+  }, [])
 
   const handleTextToSpeech = useCallback(async (text: string) => {
     try {
+      if (!text.trim()) return
+
       setCurrentSpeakingText(text)
       setDisplayText("")
+      lastWordIndexRef.current = 0
 
-      timeoutRefs.current.forEach(clearTimeout)
-      timeoutRefs.current = []
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
@@ -81,39 +121,19 @@ function ChatInterface({
       }
 
       const data = await response.json()
-      const { audio: audioBase64, timings, totalDuration } = data
+      const { audio: audioBase64, timings } = data
 
       const audioBlob = new Blob([Buffer.from(audioBase64, "base64")], { type: "audio/mp3" })
       const audioUrl = URL.createObjectURL(audioBlob)
 
       if (audioRef.current) {
         audioRef.current.src = audioUrl
-        audioRef.current.onloadedmetadata = () => {
-          const actualDuration = audioRef.current!.duration * 1000 // Convert to milliseconds
-          const scaleFactor = actualDuration / totalDuration
+        wordTimingsRef.current = timings
 
-          const startTime = performance.now()
-          const updateText = () => {
-            const elapsedTime = performance.now() - startTime
-            const currentWord = timings.find(
-              (t: WordTiming) =>
-                t.start * scaleFactor <= elapsedTime && (t.start + t.duration) * scaleFactor > elapsedTime,
-            )
-
-            if (currentWord) {
-              setDisplayText(text.substring(0, text.indexOf(currentWord.word) + currentWord.word.length))
-            }
-
-            if (elapsedTime < actualDuration) {
-              animationFrameRef.current = requestAnimationFrame(updateText)
-            } else {
-              setDisplayText(text)
-            }
-          }
-
-          audioRef.current!.play()
+        audioRef.current.onplay = () => {
           setIsSpeaking(true)
-          animationFrameRef.current = requestAnimationFrame(updateText)
+          startTimeRef.current = performance.now()
+          animationFrameRef.current = requestAnimationFrame(() => updateDisplayText(performance.now()))
         }
 
         audioRef.current.onended = () => {
@@ -123,12 +143,14 @@ function ChatInterface({
             cancelAnimationFrame(animationFrameRef.current)
           }
         }
+
+        await audioRef.current.play()
       }
     } catch (error) {
       console.error("Error in text-to-speech:", error)
       setDisplayText(text)
     }
-  }, [])
+  }, [updateDisplayText])
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -143,14 +165,12 @@ function ChatInterface({
   }, [messages, isTyping])
 
   useEffect(() => {
-    // Automatically speak the last assistant message when it's added
     const lastMessage = messages[messages.length - 1]
     if (lastMessage && lastMessage.role === "assistant" && isTTSEnabled) {
       handleTextToSpeech(lastMessage.content)
     }
   }, [messages, isTTSEnabled, handleTextToSpeech])
 
-  // Cleanup effect for audio and timeouts
   useEffect(() => {
     return () => {
       const currentAudioRef = audioRef.current
@@ -160,7 +180,6 @@ function ChatInterface({
           URL.revokeObjectURL(currentAudioRef.src)
         }
       }
-      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }
@@ -212,11 +231,8 @@ function ChatInterface({
             break
           }
 
-          // Decode the stream chunk and append to message
           const text = new TextDecoder().decode(value)
           assistantMessage += text
-
-          // Update the message in the parent component
           parentOnSendMessage(undefined, assistantMessage)
         }
       }
@@ -261,10 +277,23 @@ function ChatInterface({
       .trim()
   }
 
-  // Enhanced ChatMessage component with sync support
   const SyncedChatMessage = ({ role, content }: ChatMessageProps) => {
     const isUser = role === "user"
     const shouldSync = !isUser && isSpeaking && content === currentSpeakingText && isTTSEnabled
+    const [stableDisplayText, setStableDisplayText] = useState(content)
+    const previousDisplayText = useRef(displayText)
+
+    useEffect(() => {
+      if (shouldSync) {
+        if (displayText.length > previousDisplayText.current.length || 
+            Math.abs(displayText.length - previousDisplayText.current.length) > 10) {
+          setStableDisplayText(displayText)
+          previousDisplayText.current = displayText
+        }
+      } else {
+        setStableDisplayText(content)
+      }
+    }, [displayText, shouldSync, content])
 
     return (
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -293,7 +322,7 @@ function ChatInterface({
                 ${isUser ? "[&_strong]:text-white" : "[&_strong]:text-gray-900"}
               `}
             >
-              {shouldSync ? displayText || "..." : formatContent(content)}
+              {shouldSync ? stableDisplayText || "..." : formatContent(content)}
             </ReactMarkdown>
           </div>
         </div>
@@ -408,4 +437,3 @@ function TypingIndicator() {
 
 export type { ChatInterfaceProps }
 export { ChatInterface }
-
