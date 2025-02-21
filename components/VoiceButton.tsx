@@ -1,169 +1,171 @@
-"use client"
+"use client";
 
-import { Mic, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useEffect, useState, useCallback } from "react"
+import { Mic, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList
+  results: SpeechRecognitionResultList;
 }
 
 interface SpeechRecognitionResultList {
-  readonly length: number
-  item(index: number): SpeechRecognitionResult
-  [index: number]: SpeechRecognitionResult
+  readonly length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
 }
 
 interface SpeechRecognitionResult {
-  readonly length: number
-  item(index: number): SpeechRecognitionAlternative
-  [index: number]: SpeechRecognitionAlternative
-  isFinal: boolean
+  readonly length: number;
+  item(index: number): SpeechRecognitionAlternative;
+  [index: number]: SpeechRecognitionAlternative;
+  isFinal: boolean;
 }
 
 interface SpeechRecognitionAlternative {
-  readonly transcript: string
-  readonly confidence: number
+  readonly transcript: string;
+  readonly confidence: number;
 }
 
 interface ISpeechRecognition extends EventTarget {
-  continuous: boolean
-  interimResults: boolean
-  lang: string
-  start: () => void
-  stop: () => void
-  onstart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onend: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onerror: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onresult: ((this: ISpeechRecognition, ev: SpeechRecognitionEvent) => void) | null
-  onnomatch: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onaudiostart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onaudioend: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onsoundstart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onsoundend: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onspeechstart: ((this: ISpeechRecognition, ev: Event) => void) | null
-  onspeechend: ((this: ISpeechRecognition, ev: Event) => void) | null
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onstart: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onend: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onerror: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onresult: ((this: ISpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
+  onnomatch: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onaudiostart: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onaudioend: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onsoundstart: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onsoundend: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onspeechstart: ((this: ISpeechRecognition, ev: Event) => void) | null;
+  onspeechend: ((this: ISpeechRecognition, ev: Event) => void) | null;
 }
 
 declare global {
   interface Window {
     SpeechRecognition?: {
-      new (): ISpeechRecognition
-    }
+      new (): ISpeechRecognition;
+    };
     webkitSpeechRecognition?: {
-      new (): ISpeechRecognition
-    }
+      new (): ISpeechRecognition;
+    };
   }
 }
 
 interface VoiceButtonProps {
-  onTranscript: (text: string) => void
-  disabled?: boolean
+  onTranscript: (text: string) => void;
+  disabled?: boolean;
 }
 
 export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps) {
-  const [isListening, setIsListening] = useState(false)
-  const [isPulsing, setIsPulsing] = useState(false)
-  const [recognition, setRecognition] = useState<ISpeechRecognition | null>(null)
+  const [isListening, setIsListening] = useState(false);
+  const [isPulsing, setIsPulsing] = useState(false);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
 
-  // Setup recognition
+  // Setup recognition once on mount.
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
-        const recognitionInstance = new SpeechRecognition()
-        recognitionInstance.continuous = false
-        recognitionInstance.interimResults = true
-        recognitionInstance.lang = "en-US"
-        setRecognition(recognitionInstance)
+        const recognitionInstance = new SpeechRecognition();
+        recognitionInstance.continuous = false;
+        recognitionInstance.interimResults = true;
+        recognitionInstance.lang = "en-US";
+        recognitionRef.current = recognitionInstance;
       }
     }
 
     return () => {
-      if (recognition) {
+      if (recognitionRef.current) {
         try {
-          recognition.stop()
+          recognitionRef.current.stop();
         } catch (e) {
-          console.error("Error stopping recognition:", e)
+          console.error("Error stopping recognition:", e);
         }
       }
-    }
-  }, []) // Empty dependency array as this should only run once
+    };
+  }, []);
 
-  // Handle recognition events
+  // Handle recognition events.
   useEffect(() => {
-    if (!recognition) return
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
 
     const handleStart = () => {
-      console.log("Recognition started")
-      setIsListening(true)
-      setIsPulsing(true)
-    }
+      console.log("Recognition started");
+      setIsListening(true);
+      setIsPulsing(true);
+    };
 
     const handleEnd = () => {
-      console.log("Recognition ended")
-      setIsListening(false)
-      setIsPulsing(false)
-    }
+      console.log("Recognition ended");
+      setIsListening(false);
+      setIsPulsing(false);
+    };
 
     const handleError = (event: Event) => {
-      console.error("Recognition error:", event)
-      setIsListening(false)
-      setIsPulsing(false)
-    }
+      console.error("Recognition error:", event);
+      setIsListening(false);
+      setIsPulsing(false);
+    };
 
     const handleResult = (event: SpeechRecognitionEvent) => {
-      const transcript = event.results[0][0].transcript
-      console.log("Got transcript:", transcript)
+      const transcript = event.results[0][0].transcript;
+      console.log("Got transcript:", transcript);
       
       if (event.results[0].isFinal) {
-        console.log("Final transcript:", transcript)
-        onTranscript(transcript)
-        recognition.stop()
+        console.log("Final transcript:", transcript);
+        onTranscript(transcript);
+        recognition.stop();
       }
-    }
+    };
 
-    recognition.onstart = handleStart
-    recognition.onend = handleEnd
-    recognition.onerror = handleError
-    recognition.onresult = handleResult
+    recognition.onstart = handleStart;
+    recognition.onend = handleEnd;
+    recognition.onerror = handleError;
+    recognition.onresult = handleResult;
 
     return () => {
-      recognition.onstart = null
-      recognition.onend = null
-      recognition.onerror = null
-      recognition.onresult = null
-    }
-  }, [recognition, onTranscript]) // Added recognition to dependency array
+      recognition.onstart = null;
+      recognition.onend = null;
+      recognition.onerror = null;
+      recognition.onresult = null;
+    };
+  }, [onTranscript]);
 
   const toggleListening = useCallback(() => {
-    if (!recognition) return
+    const recognition = recognitionRef.current;
+    if (!recognition) return;
 
     if (isListening) {
-      console.log("Stopping recognition")
+      console.log("Stopping recognition");
       try {
-        recognition.stop()
-        setIsListening(false)
-        setIsPulsing(false)
+        recognition.stop();
+        setIsListening(false);
+        setIsPulsing(false);
       } catch (e) {
-        console.error("Error stopping recognition:", e)
-        setIsListening(false)
-        setIsPulsing(false)
+        console.error("Error stopping recognition:", e);
+        setIsListening(false);
+        setIsPulsing(false);
       }
     } else {
-      console.log("Starting recognition")
+      console.log("Starting recognition");
       try {
-        recognition.start()
+        recognition.start();
       } catch (e) {
-        console.error("Error starting recognition:", e)
-        setIsListening(false)
-        setIsPulsing(false)
+        console.error("Error starting recognition:", e);
+        setIsListening(false);
+        setIsPulsing(false);
       }
     }
-  }, [recognition, isListening])
+  }, [isListening]);
 
-  if (!recognition) {
-    return null
+  if (!recognitionRef.current) {
+    return null;
   }
 
   return (
@@ -193,5 +195,5 @@ export default function VoiceButton({ onTranscript, disabled }: VoiceButtonProps
         {isListening ? "Stop recording" : "Start recording"}
       </span>
     </Button>
-  )
+  );
 }
