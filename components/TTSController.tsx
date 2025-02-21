@@ -10,9 +10,19 @@ interface TTSControllerProps {
 }
 
 export function TTSController({ isEnabled = false, onToggle, className = "" }: TTSControllerProps) {
+  const handleToggle = () => {
+    onToggle?.(!isEnabled);
+    // Test speech when enabled
+    if (!isEnabled) {
+      const utterance = new SpeechSynthesisUtterance("Testing speech synthesis");
+      window.speechSynthesis.speak(utterance);
+      console.log("Test speech triggered");
+    }
+  };
+
   return (
     <button
-      onClick={() => onToggle?.(!isEnabled)}
+      onClick={handleToggle}
       className={`text-gray-500 hover:text-gray-700 transition-colors ${className}`}
       aria-label={isEnabled ? "Disable voice response" : "Enable voice response"}
     >
