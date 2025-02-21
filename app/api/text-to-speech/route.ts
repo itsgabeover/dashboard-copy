@@ -1,15 +1,12 @@
+// app/api/text-to-speech/route.ts
+
 import { NextResponse } from "next/server"
 import OpenAI from "openai"
+import { WordTiming, TTSResponse, TTS_CONSTANTS } from "@/types/tts"
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
-
-interface WordTiming {
-  word: string
-  start: number
-  duration: number
-}
 
 // Enhanced text preparation with natural language processing
 function prepareText(text: string): string[] {
@@ -28,6 +25,7 @@ function prepareText(text: string): string[] {
       .replace(/(\d{1,3}(,\d{3})+)/g, '$1 ') // Add space after large numbers
       .replace(/([A-Z]{2,})/g, '$1 ') // Add space after acronyms
       .replace(/([.,:;?!])/g, ' $1 ') // Add spaces around punctuation
+      .replace(/\s+/g, ' ') // Normalize spaces
       .trim();
 
     // Split into words while preserving meaningful punctuation
@@ -38,9 +36,8 @@ function prepareText(text: string): string[] {
   });
 }
 
-// Enhanced word duration calculation with natural speech patterns
 function estimateWordDuration(word: string, position: number, totalWords: number): number {
-  let duration = 350; // Base duration in milliseconds
+  let duration = TTS_CONSTANTS.BASE_DURATION;
 
   // Word length adjustment
   const wordLength = word.length;
@@ -52,18 +49,16 @@ function estimateWordDuration(word: string, position: number, totalWords: number
 
   // Punctuation and sentence structure adjustments
   if (/[.!?]$/.test(word)) {
-    duration += 450; // End of sentence pause
+    duration += TTS_CONSTANTS.SENTENCE_END_PAUSE;
   } else if (/[,;:]$/.test(word)) {
-    duration += 250; // Mid-sentence pause
+    duration += TTS_CONSTANTS.COMMA_PAUSE;
   } else if (/[-—]$/.test(word)) {
-    duration += 200; // Dash pause
+    duration += TTS_CONSTANTS.DASH_PAUSE;
   }
 
   // Position-based adjustments
   if (position === 0) {
-    duration += 100; // Sentence start
-  } else if (position === totalWords - 1) {
-    duration += 200; // Sentence end
+    duration += TTS_CONSTANTS.SENTENCE_START_BUFFER;
   }
 
   // Special cases
@@ -74,17 +69,16 @@ function estimateWordDuration(word: string, position: number, totalWords: number
     duration += 50; // Numbers
   }
   if (word.length === 1) {
-    duration -= 100; // Single characters
+    duration -= 100; // Single characters (but maintain minimum duration)
   }
 
   // Add natural rhythm variations
-  duration = duration + Math.sin(position * 0.5) * 20; // Subtle rhythm variation
+  duration += Math.sin(position * 0.5) * 20;
 
   // Ensure minimum duration
-  return Math.max(duration, 200);
+  return Math.max(duration, TTS_CONSTANTS.MIN_WORD_DURATION);
 }
 
-// Calculate speech rhythm and timing
 function calculateSpeechRhythm(words: string[]): WordTiming[] {
   let currentTime = 0;
   const timings: WordTiming[] = [];
@@ -92,20 +86,20 @@ function calculateSpeechRhythm(words: string[]): WordTiming[] {
 
   words.forEach((word, index) => {
     const duration = estimateWordDuration(word, index, totalWords);
-
+    
     timings.push({
       word,
       start: currentTime,
       duration
     });
 
+    // Add the word duration to the current time
     currentTime += duration;
   });
 
   return timings;
 }
 
-// Process text chunks for streaming
 function processTextChunks(text: string): string[] {
   return text
     .replace(/([.!?])\s+/g, '$1\n')
@@ -147,7 +141,7 @@ export async function POST(req: Request) {
       Math.max(sum, timing.start + timing.duration), 0);
 
     // Prepare response with enhanced metadata
-    const response = {
+    const response: TTSResponse = {
       audio: audioBase64,
       timings,
       totalDuration,
