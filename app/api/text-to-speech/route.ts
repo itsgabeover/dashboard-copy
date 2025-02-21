@@ -77,40 +77,36 @@ function estimateWordDuration(word: string, position: number, totalWords: number
     duration -= 100; // Single characters
   }
 
+  // Add natural rhythm variations
+  duration = duration + Math.sin(position * 0.5) * 20; // Subtle rhythm variation
+
   // Ensure minimum duration
   return Math.max(duration, 200);
 }
 
-// Calculate natural speech rhythm patterns
+// Calculate speech rhythm and timing
 function calculateSpeechRhythm(words: string[]): WordTiming[] {
   let currentTime = 0;
   const timings: WordTiming[] = [];
   const totalWords = words.length;
 
   words.forEach((word, index) => {
-    // Calculate base duration
     const duration = estimateWordDuration(word, index, totalWords);
 
-    // Add natural rhythm variations
-    const rhythmVariation = Math.sin(index * 0.5) * 20; // Subtle rhythm variation
-    const adjustedDuration = duration + rhythmVariation;
-
-    // Create timing entry
     timings.push({
       word,
       start: currentTime,
-      duration: adjustedDuration
+      duration
     });
 
-    // Update timing for next word
-    currentTime += adjustedDuration;
+    currentTime += duration;
   });
 
   return timings;
 }
 
 // Process text chunks for streaming
-function processTextChunks(text: string) {
+function processTextChunks(text: string): string[] {
   return text
     .replace(/([.!?])\s+/g, '$1\n')
     .split('\n')
