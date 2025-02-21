@@ -24,6 +24,13 @@ interface ChatInterfaceProps {
   userEmail?: string
 }
 
+// Add interface for word timing
+interface WordTiming {
+  word: string
+  start: number
+  duration: number
+}
+
 export function ChatInterface({
   messages,
   inputMessage,
@@ -44,6 +51,11 @@ export function ChatInterface({
   const [isTTSEnabled, setIsTTSEnabled] = useState(true) // TTS enabled by default
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
+  
+  // New state for synchronized text display
+  const [displayText, setDisplayText] = useState<string>("")
+  const [wordTimings, setWordTimings] = useState<WordTiming[]>([])
+  const timeoutRefs = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -64,6 +76,19 @@ export function ChatInterface({
       handleTextToSpeech(lastMessage.content)
     }
   }, [messages, isTTSEnabled])
+
+  // Cleanup effect for audio and timeouts
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause()
+        if (audioRef.current.src) {
+          URL.revokeObjectURL(audioRef.current.src)
+        }
+      }
+      timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
+    }
+  }, [])
 
   const handleQuickPrompt = (prompt: string) => {
     handleSendMessage(prompt)
@@ -127,6 +152,11 @@ export function ChatInterface({
   const handleTextToSpeech = async (text: string) => {
     try {
       setCurrentSpeakingText(text)
+      
+      // Clear any existing timeouts
+      timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
+      timeoutRefs.current = []
+
       const response = await fetch("/api/text-to-speech", {
         method: "POST",
         headers: {
@@ -139,16 +169,47 @@ export function ChatInterface({
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const audioBlob = await response.blob()
+      const data = await response.json()
+      const audioData = data.audio // Base64 encoded audio
+      const timings = data.timings // Word timing information
+
+      // Create audio from base64
+      const audioBlob = new Blob(
+        [Buffer.from(audioData, 'base64')], 
+        { type: 'audio/mp3' }
+      )
       const audioUrl = URL.createObjectURL(audioBlob)
 
       if (audioRef.current) {
+        // Reset audio and text state
+        audioRef.current.pause()
+        setDisplayText("")
+        setWordTimings(timings)
+
+        // Set up audio
         audioRef.current.src = audioUrl
-        audioRef.current.play()
-        setIsSpeaking(true)
+        
+        // Wait for audio to be loaded before playing
+        audioRef.current.addEventListener('loadeddata', () => {
+          audioRef.current?.play()
+          setIsSpeaking(true)
+
+          // Schedule word displays
+          timings.forEach((timing, index) => {
+            const timeout = setTimeout(() => {
+              setDisplayText(prevText => {
+                const words = timings.slice(0, index + 1).map(t => t.word)
+                return words.join(' ')
+              })
+            }, timing.start)
+            timeoutRefs.current.push(timeout)
+          })
+        }, { once: true })
       }
     } catch (error) {
       console.error("Error in text-to-speech:", error)
+      // On error, display full text
+      setDisplayText(text)
     }
   }
 
@@ -156,6 +217,11 @@ export function ChatInterface({
     if (isSpeaking && audioRef.current) {
       audioRef.current.pause()
       setIsSpeaking(false)
+      // Clear all scheduled word displays
+      timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
+      timeoutRefs.current = []
+      // Show full text when stopped
+      setDisplayText(currentSpeakingText)
     } else if (currentSpeakingText) {
       handleTextToSpeech(currentSpeakingText)
     }
@@ -172,6 +238,59 @@ export function ChatInterface({
         }, 300)
       }
     }, 2000)
+  }
+
+  const formatContent = (text: string) => {
+    return text
+      .replace(/^-(?=\S)/gm, "- ")
+      .replace(/\n-/g, "\n\n-")
+      .replace(/\*\*(\S+)\*\*/g, "**$1**")
+      .replace(/\n\n+/g, "\n\n")
+      .trim()
+  }
+
+  // Enhanced ChatMessage component with sync support
+  const SyncedChatMessage = ({ role, content }: { role: "user" | "assistant", content: string }) => {
+    const isUser = role === "user"
+    const shouldSync = !isUser && isSpeaking && content === currentSpeakingText && isTTSEnabled
+
+    return (
+      <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+        <div
+          className={`
+            max-w-[85%] rounded-2xl px-4 py-2.5
+            ${isUser ? "bg-[rgb(82,102,255)] text-white" : "bg-gray-100 text-gray-800"}
+          `}
+        >
+          <div className="text-sm leading-relaxed">
+            <ReactMarkdown
+              components={{
+                pre: ({ children }) => <div className="whitespace-pre-wrap">{children}</div>,
+                code: ({ children }) => (
+                  <code className="px-1 py-0.5 rounded-md bg-gray-200">
+                    {children}
+                  </code>
+                ),
+              }}
+              className={`
+                markdown-content
+                ${isUser ? "text-white" : "text-gray-800"}
+                [&_p]:mb-2
+                [&_p:last-child]:mb-0
+                [&_ul]:mt-1
+                [&_ul]:mb-2
+                [&_li]:ml-4
+                [&_li]:pl-1
+                [&_strong]:font-semibold
+                ${isUser ? "[&_strong]:text-white" : "[&_strong]:text-gray-900"}
+              `}
+            >
+              {shouldSync ? displayText || '...' : formatContent(content)}
+            </ReactMarkdown>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -225,7 +344,7 @@ export function ChatInterface({
               opacity: isTyping && index === messages.length - 1 ? 0.7 : 1,
             }}
           >
-            <ChatMessage role={message.role} content={message.content} />
+            <SyncedChatMessage role={message.role} content={message.content} />
           </div>
         ))}
         {isTyping && <TypingIndicator />}
@@ -284,51 +403,4 @@ interface ChatMessageProps {
   content: string
 }
 
-function ChatMessage({ role, content }: ChatMessageProps) {
-  const isUser = role === "user"
-
-  const formatContent = (text: string) => {
-    return text
-      .replace(/^-(?=\S)/gm, "- ")
-      .replace(/\n-/g, "\n\n-")
-      .replace(/\*\*(\S+)\*\*/g, "**$1**")
-      .replace(/\n\n+/g, "\n\n")
-      .trim()
-  }
-
-  return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`
-          max-w-[85%] rounded-2xl px-4 py-2.5
-          ${isUser ? "bg-[rgb(82,102,255)] text-white" : "bg-gray-100 text-gray-800"}
-        `}
-      >
-        <div className="text-sm leading-relaxed">
-          <ReactMarkdown
-            components={{
-              pre: ({ children }) => <div className="whitespace-pre-wrap">{children}</div>,
-              code: ({ children }) => <code className="px-1 py-0.5 rounded-md bg-gray-200">{children}</code>,
-            }}
-            className={`
-              markdown-content
-              ${isUser ? "text-white" : "text-gray-800"}
-              [&_p]:mb-2
-              [&_p:last-child]:mb-0
-              [&_ul]:mt-1
-              [&_ul]:mb-2
-              [&_li]:ml-4
-              [&_li]:pl-1
-              [&_strong]:font-semibold
-              ${isUser ? "[&_strong]:text-white" : "[&_strong]:text-gray-900"}
-            `}
-          >
-            {formatContent(content)}
-          </ReactMarkdown>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export { ChatMessage }
+export { ChatMessage, ChatInterface }
