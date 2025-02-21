@@ -68,10 +68,7 @@ export function ChatInterface({
     }
 
     try {
-      console.log("TTS Debug - Starting message send:", { 
-        hasDirectMessage: !!directMessage,
-        isTTSEnabled: isEnabled 
-      });
+      console.log("Starting message send, TTS enabled:", isEnabled);
 
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -95,12 +92,12 @@ export function ChatInterface({
 
       if (reader) {
         parentOnSendMessage(messageToSend)
-        console.log("TTS Debug - Stream started");
+        console.log("Starting stream processing");
         
         while (true) {
           const { done, value } = await reader.read()
           if (done) {
-            console.log("TTS Debug - Stream completed");
+            console.log("Stream completed");
             break;
           }
 
@@ -111,25 +108,15 @@ export function ChatInterface({
           // Get the new chunk of text to speak
           const newChunk = assistantMessage.slice(lastSpokenChunk.length)
           
-          console.log("TTS Basic Debug:", { 
-            isEnabled, 
-            hasChunk: !!newChunk.trim(),
-            chunkLength: newChunk.length
-          });
-
-          // Only speak if there's new content and it ends with punctuation or space
-          if (isEnabled && newChunk.trim() && 
-              (newChunk.match(/[.!?,\s]$/) || done)) {
-            console.log("TTS Debug - Chunk:", {
-              isEnabled,
-              chunkLength: newChunk.length,
-              chunk: newChunk.slice(0, 50) + "...",
-              matchTest: newChunk.match(/[.!?,\s]$/),
-              isDone: done,
-              totalMessageLength: assistantMessage.length
-            });
-            speak(newChunk)
-            lastSpokenChunk = assistantMessage
+          // Modified chunk processing for TTS
+          if (isEnabled && newChunk.trim()) {
+            console.log("Processing chunk for TTS:", newChunk.slice(0, 50));
+            // Try speaking complete sentences
+            const sentences = newChunk.match(/[^.!?]+[.!?]+/g);
+            if (sentences) {
+              speak(sentences.join(' '));
+            }
+            lastSpokenChunk = assistantMessage;
           }
 
           // Update the message in the parent component
