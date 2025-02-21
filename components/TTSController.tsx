@@ -11,12 +11,20 @@ interface TTSControllerProps {
 
 export function TTSController({ isEnabled = false, onToggle, className = "" }: TTSControllerProps) {
   const handleToggle = () => {
-    onToggle?.(!isEnabled);
-    // Test speech when enabled
-    if (!isEnabled) {
-      const utterance = new SpeechSynthesisUtterance("Testing speech synthesis");
-      window.speechSynthesis.speak(utterance);
-      console.log("Test speech triggered");
+    try {
+      // Test speech directly without API call
+      const testSpeech = () => {
+        const utterance = new SpeechSynthesisUtterance("Testing speech synthesis");
+        console.log("Attempting test speech");
+        window.speechSynthesis.speak(utterance);
+      };
+
+      onToggle?.(!isEnabled);
+      if (!isEnabled) {
+        testSpeech();
+      }
+    } catch (error) {
+      console.error("Toggle error:", error);
     }
   };
 
@@ -41,45 +49,69 @@ export function useTTS() {
   const synthRef = useRef<SpeechSynthesis | null>(null)
   const voicesLoadedRef = useRef(false)
 
-  // Separate useEffect for initialization
   useEffect(() => {
     if (typeof window !== "undefined") {
-      synthRef.current = window.speechSynthesis;
-      console.log("Speech synthesis initialized:", window.speechSynthesis);
+      try {
+        synthRef.current = window.speechSynthesis;
+        console.log("Speech synthesis available:", !!synthRef.current);
+
+        // Test if speech synthesis is working
+        const testUtterance = new SpeechSynthesisUtterance("");
+        window.speechSynthesis.speak(testUtterance);
+        window.speechSynthesis.cancel(); // Immediately cancel the test
+        console.log("Speech synthesis test successful");
+      } catch (error) {
+        console.error("Speech synthesis initialization error:", error);
+      }
     }
   }, []);
 
-  // Separate useEffect for voice loading
   useEffect(() => {
+    if (!synthRef.current) return;
+
     const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      console.log("Available voices:", voices);
-      voicesLoadedRef.current = voices.length > 0;
+      try {
+        const voices = synthRef.current?.getVoices() || [];
+        console.log("Voices loaded:", voices.length);
+        voicesLoadedRef.current = voices.length > 0;
+      } catch (error) {
+        console.error("Error loading voices:", error);
+      }
     };
 
-    loadVoices(); // Initial load
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    loadVoices();
+    synthRef.current.addEventListener('voiceschanged', loadVoices);
     
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      synthRef.current?.removeEventListener('voiceschanged', loadVoices);
+      if (isSpeaking) {
+        try {
+          synthRef.current?.cancel();
+        } catch (error) {
+          console.error("Error canceling speech:", error);
+        }
+      }
     };
-  }, []);
+  }, [isSpeaking]);
 
   const speak = (text: string) => {
-    console.log("Speak function called with:", {text, isEnabled});
-    
-    if (!window.speechSynthesis || !isEnabled || !text?.trim()) {
-      console.log("Speech conditions not met:", {
-        synthExists: !!window.speechSynthesis,
-        isEnabled,
-        hasText: !!text?.trim()
+    if (!text?.trim()) {
+      console.log("Empty text, skipping speech");
+      return;
+    }
+
+    if (!synthRef.current || !isEnabled) {
+      console.log("Speech synthesis not available or disabled", {
+        synthAvailable: !!synthRef.current,
+        isEnabled
       });
       return;
     }
 
     try {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
+      if (isSpeaking) {
+        synthRef.current.cancel();
+      }
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "en-US";
@@ -87,12 +119,20 @@ export function useTTS() {
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
-      // Get voices synchronously
-      const voices = window.speechSynthesis.getVoices();
-      console.log("Available voices for speech:", voices);
+      const voices = synthRef.current.getVoices();
+      console.log("Available voices:", voices.length);
+
+      const preferredVoice = voices.find(
+        voice => voice.name.includes("Female") && voice.lang.includes("en-US")
+      );
+
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+        console.log("Using voice:", preferredVoice.name);
+      }
 
       utterance.onstart = () => {
-        console.log("Speech started");
+        console.log("Speech started:", text.slice(0, 50) + "...");
         setIsSpeaking(true);
       };
 
@@ -106,10 +146,10 @@ export function useTTS() {
         setIsSpeaking(false);
       };
 
-      console.log("Attempting to speak:", text.slice(0, 50));
-      window.speechSynthesis.speak(utterance);
+      synthRef.current.speak(utterance);
     } catch (error) {
       console.error("Error in speak function:", error);
+      setIsSpeaking(false);
     }
   };
 
