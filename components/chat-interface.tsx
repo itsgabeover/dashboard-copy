@@ -29,6 +29,12 @@ interface ChatMessageProps {
   content: string
 }
 
+interface WordTiming {
+  word: string
+  start: number
+  duration: number
+}
+
 function ChatInterface({
   messages,
   inputMessage,
@@ -90,7 +96,8 @@ function ChatInterface({
           const updateText = () => {
             const elapsedTime = performance.now() - startTime
             const currentWord = timings.find(
-              (t) => t.start * scaleFactor <= elapsedTime && (t.start + t.duration) * scaleFactor > elapsedTime,
+              (t: WordTiming) =>
+                t.start * scaleFactor <= elapsedTime && (t.start + t.duration) * scaleFactor > elapsedTime,
             )
 
             if (currentWord) {
