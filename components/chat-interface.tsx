@@ -3,7 +3,7 @@
 import { Send, RefreshCw, MessageCircle, Volume2, VolumeX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ReactMarkdown from "react-markdown"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import VoiceButton from "./VoiceButton"
 
 interface PolicyData {
@@ -52,13 +52,12 @@ function ChatInterface({
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isTTSEnabled, setIsTTSEnabled] = useState(true) // TTS enabled by default
+  const [isTTSEnabled, setIsTTSEnabled] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
-
-  // State for synchronized text display
   const [displayText, setDisplayText] = useState<string>("")
   const timeoutRefs = useRef<NodeJS.Timeout[]>([])
+  const animationFrameRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -153,19 +152,20 @@ function ChatInterface({
     }
   }
 
-  const handleTextToSpeech = async (text: string) => {
+  const handleTextToSpeech = useCallback(async (text: string) => {
     try {
       setCurrentSpeakingText(text)
+      setDisplayText("")
 
-      // Clear any existing timeouts
-      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
+      timeoutRefs.current.forEach(clearTimeout)
       timeoutRefs.current = []
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
 
       const response = await fetch("/api/text-to-speech", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       })
 
@@ -174,62 +174,66 @@ function ChatInterface({
       }
 
       const data = await response.json()
-      const audioData = data.audio // Base64 encoded audio
-      const timings = data.timings // Word timing information
+      const { audio: audioBase64, timings, totalDuration } = data
 
-      // Create audio from base64
-      const audioBlob = new Blob([Buffer.from(audioData, "base64")], { type: "audio/mp3" })
+      const audioBlob = new Blob([Buffer.from(audioBase64, "base64")], { type: "audio/mp3" })
       const audioUrl = URL.createObjectURL(audioBlob)
 
       if (audioRef.current) {
-        // Reset audio and text state
-        audioRef.current.pause()
-        setDisplayText("")
-
-        // Set up audio
         audioRef.current.src = audioUrl
+        audioRef.current.onloadedmetadata = () => {
+          const actualDuration = audioRef.current!.duration * 1000 // Convert to milliseconds
+          const scaleFactor = actualDuration / totalDuration
 
-        // Wait for audio to be loaded before playing
-        audioRef.current.addEventListener(
-          "loadeddata",
-          () => {
-            audioRef.current?.play()
-            setIsSpeaking(true)
+          const startTime = performance.now()
+          const updateText = () => {
+            const elapsedTime = performance.now() - startTime
+            const currentWord = timings.find(
+              (t) => t.start * scaleFactor <= elapsedTime && (t.start + t.duration) * scaleFactor > elapsedTime,
+            )
 
-            // Schedule word displays
-            timings.forEach((timing: WordTiming, index: number) => {
-              const timeout = setTimeout(() => {
-                setDisplayText(() => {
-                  const words = timings.slice(0, index + 1).map((t: WordTiming) => t.word)
-                  return words.join(" ")
-                })
-              }, timing.start)
-              timeoutRefs.current.push(timeout)
-            })
-          },
-          { once: true },
-        )
+            if (currentWord) {
+              setDisplayText(text.substring(0, text.indexOf(currentWord.word) + currentWord.word.length))
+            }
+
+            if (elapsedTime < actualDuration) {
+              animationFrameRef.current = requestAnimationFrame(updateText)
+            } else {
+              setDisplayText(text)
+            }
+          }
+
+          audioRef.current!.play()
+          setIsSpeaking(true)
+          animationFrameRef.current = requestAnimationFrame(updateText)
+        }
+
+        audioRef.current.onended = () => {
+          setIsSpeaking(false)
+          setDisplayText(text)
+          if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current)
+          }
+        }
       }
     } catch (error) {
       console.error("Error in text-to-speech:", error)
-      // On error, display full text
       setDisplayText(text)
     }
-  }
+  }, [])
 
-  const toggleSpeech = () => {
+  const toggleSpeech = useCallback(() => {
     if (isSpeaking && audioRef.current) {
       audioRef.current.pause()
       setIsSpeaking(false)
-      // Clear all scheduled word displays
-      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
-      timeoutRefs.current = []
-      // Show full text when stopped
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
       setDisplayText(currentSpeakingText)
     } else if (currentSpeakingText) {
       handleTextToSpeech(currentSpeakingText)
     }
-  }
+  }, [isSpeaking, currentSpeakingText, handleTextToSpeech])
 
   const handleVoiceTranscript = (text: string) => {
     onInputChange(text)
