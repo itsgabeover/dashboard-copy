@@ -6,9 +6,6 @@ import ReactMarkdown from "react-markdown"
 import { useEffect, useRef, useState } from "react"
 import VoiceButton from "./VoiceButton"
 
-// Remove these imports if they're not used elsewhere
-// import { TTSController, useTTS } from "./TTSController"
-
 interface PolicyData {
   session_id: string
 }
@@ -43,11 +40,10 @@ export function ChatInterface({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const prevMessagesLengthRef = useRef(messages.length)
-  // Remove this line if useTTS is not needed
-  // const { isEnabled, speak, setEnabled } = useTTS()
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isTTSEnabled, setIsTTSEnabled] = useState(false)
+  const [isTTSEnabled, setIsTTSEnabled] = useState(true) // TTS enabled by default
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [currentSpeakingText, setCurrentSpeakingText] = useState("")
 
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
@@ -60,6 +56,14 @@ export function ChatInterface({
     }
     prevMessagesLengthRef.current = messages.length
   }, [messages, isTyping])
+
+  useEffect(() => {
+    // Automatically speak the last assistant message when it's added
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage && lastMessage.role === "assistant" && isTTSEnabled) {
+      handleTextToSpeech(lastMessage.content)
+    }
+  }, [messages, isTTSEnabled])
 
   const handleQuickPrompt = (prompt: string) => {
     handleSendMessage(prompt)
@@ -94,7 +98,6 @@ export function ChatInterface({
 
       const reader = response.body?.getReader()
       let assistantMessage = ""
-      let lastSpokenChunk = ""
 
       if (reader) {
         parentOnSendMessage(messageToSend)
@@ -104,30 +107,12 @@ export function ChatInterface({
           const { done, value } = await reader.read()
           if (done) {
             console.log("Stream complete, last message length:", assistantMessage.length)
-            // Try to speak the final message if needed
-            if (isTTSEnabled && assistantMessage.trim()) {
-              console.log("Attempting to speak final message")
-              await handleTextToSpeech(assistantMessage)
-            }
             break
           }
 
           // Decode the stream chunk and append to message
           const text = new TextDecoder().decode(value)
           assistantMessage += text
-          const newChunk = assistantMessage.slice(lastSpokenChunk.length)
-
-          console.log("Processing chunk:", {
-            isTTSEnabled,
-            chunkLength: newChunk.length,
-            hasContent: !!newChunk.trim(),
-          })
-
-          if (isTTSEnabled && newChunk.trim()) {
-            // Speak this chunk
-            await handleTextToSpeech(newChunk)
-            lastSpokenChunk = assistantMessage
-          }
 
           // Update the message in the parent component
           parentOnSendMessage(undefined, assistantMessage)
@@ -141,6 +126,7 @@ export function ChatInterface({
 
   const handleTextToSpeech = async (text: string) => {
     try {
+      setCurrentSpeakingText(text)
       const response = await fetch("/api/text-to-speech", {
         method: "POST",
         headers: {
@@ -170,11 +156,8 @@ export function ChatInterface({
     if (isSpeaking && audioRef.current) {
       audioRef.current.pause()
       setIsSpeaking(false)
-    } else if (messages.length > 0) {
-      const lastAssistantMessage = messages.filter((msg) => msg.role === "assistant").pop()
-      if (lastAssistantMessage) {
-        handleTextToSpeech(lastAssistantMessage.content)
-      }
+    } else if (currentSpeakingText) {
+      handleTextToSpeech(currentSpeakingText)
     }
   }
 
@@ -202,7 +185,6 @@ export function ChatInterface({
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* Replace TTSController with a simple toggle button */}
           <Button
             variant="outline"
             size="sm"
