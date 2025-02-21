@@ -59,6 +59,8 @@ function estimateWordDuration(word: string, position: number, totalWords: number
   // Position-based adjustments
   if (position === 0) {
     duration += TTS_CONSTANTS.SENTENCE_START_BUFFER;
+  } else if (position === totalWords - 1) {
+    duration += TTS_CONSTANTS.SENTENCE_END_PAUSE; // Add extra pause for last word
   }
 
   // Special cases
