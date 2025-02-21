@@ -31,9 +31,6 @@ interface ChatInterfaceProps {
 interface ChatMessageProps {
   role: "user" | "assistant"
   content: string
-  isSpeaking?: boolean
-  currentSpeakingText?: string
-  displayText?: string
 }
 
 interface WordTiming {
@@ -62,7 +59,7 @@ function ChatInterface({
   const [isTTSEnabled, setIsTTSEnabled] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
-  const [displayText, setDisplayText] = useState<string>("")
+  const [displayText, setDisplayText] = useState("")
   const animationFrameRef = useRef<number | null>(null)
   const wordTimingsRef = useRef<WordTiming[]>([])
   const startTimeRef = useRef(0)
@@ -78,7 +75,6 @@ function ChatInterface({
     for (let i = 0; i < timings.length; i++) {
       const timing = timings[i]
       const adjustedStart = timing.start + WORD_TRANSITION_BUFFER
-      const adjustedDuration = Math.max(timing.duration, MIN_WORD_DISPLAY_TIME)
       
       if (currentTime - startTimeRef.current >= adjustedStart) {
         text += (i > 0 ? " " : "") + timing.word
@@ -280,18 +276,18 @@ function ChatInterface({
     const previousDisplayTextRef = useRef(content)
 
     useEffect(() => {
-      if (shouldSync) {
-        const currentLength = stableDisplayText.length
+      if (shouldSync && displayText) {
+        const currentLength = displayText.length
         const prevLength = previousDisplayTextRef.current.length
         
         if (currentLength > prevLength || Math.abs(currentLength - prevLength) > 10) {
-          setStableDisplayText(content)
-          previousDisplayTextRef.current = content
+          setStableDisplayText(displayText)
+          previousDisplayTextRef.current = displayText
         }
       } else {
         setStableDisplayText(content)
       }
-    }, [shouldSync, content, stableDisplayText])
+    }, [shouldSync, content, displayText])
 
     return (
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
