@@ -46,7 +46,7 @@ function prepareText(text: string): string[] {
 }
 
 function estimateWordDuration(word: string, position: number, totalWords: number, speed: number = 1.0): number {
-  let duration = TTS_CONSTANTS.BASE_DURATION
+  let duration: number = TTS_CONSTANTS.BASE_DURATION;
 
   // Enhanced word length adjustment
   const wordLength = word.length
