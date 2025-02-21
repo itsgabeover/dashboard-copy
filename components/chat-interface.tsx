@@ -55,10 +55,9 @@ function ChatInterface({
   const [isTTSEnabled, setIsTTSEnabled] = useState(true) // TTS enabled by default
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [currentSpeakingText, setCurrentSpeakingText] = useState("")
-  
+
   // State for synchronized text display
   const [displayText, setDisplayText] = useState<string>("")
-  const [wordTimings, setWordTimings] = useState<WordTiming[]>([])
   const timeoutRefs = useRef<NodeJS.Timeout[]>([])
 
   useEffect(() => {
@@ -90,7 +89,7 @@ function ChatInterface({
           URL.revokeObjectURL(audioRef.current.src)
         }
       }
-      timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
+      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
     }
   }, [])
 
@@ -156,9 +155,9 @@ function ChatInterface({
   const handleTextToSpeech = async (text: string) => {
     try {
       setCurrentSpeakingText(text)
-      
+
       // Clear any existing timeouts
-      timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
+      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
       timeoutRefs.current = []
 
       const response = await fetch("/api/text-to-speech", {
@@ -178,37 +177,37 @@ function ChatInterface({
       const timings = data.timings // Word timing information
 
       // Create audio from base64
-      const audioBlob = new Blob(
-        [Buffer.from(audioData, 'base64')], 
-        { type: 'audio/mp3' }
-      )
+      const audioBlob = new Blob([Buffer.from(audioData, "base64")], { type: "audio/mp3" })
       const audioUrl = URL.createObjectURL(audioBlob)
 
       if (audioRef.current) {
         // Reset audio and text state
         audioRef.current.pause()
         setDisplayText("")
-        setWordTimings(timings)
 
         // Set up audio
         audioRef.current.src = audioUrl
-        
-        // Wait for audio to be loaded before playing
-        audioRef.current.addEventListener('loadeddata', () => {
-          audioRef.current?.play()
-          setIsSpeaking(true)
 
-          // Schedule word displays
-          timings.forEach((timing, index) => {
-            const timeout = setTimeout(() => {
-              setDisplayText(prevText => {
-                const words = timings.slice(0, index + 1).map(t => t.word)
-                return words.join(' ')
-              })
-            }, timing.start)
-            timeoutRefs.current.push(timeout)
-          })
-        }, { once: true })
+        // Wait for audio to be loaded before playing
+        audioRef.current.addEventListener(
+          "loadeddata",
+          () => {
+            audioRef.current?.play()
+            setIsSpeaking(true)
+
+            // Schedule word displays
+            timings.forEach((timing: WordTiming, index: number) => {
+              const timeout = setTimeout(() => {
+                setDisplayText((prevText) => {
+                  const words = timings.slice(0, index + 1).map((t: WordTiming) => t.word)
+                  return words.join(" ")
+                })
+              }, timing.start)
+              timeoutRefs.current.push(timeout)
+            })
+          },
+          { once: true },
+        )
       }
     } catch (error) {
       console.error("Error in text-to-speech:", error)
@@ -222,7 +221,7 @@ function ChatInterface({
       audioRef.current.pause()
       setIsSpeaking(false)
       // Clear all scheduled word displays
-      timeoutRefs.current.forEach(timeout => clearTimeout(timeout))
+      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout))
       timeoutRefs.current = []
       // Show full text when stopped
       setDisplayText(currentSpeakingText)
@@ -270,11 +269,7 @@ function ChatInterface({
             <ReactMarkdown
               components={{
                 pre: ({ children }) => <div className="whitespace-pre-wrap">{children}</div>,
-                code: ({ children }) => (
-                  <code className="px-1 py-0.5 rounded-md bg-gray-200">
-                    {children}
-                  </code>
-                ),
+                code: ({ children }) => <code className="px-1 py-0.5 rounded-md bg-gray-200">{children}</code>,
               }}
               className={`
                 markdown-content
@@ -289,7 +284,7 @@ function ChatInterface({
                 ${isUser ? "[&_strong]:text-white" : "[&_strong]:text-gray-900"}
               `}
             >
-              {shouldSync ? displayText || '...' : formatContent(content)}
+              {shouldSync ? displayText || "..." : formatContent(content)}
             </ReactMarkdown>
           </div>
         </div>
@@ -404,3 +399,4 @@ function TypingIndicator() {
 
 export type { ChatInterfaceProps }
 export { ChatInterface }
+
