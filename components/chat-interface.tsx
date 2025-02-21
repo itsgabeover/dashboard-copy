@@ -6,7 +6,7 @@ import ReactMarkdown from "react-markdown"
 import { useEffect, useRef, useState, useCallback } from "react"
 import VoiceButton from "./VoiceButton"
 
-// Add constants for TTS timing control
+// Constants for TTS timing control
 const WORD_TRANSITION_BUFFER = 50
 const MIN_WORD_DISPLAY_TIME = 200
 
@@ -126,17 +126,18 @@ function ChatInterface({
       const audioBlob = new Blob([Buffer.from(audioBase64, "base64")], { type: "audio/mp3" })
       const audioUrl = URL.createObjectURL(audioBlob)
 
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl
+      const currentAudioRef = audioRef.current
+      if (currentAudioRef) {
+        currentAudioRef.src = audioUrl
         wordTimingsRef.current = timings
 
-        audioRef.current.onplay = () => {
+        currentAudioRef.onplay = () => {
           setIsSpeaking(true)
           startTimeRef.current = performance.now()
           animationFrameRef.current = requestAnimationFrame(() => updateDisplayText(performance.now()))
         }
 
-        audioRef.current.onended = () => {
+        currentAudioRef.onended = () => {
           setIsSpeaking(false)
           setDisplayText(text)
           if (animationFrameRef.current) {
@@ -144,7 +145,7 @@ function ChatInterface({
           }
         }
 
-        await audioRef.current.play()
+        await currentAudioRef.play()
       }
     } catch (error) {
       console.error("Error in text-to-speech:", error)
@@ -172,7 +173,7 @@ function ChatInterface({
   }, [messages, isTTSEnabled, handleTextToSpeech])
 
   useEffect(() => {
-    return () => {
+    const cleanupAudio = () => {
       const currentAudioRef = audioRef.current
       if (currentAudioRef) {
         currentAudioRef.pause()
@@ -184,6 +185,7 @@ function ChatInterface({
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
+    return cleanupAudio
   }, [])
 
   const handleQuickPrompt = (prompt: string) => {
@@ -199,8 +201,6 @@ function ChatInterface({
     }
 
     try {
-      console.log("Message send starting, TTS enabled:", isTTSEnabled)
-
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -222,14 +222,10 @@ function ChatInterface({
 
       if (reader) {
         parentOnSendMessage(messageToSend)
-        console.log("Stream starting, TTS status:", { isTTSEnabled })
 
         while (true) {
           const { done, value } = await reader.read()
-          if (done) {
-            console.log("Stream complete, last message length:", assistantMessage.length)
-            break
-          }
+          if (done) break
 
           const text = new TextDecoder().decode(value)
           assistantMessage += text
@@ -281,19 +277,21 @@ function ChatInterface({
     const isUser = role === "user"
     const shouldSync = !isUser && isSpeaking && content === currentSpeakingText && isTTSEnabled
     const [stableDisplayText, setStableDisplayText] = useState(content)
-    const previousDisplayText = useRef(displayText)
+    const previousDisplayTextRef = useRef(content)
 
     useEffect(() => {
       if (shouldSync) {
-        if (displayText.length > previousDisplayText.current.length || 
-            Math.abs(displayText.length - previousDisplayText.current.length) > 10) {
-          setStableDisplayText(displayText)
-          previousDisplayText.current = displayText
+        const currentLength = stableDisplayText.length
+        const prevLength = previousDisplayTextRef.current.length
+        
+        if (currentLength > prevLength || Math.abs(currentLength - prevLength) > 10) {
+          setStableDisplayText(content)
+          previousDisplayTextRef.current = content
         }
       } else {
         setStableDisplayText(content)
       }
-    }, [displayText, shouldSync, content])
+    }, [shouldSync, content, stableDisplayText])
 
     return (
       <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
@@ -326,6 +324,16 @@ function ChatInterface({
             </ReactMarkdown>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  function TypingIndicator() {
+    return (
+      <div className="flex items-center gap-1 text-gray-400 h-8 px-3">
+        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" />
+        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-150" />
+        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-300" />
       </div>
     )
   }
@@ -421,16 +429,6 @@ function ChatInterface({
         </div>
       </div>
       <audio ref={audioRef} onEnded={() => setIsSpeaking(false)} />
-    </div>
-  )
-}
-
-function TypingIndicator() {
-  return (
-    <div className="flex items-center gap-1 text-gray-400 h-8 px-3">
-      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" />
-      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-150" />
-      <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce delay-300" />
     </div>
   )
 }
