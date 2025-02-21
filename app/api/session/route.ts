@@ -13,7 +13,7 @@ export async function GET() {
         },
         body: JSON.stringify({
           model: "gpt-4o-realtime-preview-2024-12-17",
-          voice: "verse", // adjust voice settings as needed
+          voice: "alloy", // adjust voice settings as needed
         }),
       }
     );

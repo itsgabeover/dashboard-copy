@@ -14,10 +14,8 @@ import {
   AudioPlaybackState,
   TTSMetadata,
 } from "@/types/tts";
+import { PolicyDashboard } from "@/app/dashboard/page"
 
-interface PolicyData {
-  session_id: string
-}
 
 interface ChatInterfaceProps {
   messages: Array<{ role: "user" | "assistant"; content: string }>
@@ -29,7 +27,7 @@ interface ChatInterfaceProps {
   quickPrompts: string[]
   chatTitle: string
   chatSubtext?: string
-  policyData?: PolicyData
+  policyData?: PolicyDashboard | null;
   userEmail?: string
 }
 
@@ -49,7 +47,7 @@ const ChatInterface = ({
   quickPrompts,
   chatTitle,
   chatSubtext,
-  policyData = { session_id: "default" },
+  policyData,
   userEmail = "default@user.com",
 }: ChatInterfaceProps) => {
   // Refs
@@ -359,7 +357,7 @@ const ChatInterface = ({
         },
         body: JSON.stringify({
           content: messageToSend,
-          session_id: policyData.session_id,
+          session_id: policyData?.session_id,
         }),
       });
 
@@ -575,7 +573,7 @@ const ChatInterface = ({
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px] transition-all duration-300"
       >
-        {showRealtimeChat && <RealtimeVoiceChat />}
+        {showRealtimeChat && <RealtimeVoiceChat policyData={policyData ?? null} />}
         {messages.map((message, index) => (
           <div
             key={index}

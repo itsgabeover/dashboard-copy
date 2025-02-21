@@ -14,7 +14,7 @@ import { ChatInterface } from "@/components/chat-interface"
 import { MobileTabsNavigation } from "@/components/MobileTabsNavigation"
 import { MobileCardGrid } from "@/components/MobileCardGrid"
 
-interface PolicyDashboard {
+export interface PolicyDashboard {
   id: string
   policy_name: string
   created_at: string
@@ -225,6 +225,7 @@ export default function Dashboard() {
   const [isChatOpen, setIsChatOpen] = useState(false)
 
   const contentSectionRef = useRef<HTMLDivElement>(null)
+
 
   const loadPolicies = useCallback(async (email: string) => {
     try {
@@ -451,15 +452,24 @@ export default function Dashboard() {
           {policyData && policyData.analysis_data.data.policyOverview && (
             <>
               <h1 className="text-3xl font-bold mb-2 text-[rgb(82,102,255)]">
-                Your {policyData.analysis_data.data.policyOverview.productName || "Policy Overview"} Policy
+                Your{" "}
+                {policyData.analysis_data.data.policyOverview.productName ||
+                  "Policy Overview"}{" "}
+                Policy
               </h1>
-              <h2 className="text-xl text-gray-600">{policyData.analysis_data.data.policyOverview.issuer || ""}</h2>
+              <h2 className="text-xl text-gray-600">
+                {policyData.analysis_data.data.policyOverview.issuer || ""}
+              </h2>
             </>
           )}
         </header>
 
         <div className="md:hidden mb-4">
-          <MobileTabsNavigation tabs={tabStructure} activeTab={activeTab} onTabChange={setActiveTab} />
+          <MobileTabsNavigation
+            tabs={tabStructure}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -478,15 +488,23 @@ export default function Dashboard() {
           {tabStructure.map((tab) => (
             <TabsContent key={tab.id} value={tab.id} className="space-y-20">
               {/* Content Section (Area 1) */}
-              <div ref={contentSectionRef} className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <div
+                ref={contentSectionRef}
+                className="bg-white rounded-xl shadow-sm p-6 mb-6"
+              >
                 <div className="space-y-3">
                   {tab.sections.map((sectionId) => {
-                    const section = policyData?.analysis_data.data.sections[sectionId as keyof PolicySections]
+                    const section =
+                      policyData?.analysis_data.data.sections[
+                        sectionId as keyof PolicySections
+                      ];
                     return (
                       <div key={sectionId}>
-                        {isLoading || !section ? renderSkeletonContent() : renderSectionContent(section, tab)}
+                        {isLoading || !section
+                          ? renderSkeletonContent()
+                          : renderSectionContent(section, tab)}
                       </div>
-                    )
+                    );
                   })}
                 </div>
 
@@ -502,19 +520,23 @@ export default function Dashboard() {
                         variant="outline"
                         className="group flex items-center space-x-2 border-[rgb(82,102,255)] text-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)] hover:text-white transition-all duration-300"
                         onClick={() => {
-                          setIsChatOpen(!isChatOpen)
+                          setIsChatOpen(!isChatOpen);
                           if (!isChatOpen) {
                             setTimeout(() => {
-                              const chatElement = document.querySelector(".mt-6.pt-6.border-t")
+                              const chatElement = document.querySelector(
+                                ".mt-6.pt-6.border-t"
+                              );
                               if (chatElement) {
-                                const elementPosition = chatElement.getBoundingClientRect().top
-                                const offsetPosition = elementPosition + window.pageYOffset - 100
+                                const elementPosition =
+                                  chatElement.getBoundingClientRect().top;
+                                const offsetPosition =
+                                  elementPosition + window.pageYOffset - 100;
                                 window.scrollTo({
                                   top: offsetPosition,
                                   behavior: "smooth",
-                                })
+                                });
                               }
-                            }, 100)
+                            }, 100);
                           }
                         }}
                       >
@@ -549,11 +571,15 @@ export default function Dashboard() {
                         quickPrompts={tab.chatPrompts}
                         chatTitle={tab.chatTitle}
                         chatSubtext={tab.chatSubtext}
+                        policyData={policyData}
                       />
                       {/* Download Button */}
                       {policyData && (
                         <div className="mt-6 pt-4 border-t border-gray-200">
-                          <PDFDownloadButton sessionId={policyData.session_id} email={userEmail} />
+                          <PDFDownloadButton
+                            sessionId={policyData.session_id}
+                            email={userEmail}
+                          />
                         </div>
                       )}
                     </div>
@@ -565,6 +591,6 @@ export default function Dashboard() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
 
