@@ -135,14 +135,14 @@ export function useTTS() {
   return {
     isEnabled,
     isSpeaking,
-    setEnabled,
+    setEnabled: setIsEnabled,
     speak,
   };
 }
 
 // TTS Controller component that uses the above hook
 export function TTSController({ className = "" }: { className?: string }) {
-  // Only destructuring the variables that are used.
+  // Destructure the variables that are used.
   const { isEnabled, setEnabled } = useTTS();
 
   const toggleTTS = () => {
