@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, HelpCircle, ArrowUp } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { supabase } from "@/lib/supabase"
-import { ChatInterface } from "@/components/chat-interface"
+import ChatInterface from "@/components/chat-interface"
 import { MobileTabsNavigation } from "@/components/MobileTabsNavigation"
 import { MobileCardGrid } from "@/components/MobileCardGrid"
 

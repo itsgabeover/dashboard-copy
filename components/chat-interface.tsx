@@ -1,11 +1,13 @@
 "use client";
 
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, RefreshCw, MessageCircle, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
-import { useEffect, useRef, useState, useCallback } from "react";
 import VoiceButton from "./VoiceButton";
-import RealtimeVoiceChat from "./RealtimeVoiceChat"; // Import the realtime component
+import RealtimeVoiceChat from "./realtime/RealtimeVoiceChat";
+import { TranscriptProvider } from "@/components/realtime/TranscriptContext";
+import { EventProvider } from "./realtime/EventContext";
 import {
   WordTiming,
   TTSResponse,
@@ -35,7 +37,7 @@ interface ChatMessageProps {
   isCurrentlyPlaying?: boolean;
 }
 
-const ChatInterface = ({
+export default function ChatInterface({
   messages,
   inputMessage,
   isTyping,
@@ -47,8 +49,11 @@ const ChatInterface = ({
   chatSubtext,
   policyData,
   userEmail = "default@user.com",
-}: ChatInterfaceProps) => {
-  // Refs
+}: ChatInterfaceProps) {
+  // State that toggles whether the realtime panel is shown
+  const [showRealtimeChat, setShowRealtimeChat] = useState(false);
+
+  // Refs for old TTS chat
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const prevMessagesLengthRef = useRef(messages.length);
@@ -59,7 +64,7 @@ const ChatInterface = ({
   const animationFrameRef = useRef<number | null>(null);
   const audioPositionRef = useRef(0);
 
-  // State
+  // TTS states
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isAudioPaused, setIsAudioPaused] = useState(false);
   const [isTTSEnabled, setIsTTSEnabled] = useState(true);
@@ -74,18 +79,15 @@ const ChatInterface = ({
     currentTime: 0,
     duration: 0,
   });
-  const [showRealtimeChat, setShowRealtimeChat] = useState(false);
 
-  // Text display update function
+  // ========== TTS Functions (unchanged) ==========
   const updateDisplayText = useCallback(
     (currentTime: number) => {
       const timings = wordTimingsRef.current;
       if (!timings.length) return;
-
       let text = "";
       let updatedLastIndex = lastWordIndexRef.current;
       const elapsedTime = currentTime - startTimeRef.current;
-
       for (let i = 0; i < timings.length; i++) {
         const timing = timings[i];
         const adjustedStart =
@@ -97,12 +99,10 @@ const ChatInterface = ({
           break;
         }
       }
-
       if (updatedLastIndex > lastWordIndexRef.current) {
         lastWordIndexRef.current = updatedLastIndex;
         setDisplayText(text);
       }
-
       const lastTiming = timings[timings.length - 1];
       if (
         elapsedTime <
@@ -114,62 +114,47 @@ const ChatInterface = ({
           updateDisplayText(performance.now())
         );
       } else {
-        setDisplayText(currentSpeakingText); // Show full text when complete
+        setDisplayText(currentSpeakingText);
       }
     },
     [currentSpeakingText]
   );
 
-  // TTS handling
   const handleTextToSpeech = useCallback(async (text: string) => {
     try {
       if (!text.trim()) return;
-
-      // Reset state
       setCurrentSpeakingText(text);
       setDisplayText("");
       lastWordIndexRef.current = 0;
-
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
-
-      // Clear existing audio
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
-
       const response = await fetch("/api/text-to-speech", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text }),
       });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data: TTSResponse = await response.json();
       const { audio: audioBase64, timings, metadata } = data;
-
       setAudioMetadata(metadata);
-
       const audioBlob = new Blob([Buffer.from(audioBase64, "base64")], {
         type: "audio/mp3",
       });
       const audioUrl = URL.createObjectURL(audioBlob);
-
       const currentAudioRef = audioRef.current;
       if (currentAudioRef) {
         currentAudioRef.src = audioUrl;
         wordTimingsRef.current = timings;
-
-        // Add preload delay
         await new Promise((resolve) =>
           setTimeout(resolve, TTS_CONSTANTS.AUDIO_PRELOAD_DELAY)
         );
-
         try {
           await currentAudioRef.play();
           setPlaybackState((prev) => ({
@@ -194,7 +179,6 @@ const ChatInterface = ({
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
     const handlePlay = () => {
       setIsSpeaking(true);
       setIsAudioPaused(false);
@@ -203,7 +187,6 @@ const ChatInterface = ({
         updateDisplayText(performance.now())
       );
     };
-
     const handlePause = () => {
       if (!audio.ended) {
         setIsAudioPaused(true);
@@ -213,7 +196,6 @@ const ChatInterface = ({
         }
       }
     };
-
     const handleEnded = () => {
       setIsSpeaking(false);
       setIsAudioPaused(false);
@@ -229,19 +211,16 @@ const ChatInterface = ({
         currentTime: 0,
       }));
     };
-
     const handleTimeUpdate = () => {
       setPlaybackState((prev) => ({
         ...prev,
         currentTime: audio.currentTime,
       }));
     };
-
     audio.addEventListener("play", handlePlay);
     audio.addEventListener("pause", handlePause);
     audio.addEventListener("ended", handleEnded);
     audio.addEventListener("timeupdate", handleTimeUpdate);
-
     return () => {
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
@@ -250,7 +229,7 @@ const ChatInterface = ({
     };
   }, [currentSpeakingText, updateDisplayText]);
 
-  // Message scroll handling
+  // Scroll to bottom on new messages
   useEffect(() => {
     if (messages.length > prevMessagesLengthRef.current || isTyping) {
       if (messagesContainerRef.current && messagesEndRef.current) {
@@ -263,7 +242,7 @@ const ChatInterface = ({
     prevMessagesLengthRef.current = messages.length;
   }, [messages, isTyping]);
 
-  // Auto-play handling for new messages
+  // Auto TTS for new assistant messages
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     if (
@@ -276,7 +255,7 @@ const ChatInterface = ({
     }
   }, [messages, isTTSEnabled, handleTextToSpeech, isTyping]);
 
-  // Cleanup effect
+  // Cleanup
   useEffect(() => {
     return () => {
       const currentAudioRef = audioRef.current;
@@ -295,11 +274,10 @@ const ChatInterface = ({
     };
   }, []);
 
-  // Speech toggle handler
+  // TTS toggles
   const toggleSpeech = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || !isTTSEnabled) return;
-
     if (isSpeaking) {
       audio.pause();
     } else if (isAudioPaused && currentSpeakingText) {
@@ -316,7 +294,6 @@ const ChatInterface = ({
     handleTextToSpeech,
   ]);
 
-  // TTS toggle handler
   const handleTTSToggle = useCallback(() => {
     if (isTTSEnabled && isSpeaking) {
       const audio = audioRef.current;
@@ -335,15 +312,13 @@ const ChatInterface = ({
     setIsTTSEnabled(!isTTSEnabled);
   }, [isTTSEnabled, isSpeaking, currentSpeakingText]);
 
-  // Message handling
+  // Send text messages in old TTS chat
   const handleSendMessage = async (directMessage?: string) => {
     const messageToSend = directMessage || inputMessage.trim();
     if (!messageToSend) return;
-
     if (!directMessage) {
       onInputChange("");
     }
-
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
@@ -356,21 +331,16 @@ const ChatInterface = ({
           session_id: policyData?.session_id,
         }),
       });
-
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-
       const reader = response.body?.getReader();
       let assistantMessage = "";
-
       if (reader) {
         parentOnSendMessage(messageToSend);
-
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-
           const text = new TextDecoder().decode(value);
           assistantMessage += text;
           parentOnSendMessage(undefined, assistantMessage);
@@ -399,17 +369,17 @@ const ChatInterface = ({
     }
   };
 
-  // Text formatting
-  const formatContent = (text: string) => {
+  // Format text for TTS messages
+  function formatContent(text: string) {
     return text
       .replace(/^-(?=\S)/gm, "- ")
       .replace(/\n-/g, "\n\n-")
       .replace(/\*\*(\S+)\*\*/g, "**$1**")
       .replace(/\n\n+/g, "\n\n")
       .trim();
-  };
+  }
 
-  // Chat message component
+  // TTS chat message
   const SyncedChatMessage = ({
     role,
     content,
@@ -429,10 +399,8 @@ const ChatInterface = ({
         setStableDisplayText(content);
         return;
       }
-
       const currentLength = stableDisplayText.length;
       const prevLength = previousTextRef.current.length;
-
       if (
         currentLength > prevLength ||
         Math.abs(currentLength - prevLength) > 10
@@ -488,7 +456,7 @@ const ChatInterface = ({
     );
   };
 
-  // Typing indicator component
+  // Typing indicator for TTS chat
   const TypingIndicator = () => {
     return (
       <div className="flex items-center gap-1 text-gray-400 h-8 px-3">
@@ -498,7 +466,7 @@ const ChatInterface = ({
       </div>
     );
   };
-
+  // chat interface
   return (
     <div className="flex flex-col h-[800px] bg-white rounded-xl shadow-md">
       {/* Header */}
@@ -511,6 +479,7 @@ const ChatInterface = ({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Toggle for Realtime Chat */}
           <Button
             variant="outline"
             onClick={() => setShowRealtimeChat(!showRealtimeChat)}
@@ -518,6 +487,8 @@ const ChatInterface = ({
           >
             {showRealtimeChat ? "Close Realtime Chat" : "Open Realtime Chat"}
           </Button>
+
+          {/* TTS Controls */}
           <Button
             variant="outline"
             size="sm"
@@ -563,80 +534,87 @@ const ChatInterface = ({
         </div>
       </div>
 
-      {/* Realtime Voice Chat Panel */}
-      {showRealtimeChat && (
-        <div className="px-6 py-4 border-b border-gray-200">
-          <RealtimeVoiceChat policyData={policyData ?? null} />
+      {/* Conditionally show Realtime Chat or TTS chat */}
+      {showRealtimeChat ? (
+        // Realtime chat replaces TTS panel entirely
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <TranscriptProvider>
+            <EventProvider>
+              <RealtimeVoiceChat policyData={policyData ?? null} />
+            </EventProvider>
+          </TranscriptProvider>
         </div>
+      ) : (
+        <>
+          {/* TTS Messages Container */}
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px] transition-all duration-300"
+          >
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className="transition-all duration-300 transform"
+                style={{
+                  opacity: isTyping && index === messages.length - 1 ? 0.7 : 1,
+                }}
+              >
+                <SyncedChatMessage
+                  role={message.role}
+                  content={message.content}
+                  isCurrentlyPlaying={
+                    message.role === "assistant" &&
+                    message.content === currentSpeakingText &&
+                    isSpeaking
+                  }
+                />
+              </div>
+            ))}
+            {isTyping && <TypingIndicator />}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* TTS Input Area */}
+          <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto rounded-b-xl">
+            <div className="flex flex-wrap gap-2 mb-3">
+              {quickPrompts.map((prompt, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleQuickPrompt(prompt)}
+                  className="text-sm bg-white hover:bg-gray-50 border-gray-200"
+                >
+                  {prompt}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => onInputChange(e.target.value)}
+                placeholder="Type your message..."
+                className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white transition-all duration-200"
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+              />
+              <VoiceButton
+                onTranscript={handleVoiceTranscript}
+                disabled={isTyping}
+              />
+              <Button
+                onClick={() => handleSendMessage()}
+                disabled={isTyping}
+                className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </>
       )}
 
-      {/* Messages Container */}
-      <div
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-[500px] transition-all duration-300"
-      >
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className="transition-all duration-300 transform"
-            style={{
-              opacity: isTyping && index === messages.length - 1 ? 0.7 : 1,
-            }}
-          >
-            <SyncedChatMessage
-              role={message.role}
-              content={message.content}
-              isCurrentlyPlaying={
-                message.role === "assistant" &&
-                message.content === currentSpeakingText &&
-                isSpeaking
-              }
-            />
-          </div>
-        ))}
-        {isTyping && <TypingIndicator />}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input Area */}
-      <div className="p-4 pt-8 border-t border-gray-200 bg-gray-50 mt-auto rounded-b-xl">
-        <div className="flex flex-wrap gap-2 mb-3">
-          {quickPrompts.map((prompt, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickPrompt(prompt)}
-              className="text-sm bg-white hover:bg-gray-50 border-gray-200"
-            >
-              {prompt}
-            </Button>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => onInputChange(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[rgb(82,102,255)] focus:border-transparent bg-white transition-all duration-200"
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-          />
-          <VoiceButton
-            onTranscript={handleVoiceTranscript}
-            disabled={isTyping}
-          />
-          <Button
-            onClick={() => handleSendMessage()}
-            disabled={isTyping}
-            className="rounded-full bg-[rgb(82,102,255)] hover:bg-[rgb(82,102,255)]/90 text-white px-4 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Hidden audio element */}
+      {/* Hidden audio element for TTS */}
       <audio
         ref={audioRef}
         onEnded={() => setIsSpeaking(false)}
@@ -648,7 +626,4 @@ const ChatInterface = ({
       />
     </div>
   );
-};
-
-export type { ChatInterfaceProps };
-export { ChatInterface };
+}
