@@ -30,6 +30,11 @@ export default function RealtimeVoiceChat({
   const [selectedAgentConfigSet, setSelectedAgentConfigSet] = useState<
     AgentConfig[] | null
   >(null);
+  // --- Refs for WebRTC and Audio ---
+  const [dataChannel, setDataChannel] = useState<RTCDataChannel | null>(null);
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const dcRef = useRef<RTCDataChannel | null>(null);
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const [sessionStatus, setSessionStatus] =
     useState<SessionStatus>("DISCONNECTED");
   const [userText, setUserText] = useState("");
@@ -38,36 +43,57 @@ export default function RealtimeVoiceChat({
   const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] = useState(true);
   const [isEventsPaneExpanded, setIsEventsPaneExpanded] =
     useState<boolean>(false);
+  const [welcomeSent, setWelcomeSent] = useState(false);
 
   // --- Contexts ---
   const { transcriptItems, addTranscriptMessage, addTranscriptBreadcrumb } =
     useTranscript();
-  const { logClientEvent } = useEvent();
+  const { logClientEvent, logServerEvent } = useEvent();
+
+  interface ClientEvent {
+    type: string;
+    [key: string]: unknown;
+  }
+  const sendClientEvent = (eventObj: ClientEvent, eventNameSuffix = ""): void => {
+    if (dcRef.current && dcRef.current.readyState === "open") {
+      logClientEvent(eventObj, eventNameSuffix);
+      dcRef.current.send(JSON.stringify(eventObj));
+    } else {
+      logClientEvent(
+        { attemptedEvent: eventObj.type },
+        "error.data_channel_not_open"
+      );
+      console.error(
+        "Failed to send message - no data channel available",
+        eventObj
+      );
+    }
+  };
+
   // Then call the hook with all required parameters:
   const handleServerEventRef = useHandleServerEvent({
     setSessionStatus,
     selectedAgentName,
     selectedAgentConfigSet,
-    sendClientEvent: logClientEvent,
+    sendClientEvent,
     setSelectedAgentName,
   });
-  // --- Refs for WebRTC and Audio ---
-  const pcRef = useRef<RTCPeerConnection | null>(null);
-  const dataChannelRef = useRef<RTCDataChannel | null>(null);
-  const audioElementRef = useRef<HTMLAudioElement | null>(null);
 
   // --- Agent Config Initialization ---
   useEffect(() => {
-    let agentConfigKey = searchParams?.get("agentConfig");
-    if (!agentConfigKey || !allAgentSets[agentConfigKey]) {
-      agentConfigKey = defaultAgentSetKey;
+    let finalAgentConfig = searchParams.get("agentConfig");
+    if (!finalAgentConfig || !allAgentSets[finalAgentConfig]) {
+      finalAgentConfig = defaultAgentSetKey;
       const url = new URL(window.location.toString());
-      url.searchParams.set("agentConfig", agentConfigKey);
-      window.history.replaceState(null, "", url.toString());
+      url.searchParams.set("agentConfig", finalAgentConfig);
+      window.location.replace(url.toString());
+      return;
     }
-    const agents = allAgentSets[agentConfigKey];
-    const agentToUse = agents[0]?.name || "";
-    setSelectedAgentName(agentToUse);
+
+    const agents = allAgentSets[finalAgentConfig];
+    const agentKeyToUse = agents[0]?.name || "";
+
+    setSelectedAgentName(agentKeyToUse);
     setSelectedAgentConfigSet(agents);
   }, [searchParams]);
 
@@ -123,207 +149,262 @@ export default function RealtimeVoiceChat({
       const currentAgent = selectedAgentConfigSet.find(
         (a) => a.name === selectedAgentName
       );
-      addTranscriptBreadcrumb(
-        `Agent: ${selectedAgentName}`,
-        currentAgent as unknown as Record<string, unknown>
-      );
-      updateSession(true);
+      addTranscriptBreadcrumb(`Agent: ${selectedAgentName}`, currentAgent);
+      updateSession(false);
     }
   }, [selectedAgentConfigSet, selectedAgentName, sessionStatus]);
 
   // --- Update Session on PTT Toggle ---
   useEffect(() => {
     if (sessionStatus === "CONNECTED") {
-      updateSession();
+      console.log(
+        `updatingSession, isPTTACtive=${isPTTActive} sessionStatus=${sessionStatus}`
+      );
+      updateSession(false);
     }
   }, [isPTTActive]);
 
   // --- Fetch Ephemeral Key ---
   const fetchEphemeralKey = async (): Promise<string | null> => {
-    try {
-      const tokenRes = await fetch("/api/session");
-      if (!tokenRes.ok) throw new Error("Failed to fetch token");
-      const tokenData = await tokenRes.json();
-      return tokenData.client_secret.value;
-    } catch (err) {
-      console.error("Error fetching ephemeral key", err);
+    logClientEvent({ url: "/session" }, "fetch_session_token_request");
+    const tokenResponse = await fetch("/api/session");
+    const data = await tokenResponse.json();
+    logServerEvent(data, "fetch_session_token_response");
+
+    if (!data.client_secret?.value) {
+      logClientEvent(data, "error.no_ephemeral_key");
+      console.error("No ephemeral key provided by the server");
+      setSessionStatus("DISCONNECTED");
       return null;
     }
+
+    return data.client_secret.value;
   };
 
-  // --- Connect to Realtime Service ---
+  // Connect to Realtime
   const connectToRealtime = async () => {
     if (sessionStatus !== "DISCONNECTED") return;
     setSessionStatus("CONNECTING");
 
-    const EPHEMERAL_KEY = await fetchEphemeralKey();
-    if (!EPHEMERAL_KEY) {
-      setSessionStatus("DISCONNECTED");
-      return;
-    }
-
-    // Create or reuse an audio element (hidden in the DOM)
-    if (!audioElementRef.current) {
-      audioElementRef.current = document.createElement("audio");
-      audioElementRef.current.autoplay = true;
-      (
-        audioElementRef.current as HTMLMediaElement & { playsInline?: boolean }
-      ).playsInline = true;
-      audioElementRef.current.style.display = "none";
-      document.body.appendChild(audioElementRef.current);
-    }
-    audioElementRef.current.autoplay = isAudioPlaybackEnabled;
-
     try {
+      const EPHEMERAL_KEY = await fetchEphemeralKey();
+      if (!EPHEMERAL_KEY) {
+        return;
+      }
+
+      if (!audioElementRef.current) {
+        audioElementRef.current = document.createElement("audio");
+      }
+      audioElementRef.current.autoplay = isAudioPlaybackEnabled;
+
       const { pc, dc } = await createRealtimeConnection(
         EPHEMERAL_KEY,
         audioElementRef
       );
       pcRef.current = pc;
-      dataChannelRef.current = dc;
+      dcRef.current = dc;
 
       dc.addEventListener("open", () => {
-        logClientEvent({ type: "data_channel.open" });
-        setSessionStatus("CONNECTED");
-        // Immediately send the session update event with policy instructions.
-        updateSession(true);
+        logClientEvent({}, "data_channel.open");
       });
-      dc.addEventListener("message", (e: MessageEvent) => {
-        try {
-          const evtData = JSON.parse(e.data);
-          handleServerEventRef.current(evtData);
-
-          // Process AI text responses
-          if (evtData.type === "response.text.delta") {
-            const id = uuidv4();
-            addTranscriptMessage(id, "assistant", evtData.delta);
-          }
-          // Process user audio transcription events
-          if (evtData.type === "input.audio.transcription") {
-            const id = uuidv4();
-            addTranscriptMessage(id, "user", evtData.transcript || "");
-          }
-        } catch (error) {
-          console.error("Error parsing data channel message:", error);
-        }
+      dc.addEventListener("close", () => {
+        logClientEvent({}, "data_channel.close");
       });
-      dc.addEventListener("error", (err) => {
+      dc.addEventListener("error", (err: any) => {
         logClientEvent({ error: err }, "data_channel.error");
       });
+      dc.addEventListener("message", (e: MessageEvent) => {
+        handleServerEventRef.current(JSON.parse(e.data));
+      });
+
+      setDataChannel(dc);
     } catch (err) {
       console.error("Error connecting to realtime:", err);
       setSessionStatus("DISCONNECTED");
     }
   };
-
-  // --- Disconnect from Realtime Service ---
+  // disconnect from Realtime
   const disconnectFromRealtime = () => {
     if (pcRef.current) {
       pcRef.current.getSenders().forEach((sender) => {
-        if (sender.track) sender.track.stop();
+        if (sender.track) {
+          sender.track.stop();
+        }
       });
+
       pcRef.current.close();
       pcRef.current = null;
     }
-    if (dataChannelRef.current) {
-      dataChannelRef.current.close();
-      dataChannelRef.current = null;
-    }
+    setDataChannel(null);
     setSessionStatus("DISCONNECTED");
     setIsPTTUserSpeaking(false);
-    logClientEvent({ type: "disconnected" });
+
+    logClientEvent({}, "disconnected");
   };
 
   // --- Cancel In-Progress Assistant Speech ---
-  const cancelAssistantSpeech = () => {
-    const mostRecentAssistant = [...transcriptItems]
+  const cancelAssistantSpeech = async () => {
+    const mostRecentAssistantMessage = [...transcriptItems]
       .reverse()
       .find((item) => item.role === "assistant");
-    if (!mostRecentAssistant || mostRecentAssistant.status === "DONE") return;
-    if (
-      dataChannelRef.current &&
-      dataChannelRef.current.readyState === "open"
-    ) {
-      dataChannelRef.current.send(
-        JSON.stringify({
-          type: "conversation.item.truncate",
-          item_id: mostRecentAssistant.itemId,
-          content_index: 0,
-          audio_end_ms: Date.now() - mostRecentAssistant.createdAtMs,
-        })
-      );
-      dataChannelRef.current.send(JSON.stringify({ type: "response.cancel" }));
+
+    if (!mostRecentAssistantMessage) {
+      console.warn("can't cancel, no recent assistant message found");
+      return;
     }
+    if (mostRecentAssistantMessage.status === "DONE") {
+      console.log("No truncation needed, message is DONE");
+      return;
+    }
+
+    sendClientEvent({
+      type: "conversation.item.truncate",
+      item_id: mostRecentAssistantMessage?.itemId,
+      content_index: 0,
+      audio_end_ms: Date.now() - mostRecentAssistantMessage.createdAtMs,
+    });
+    sendClientEvent(
+      { type: "response.cancel" },
+      "(cancel due to user interruption)"
+    );
   };
 
   // --- Send User Text Message ---
   const handleSendMessage = () => {
-    if (
-      !userText.trim() ||
-      !dataChannelRef.current ||
-      sessionStatus !== "CONNECTED"
-    )
-      return;
+    if (!userText.trim()) return;
     cancelAssistantSpeech();
-    const id = uuidv4();
-    addTranscriptMessage(id, "user", userText.trim());
-    const conversationEvent = {
-      type: "conversation.item.create",
-      item: {
-        type: "message",
-        role: "user",
-        content: [{ type: "input_text", text: userText.trim() }],
+
+    sendClientEvent(
+      {
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: userText.trim() }],
+        },
       },
-    };
-    dataChannelRef.current.send(JSON.stringify(conversationEvent));
-    dataChannelRef.current.send(JSON.stringify({ type: "response.create" }));
+      "(send user text message)"
+    );
     setUserText("");
+
+    sendClientEvent({ type: "response.create" }, "trigger response");
   };
 
   // --- Push-to-Talk Handlers ---
   const handleTalkButtonDown = () => {
-    if (
-      sessionStatus !== "CONNECTED" ||
-      !dataChannelRef.current ||
-      dataChannelRef.current.readyState !== "open"
-    )
+    if (sessionStatus !== "CONNECTED" || dataChannel?.readyState !== "open")
       return;
     cancelAssistantSpeech();
+
     setIsPTTUserSpeaking(true);
-    dataChannelRef.current.send(
-      JSON.stringify({ type: "input_audio_buffer.clear" })
-    );
+    sendClientEvent({ type: "input_audio_buffer.clear" }, "clear PTT buffer");
   };
 
   const handleTalkButtonUp = () => {
     if (
       sessionStatus !== "CONNECTED" ||
-      !dataChannelRef.current ||
-      dataChannelRef.current.readyState !== "open" ||
+      dataChannel?.readyState !== "open" ||
       !isPTTUserSpeaking
     )
       return;
+
     setIsPTTUserSpeaking(false);
-    dataChannelRef.current.send(
-      JSON.stringify({ type: "input_audio_buffer.commit" })
-    );
-    dataChannelRef.current.send(JSON.stringify({ type: "response.create" }));
+    sendClientEvent({ type: "input_audio_buffer.commit" }, "commit PTT");
+    sendClientEvent({ type: "response.create" }, "trigger response PTT");
   };
+
+    // const handleAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    //   const newAgentConfig = e.target.value;
+    //   const url = new URL(window.location.toString());
+    //   url.searchParams.set("agentConfig", newAgentConfig);
+    //   window.location.replace(url.toString());
+    // };
+    //   const handleSelectedAgentChange = (
+    //     e: React.ChangeEvent<HTMLSelectElement>
+    //   ) => {
+    //     const newAgentName = e.target.value;
+    //     setSelectedAgentName(newAgentName);
+    //   };
+  useEffect(() => {
+    const storedPushToTalkUI = localStorage.getItem("pushToTalkUI");
+    if (storedPushToTalkUI) {
+      setIsPTTActive(storedPushToTalkUI === "true");
+    }
+    const storedLogsExpanded = localStorage.getItem("logsExpanded");
+    if (storedLogsExpanded) {
+      setIsEventsPaneExpanded(storedLogsExpanded === "true");
+    }
+    const storedAudioPlaybackEnabled = localStorage.getItem(
+      "audioPlaybackEnabled"
+    );
+    if (storedAudioPlaybackEnabled) {
+      setIsAudioPlaybackEnabled(storedAudioPlaybackEnabled === "true");
+    }
+  }, []);
+    useEffect(() => {
+      localStorage.setItem("pushToTalkUI", isPTTActive.toString());
+    }, [isPTTActive]);
+
+    useEffect(() => {
+      localStorage.setItem("logsExpanded", isEventsPaneExpanded.toString());
+    }, [isEventsPaneExpanded]);
+
+    useEffect(() => {
+      localStorage.setItem(
+        "audioPlaybackEnabled",
+        isAudioPlaybackEnabled.toString()
+      );
+    }, [isAudioPlaybackEnabled]);
+
+    useEffect(() => {
+      if (audioElementRef.current) {
+        if (isAudioPlaybackEnabled) {
+          audioElementRef.current.play().catch((err) => {
+            console.warn("Autoplay may be blocked by browser:", err);
+          });
+        } else {
+          audioElementRef.current.pause();
+        }
+      }
+    }, [isAudioPlaybackEnabled]);
+
+    //const agentSetKey = searchParams.get("agentConfig") || "default";
 
   // --- Session Update ---
   // This event sends instructions including transcription configuration.
-  const updateSession = (shouldTriggerResponse: boolean = true) => {
-    if (!dataChannelRef.current || dataChannelRef.current.readyState !== "open")
-      return;
 
+  const sendSimulatedUserMessage = (text: string) => {
+    const id = uuidv4().slice(0, 32);
+    addTranscriptMessage(id, "user", text, true);
+
+    sendClientEvent(
+      {
+        type: "conversation.item.create",
+        item: {
+          id,
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text }],
+        },
+      },
+      "(simulated user text message)"
+    );
+    sendClientEvent(
+      { type: "response.create" },
+      "(trigger response after simulated user text message)"
+    );
+  };
+  const updateSession = (shouldTriggerResponse: boolean = false) => {
     // Clear any buffered audio
-    dataChannelRef.current.send(
-      JSON.stringify({ type: "input_audio_buffer.clear" })
+    sendClientEvent(
+      { type: "input_audio_buffer.clear" },
+      "clear audio buffer on session update"
     );
 
     const currentAgent = selectedAgentConfigSet?.find(
       (a) => a.name === selectedAgentName
     );
+
     const turnDetection = isPTTActive
       ? null
       : {
@@ -338,9 +419,10 @@ export default function RealtimeVoiceChat({
       type: "session.update",
       session: {
         modalities: ["text", "audio"],
-        instructions: ("Answer any questions the user has about their policy. Here are the policy details for reference:" + (policyData
-          ? generateInstructionsFromPolicy(policyData)
-          : "")),
+        instructions:
+          "Answer any questions the user has about their policy. Start by saying: what would you like to know about your policy?" +
+          "Here are the policy details for reference:" +
+          (policyData ? generateInstructionsFromPolicy(policyData) : ""),
         voice: "alloy",
         input_audio_format: "pcm16",
         output_audio_format: "pcm16",
@@ -350,13 +432,10 @@ export default function RealtimeVoiceChat({
       },
     };
 
-    dataChannelRef.current.send(JSON.stringify(sessionUpdateEvent));
-
-    if (shouldTriggerResponse) {
-      // Optionally trigger a simulated user message to initiate a response
-      const simulatedId = uuidv4();
-      addTranscriptMessage(simulatedId, "user", "hi", true);
-      dataChannelRef.current.send(JSON.stringify({ type: "response.create" }));
+    sendClientEvent(sessionUpdateEvent, "session.update");
+    if (shouldTriggerResponse && !welcomeSent) {
+      sendSimulatedUserMessage("hi");
+      setWelcomeSent(true);
     }
   };
 
@@ -421,7 +500,7 @@ export default function RealtimeVoiceChat({
           onSendMessage={handleSendMessage}
           canSend={
             sessionStatus === "CONNECTED" &&
-            dataChannelRef.current?.readyState === "open"
+            dcRef.current?.readyState === "open"
           }
         />
       </div>

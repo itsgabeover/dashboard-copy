@@ -4,13 +4,16 @@ import { ServerEvent, SessionStatus, AgentConfig } from "@/types/realtime";
 import { useTranscript } from "./TranscriptContext";
 import { useEvent } from "./EventContext";
 import { useRef } from "react";
-
+  interface ClientEvent {
+    type: string;
+    [key: string]: unknown;
+  }
 export interface UseHandleServerEventParams {
   setSessionStatus: (status: SessionStatus) => void;
   selectedAgentName: string;
   selectedAgentConfigSet: AgentConfig[] | null;
   sendClientEvent: (
-    eventObj: Record<string, unknown>,
+    eventObj: ClientEvent,
     eventNameSuffix?: string
   ) => void;
   setSelectedAgentName: (name: string) => void;
