@@ -19,7 +19,7 @@ function Transcript({
   onSendMessage,
   canSend,
 }: TranscriptProps) {
-  const { transcriptItems, toggleTranscriptItemExpand } = useTranscript();
+  const { transcriptItems} = useTranscript();
   const transcriptRef = useRef<HTMLDivElement | null>(null);
   const [prevLogs, setPrevLogs] = useState<TranscriptItem[]>([]);
   const [justCopied, setJustCopied] = useState(false);
@@ -68,7 +68,7 @@ function Transcript({
   return (
     <div className="flex flex-col flex-1 bg-white rounded-md shadow-sm border border-gray-200">
       {/* copy button and message list */}
-      <div className="relative flex-1 min-h-0 overflow-y-auto ">
+      <div className="relative flex-1 min-h-0 overflow-y-auto mt-32">
         <button
           onClick={handleCopyTranscript}
           className="absolute top-2 right-2 z-10 text-xs px-2 py-1 rounded-full bg-gray-200 hover:bg-gray-300"
@@ -87,7 +87,6 @@ function Transcript({
                 type,
                 role,
                 data,
-                expanded,
                 timestamp,
                 title = "",
                 isHidden,

@@ -8,7 +8,7 @@ type TranscriptContextValue = {
   transcriptItems: TranscriptItem[];
   addTranscriptMessage: (itemId: string, role: "user" | "assistant", text: string, hidden?: boolean) => void;
   updateTranscriptMessage: (itemId: string, text: string, isDelta: boolean) => void;
-  addTranscriptBreadcrumb: (title: string, data?: Record<string, any>) => void;
+  addTranscriptBreadcrumb: (title: string, data?: Record<string, unknown>) => void;
   toggleTranscriptItemExpand: (itemId: string) => void;
   updateTranscriptItemStatus: (itemId: string, newStatus: "IN_PROGRESS" | "DONE") => void;
 };

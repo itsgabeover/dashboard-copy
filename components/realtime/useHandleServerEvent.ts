@@ -9,7 +9,10 @@ export interface UseHandleServerEventParams {
   setSessionStatus: (status: SessionStatus) => void;
   selectedAgentName: string;
   selectedAgentConfigSet: AgentConfig[] | null;
-  sendClientEvent: (eventObj: any, eventNameSuffix?: string) => void;
+  sendClientEvent: (
+    eventObj: Record<string, unknown>,
+    eventNameSuffix?: string
+  ) => void;
   setSelectedAgentName: (name: string) => void;
   shouldForceResponse?: boolean;
 }
@@ -36,7 +39,11 @@ export function useHandleServerEvent({
     call_id?: string;
     arguments: string;
   }) => {
-    const args = JSON.parse(functionCallParams.arguments);
+    // Parse the arguments as an object. Cast to a Record to be safe.
+    const args = JSON.parse(functionCallParams.arguments) as Record<
+      string,
+      unknown
+    >;
     const currentAgent = selectedAgentConfigSet?.find(
       (a) => a.name === selectedAgentName
     );
@@ -45,10 +52,12 @@ export function useHandleServerEvent({
 
     if (currentAgent?.toolLogic?.[functionCallParams.name]) {
       const fn = currentAgent.toolLogic[functionCallParams.name];
+      // Call the tool logic function with args and the transcript items
       const fnResult = await fn(args, transcriptItems);
+      // Cast the result to a Record in case it isn't already one.
       addTranscriptBreadcrumb(
         `function call result: ${functionCallParams.name}`,
-        fnResult
+        fnResult as Record<string, unknown>
       );
 
       sendClientEvent({
@@ -61,9 +70,12 @@ export function useHandleServerEvent({
       });
       sendClientEvent({ type: "response.create" });
     } else if (functionCallParams.name === "transferAgents") {
-      const destinationAgent = args.destination_agent;
+      // We assume args has a property "destination_agent"
+      const destinationAgent = (args as { destination_agent: string })
+        .destination_agent;
       const newAgentConfig =
-        selectedAgentConfigSet?.find((a) => a.name === destinationAgent) || null;
+        selectedAgentConfigSet?.find((a) => a.name === destinationAgent) ||
+        null;
       if (newAgentConfig) {
         setSelectedAgentName(destinationAgent);
       }
@@ -103,7 +115,7 @@ export function useHandleServerEvent({
   };
 
   const handleServerEvent = (serverEvent: ServerEvent) => {
-    logServerEvent(serverEvent);
+    logServerEvent(serverEvent as unknown as Record<string, unknown>);
 
     switch (serverEvent.type) {
       case "session.created": {
@@ -168,11 +180,14 @@ export function useHandleServerEvent({
               outputItem.name &&
               outputItem.arguments
             ) {
-              handleFunctionCall({
-                name: outputItem.name,
-                call_id: outputItem.call_id,
-                arguments: outputItem.arguments,
-              });
+handleFunctionCall({
+  name: outputItem.name,
+  call_id: outputItem.call_id,
+  arguments:
+    typeof outputItem.arguments === "string"
+      ? outputItem.arguments
+      : JSON.stringify(outputItem.arguments),
+});
             }
           });
         }
@@ -193,6 +208,7 @@ export function useHandleServerEvent({
   };
 
   const handleServerEventRef = useRef(handleServerEvent);
+  // Update the ref to always have the latest version
   handleServerEventRef.current = handleServerEvent;
 
   return handleServerEventRef;
