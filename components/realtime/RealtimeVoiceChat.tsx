@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import Transcript from "./Transcript";
 import BottomToolbar from "./BottomToolbar";
+import Events from "./Events";
 import { PolicyDashboard } from "@/app/dashboard/page";
 import { useTranscript } from "./TranscriptContext";
 import { useEvent } from "./EventContext";
@@ -81,6 +82,7 @@ export default function RealtimeVoiceChat({
 
   // --- Agent Config Initialization ---
   useEffect(() => {
+    if (!searchParams) return;
     let finalAgentConfig = searchParams.get("agentConfig");
     if (!finalAgentConfig || !allAgentSets[finalAgentConfig]) {
       finalAgentConfig = defaultAgentSetKey;
@@ -149,7 +151,10 @@ export default function RealtimeVoiceChat({
       const currentAgent = selectedAgentConfigSet.find(
         (a) => a.name === selectedAgentName
       );
-      addTranscriptBreadcrumb(`Agent: ${selectedAgentName}`, currentAgent);
+      addTranscriptBreadcrumb(
+        `Agent: ${selectedAgentName}`,
+        currentAgent as unknown as Record<string, unknown>
+      );
       updateSession(false);
     }
   }, [selectedAgentConfigSet, selectedAgentName, sessionStatus]);
@@ -160,7 +165,7 @@ export default function RealtimeVoiceChat({
       console.log(
         `updatingSession, isPTTACtive=${isPTTActive} sessionStatus=${sessionStatus}`
       );
-      updateSession(false);
+      updateSession(true);
     }
   }, [isPTTActive]);
 
@@ -206,11 +211,12 @@ export default function RealtimeVoiceChat({
 
       dc.addEventListener("open", () => {
         logClientEvent({}, "data_channel.open");
+        sendSimulatedUserMessage("hi");
       });
       dc.addEventListener("close", () => {
         logClientEvent({}, "data_channel.close");
       });
-      dc.addEventListener("error", (err: any) => {
+      dc.addEventListener("error", (err: Event) => {
         logClientEvent({ error: err }, "data_channel.error");
       });
       dc.addEventListener("message", (e: MessageEvent) => {
@@ -432,7 +438,7 @@ export default function RealtimeVoiceChat({
       },
     };
 
-    sendClientEvent(sessionUpdateEvent, "session.update");
+    sendClientEvent(sessionUpdateEvent);
     if (shouldTriggerResponse && !welcomeSent) {
       sendSimulatedUserMessage("hi");
       setWelcomeSent(true);
@@ -453,10 +459,10 @@ export default function RealtimeVoiceChat({
   }, [isAudioPlaybackEnabled]);
 
   // --- Connect on Mount and Clean Up on Unmount ---
-  useEffect(() => {
-    connectToRealtime();
-    return () => disconnectFromRealtime();
-  }, []);
+  // useEffect(() => {
+  //   connectToRealtime();
+  //   return () => disconnectFromRealtime();
+  // }, []);
 
   // --- Hidden Agent UI ---
   // This keeps the agent-changing functionality in place but hides it from the user.
@@ -479,17 +485,7 @@ export default function RealtimeVoiceChat({
   );
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100 text-gray-800">
-      {/* Header */}
-      <div className="p-5 text-lg font-semibold flex justify-between items-center">
-        <div>Realtime Voice Chat</div>
-        <button
-          onClick={disconnectFromRealtime}
-          className="text-sm text-red-500"
-        >
-          Disconnect
-        </button>
-      </div>
+    <div className="flex flex-col h-full bg-gray-100 text-gray-800">
       {/* Hidden Agent UI */}
       {hiddenAgentUI}
       {/* Main Content: Transcript */}
@@ -524,6 +520,7 @@ export default function RealtimeVoiceChat({
         isEventsPaneExpanded={isEventsPaneExpanded}
         setIsEventsPaneExpanded={setIsEventsPaneExpanded}
       />
+      <Events isExpanded={isEventsPaneExpanded} />
     </div>
   );
 }

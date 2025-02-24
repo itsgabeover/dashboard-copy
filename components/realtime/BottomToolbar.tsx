@@ -59,7 +59,7 @@ function BottomToolbar({
         {getConnectionButtonLabel()}
       </button>
 
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-2 hidden">
         <input
           id="push-to-talk"
           type="checkbox"
@@ -101,7 +101,7 @@ function BottomToolbar({
         </label>
       </div>
 
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-2 hidden">
         <input
           id="logs"
           type="checkbox"
