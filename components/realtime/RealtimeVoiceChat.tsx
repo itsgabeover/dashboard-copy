@@ -489,18 +489,6 @@ export default function RealtimeVoiceChat({
       {/* Hidden Agent UI */}
       {hiddenAgentUI}
       {/* Main Content: Transcript */}
-      <div className="flex flex-1 overflow-hidden">
-        <Transcript
-          userText={userText}
-          setUserText={setUserText}
-          onSendMessage={handleSendMessage}
-          canSend={
-            sessionStatus === "CONNECTED" &&
-            dcRef.current?.readyState === "open"
-          }
-        />
-      </div>
-      {/* Bottom Toolbar */}
       <BottomToolbar
         sessionStatus={sessionStatus}
         onToggleConnection={() => {
@@ -520,6 +508,19 @@ export default function RealtimeVoiceChat({
         isEventsPaneExpanded={isEventsPaneExpanded}
         setIsEventsPaneExpanded={setIsEventsPaneExpanded}
       />
+      <div className="flex flex-1 overflow-hidden">
+        <Transcript
+          userText={userText}
+          setUserText={setUserText}
+          onSendMessage={handleSendMessage}
+          canSend={
+            sessionStatus === "CONNECTED" &&
+            dcRef.current?.readyState === "open"
+          }
+        />
+      </div>
+      {/* Bottom Toolbar */}
+
       <Events isExpanded={isEventsPaneExpanded} />
     </div>
   );
